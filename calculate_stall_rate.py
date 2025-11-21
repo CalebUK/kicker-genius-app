@@ -304,12 +304,3 @@ def run_analysis():
 
 if __name__ == "__main__":
     run_analysis()
-```
-
-### Next Steps
-
-1.  **Commit and Push:** Please commit and push this *clean* Python file to GitHub immediately.
-    ```bash
-    git add calculate_stall_rate.py
-    git commit -m "Fix: Removed all non-code documentation/syntax errors from the end of Python file."
-    git push origin main
