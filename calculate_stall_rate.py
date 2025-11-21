@@ -213,8 +213,8 @@ def run_analysis():
     # 3. Opponent Stats (Join on opponent)
     # FIXED: Changed 'team' to 'opponent' for the right_on key in def_pa and def_share merges
     final = pd.merge(final, def_stall, left_on='opponent', right_on='defteam', how='left')
-    final = pd.merge(final, def_pa, on='opponent', how='left')      # def_pa now has 'opponent' column
-    final = pd.merge(final, def_share, on='opponent', how='left')   # def_share now has 'opponent' column
+    final = pd.merge(final, def_pa, on='opponent', how='left')
+    final = pd.merge(final, def_share, on='opponent', how='left')
     
     final = final.fillna(0)
 
@@ -255,8 +255,9 @@ def run_analysis():
         s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
         def_cap = w_def_allowed * (s_def * 1.2)
         
-        final_cap = min(off_cap, def_cap)
-        proj = round(min(base_proj, final_cap), 1) if final_cap > 1.0 else round(base_proj, 1)
+        # Final Weighted Projection
+        weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
+        proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
         
         return pd.Series({
             'grade': grade,
@@ -293,10 +294,10 @@ def run_analysis():
         "ytd": ytd_sorted.head(30).to_dict(orient='records')
     }
     
-    with open("kicker_data.json", "w") as f:
+    with open("public/kicker_data.json", "w") as f:
         json.dump(output, f, indent=2)
     
-    print(f"✅ Success! Data saved to kicker_data.json")
+    print(f"✅ Success! Data saved to public/kicker_data.json")
 
 if __name__ == "__main__":
     run_analysis()
