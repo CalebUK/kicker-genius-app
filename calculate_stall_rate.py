@@ -308,8 +308,8 @@ if __name__ == "__main__":
 
 ### Next Steps
 
-1.  **Commit and Push:** You must commit and push this corrected Python file to GitHub.
+1.  **Commit and Push:** Please commit and push this *corrected* Python file to GitHub immediately.
     ```bash
-    git add .
-    git commit -m "Fix: Removed non-code documentation causing SyntaxError in GitHub Action."
+    git add calculate_stall_rate.py
+    git commit -m "Fix: Removed non-code documentation causing SyntaxError at end of Python file. Action should now execute."
     git push origin main
