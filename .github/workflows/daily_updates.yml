@@ -1,0 +1,34 @@
+name: Daily Kicker Data Update
+
+on:
+  schedule:
+    # Runs at 12:00 UTC (which is 7 AM or 8 AM in Winnersh depending on DST)
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Allows you to click "Run Now" manually
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install nflreadpy pandas requests
+
+      - name: Run Analysis Script
+        run: python calculate_stall_rate.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "KickerGenius Bot"
+          git config --global user.email "bot@kickergenius.com"
+          git add kicker_data.json
+          git commit -m "Daily Data Update: $(date)" || echo "No changes to commit"
+          git push

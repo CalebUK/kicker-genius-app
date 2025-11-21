@@ -1,0 +1,13 @@
+Python Environment
+
+venv/
+pycache/
+
+Large Data Files (Locally generated)
+
+kicker_data.json
+
+Operating System Files
+
+.DS_Store
+Thumbs.db
