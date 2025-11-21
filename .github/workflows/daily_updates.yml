@@ -10,6 +10,8 @@ jobs:
   update-data:
     runs-on: ubuntu-latest
     timeout-minutes: 10 # Set a generous timeout for the entire job
+    permissions:
+      contents: write # IMPORTANT: Give the workflow permission to commit back to the repo
 
     steps:
       - name: 1. Checkout Repository
@@ -23,11 +25,11 @@ jobs:
       - name: 3. Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: 4. Create Public Data Directory
+      - name: 4. Create Public Data Directory (Ensure lowercase)
+        # This creates the directory if it doesn't exist, guaranteeing 'public' case
         run: mkdir -p public
 
       - name: 5. Run Analysis Script (Writes directly to public/kicker_data.json)
-        # We run the script using a specific Python command to ensure it executes correctly
         run: python calculate_stall_rate.py
         
       - name: 6. Commit and Push Changes
@@ -35,7 +37,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Data Bot Update: Week ${{ github.event.inputs.week }} Kicker Projections"
-          # FIX: Renamed 'files' to 'file_pattern' to match action syntax
           file_pattern: 'public/kicker_data.json'
           commit_user_name: KickerGenius Bot
           commit_user_email: bot@kickergenius.com
