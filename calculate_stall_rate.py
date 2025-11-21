@@ -45,7 +45,6 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     
     lat, lon = coords
     try:
-        # FIX: Removed the incorrect markdown link brackets from the URL string
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
         data = requests.get(url, timeout=10).json()
         target = game_dt_str.replace(" ", "T")[:13]
@@ -307,14 +306,10 @@ if __name__ == "__main__":
     run_analysis()
 ```
 
-The action is stuck because of a simple syntax issue in the weather URL. I have corrected the URL in `calculate_stall_rate.py` and provided the corrected version above.
+### Next Steps
 
-You are experiencing a hang because the Python script cannot resolve the API URL (due to the bad markdown link syntax) and is stuck inside a failed request that isn't being caught immediately, causing the action to stall.
-
-### The Fix
-
-1.  **Commit the Updated Files:** Please commit the corrected `calculate_stall_rate.py` and the corrected `daily_update.yml` (from my previous response) to GitHub.
+1.  **Commit and Push:** You must commit and push this corrected Python file to GitHub.
     ```bash
     git add .
-    git commit -m "Fix: Corrected API URL and fixed GitHub Action syntax for file_pattern."
+    git commit -m "Fix: Removed non-code documentation causing SyntaxError in GitHub Action."
     git push origin main
