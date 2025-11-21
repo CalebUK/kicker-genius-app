@@ -45,8 +45,9 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     
     lat, lon = coords
     try:
+        # Added timeout=10 here to prevent script from hanging indefinitely
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-        data = requests.get(url).json()
+        data = requests.get(url, timeout=10).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
         match_index = -1
@@ -66,7 +67,11 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         elif wind > 15: cond += " 🌬️"
         else: cond += " ☀️"
         return wind, cond
-    except:
+    
+    # Catch timeout errors specifically
+    except requests.exceptions.Timeout:
+        return 0, "Timeout"
+    except Exception:
         return 0, "API Error"
 
 def run_analysis():
@@ -197,21 +202,19 @@ def run_analysis():
     model['is_dome'] = model['roof'].isin(['dome', 'closed'])
     
     print("🌤️ Fetching Weather...")
+    # NOTE: Requests library must be installed for this to work
+    import requests 
     model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
     model['wind'] = model['weather_data'].apply(lambda x: x[0])
     model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
     # Merge All Stats
-    # 1. Stats + Matchups (Join on team)
     final = pd.merge(stats, model, on='team', how='inner')
     
-    # 2. Team Stats (Join on team)
     final = pd.merge(final, off_stall, left_on='team', right_on='posteam', how='left')
     final = pd.merge(final, off_ppg, on='team', how='left')
     final = pd.merge(final, off_share, on='team', how='left')
     
-    # 3. Opponent Stats (Join on opponent)
-    # FIXED: Changed 'team' to 'opponent' for the right_on key in def_pa and def_share merges
     final = pd.merge(final, def_stall, left_on='opponent', right_on='defteam', how='left')
     final = pd.merge(final, def_pa, on='opponent', how='left')
     final = pd.merge(final, def_share, on='opponent', how='left')
@@ -230,10 +233,12 @@ def run_analysis():
         if row['is_dome']: 
             bonus_val += 10; bonuses.append("+10 Dome")
         else:
-            if row['wind'] > 15: bonus_val -= 10; bonuses.append("-10 Heavy Wind")
-            elif row['wind'] > 10: bonus_val -= 5; bonuses.append("-5 Wind")
-            if "🌨️" in row['weather_desc']: bonus_val -= 10; bonuses.append("-10 Snow")
-            elif "🌧️" in row['weather_desc']: bonus_val -= 5; bonuses.append("-5 Rain")
+            wind = row['wind']
+            weather_desc = row['weather_desc']
+            if wind > 15: bonus_val -= 10; bonuses.append("-10 Heavy Wind")
+            elif wind > 10: bonus_val -= 5; bonuses.append("-5 Wind")
+            if "🌨️" in weather_desc: bonus_val -= 10; bonuses.append("-10 Snow")
+            elif "🌧️" in weather_desc: bonus_val -= 5; bonuses.append("-5 Rain")
             
         if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
         if abs(row['spread_line']) < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
@@ -301,3 +306,15 @@ def run_analysis():
 
 if __name__ == "__main__":
     run_analysis()
+```
+
+#### Step 4: Final Git Commands
+
+1.  **Commit the Code Fixes:**
+    ```bash
+    git add .
+    git commit -m "Fix: Added requests import and API timeouts to prevent hang in GitHub Actions."
+    ```
+2.  **Push to GitHub:**
+    ```bash
+    git push origin main
