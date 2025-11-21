@@ -9,35 +9,34 @@ on:
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    timeout-minutes: 10 # Set a generous timeout for the entire job
+
     steps:
       - name: 1. Checkout Repository
         uses: actions/checkout@v3
 
-      - name: 2. Set up Python Environment
+      - name: 2. Set up Python Environment (3.10)
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10' # Stable version for data science libraries
+          python-version: '3.10'
 
       - name: 3. Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: 4. Create Public Data Directory (Ensures path exists for Python)
+      - name: 4. Create Public Data Directory
         run: mkdir -p public
 
       - name: 5. Run Analysis Script (Writes directly to public/kicker_data.json)
+        # We run the script using a specific Python command to ensure it executes correctly
         run: python calculate_stall_rate.py
         
-      - name: 6. Configure Git for Commit
-        run: |
-          git config --global user.name "KickerGenius Bot"
-          git config --global user.email "bot@kickergenius.com"
-
-      - name: 7. Commit and Push Changes
+      - name: 6. Commit and Push Changes
         # This step commits the new JSON file and pushes it back to the repo
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Data Bot Update: Week ${{ github.event.inputs.week }} Kicker Projections"
-          files: public/kicker_data.json
+          # FIX: Renamed 'files' to 'file_pattern' to match action syntax
+          file_pattern: 'public/kicker_data.json'
           commit_user_name: KickerGenius Bot
           commit_user_email: bot@kickergenius.com
           branch: main

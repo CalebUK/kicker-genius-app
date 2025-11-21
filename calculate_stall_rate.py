@@ -45,8 +45,8 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     
     lat, lon = coords
     try:
-        # Added timeout=10 here to prevent script from hanging indefinitely
-        url = f"[https://api.open-meteo.com/v1/forecast?latitude=](https://api.open-meteo.com/v1/forecast?latitude=){lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
+        # FIX: Removed the incorrect markdown link brackets from the URL string
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
         data = requests.get(url, timeout=10).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
@@ -202,8 +202,7 @@ def run_analysis():
     model['is_dome'] = model['roof'].isin(['dome', 'closed'])
     
     print("🌤️ Fetching Weather...")
-    # NOTE: Requests library must be installed for this to work
-    import requests 
+    
     model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
     model['wind'] = model['weather_data'].apply(lambda x: x[0])
     model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
@@ -306,3 +305,16 @@ def run_analysis():
 
 if __name__ == "__main__":
     run_analysis()
+```
+
+The action is stuck because of a simple syntax issue in the weather URL. I have corrected the URL in `calculate_stall_rate.py` and provided the corrected version above.
+
+You are experiencing a hang because the Python script cannot resolve the API URL (due to the bad markdown link syntax) and is stuck inside a failed request that isn't being caught immediately, causing the action to stall.
+
+### The Fix
+
+1.  **Commit the Updated Files:** Please commit the corrected `calculate_stall_rate.py` and the corrected `daily_update.yml` (from my previous response) to GitHub.
+    ```bash
+    git add .
+    git commit -m "Fix: Corrected API URL and fixed GitHub Action syntax for file_pattern."
+    git push origin main
