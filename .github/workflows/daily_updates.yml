@@ -11,11 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10 # Set a generous timeout for the entire job
     permissions:
-      contents: write # IMPORTANT: Give the workflow permission to commit back to the repo
+      contents: write # 1. IMPORTANT: Grant permission for the entire job
 
     steps:
-      - name: 1. Checkout Repository
-        uses: actions/checkout@v3
+      - name: 1. Checkout Repository (With Write Permissions)
+        # 2. FIX: Explicitly set write permissions during checkout
+        uses: actions/checkout@v4 
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }} # Use the token provided by GitHub Actions for committing
 
       - name: 2. Set up Python Environment (3.10)
         uses: actions/setup-python@v4
@@ -26,14 +29,12 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: 4. Create Public Data Directory (Ensure lowercase)
-        # This creates the directory if it doesn't exist, guaranteeing 'public' case
         run: mkdir -p public
 
       - name: 5. Run Analysis Script (Writes directly to public/kicker_data.json)
         run: python calculate_stall_rate.py
         
       - name: 6. Commit and Push Changes
-        # This step commits the new JSON file and pushes it back to the repo
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Data Bot Update: Week ${{ github.event.inputs.week }} Kicker Projections"
