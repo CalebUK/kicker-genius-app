@@ -267,6 +267,7 @@ def run_analysis():
 
     # --- 4. CALCULATION ENGINE ---
     def process_row(row):
+        # A. Grade Calculation
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
         def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
         
@@ -289,11 +290,14 @@ def run_analysis():
         
         grade = round(off_score + def_score + bonus_val, 1)
         
+        # B. Projection Calculation
         base_proj = row['avg_pts'] * (grade / 90)
         
-        weighted_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
+        # Weighted Scores (FIXED variable name here: w_team_score)
+        w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
         w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
+        # Caps
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
         s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
