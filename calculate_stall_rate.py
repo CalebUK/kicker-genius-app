@@ -46,16 +46,20 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     lat, lon = coords
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-        data = requests.get(url, timeout=5).json() # 5s timeout for speed
+        data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
+        match_index = -1
+        for i, t in enumerate(times):
+            if t.startswith(target):
+                match_index = i
+                break
         
-        if idx == -1: return 0, "No Data"
+        if match_index == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
+        wind = data['hourly']['wind_speed_10m'][match_index]
+        precip = data['hourly']['precipitation_probability'][match_index]
+        temp = data['hourly']['temperature_2m'][match_index]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -69,16 +73,40 @@ def run_analysis():
     target_week = get_current_nfl_week()
     print(f"🚀 Starting Analysis for Week {target_week}...")
     
-    # Load All Data Sources
+    # Load Data
     pbp = nfl.load_pbp(seasons=[CURRENT_SEASON])
     schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
-    players = nfl.load_players() # For headshots
-    injuries = nfl.load_injuries(seasons=[CURRENT_SEASON]) # For status
+    players = nfl.load_players()
     
+    # --- ROBUST INJURY ENGINE ---
+    print("🏥 Fetching Injury & Roster Data...")
+    
+    # 1. Attempt to load Detailed Injury Report (Questionable/Doubtful/Out)
+    try:
+        injuries = nfl.load_injuries(seasons=[CURRENT_SEASON])
+        if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
+        # Filter for current week only
+        current_injuries = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
+    except Exception:
+        print(f"⚠️ Detailed Injury Report not found for {CURRENT_SEASON}. Falling back to Roster Status.")
+        current_injuries = pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status'])
+
+    # 2. Load Live Roster Data (Daily Updates for IR/Suspensions)
+    try:
+        rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
+        if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
+        
+        # Filter for players NOT active (IR, PUP, SUS, etc)
+        # 'status' column usually contains: ACT, RES, NON, SUS, UDF, etc.
+        inactive_roster = rosters[rosters['status'] != 'ACT'][['gsis_id', 'status']].copy()
+        inactive_roster.rename(columns={'status': 'roster_status'}, inplace=True)
+    except Exception:
+        print("⚠️ Could not load Roster data.")
+        inactive_roster = pd.DataFrame(columns=['gsis_id', 'roster_status'])
+
     if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
     if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
     if hasattr(players, "to_pandas"): players = players.to_pandas()
-    if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
 
     # --- 1. KICKER STATS ---
     kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
@@ -93,11 +121,9 @@ def run_analysis():
     kick_plays['is_50'] = (kick_plays['kick_distance'] >= 50) & (kick_plays['field_goal_result'] == 'made')
     kick_plays['is_dome'] = kick_plays['roof'].isin(['dome', 'closed'])
     
-    # Filter for 25-yard line (True Red Zone)
     rz_drives = pbp[(pbp['yardline_100'] <= 25) & (pbp['yardline_100'].notnull())][['game_id', 'drive', 'posteam']].drop_duplicates()
     rz_counts = rz_drives.groupby('posteam').size().reset_index(name='rz_trips')
 
-    # Need kicker_player_id for joining headshots
     stats = kick_plays.groupby(['kicker_player_name', 'kicker_player_id']).agg(
         team=('posteam', 'last'),
         fpts=('fantasy_pts', 'sum'),
@@ -115,39 +141,43 @@ def run_analysis():
     stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
     # --- JOIN HEADSHOTS ---
-    # Use gsis_id from players table matching kicker_player_id from pbp
     player_map = players[['gsis_id', 'headshot_url']].rename(columns={'gsis_id': 'kicker_player_id'})
     stats = pd.merge(stats, player_map, on='kicker_player_id', how='left')
-    # Fallback image if missing
     stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
 
-    # --- JOIN INJURIES ---
-    # Filter for target week
-    current_injuries = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
+    # --- MERGE INJURY LAYERS ---
+    # 1. Merge Detailed Report
     current_injuries = current_injuries.rename(columns={'gsis_id': 'kicker_player_id'})
-    
     stats = pd.merge(stats, current_injuries, on='kicker_player_id', how='left')
+    
+    # 2. Merge Roster Status (The Safety Net)
+    inactive_roster = inactive_roster.rename(columns={'gsis_id': 'kicker_player_id'})
+    stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
     
     # Logic for Injury Status Display
     def get_injury_meta(row):
-        status = row['report_status']
+        # Priority 1: Roster Status (IR/SUS is definitive)
+        roster_st = str(row['roster_status']) if pd.notna(row['roster_status']) else ""
+        if roster_st and roster_st != 'ACT':
+             return "OUT", "red-700", f"Roster: {roster_st}"
+
+        # Priority 2: Weekly Injury Report
+        report_st = row['report_status']
         practice = row['practice_status']
         
-        if pd.isna(status):
-            return "Healthy", "green", "No Report"
+        if pd.isna(report_st):
+            return "Healthy", "green", "Active"
         
-        status = str(status).lower()
-        
-        if "out" in status or "ir" in status:
+        report_st = str(report_st).lower()
+        if "out" in report_st or "ir" in report_st:
             return "OUT", "red-700", f"{row['report_status']} ({practice})"
-        elif "doubtful" in status:
+        elif "doubtful" in report_st:
             return "Doubtful", "red-400", f"{row['report_status']} ({practice})"
-        elif "questionable" in status:
+        elif "questionable" in report_st:
             return "Questionable", "yellow-500", f"{row['report_status']} ({practice})"
         else:
             return "Healthy", "green", "Active"
 
-    # Apply meta calculation
     injury_meta = stats.apply(get_injury_meta, axis=1)
     stats['injury_status'] = [x[0] for x in injury_meta]
     stats['injury_color'] = [x[1] for x in injury_meta]
@@ -223,7 +253,6 @@ def run_analysis():
     model['is_dome'] = model['roof'].isin(['dome', 'closed'])
     
     print("🌤️ Fetching Weather...")
-    import requests 
     model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
     model['wind'] = model['weather_data'].apply(lambda x: x[0])
     model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
@@ -249,10 +278,12 @@ def run_analysis():
         if row['is_dome']: 
             bonus_val += 10; bonuses.append("+10 Dome")
         else:
-            if row['wind'] > 15: bonus_val -= 10; bonuses.append("-10 Heavy Wind")
-            elif row['wind'] > 10: bonus_val -= 5; bonuses.append("-5 Wind")
-            if "🌨️" in row['weather_desc']: bonus_val -= 10; bonuses.append("-10 Snow")
-            elif "🌧️" in row['weather_desc']: bonus_val -= 5; bonuses.append("-5 Rain")
+            wind = row['wind']
+            weather_desc = row['weather_desc']
+            if wind > 15: bonus_val -= 10; bonuses.append("-10 Heavy Wind")
+            elif wind > 10: bonus_val -= 5; bonuses.append("-5 Wind")
+            if "🌨️" in weather_desc: bonus_val -= 10; bonuses.append("-10 Snow")
+            elif "🌧️" in weather_desc: bonus_val -= 5; bonuses.append("-5 Rain")
             
         if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
         if abs(row['spread_line']) < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
@@ -262,7 +293,6 @@ def run_analysis():
         
         base_proj = row['avg_pts'] * (grade / 90)
         
-        # Projection Logic
         weighted_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
         w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
@@ -297,7 +327,6 @@ def run_analysis():
     final = final.sort_values('proj', ascending=False)
     ytd_sorted = stats.sort_values('fpts', ascending=False)
     
-    # Injury Report List
     injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False)
 
     output = {
@@ -324,3 +353,12 @@ def run_analysis():
 
 if __name__ == "__main__":
     run_analysis()
+```
+
+### Final Steps
+
+1.  **Commit and Push:** Send this robust script to GitHub.
+    ```bash
+    git add calculate_stall_rate.py
+    git commit -m "Feature: Added Roster fallback for injuries and robust error handling."
+    git push origin main
