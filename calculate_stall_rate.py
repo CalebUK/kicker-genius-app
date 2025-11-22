@@ -49,17 +49,13 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        match_index = -1
-        for i, t in enumerate(times):
-            if t.startswith(target):
-                match_index = i
-                break
+        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
         
-        if match_index == -1: return 0, "No Data"
+        if idx == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][match_index]
-        precip = data['hourly']['precipitation_probability'][match_index]
-        temp = data['hourly']['temperature_2m'][match_index]
+        wind = data['hourly']['wind_speed_10m'][idx]
+        precip = data['hourly']['precipitation_probability'][idx]
+        temp = data['hourly']['temperature_2m'][idx]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -85,7 +81,8 @@ def run_analysis():
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
         current_injuries = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
     except Exception as e:
-        print(f"⚠️ Detailed Injury Report not found. Falling back to Roster Status.")
+        print(f"⚠️ Detailed Injury Report not found for {CURRENT_SEASON}. Falling back to Roster Status.")
+        injuries = pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'week'])
         current_injuries = pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status'])
 
     try:
@@ -133,8 +130,13 @@ def run_analysis():
     stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
     stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-    # --- JOIN HEADSHOTS ---
-    headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
+    # --- JOIN HEADSHOTS (SAFE MODE) ---
+    headshot_col = None
+    if 'headshot_url' in players.columns:
+        headshot_col = 'headshot_url'
+    elif 'headshot' in players.columns:
+        headshot_col = 'headshot'
+    
     if headshot_col:
         player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
         stats = pd.merge(stats, player_map, on='kicker_player_id', how='left')
@@ -252,6 +254,7 @@ def run_analysis():
 
     # --- 4. CALCULATION ENGINE ---
     def process_row(row):
+        # A. Grade Calculation
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
         def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
         
@@ -274,11 +277,15 @@ def run_analysis():
         
         grade = round(off_score + def_score + bonus_val, 1)
         
+        # B. Projection Calculation
         base_proj = row['avg_pts'] * (grade / 90)
         
-        weighted_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
+        # Weighted Scores
+        # FIX: Variable name matched to usage 'w_team_score'
+        w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
         w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
+        # Caps
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
         s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
