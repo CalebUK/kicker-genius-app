@@ -49,17 +49,13 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        match_index = -1
-        for i, t in enumerate(times):
-            if t.startswith(target):
-                match_index = i
-                break
+        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
         
-        if match_index == -1: return 0, "No Data"
+        if idx == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][match_index]
-        precip = data['hourly']['precipitation_probability'][match_index]
-        temp = data['hourly']['temperature_2m'][match_index]
+        wind = data['hourly']['wind_speed_10m'][idx]
+        precip = data['hourly']['precipitation_probability'][idx]
+        temp = data['hourly']['temperature_2m'][idx]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -70,66 +66,38 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         return 0, "API Error"
 
 def scrape_cbs_injuries():
-    """
-    Scrapes CBS Sports Injury Report page with fuzzy column matching.
-    """
     print("   🌐 Scraping CBS Sports for live injury data...")
     url = "https://www.cbssports.com/nfl/injuries/"
     headers = {'User-Agent': 'Mozilla/5.0'}
-    
     try:
         response = requests.get(url, headers=headers)
         dfs = pd.read_html(response.text)
         if not dfs: return pd.DataFrame()
-        
         combined = pd.concat(dfs, ignore_index=True)
-        
-        # Clean columns: lowercase and strip whitespace
         combined.columns = [c.lower().strip() for c in combined.columns]
-        
-        # Fuzzy Column Rename (Handle 'Game Status' vs 'Status')
         col_map = {}
         for col in combined.columns:
-            c_low = col.lower()
-            if 'player' in c_low:
-                col_map[col] = 'full_name'
-            # Priority: 'status' usually captures 'Injury Status' or 'Game Status'
-            elif 'status' in c_low:
-                col_map[col] = 'report_status'
-            # Secondary: 'injury' captures the body part info (used for practice_status field)
-            elif 'injury' in c_low:
-                col_map[col] = 'practice_status'
-            
+            if 'player' in col: col_map[col] = 'full_name'
+            elif 'status' in col: col_map[col] = 'report_status'
+            elif 'injury' in col: col_map[col] = 'practice_status'
         combined.rename(columns=col_map, inplace=True)
         
-        # Verify we have what we need
-        if 'full_name' not in combined.columns:
-            return pd.DataFrame()
+        if 'full_name' not in combined.columns: return pd.DataFrame()
+        if 'report_status' not in combined.columns: combined['report_status'] = 'Questionable'
+        if 'practice_status' not in combined.columns: combined['practice_status'] = 'Unknown'
 
-        if 'report_status' not in combined.columns:
-             combined['report_status'] = 'Questionable' 
-
-        if 'practice_status' not in combined.columns:
-             combined['practice_status'] = 'Unknown'
-
-        # Clean Name
         def clean_name(val):
             if not isinstance(val, str): return val
             return val.split(' (')[0].strip()
-
         combined['full_name'] = combined['full_name'].apply(clean_name)
         combined['gsis_id'] = None 
-        
         return combined[['full_name', 'report_status', 'practice_status']]
-
     except Exception as e:
         print(f"   ⚠️ Scraping failed: {e}")
         return pd.DataFrame()
 
 def load_injury_data_safe(season, target_week):
     print("🏥 Fetching Injury Data...")
-    
-    # Attempt 1: Standard Library
     try:
         injuries = nfl.load_injuries(seasons=[season])
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
@@ -139,7 +107,6 @@ def load_injury_data_safe(season, target_week):
     except Exception:
         pass
 
-    # Attempt 2: Direct CSV
     try:
         url = f"https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_{season}.csv"
         injuries = pd.read_csv(url)
@@ -149,7 +116,6 @@ def load_injury_data_safe(season, target_week):
     except Exception:
         pass
 
-    # Attempt 3: Web Scrape
     scraped_data = scrape_cbs_injuries()
     if not scraped_data.empty:
         print("   ✅ Loaded via Web Scrape")
@@ -168,17 +134,15 @@ def run_analysis():
     
     injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
 
-    # 2. Load Roster Data (Safety Net)
     try:
         rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
         if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
-        
         if rosters.empty:
              rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
              if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
 
-        # Keep all statuses to check later
-        inactive_roster = rosters[['gsis_id', 'status']].copy()
+        inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
+        inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
         inactive_roster.rename(columns={'status': 'roster_status'}, inplace=True)
     except Exception:
         print("⚠️ Could not load Roster data.")
@@ -188,14 +152,28 @@ def run_analysis():
     if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
     if hasattr(players, "to_pandas"): players = players.to_pandas()
 
-    # --- KICKER STATS ---
+    # --- 1. KICKER STATS (FIXED POINTS CALC) ---
     kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
     kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
     
+    # Updated Scoring Logic: Result FIRST
     def calc_pts(row):
+        # Field Goals
         if row['play_type'] == 'field_goal':
-            return 5 if row['kick_distance'] >= 50 else 4 if row['kick_distance'] >= 40 else 3 if row['field_goal_result'] == 'made' else -1
-        return 1 if row['extra_point_result'] == 'good' else -1
+            if row['field_goal_result'] == 'made':
+                if row['kick_distance'] >= 50: return 5
+                elif row['kick_distance'] >= 40: return 4
+                else: return 3
+            else:
+                # Missed FG is -1
+                return -1
+        
+        # Extra Points
+        elif row['play_type'] == 'extra_point':
+            if row['extra_point_result'] == 'good': return 1
+            else: return -1 # Missed XP is -1
+            
+        return 0
     
     kick_plays['fantasy_pts'] = kick_plays.apply(calc_pts, axis=1)
     kick_plays['is_50'] = (kick_plays['kick_distance'] >= 50) & (kick_plays['field_goal_result'] == 'made')
@@ -220,7 +198,7 @@ def run_analysis():
     stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
     stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-    # JOIN HEADSHOTS
+    # HEADSHOTS
     headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
     if headshot_col:
         player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
@@ -229,14 +207,13 @@ def run_analysis():
         stats['headshot_url'] = None
     stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
 
-    # --- MERGE INJURIES (Advanced) ---
+    # MERGE INJURIES
     if 'full_name' in injury_report.columns:
         name_map = players[['gsis_id', 'display_name']].rename(columns={'gsis_id': 'kicker_player_id', 'display_name': 'full_name_official'})
         stats = pd.merge(stats, name_map, on='kicker_player_id', how='left')
         injury_report = injury_report.rename(columns={'full_name': 'full_name_official'})
         injury_report = injury_report.drop_duplicates(subset=['full_name_official'])
         stats = pd.merge(stats, injury_report, on='full_name_official', how='left')
-    
     elif 'gsis_id' in injury_report.columns:
         injury_report = injury_report.rename(columns={'gsis_id': 'kicker_player_id'})
         stats = pd.merge(stats, injury_report, on='kicker_player_id', how='left')
@@ -244,26 +221,22 @@ def run_analysis():
         stats['report_status'] = None
         stats['practice_status'] = None
 
-    # Merge Roster Status
-    inactive_roster = inactive_roster.rename(columns={'gsis_id': 'kicker_player_id'})
     stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
     
     def get_injury_meta(row):
         roster_st = str(row['roster_status']) if pd.notna(row['roster_status']) else ""
         
-        # 1. Official Roster Overrides
         if roster_st in ['RES', 'NON', 'SUS', 'PUP']: 
              return "OUT", "red-700", f"Roster: {roster_st}"
-        
+        if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']:
+             return "CUT", "red-700", "Released"
         if roster_st == 'DEV':
              return "Practice Squad", "yellow-500", "Roster: Practice Squad"
 
-        # 2. Injury Report
         report_st = row['report_status']
         practice = row['practice_status']
         
         if pd.isna(report_st):
-            # Fallback: If we have no injury report but roster says something other than ACT
             if roster_st and roster_st != 'ACT' and roster_st != 'nan':
                  return roster_st, "gray-400", f"Roster: {roster_st}"
             return "Healthy", "green", "Active"
@@ -400,11 +373,14 @@ def run_analysis():
         weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
         proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
         
-        # --- INJURY OVERRIDE ---
-        if row['injury_status'] == 'OUT' or row['injury_status'] == 'Practice Squad':
+        if row['injury_status'] == 'OUT':
             proj = 0.0
             grade = 0.0
             bonuses.append("⛔ INJURY (OUT)")
+        if row['injury_status'] == 'CUT':
+            proj = 0.0
+            grade = 0.0
+            bonuses.append("⛔ RELEASED")
 
         return pd.Series({
             'grade': grade,
@@ -421,7 +397,6 @@ def run_analysis():
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
     
-    # REPLACING np.nan with None (null) to fix JSON export
     final = final.replace({np.nan: None})
     ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
     
