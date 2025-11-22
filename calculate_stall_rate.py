@@ -353,11 +353,3 @@ def run_analysis():
 
 if __name__ == "__main__":
     run_analysis()
-
-### Final Steps
-
-1.  **Commit and Push:** Send this robust script to GitHub.
-    ```bash
-    git add calculate_stall_rate.py
-    git commit -m "Feature: Added Roster fallback for injuries and robust error handling."
-    git push origin main
