@@ -130,7 +130,7 @@ const App = () => {
 
   // --- LIVE DATA FETCH ---
   useEffect(() => {
-    fetch('./kicker_data.json')
+    fetch('/kicker_data.json')
       .then(response => {
         if (!response.ok) {
           throw new Error("Failed to load data file");
