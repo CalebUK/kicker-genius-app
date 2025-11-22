@@ -49,13 +49,17 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
+        match_index = -1
+        for i, t in enumerate(times):
+            if t.startswith(target):
+                match_index = i
+                break
         
-        if idx == -1: return 0, "No Data"
+        if match_index == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
+        wind = data['hourly']['wind_speed_10m'][match_index]
+        precip = data['hourly']['precipitation_probability'][match_index]
+        temp = data['hourly']['temperature_2m'][match_index]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -74,13 +78,13 @@ def run_analysis():
     schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
     players = nfl.load_players()
     
-    # --- ROBUST INJURY ENGINE ---
+    # --- SAFE INJURY LOADING ---
     print("🏥 Fetching Injury & Roster Data...")
     try:
         injuries = nfl.load_injuries(seasons=[CURRENT_SEASON])
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
         current_injuries = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
-    except Exception:
+    except Exception as e:
         print(f"⚠️ Detailed Injury Report not found. Falling back to Roster Status.")
         current_injuries = pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status'])
 
@@ -248,7 +252,6 @@ def run_analysis():
 
     # --- 4. CALCULATION ENGINE ---
     def process_row(row):
-        # A. Grade Calculation
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
         def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
         
@@ -271,14 +274,11 @@ def run_analysis():
         
         grade = round(off_score + def_score + bonus_val, 1)
         
-        # B. Projection Calculation
         base_proj = row['avg_pts'] * (grade / 90)
         
-        # Weighted Scores
-        w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
+        weighted_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
         w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
-        # Caps
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
         s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
@@ -288,7 +288,6 @@ def run_analysis():
         weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
         proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
         
-        # --- INJURY OVERRIDE ---
         if row['injury_status'] == 'OUT':
             proj = 0.0
             grade = 0.0
@@ -308,9 +307,12 @@ def run_analysis():
 
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
-    ytd_sorted = stats.sort_values('fpts', ascending=False)
     
-    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False)
+    # REPLACING np.nan with None (null) to fix JSON export
+    final = final.replace({np.nan: None})
+    ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
+    
+    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace({np.nan: None})
 
     output = {
         "meta": {
