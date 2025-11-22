@@ -76,14 +76,12 @@ def run_analysis():
     
     # --- ROBUST INJURY ENGINE ---
     print("🏥 Fetching Injury & Roster Data...")
-    
     try:
         injuries = nfl.load_injuries(seasons=[CURRENT_SEASON])
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
         current_injuries = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
-    except Exception as e:
-        print(f"⚠️ Detailed Injury Report not found for {CURRENT_SEASON}. Falling back to Roster Status.")
-        injuries = pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'week'])
+    except Exception:
+        print(f"⚠️ Detailed Injury Report not found. Falling back to Roster Status.")
         current_injuries = pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status'])
 
     try:
@@ -131,52 +129,34 @@ def run_analysis():
     stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
     stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-    # --- JOIN HEADSHOTS (SAFE MODE) ---
-    # Determine which column holds the image url (it changes in different library versions)
-    headshot_col = None
-    if 'headshot_url' in players.columns:
-        headshot_col = 'headshot_url'
-    elif 'headshot' in players.columns:
-        headshot_col = 'headshot'
-    
+    # --- JOIN HEADSHOTS ---
+    headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
     if headshot_col:
         player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
         stats = pd.merge(stats, player_map, on='kicker_player_id', how='left')
     else:
         stats['headshot_url'] = None
+    stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
 
-    # Fill missing or N/A headshots with default
-    default_img = "https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png"
-    stats['headshot_url'] = stats['headshot_url'].fillna(default_img)
-
-    # --- MERGE INJURY LAYERS ---
-    # 1. Merge Detailed Report
+    # --- MERGE INJURIES ---
     current_injuries = current_injuries.rename(columns={'gsis_id': 'kicker_player_id'})
     stats = pd.merge(stats, current_injuries, on='kicker_player_id', how='left')
-    
-    # 2. Merge Roster Status (The Safety Net)
     inactive_roster = inactive_roster.rename(columns={'gsis_id': 'kicker_player_id'})
     stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
     
     def get_injury_meta(row):
         roster_st = str(row['roster_status']) if pd.notna(row['roster_status']) else ""
-        if roster_st and roster_st != 'ACT':
-             return "OUT", "red-700", f"Roster: {roster_st}"
-
+        if roster_st and roster_st != 'ACT': return "OUT", "red-700", f"Roster: {roster_st}"
+        
         report_st = row['report_status']
         practice = row['practice_status']
-        
         if pd.isna(report_st): return "Healthy", "green", "Active"
         
         report_st = str(report_st).lower()
-        if "out" in report_st or "ir" in report_st:
-            return "OUT", "red-700", f"{row['report_status']} ({practice})"
-        elif "doubtful" in report_st:
-            return "Doubtful", "red-400", f"{row['report_status']} ({practice})"
-        elif "questionable" in report_st:
-            return "Questionable", "yellow-500", f"{row['report_status']} ({practice})"
-        else:
-            return "Healthy", "green", "Active"
+        if "out" in report_st or "ir" in report_st: return "OUT", "red-700", f"{row['report_status']} ({practice})"
+        elif "doubtful" in report_st: return "Doubtful", "red-400", f"{row['report_status']} ({practice})"
+        elif "questionable" in report_st: return "Questionable", "yellow-500", f"{row['report_status']} ({practice})"
+        else: return "Healthy", "green", "Active"
 
     injury_meta = stats.apply(get_injury_meta, axis=1)
     stats['injury_status'] = [x[0] for x in injury_meta]
@@ -209,6 +189,7 @@ def run_analysis():
     lg_off_avg = off_stall['off_stall_rate'].mean()
     lg_def_avg = def_stall['def_stall_rate'].mean()
 
+    # Scoring & Share (L4)
     completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
     home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
     away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
@@ -267,6 +248,7 @@ def run_analysis():
 
     # --- 4. CALCULATION ENGINE ---
     def process_row(row):
+        # A. Grade Calculation
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
         def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
         
@@ -289,11 +271,14 @@ def run_analysis():
         
         grade = round(off_score + def_score + bonus_val, 1)
         
+        # B. Projection Calculation
         base_proj = row['avg_pts'] * (grade / 90)
         
-        weighted_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
+        # Weighted Scores
+        w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
         w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
+        # Caps
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
         s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
@@ -303,6 +288,7 @@ def run_analysis():
         weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
         proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
         
+        # --- INJURY OVERRIDE ---
         if row['injury_status'] == 'OUT':
             proj = 0.0
             grade = 0.0
