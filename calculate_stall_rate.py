@@ -65,26 +65,44 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     except:
         return 0, "API Error"
 
+def load_injury_data_safe(season, target_week):
+    """
+    Attempts to load injury data from multiple sources to avoid 404 errors.
+    """
+    print("🏥 Fetching Injury Data (Triple-Check Mode)...")
+    
+    # Attempt 1: Standard Library (Parquet)
+    try:
+        injuries = nfl.load_injuries(seasons=[season])
+        if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
+        print("   ✅ Loaded Injury Report via nflreadpy")
+        return injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']]
+    except Exception:
+        print("   ⚠️ Standard load failed. Trying direct CSV download...")
+
+    # Attempt 2: Direct CSV Download (Backup Source)
+    try:
+        url = f"https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_{season}.csv"
+        injuries = pd.read_csv(url)
+        print("   ✅ Loaded Injury Report via Direct CSV")
+        return injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']]
+    except Exception:
+        print("   ⚠️ Direct CSV failed. Detailed injury report unavailable.")
+    
+    return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status'])
+
 def run_analysis():
     target_week = get_current_nfl_week()
     print(f"🚀 Starting Analysis for Week {target_week}...")
     
-    # Load Data
     pbp = nfl.load_pbp(seasons=[CURRENT_SEASON])
     schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
     players = nfl.load_players()
     
-    # --- SAFE INJURY LOADING ---
-    print("🏥 Fetching Injury & Roster Data...")
-    try:
-        injuries = nfl.load_injuries(seasons=[CURRENT_SEASON])
-        if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
-        current_injuries = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
-    except Exception as e:
-        print(f"⚠️ Detailed Injury Report not found for {CURRENT_SEASON}. Falling back to Roster Status.")
-        injuries = pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'week'])
-        current_injuries = pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status'])
+    # Load Injuries using new safe function
+    current_injuries = load_injury_data_safe(CURRENT_SEASON, target_week)
 
+    # Load Roster (Safety Net)
     try:
         rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
         if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
@@ -130,13 +148,8 @@ def run_analysis():
     stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
     stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-    # --- JOIN HEADSHOTS (SAFE MODE) ---
-    headshot_col = None
-    if 'headshot_url' in players.columns:
-        headshot_col = 'headshot_url'
-    elif 'headshot' in players.columns:
-        headshot_col = 'headshot'
-    
+    # --- JOIN HEADSHOTS ---
+    headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
     if headshot_col:
         player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
         stats = pd.merge(stats, player_map, on='kicker_player_id', how='left')
@@ -254,7 +267,6 @@ def run_analysis():
 
     # --- 4. CALCULATION ENGINE ---
     def process_row(row):
-        # A. Grade Calculation
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
         def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
         
@@ -277,15 +289,11 @@ def run_analysis():
         
         grade = round(off_score + def_score + bonus_val, 1)
         
-        # B. Projection Calculation
         base_proj = row['avg_pts'] * (grade / 90)
         
-        # Weighted Scores
-        # FIX: Variable name matched to usage 'w_team_score'
-        w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
+        weighted_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
         w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
-        # Caps
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
         s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
@@ -315,7 +323,6 @@ def run_analysis():
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
     
-    # REPLACING np.nan with None (null) to fix JSON export
     final = final.replace({np.nan: None})
     ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
     
