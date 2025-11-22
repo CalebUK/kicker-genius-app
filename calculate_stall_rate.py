@@ -80,15 +80,34 @@ def scrape_cbs_injuries():
         
         combined = pd.concat(dfs, ignore_index=True)
         
+        # Clean columns: lowercase and strip whitespace
+        combined.columns = [c.lower().strip() for c in combined.columns]
+        
         # Fuzzy Column Rename (Handle 'Game Status' vs 'Status')
         col_map = {}
         for col in combined.columns:
-            if 'player' in col.lower(): col_map[col] = 'full_name'
-            if 'status' in col.lower(): col_map[col] = 'report_status'
-            if 'injury' in col.lower(): col_map[col] = 'practice_status'
+            c_low = col.lower()
+            if 'player' in c_low:
+                col_map[col] = 'full_name'
+            # Priority: 'status' usually captures 'Injury Status' or 'Game Status'
+            elif 'status' in c_low:
+                col_map[col] = 'report_status'
+            # Secondary: 'injury' captures the body part info (used for practice_status field)
+            elif 'injury' in c_low:
+                col_map[col] = 'practice_status'
             
         combined.rename(columns=col_map, inplace=True)
         
+        # Verify we have what we need
+        if 'full_name' not in combined.columns:
+            return pd.DataFrame()
+
+        if 'report_status' not in combined.columns:
+             combined['report_status'] = 'Questionable' 
+
+        if 'practice_status' not in combined.columns:
+             combined['practice_status'] = 'Unknown'
+
         # Clean Name
         def clean_name(val):
             if not isinstance(val, str): return val
@@ -97,6 +116,7 @@ def scrape_cbs_injuries():
         combined['full_name'] = combined['full_name'].apply(clean_name)
         combined['gsis_id'] = None 
         
+        print(f"   ✅ Scraped {len(combined)} injury records.")
         return combined[['full_name', 'report_status', 'practice_status']]
 
     except Exception as e:
@@ -328,7 +348,6 @@ def run_analysis():
 
     # --- 4. CALCULATION ENGINE ---
     def process_row(row):
-        # A. Grade Calculation
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
         def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
         
@@ -351,14 +370,11 @@ def run_analysis():
         
         grade = round(off_score + def_score + bonus_val, 1)
         
-        # B. Projection Calculation
         base_proj = row['avg_pts'] * (grade / 90)
         
-        # Weighted Scores - FIXED Variable Names
         w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
         w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
-        # Caps
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
         s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
@@ -388,7 +404,6 @@ def run_analysis():
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
     
-    # REPLACING np.nan with None (null) to fix JSON export
     final = final.replace({np.nan: None})
     ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
     
