@@ -49,17 +49,13 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        match_index = -1
-        for i, t in enumerate(times):
-            if t.startswith(target):
-                match_index = i
-                break
+        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
         
-        if match_index == -1: return 0, "No Data"
+        if idx == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][match_index]
-        precip = data['hourly']['precipitation_probability'][match_index]
-        temp = data['hourly']['temperature_2m'][match_index]
+        wind = data['hourly']['wind_speed_10m'][idx]
+        precip = data['hourly']['precipitation_probability'][idx]
+        temp = data['hourly']['temperature_2m'][idx]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -93,16 +89,6 @@ def scrape_cbs_injuries():
             
         combined.rename(columns=col_map, inplace=True)
         
-        # Verify we have what we need
-        if 'full_name' not in combined.columns:
-            return pd.DataFrame()
-
-        if 'report_status' not in combined.columns:
-             combined['report_status'] = 'Questionable' # Default if column missing
-
-        if 'practice_status' not in combined.columns:
-             combined['practice_status'] = 'Unknown'
-
         # Clean Name
         def clean_name(val):
             if not isinstance(val, str): return val
@@ -160,20 +146,18 @@ def run_analysis():
     injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
 
     # 2. Load Roster Data (Safety Net)
-    # Try 2025 first, fallback to 2024 if empty (common issue in transition)
     try:
         rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
         if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
         
         if rosters.empty:
-             # Fallback to last season if current is empty
              rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
              if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
 
         inactive_roster = rosters[rosters['status'].isin(['RES', 'NON', 'SUS', 'PUP'])][['gsis_id', 'status']].copy()
         inactive_roster.rename(columns={'status': 'roster_status'}, inplace=True)
-    except Exception as e:
-        print(f"⚠️ Could not load Roster data: {e}")
+    except Exception:
+        print("⚠️ Could not load Roster data.")
         inactive_roster = pd.DataFrame(columns=['gsis_id', 'roster_status'])
 
     if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
@@ -344,6 +328,7 @@ def run_analysis():
 
     # --- 4. CALCULATION ENGINE ---
     def process_row(row):
+        # A. Grade Calculation
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
         def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
         
@@ -366,11 +351,14 @@ def run_analysis():
         
         grade = round(off_score + def_score + bonus_val, 1)
         
+        # B. Projection Calculation
         base_proj = row['avg_pts'] * (grade / 90)
         
-        weighted_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
+        # Weighted Scores - FIXED Variable Names
+        w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
         w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
+        # Caps
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
         s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
@@ -400,6 +388,7 @@ def run_analysis():
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
     
+    # REPLACING np.nan with None (null) to fix JSON export
     final = final.replace({np.nan: None})
     ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
     
