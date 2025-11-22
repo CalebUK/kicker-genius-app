@@ -138,7 +138,6 @@ def run_analysis():
     
     injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
 
-    # 2. Load Roster Data (Safety Net)
     try:
         rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
         if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
@@ -146,13 +145,11 @@ def run_analysis():
              rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
              if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
 
-        # Keep all statuses to check later
-        inactive_roster = rosters[['gsis_id', 'status']].copy()
-        # FIX: Rename gsis_id here to ensure merge works later
+        inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
+        inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
         inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
     except Exception:
         print("⚠️ Could not load Roster data.")
-        # FIX: Create fallback dataframe with correct column names
         inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
 
     if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
@@ -372,14 +369,11 @@ def run_analysis():
         weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
         proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
         
-        if row['injury_status'] == 'OUT':
+        # FIXED: Include Practice Squad in the 0.0 Override
+        if row['injury_status'] in ['OUT', 'CUT', 'Practice Squad']:
             proj = 0.0
             grade = 0.0
-            bonuses.append("⛔ INJURY (OUT)")
-        if row['injury_status'] == 'CUT':
-            proj = 0.0
-            grade = 0.0
-            bonuses.append("⛔ RELEASED")
+            bonuses.append(f"⛔ {row['injury_status'].upper()}")
 
         return pd.Series({
             'grade': grade,
