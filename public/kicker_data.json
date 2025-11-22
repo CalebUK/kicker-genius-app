@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 12,
-    "updated": "2025-11-22 20:55",
+    "updated": "2025-11-22 21:16",
     "league_avgs": {
       "fpts": 76.1,
       "off_stall": 41.5,
@@ -237,11 +237,11 @@
       "home_field": "TEN",
       "is_dome": false,
       "weather_data": [
-        5.1,
-        "5mph \u2600\ufe0f"
+        0,
+        "API Error"
       ],
-      "wind": 5.1,
-      "weather_desc": "5mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "API Error",
       "posteam_y": "SEA",
       "off_stall_rate": 43.8,
       "off_ppg": 33.666666666666664,
@@ -1405,11 +1405,11 @@
       "home_field": "SF",
       "is_dome": false,
       "weather_data": [
-        6.2,
-        "6mph \u2600\ufe0f"
+        0,
+        "API Error"
       ],
-      "wind": 6.2,
-      "weather_desc": "6mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "API Error",
       "posteam_y": "CAR",
       "off_stall_rate": 33.3,
       "off_ppg": 17.666666666666668,
