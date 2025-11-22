@@ -49,13 +49,17 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
+        match_index = -1
+        for i, t in enumerate(times):
+            if t.startswith(target):
+                match_index = i
+                break
         
-        if idx == -1: return 0, "No Data"
+        if match_index == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
+        wind = data['hourly']['wind_speed_10m'][match_index]
+        precip = data['hourly']['precipitation_probability'][match_index]
+        temp = data['hourly']['temperature_2m'][match_index]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -116,7 +120,6 @@ def scrape_cbs_injuries():
         combined['full_name'] = combined['full_name'].apply(clean_name)
         combined['gsis_id'] = None 
         
-        print(f"   ✅ Scraped {len(combined)} injury records.")
         return combined[['full_name', 'report_status', 'practice_status']]
 
     except Exception as e:
@@ -174,7 +177,8 @@ def run_analysis():
              rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
              if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
 
-        inactive_roster = rosters[rosters['status'].isin(['RES', 'NON', 'SUS', 'PUP'])][['gsis_id', 'status']].copy()
+        # Keep all statuses to check later
+        inactive_roster = rosters[['gsis_id', 'status']].copy()
         inactive_roster.rename(columns={'status': 'roster_status'}, inplace=True)
     except Exception:
         print("⚠️ Could not load Roster data.")
@@ -246,11 +250,23 @@ def run_analysis():
     
     def get_injury_meta(row):
         roster_st = str(row['roster_status']) if pd.notna(row['roster_status']) else ""
-        if roster_st and roster_st != 'ACT': return "OUT", "red-700", f"Roster: {roster_st}"
         
+        # 1. Official Roster Overrides
+        if roster_st in ['RES', 'NON', 'SUS', 'PUP']: 
+             return "OUT", "red-700", f"Roster: {roster_st}"
+        
+        if roster_st == 'DEV':
+             return "Practice Squad", "yellow-500", "Roster: Practice Squad"
+
+        # 2. Injury Report
         report_st = row['report_status']
         practice = row['practice_status']
-        if pd.isna(report_st): return "Healthy", "green", "Active"
+        
+        if pd.isna(report_st):
+            # Fallback: If we have no injury report but roster says something other than ACT
+            if roster_st and roster_st != 'ACT' and roster_st != 'nan':
+                 return roster_st, "gray-400", f"Roster: {roster_st}"
+            return "Healthy", "green", "Active"
         
         report_st = str(report_st).title()
         if "Out" in report_st or "Ir" in report_st: return "OUT", "red-700", f"{report_st} ({practice})"
@@ -384,7 +400,8 @@ def run_analysis():
         weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
         proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
         
-        if row['injury_status'] == 'OUT':
+        # --- INJURY OVERRIDE ---
+        if row['injury_status'] == 'OUT' or row['injury_status'] == 'Practice Squad':
             proj = 0.0
             grade = 0.0
             bonuses.append("⛔ INJURY (OUT)")
@@ -404,6 +421,7 @@ def run_analysis():
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
     
+    # REPLACING np.nan with None (null) to fix JSON export
     final = final.replace({np.nan: None})
     ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
     
