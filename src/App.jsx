@@ -1,6 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope } from 'lucide-react';
 
+// --- GLOSSARY DATA (Static) ---
+const GLOSSARY_DATA = [
+  {
+    header: "Grade",
+    title: "Matchup Grade",
+    desc: "Composite score (0-100) combining Stall Rates, Weather, and History.",
+    why: "Predictive Model. 100+ is a 'Smash Spot'. <75 is a 'Sit'."
+  },
+  {
+    header: "Proj Pts",
+    title: "Projected Points",
+    desc: "Forecasted score based on Kicker's Average adjusted by the Matchup Grade.",
+    why: "The bottom line. Use this to make Start/Sit decisions."
+  },
+  {
+    header: "L4 Off %",
+    title: "Offensive Stall Rate (L4)",
+    desc: "Last 4 Weeks: % of drives inside the 25 that fail to score a TD.",
+    why: "Recent Trend. A high number means the offense is moving but struggling to finish. (Good for Kickers)."
+  },
+  {
+    header: "L4 Def %",
+    title: "Opponent Force Rate (L4)",
+    desc: "Last 4 Weeks: % of drives allowed inside the 25 that resulted in FGs.",
+    why: "Matchup. Does the opponent bend but don't break?"
+  },
+  {
+    header: "Vegas",
+    title: "Implied Team Total",
+    desc: "Points Vegas expects this team to score (based on Spread/Total).",
+    why: "Reality Check. If Vegas predicts 28 points, the kicker has a high ceiling."
+  },
+  {
+    header: "Off PF",
+    title: "Offense Points For (L4)",
+    desc: "Average points scored by the kicker's team over the last 4 weeks.",
+    why: "Current Form. ❄️ indicates a cold offense (<15 PPG)."
+  },
+  {
+    header: "Opp PA",
+    title: "Opponent Points Allowed (L4)",
+    desc: "Average points allowed by the opponent over the last 4 weeks.",
+    why: "Defense Quality. 🛡️ indicates an elite defense (<17 PPG allowed)."
+  }
+];
+
 // --- COMPONENT: HEADER CELL ---
 const HeaderCell = ({ label, description, avg }) => (
   <th className="px-3 py-3 text-center group relative cursor-help">
@@ -105,10 +151,14 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // --- LIVE DATA FETCH ---
   useEffect(() => {
-    fetch('/kicker_data.json')
+    // FIXED: Removed leading slash for better relative path support
+    fetch('kicker_data.json')
       .then(response => {
-        if (!response.ok) throw new Error("Failed to load data file");
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
         return response.json();
       })
       .then(jsonData => {
@@ -117,7 +167,7 @@ const App = () => {
       })
       .catch(err => {
         console.error("Error loading JSON:", err);
-        setError("Could not load kicker data.");
+        setError(`Failed to load data: ${err.message}`);
         setLoading(false);
       });
   }, []);
@@ -125,11 +175,27 @@ const App = () => {
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p className="text-slate-400 animate-pulse">Loading Kicker Intelligence...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p></div>;
+  
+  if (error || !data) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center">
+        <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
+        <h2 className="text-xl font-bold mb-2">Data Not Found</h2>
+        <p className="text-slate-400 mb-6">{error}</p>
+        <div className="text-sm text-slate-600 bg-slate-900 p-4 rounded">
+          <p>Troubleshooting:</p>
+          <ul className="list-disc text-left ml-4 mt-2 space-y-1">
+             <li>Verify <strong>kicker_data.json</strong> exists in the <strong>public</strong> folder on GitHub.</li>
+             <li>Ensure Vercel deployment has finished.</li>
+             <li>Try visiting <strong>/kicker_data.json</strong> directly in your browser address bar.</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
 
   const { rankings, ytd, injuries, meta } = data;
 
-  // Group Injuries
   const outKickers = injuries?.filter(k => k.injury_status === 'OUT') || [];
   const doubtfulKickers = injuries?.filter(k => k.injury_status === 'Doubtful') || [];
   const questionableKickers = injuries?.filter(k => k.injury_status === 'Questionable') || [];
@@ -138,7 +204,6 @@ const App = () => {
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         
-        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
@@ -153,7 +218,6 @@ const App = () => {
           </div>
         </div>
 
-        {/* Tab Navigation */}
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => setActiveTab('potential')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => setActiveTab('ytd')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
@@ -161,10 +225,8 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* --- VIEW: INJURIES --- */}
         {activeTab === 'injuries' && (
            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             {/* OUT */}
              {outKickers.length > 0 && (
                <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden">
                  <div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2">
@@ -174,7 +236,7 @@ const App = () => {
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     {outKickers.map((k, i) => (
                        <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
-                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-red-600 object-cover" />
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-red-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
                              <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
                              <div className="text-xs text-red-300">{k.injury_details}</div>
@@ -185,8 +247,6 @@ const App = () => {
                  </div>
                </div>
              )}
-
-             {/* DOUBTFUL */}
              {doubtfulKickers.length > 0 && (
                <div className="bg-orange-900/20 rounded-xl border border-orange-800/50 overflow-hidden">
                  <div className="p-4 bg-orange-900/40 border-b border-orange-800/50 flex items-center gap-2">
@@ -196,7 +256,7 @@ const App = () => {
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     {doubtfulKickers.map((k, i) => (
                        <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
-                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-orange-500 object-cover" />
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-orange-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
                              <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
                              <div className="text-xs text-orange-300">{k.injury_details}</div>
@@ -207,8 +267,6 @@ const App = () => {
                  </div>
                </div>
              )}
-
-             {/* QUESTIONABLE */}
              {questionableKickers.length > 0 && (
                <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden">
                  <div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2">
@@ -218,7 +276,7 @@ const App = () => {
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     {questionableKickers.map((k, i) => (
                        <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
-                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" />
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
                              <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
                              <div className="text-xs text-yellow-300">{k.injury_details}</div>
@@ -229,7 +287,6 @@ const App = () => {
                  </div>
                </div>
              )}
-
              {(!outKickers.length && !doubtfulKickers.length && !questionableKickers.length) && (
                 <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">
                    No kickers currently listed on the injury report!
@@ -238,7 +295,6 @@ const App = () => {
            </div>
         )}
 
-        {/* --- VIEW: POTENTIAL MODEL --- */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="overflow-x-auto">
@@ -283,7 +339,6 @@ const App = () => {
           </div>
         )}
 
-        {/* --- VIEW: YTD --- */}
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="overflow-x-auto">
@@ -296,7 +351,7 @@ const App = () => {
                     <th className="px-6 py-3 text-center">FG (M/A)</th>
                     <HeaderCell label="50+ Yds" description="Long Distance Makes" />
                     <HeaderCell label="Dome %" description="Dome Games Played" />
-                    <HeaderCell label="RZ Trips" description="Drives reaching FG Range" />
+                    <HeaderCell label="FG RZ Trips" description="Drives reaching FG Range" />
                     <HeaderCell label="Off Stall %" description="Season Long Stall Rate" />
                   </tr>
                 </thead>
@@ -319,7 +374,6 @@ const App = () => {
           </div>
         )}
 
-        {/* --- VIEW: GLOSSARY --- */}
         {activeTab === 'glossary' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="overflow-x-auto">
