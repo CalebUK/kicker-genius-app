@@ -5,7 +5,6 @@ import json
 import warnings
 from datetime import datetime
 import numpy as np
-import re
 
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
@@ -50,13 +49,17 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
+        match_index = -1
+        for i, t in enumerate(times):
+            if t.startswith(target):
+                match_index = i
+                break
         
-        if idx == -1: return 0, "No Data"
+        if match_index == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
+        wind = data['hourly']['wind_speed_10m'][match_index]
+        precip = data['hourly']['precipitation_probability'][match_index]
+        temp = data['hourly']['temperature_2m'][match_index]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -68,37 +71,45 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
 
 def scrape_cbs_injuries():
     """
-    Scrapes CBS Sports Injury Report page as a fallback.
-    Returns a dataframe with columns: ['full_name', 'report_status', 'practice_status']
+    Scrapes CBS Sports Injury Report page with fuzzy column matching.
     """
     print("   🌐 Scraping CBS Sports for live injury data...")
     url = "https://www.cbssports.com/nfl/injuries/"
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+    headers = {'User-Agent': 'Mozilla/5.0'}
     
     try:
         response = requests.get(url, headers=headers)
         dfs = pd.read_html(response.text)
-        
-        # CBS returns a list of DFs (one per team). Concatenate them.
         if not dfs: return pd.DataFrame()
         
         combined = pd.concat(dfs, ignore_index=True)
         
-        # CBS Columns are usually: Player, Position, Injury, Game Status
-        # We need to rename them to match our schema
-        combined.rename(columns={'Player': 'full_name', 'Game Status': 'report_status', 'Injury': 'practice_status'}, inplace=True)
+        # Fuzzy Column Rename (Handle 'Game Status' vs 'Status')
+        col_map = {}
+        for col in combined.columns:
+            if 'player' in col.lower(): col_map[col] = 'full_name'
+            if 'status' in col.lower(): col_map[col] = 'report_status'
+            if 'injury' in col.lower(): col_map[col] = 'practice_status'
+            
+        combined.rename(columns=col_map, inplace=True)
         
-        # Clean up names (CBS often has "First Last POS")
-        # We will strip the position from the name string if it exists
+        # Verify we have what we need
+        if 'full_name' not in combined.columns:
+            return pd.DataFrame()
+
+        if 'report_status' not in combined.columns:
+             combined['report_status'] = 'Questionable' # Default if column missing
+
+        if 'practice_status' not in combined.columns:
+             combined['practice_status'] = 'Unknown'
+
+        # Clean Name
         def clean_name(val):
             if not isinstance(val, str): return val
-            # Basic clean: remove the position acronym often found at end
-            return val.split(' (')[0].strip() # Example: "Brandon Aubrey (K)"
+            return val.split(' (')[0].strip()
 
         combined['full_name'] = combined['full_name'].apply(clean_name)
-        
-        # Add standardized columns
-        combined['gsis_id'] = None # We won't have IDs, so we'll match on Name later
+        combined['gsis_id'] = None 
         
         return combined[['full_name', 'report_status', 'practice_status']]
 
@@ -107,12 +118,9 @@ def scrape_cbs_injuries():
         return pd.DataFrame()
 
 def load_injury_data_safe(season, target_week):
-    """
-    Attempts to load injury data from multiple sources.
-    """
     print("🏥 Fetching Injury Data...")
     
-    # Attempt 1: Standard Library (Parquet)
+    # Attempt 1: Standard Library
     try:
         injuries = nfl.load_injuries(seasons=[season])
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
@@ -120,7 +128,7 @@ def load_injury_data_safe(season, target_week):
         print("   ✅ Loaded via nflreadpy")
         return current_injuries
     except Exception:
-        pass # Fail silently to next method
+        pass
 
     # Attempt 2: Direct CSV
     try:
@@ -132,7 +140,7 @@ def load_injury_data_safe(season, target_week):
     except Exception:
         pass
 
-    # Attempt 3: Web Scrape (The New Fallback)
+    # Attempt 3: Web Scrape
     scraped_data = scrape_cbs_injuries()
     if not scraped_data.empty:
         print("   ✅ Loaded via Web Scrape")
@@ -149,17 +157,23 @@ def run_analysis():
     schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
     players = nfl.load_players()
     
-    # 1. Load Injury Reports (With Scraping Fallback)
     injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
 
     # 2. Load Roster Data (Safety Net)
+    # Try 2025 first, fallback to 2024 if empty (common issue in transition)
     try:
         rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
         if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
+        
+        if rosters.empty:
+             # Fallback to last season if current is empty
+             rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
+             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
+
         inactive_roster = rosters[rosters['status'].isin(['RES', 'NON', 'SUS', 'PUP'])][['gsis_id', 'status']].copy()
         inactive_roster.rename(columns={'status': 'roster_status'}, inplace=True)
-    except Exception:
-        print("⚠️ Could not load Roster data.")
+    except Exception as e:
+        print(f"⚠️ Could not load Roster data: {e}")
         inactive_roster = pd.DataFrame(columns=['gsis_id', 'roster_status'])
 
     if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
@@ -208,36 +222,21 @@ def run_analysis():
     stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
 
     # --- MERGE INJURIES (Advanced) ---
-    # 1. Merge Scraped Data (Match by Name since we don't have IDs from scrape)
-    # We do a left join on name. Note: Names must match exactly (e.g. "B.Aubrey" vs "Brandon Aubrey")
-    # To fix this, we create a 'simple_name' column for matching
-    
     if 'full_name' in injury_report.columns:
-        # We need to map the scraper's "Brandon Aubrey" to our "B.Aubrey"
-        # Let's try to join on 'kicker_player_name' if possible, but names differ.
-        # Strategy: We use the 'players' table to bridge GSIS_ID to Full Name
-        
-        # Add Full Name to our stats from the players table
         name_map = players[['gsis_id', 'display_name']].rename(columns={'gsis_id': 'kicker_player_id', 'display_name': 'full_name_official'})
         stats = pd.merge(stats, name_map, on='kicker_player_id', how='left')
-        
-        # Now merge injury report on Full Name
-        # We might need to normalize names (remove Jr., III, etc) but let's try direct first
         injury_report = injury_report.rename(columns={'full_name': 'full_name_official'})
-        # Deduplicate just in case
         injury_report = injury_report.drop_duplicates(subset=['full_name_official'])
-        
         stats = pd.merge(stats, injury_report, on='full_name_official', how='left')
     
     elif 'gsis_id' in injury_report.columns:
-        # Standard merge if we got the official file
         injury_report = injury_report.rename(columns={'gsis_id': 'kicker_player_id'})
         stats = pd.merge(stats, injury_report, on='kicker_player_id', how='left')
     else:
         stats['report_status'] = None
         stats['practice_status'] = None
 
-    # 2. Merge Roster Status
+    # Merge Roster Status
     inactive_roster = inactive_roster.rename(columns={'gsis_id': 'kicker_player_id'})
     stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
     
@@ -329,7 +328,6 @@ def run_analysis():
     model['is_dome'] = model['roof'].isin(['dome', 'closed'])
     
     print("🌤️ Fetching Weather...")
-    import requests 
     model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
     model['wind'] = model['weather_data'].apply(lambda x: x[0])
     model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
@@ -393,7 +391,7 @@ def run_analysis():
             'grade_details': bonuses,
             'off_score_val': round(off_score, 1),
             'def_score_val': round(def_score, 1),
-            'w_team_score': round(weighted_team_score, 1),
+            'w_team_score': round(w_team_score, 1),
             'w_def_allowed': round(w_def_allowed, 1),
             'off_cap_val': round(off_cap, 1),
             'def_cap_val': round(def_cap, 1)
