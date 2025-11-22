@@ -5,7 +5,6 @@ import json
 import warnings
 from datetime import datetime
 import numpy as np
-import time # Added for retries
 
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
@@ -45,48 +44,37 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     if not coords: return 0, "Unknown"
     
     lat, lon = coords
-    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-    
-    # RETRY LOGIC (Fixes API Errors)
-    for attempt in range(3):
-        try:
-            response = requests.get(url, timeout=10) # Increased timeout
-            if response.status_code != 200:
-                time.sleep(1)
-                continue
-                
-            data = response.json()
-            target = game_dt_str.replace(" ", "T")[:13]
-            times = data['hourly']['time']
-            match_index = -1
-            for i, t in enumerate(times):
-                if t.startswith(target):
-                    match_index = i
-                    break
-            
-            if match_index == -1: return 0, "No Data"
-            
-            wind = data['hourly']['wind_speed_10m'][match_index]
-            precip = data['hourly']['precipitation_probability'][match_index]
-            temp = data['hourly']['temperature_2m'][match_index]
-            
-            cond = f"{int(wind)}mph"
-            if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
-            elif wind > 15: cond += " 🌬️"
-            else: cond += " ☀️"
-            return wind, cond
-            
-        except (requests.exceptions.RequestException, ValueError):
-            time.sleep(1) # Wait 1s before retry
-            
-    return 0, "API Error"
+    try:
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
+        data = requests.get(url, timeout=5).json()
+        target = game_dt_str.replace(" ", "T")[:13]
+        times = data['hourly']['time']
+        match_index = -1
+        for i, t in enumerate(times):
+            if t.startswith(target):
+                match_index = i
+                break
+        
+        if match_index == -1: return 0, "No Data"
+        
+        wind = data['hourly']['wind_speed_10m'][match_index]
+        precip = data['hourly']['precipitation_probability'][match_index]
+        temp = data['hourly']['temperature_2m'][match_index]
+        
+        cond = f"{int(wind)}mph"
+        if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
+        elif wind > 15: cond += " 🌬️"
+        else: cond += " ☀️"
+        return wind, cond
+    except:
+        return 0, "API Error"
 
 def scrape_cbs_injuries():
     print("   🌐 Scraping CBS Sports for live injury data...")
     url = "https://www.cbssports.com/nfl/injuries/"
     headers = {'User-Agent': 'Mozilla/5.0'}
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers)
         dfs = pd.read_html(response.text)
         if not dfs: return pd.DataFrame()
         combined = pd.concat(dfs, ignore_index=True)
@@ -150,6 +138,7 @@ def run_analysis():
     
     injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
 
+    # 2. Load Roster Data (Safety Net)
     try:
         rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
         if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
@@ -157,12 +146,14 @@ def run_analysis():
              rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
              if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
 
-        inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
-        inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
-        inactive_roster.rename(columns={'status': 'roster_status'}, inplace=True)
+        # Keep all statuses to check later
+        inactive_roster = rosters[['gsis_id', 'status']].copy()
+        # FIX: Rename gsis_id here to ensure merge works later
+        inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
     except Exception:
         print("⚠️ Could not load Roster data.")
-        inactive_roster = pd.DataFrame(columns=['gsis_id', 'roster_status'])
+        # FIX: Create fallback dataframe with correct column names
+        inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
 
     if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
     if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
@@ -311,7 +302,7 @@ def run_analysis():
     share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
     def_share = share_df.groupby('opponent')['share'].mean().reset_index().rename(columns={'share': 'def_share'})
 
-    # Matchups
+    # --- 3. MATCHUP ENGINE ---
     matchups = schedule[schedule['week'] == target_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']].copy()
     matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
     matchups['total_line'] = matchups['total_line'].fillna(44.0)
@@ -323,6 +314,7 @@ def run_analysis():
     home['is_home'] = True
     away = matchups.rename(columns={'away_team': 'team', 'home_team': 'opponent', 'away_imp': 'vegas'})
     away['is_home'] = False
+    
     model = pd.concat([home, away])
     model['home_field'] = model.apply(lambda x: x['team'] if x['is_home'] else x['opponent'], axis=1)
     model['is_dome'] = model['roof'].isin(['dome', 'closed'])
@@ -332,6 +324,7 @@ def run_analysis():
     model['wind'] = model['weather_data'].apply(lambda x: x[0])
     model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
+    # Merge All Stats
     final = pd.merge(stats, model, on='team', how='inner')
     final = pd.merge(final, off_stall, left_on='team', right_on='posteam', how='left')
     final = pd.merge(final, off_ppg, on='team', how='left')
@@ -341,6 +334,7 @@ def run_analysis():
     final = pd.merge(final, def_share, on='opponent', how='left')
     final = final.fillna(0)
 
+    # --- 4. CALCULATION ENGINE ---
     def process_row(row):
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
         def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
@@ -378,11 +372,14 @@ def run_analysis():
         weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
         proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
         
-        # FIXED: Practice Squad Logic
-        if row['injury_status'] == 'OUT' or row['injury_status'] == 'CUT' or row['injury_status'] == 'Practice Squad':
+        if row['injury_status'] == 'OUT':
             proj = 0.0
             grade = 0.0
-            bonuses.append(f"⛔ {row['injury_status']}")
+            bonuses.append("⛔ INJURY (OUT)")
+        if row['injury_status'] == 'CUT':
+            proj = 0.0
+            grade = 0.0
+            bonuses.append("⛔ RELEASED")
 
         return pd.Series({
             'grade': grade,
@@ -398,8 +395,10 @@ def run_analysis():
 
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
+    
     final = final.replace({np.nan: None})
     ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
+    
     injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace({np.nan: None})
 
     output = {
