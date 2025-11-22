@@ -46,39 +46,42 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     lat, lon = coords
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-        data = requests.get(url, timeout=5).json() # 5s timeout for speed
+        data = requests.get(url, timeout=10).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
+        match_index = -1
+        for i, t in enumerate(times):
+            if t.startswith(target):
+                match_index = i
+                break
         
-        if idx == -1: return 0, "No Data"
+        if match_index == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
+        wind = data['hourly']['wind_speed_10m'][match_index]
+        precip = data['hourly']['precipitation_probability'][match_index]
+        temp = data['hourly']['temperature_2m'][match_index]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
         elif wind > 15: cond += " 🌬️"
         else: cond += " ☀️"
         return wind, cond
-    except:
+    
+    # Catch timeout errors specifically
+    except requests.exceptions.Timeout:
+        return 0, "Timeout"
+    except Exception:
         return 0, "API Error"
 
 def run_analysis():
     target_week = get_current_nfl_week()
     print(f"🚀 Starting Analysis for Week {target_week}...")
     
-    # Load All Data Sources
+    # Load Data
     pbp = nfl.load_pbp(seasons=[CURRENT_SEASON])
     schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
-    players = nfl.load_players() # For headshots
-    injuries = nfl.load_injuries(seasons=[CURRENT_SEASON]) # For status
-    
     if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
     if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
-    if hasattr(players, "to_pandas"): players = players.to_pandas()
-    if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
 
     # --- 1. KICKER STATS ---
     kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
@@ -97,8 +100,7 @@ def run_analysis():
     rz_drives = pbp[(pbp['yardline_100'] <= 25) & (pbp['yardline_100'].notnull())][['game_id', 'drive', 'posteam']].drop_duplicates()
     rz_counts = rz_drives.groupby('posteam').size().reset_index(name='rz_trips')
 
-    # Need kicker_player_id for joining headshots
-    stats = kick_plays.groupby(['kicker_player_name', 'kicker_player_id']).agg(
+    stats = kick_plays.groupby('kicker_player_name').agg(
         team=('posteam', 'last'),
         fpts=('fantasy_pts', 'sum'),
         made=('field_goal_result', lambda x: (x=='made').sum()),
@@ -114,45 +116,6 @@ def run_analysis():
     stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
     stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-    # --- JOIN HEADSHOTS ---
-    # Use gsis_id from players table matching kicker_player_id from pbp
-    player_map = players[['gsis_id', 'headshot_url']].rename(columns={'gsis_id': 'kicker_player_id'})
-    stats = pd.merge(stats, player_map, on='kicker_player_id', how='left')
-    # Fallback image if missing
-    stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
-
-    # --- JOIN INJURIES ---
-    # Filter for target week
-    current_injuries = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
-    current_injuries = current_injuries.rename(columns={'gsis_id': 'kicker_player_id'})
-    
-    stats = pd.merge(stats, current_injuries, on='kicker_player_id', how='left')
-    
-    # Logic for Injury Status Display
-    def get_injury_meta(row):
-        status = row['report_status']
-        practice = row['practice_status']
-        
-        if pd.isna(status):
-            return "Healthy", "green", "No Report"
-        
-        status = str(status).lower()
-        
-        if "out" in status or "ir" in status:
-            return "OUT", "red-700", f"{row['report_status']} ({practice})"
-        elif "doubtful" in status:
-            return "Doubtful", "red-400", f"{row['report_status']} ({practice})"
-        elif "questionable" in status:
-            return "Questionable", "yellow-500", f"{row['report_status']} ({practice})"
-        else:
-            return "Healthy", "green", "Active"
-
-    # Apply meta calculation
-    injury_meta = stats.apply(get_injury_meta, axis=1)
-    stats['injury_status'] = [x[0] for x in injury_meta]
-    stats['injury_color'] = [x[1] for x in injury_meta]
-    stats['injury_details'] = [x[2] for x in injury_meta]
-
     # Elite Threshold
     qualified = stats[stats['att'] >= 5]
     elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
@@ -160,6 +123,8 @@ def run_analysis():
     # --- 2. STALL METRICS (L4) ---
     max_wk = pbp['week'].max()
     start_wk = max(1, max_wk - 3)
+    
+    # Get ALL drives inside 25 for Stall Rate
     recent_pbp = pbp[pbp['week'] >= start_wk].copy()
     rz_plays_l4 = recent_pbp[(recent_pbp['yardline_100'] <= 25) & (recent_pbp['yardline_100'].notnull())]
     drives = rz_plays_l4[['game_id', 'drive', 'posteam', 'defteam']].drop_duplicates()
@@ -172,34 +137,47 @@ def run_analysis():
         drive_results.append({'posteam': row['posteam'], 'defteam': row['defteam'], 'stalled': (not is_td and not is_to)})
         
     df_drives = pd.DataFrame(drive_results)
+    
+    # Calculate Rates
     off_stall = df_drives.groupby('posteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'off_stall_rate'})
     def_stall = df_drives.groupby('defteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'def_stall_rate'})
+    
     off_stall['off_stall_rate'] = (off_stall['off_stall_rate'] * 100).round(1)
     def_stall['def_stall_rate'] = (def_stall['def_stall_rate'] * 100).round(1)
     
     lg_off_avg = off_stall['off_stall_rate'].mean()
     lg_def_avg = def_stall['def_stall_rate'].mean()
 
-    # Scoring & Share (L4)
+    # Points per Game (L4)
     completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
     home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
     away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
+    
+    # Offense Scoring
     all_scores = pd.concat([home_scores, away_scores])
     off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
     
+    # Defense Allowed
     home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
     away_allowed = completed[['away_team', 'home_score']].rename(columns={'away_team': 'team', 'home_score': 'pts_allowed'})
     all_allowed = pd.concat([home_allowed, away_allowed])
+    
+    # RENAME HERE to prevent collision later
     def_pa = all_allowed.groupby('team')['pts_allowed'].mean().reset_index().rename(columns={'pts_allowed': 'def_pa', 'team': 'opponent'})
 
+    # Kicker Share (L4)
     l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
     kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['fantasy_pts'].sum().reset_index()
+    
     home_g = completed[['game_id', 'home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'total'})
     away_g = completed[['game_id', 'away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'total'})
     all_g = pd.concat([home_g, away_g])
+    
     share_df = pd.merge(all_g, kicker_game_pts, left_on=['game_id', 'team'], right_on=['game_id', 'posteam'], how='left').fillna(0)
     share_df['share'] = share_df.apply(lambda x: x['fantasy_pts'] / x['total'] if x['total'] > 0 else 0, axis=1)
+    
     off_share = share_df.groupby('team')['share'].mean().reset_index().rename(columns={'share': 'off_share'})
+    
     matchup_lookup = schedule[['game_id', 'home_team', 'away_team']]
     share_df = pd.merge(share_df, matchup_lookup, on='game_id')
     share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
@@ -223,23 +201,27 @@ def run_analysis():
     model['is_dome'] = model['roof'].isin(['dome', 'closed'])
     
     print("🌤️ Fetching Weather...")
-    import requests 
+    
     model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
     model['wind'] = model['weather_data'].apply(lambda x: x[0])
     model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
     # Merge All Stats
     final = pd.merge(stats, model, on='team', how='inner')
+    
     final = pd.merge(final, off_stall, left_on='team', right_on='posteam', how='left')
     final = pd.merge(final, off_ppg, on='team', how='left')
     final = pd.merge(final, off_share, on='team', how='left')
+    
     final = pd.merge(final, def_stall, left_on='opponent', right_on='defteam', how='left')
     final = pd.merge(final, def_pa, on='opponent', how='left')
     final = pd.merge(final, def_share, on='opponent', how='left')
+    
     final = final.fillna(0)
 
     # --- 4. CALCULATION ENGINE ---
     def process_row(row):
+        # A. Grade Calculation
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
         def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
         
@@ -249,10 +231,12 @@ def run_analysis():
         if row['is_dome']: 
             bonus_val += 10; bonuses.append("+10 Dome")
         else:
-            if row['wind'] > 15: bonus_val -= 10; bonuses.append("-10 Heavy Wind")
-            elif row['wind'] > 10: bonus_val -= 5; bonuses.append("-5 Wind")
-            if "🌨️" in row['weather_desc']: bonus_val -= 10; bonuses.append("-10 Snow")
-            elif "🌧️" in row['weather_desc']: bonus_val -= 5; bonuses.append("-5 Rain")
+            wind = row['wind']
+            weather_desc = row['weather_desc']
+            if wind > 15: bonus_val -= 10; bonuses.append("-10 Heavy Wind")
+            elif wind > 10: bonus_val -= 5; bonuses.append("-5 Wind")
+            if "🌨️" in weather_desc: bonus_val -= 10; bonuses.append("-10 Snow")
+            elif "🌧️" in weather_desc: bonus_val -= 5; bonuses.append("-5 Rain")
             
         if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
         if abs(row['spread_line']) < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
@@ -260,27 +244,24 @@ def run_analysis():
         
         grade = round(off_score + def_score + bonus_val, 1)
         
+        # B. Projection Calculation
         base_proj = row['avg_pts'] * (grade / 90)
         
-        # Projection Logic
-        weighted_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
+        # Weighted Scores
+        w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
         w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
+        # Caps
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
+        
         s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
         def_cap = w_def_allowed * (s_def * 1.2)
         
-        final_cap = min(off_cap, def_cap)
+        # Final Weighted Projection
         weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
         proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
         
-        # --- INJURY OVERRIDE ---
-        if row['injury_status'] == 'OUT':
-            proj = 0.0
-            grade = 0.0
-            bonuses.append("⛔ INJURY (OUT)")
-
         return pd.Series({
             'grade': grade,
             'proj': proj,
@@ -294,12 +275,12 @@ def run_analysis():
         })
 
     final = final.join(final.apply(process_row, axis=1))
+    
+    # Sort
     final = final.sort_values('proj', ascending=False)
     ytd_sorted = stats.sort_values('fpts', ascending=False)
-    
-    # Injury Report List
-    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False)
 
+    # --- EXPORT ---
     output = {
         "meta": {
             "week": int(target_week),
@@ -313,14 +294,13 @@ def run_analysis():
             }
         },
         "rankings": final.head(30).to_dict(orient='records'),
-        "ytd": ytd_sorted.head(30).to_dict(orient='records'),
-        "injuries": injuries_list.to_dict(orient='records')
+        "ytd": ytd_sorted.head(30).to_dict(orient='records')
     }
     
     with open("public/kicker_data.json", "w") as f:
         json.dump(output, f, indent=2)
     
-    print(f"✅ Success! Data saved.")
+    print(f"✅ Success! Data saved to public/kicker_data.json")
 
 if __name__ == "__main__":
     run_analysis()
