@@ -134,45 +134,40 @@ def run_analysis():
     
     injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
 
+    # 2. Load Roster Data (Safety Net)
     try:
         rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
         if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
         if rosters.empty:
              rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
              if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
-
-        inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
-        inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
-        inactive_roster.rename(columns={'status': 'roster_status'}, inplace=True)
-    except Exception:
-        print("⚠️ Could not load Roster data.")
-        inactive_roster = pd.DataFrame(columns=['gsis_id', 'roster_status'])
+        
+        # Filter for inactive players
+        inactive_roster = rosters[['gsis_id', 'status']].copy()
+        # Ensure consistent naming for merge
+        inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
+        
+    except Exception as e:
+        print(f"⚠️ Could not load Roster data: {e}")
+        inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
 
     if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
     if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
     if hasattr(players, "to_pandas"): players = players.to_pandas()
 
-    # --- 1. KICKER STATS (FIXED POINTS CALC) ---
+    # --- 1. KICKER STATS ---
     kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
     kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
     
-    # Updated Scoring Logic: Result FIRST
     def calc_pts(row):
-        # Field Goals
         if row['play_type'] == 'field_goal':
             if row['field_goal_result'] == 'made':
                 if row['kick_distance'] >= 50: return 5
                 elif row['kick_distance'] >= 40: return 4
                 else: return 3
-            else:
-                # Missed FG is -1
-                return -1
-        
-        # Extra Points
+            else: return -1
         elif row['play_type'] == 'extra_point':
-            if row['extra_point_result'] == 'good': return 1
-            else: return -1 # Missed XP is -1
-            
+            return 1 if row['extra_point_result'] == 'good' else -1
         return 0
     
     kick_plays['fantasy_pts'] = kick_plays.apply(calc_pts, axis=1)
@@ -221,6 +216,7 @@ def run_analysis():
         stats['report_status'] = None
         stats['practice_status'] = None
 
+    # Merge Roster Status (Now guaranteed to have kicker_player_id)
     stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
     
     def get_injury_meta(row):
