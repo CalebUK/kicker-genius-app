@@ -5,7 +5,6 @@ import json
 import warnings
 from datetime import datetime
 import numpy as np
-import math
 
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
@@ -50,17 +49,13 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        match_index = -1
-        for i, t in enumerate(times):
-            if t.startswith(target):
-                match_index = i
-                break
+        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
         
-        if match_index == -1: return 0, "No Data"
+        if idx == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][match_index]
-        precip = data['hourly']['precipitation_probability'][match_index]
-        temp = data['hourly']['temperature_2m'][match_index]
+        wind = data['hourly']['wind_speed_10m'][idx]
+        precip = data['hourly']['precipitation_probability'][idx]
+        temp = data['hourly']['temperature_2m'][idx]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -149,7 +144,6 @@ def load_injury_data_safe(season, target_week):
     return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
 
 def clean_nan(val):
-    """Helper to safely clean NaN/Inf for JSON export"""
     if isinstance(val, float):
         if pd.isna(val) or math.isinf(val):
             return None
@@ -229,7 +223,6 @@ def run_analysis():
     stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
     stats['acc'] = (stats['fg_made'] / stats['fg_att'] * 100).round(1)
     stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
-    # Recalc Fantasy Points for Sort (Default Scoring)
     stats['fpts'] = (stats['fg_0_19']*3 + stats['fg_20_29']*3 + stats['fg_30_39']*3 + 
                      stats['fg_40_49']*4 + stats['fg_50_59']*5 + stats['fg_60_plus']*5 + 
                      stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
@@ -290,7 +283,7 @@ def run_analysis():
     qualified = stats[stats['fg_att'] >= 5]
     elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
 
-    # --- STALL METRICS ---
+    # --- 2. STALL METRICS (L4) ---
     max_wk = pbp['week'].max()
     start_wk = max(1, max_wk - 3)
     recent_pbp = pbp[pbp['week'] >= start_wk].copy()
@@ -312,7 +305,7 @@ def run_analysis():
     lg_off_avg = off_stall['off_stall_rate'].mean()
     lg_def_avg = def_stall['def_stall_rate'].mean()
 
-    # Scoring & Share
+    # Scoring & Share (L4) - FIXED MATCHING
     completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
     home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
     away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
@@ -325,12 +318,16 @@ def run_analysis():
     def_pa = all_allowed.groupby('team')['pts_allowed'].mean().reset_index().rename(columns={'pts_allowed': 'def_pa', 'team': 'opponent'})
 
     l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
+    
+    # Corrected: Use 'real_pts' (3 pts per FG, 1 per XP)
     kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
+    kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True) # Rename to match merge logic
+    
     home_g = completed[['game_id', 'home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'total'})
     away_g = completed[['game_id', 'away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'total'})
     all_g = pd.concat([home_g, away_g])
     share_df = pd.merge(all_g, kicker_game_pts, left_on=['game_id', 'team'], right_on=['game_id', 'posteam'], how='left').fillna(0)
-    share_df['share'] = share_df.apply(lambda x: x['fantasy_pts'] / x['total'] if x['total'] > 0 else 0, axis=1)
+    share_df['share'] = share_df.apply(lambda x: x['kicker_pts'] / x['total'] if x['total'] > 0 else 0, axis=1)
     off_share = share_df.groupby('team')['share'].mean().reset_index().rename(columns={'share': 'off_share'})
     matchup_lookup = schedule[['game_id', 'home_team', 'away_team']]
     share_df = pd.merge(share_df, matchup_lookup, on='game_id')
@@ -365,7 +362,7 @@ def run_analysis():
     final = pd.merge(final, def_stall, left_on='opponent', right_on='defteam', how='left')
     final = pd.merge(final, def_pa, on='opponent', how='left')
     final = pd.merge(final, def_share, on='opponent', how='left')
-    final = final.fillna(0) # Fills numeric NaNs with 0 (Safe for calculations)
+    final = final.fillna(0)
 
     def process_row(row):
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
@@ -387,6 +384,7 @@ def run_analysis():
         if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
         if abs(row['spread_line']) < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
         if row['fpts'] >= elite_thresh: bonus_val += 5; bonuses.append("+5 Elite Talent")
+        if row['aggression_pct'] > 25.0: bonus_val -= 5; bonuses.append("-5 Aggressive Coach")
         
         grade = round(off_score + def_score + bonus_val, 1)
         
@@ -424,18 +422,13 @@ def run_analysis():
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
     
-    # AGGRESSIVE CLEANING FOR JSON
-    # Replace NaN and Infinity with None (which becomes null in JSON)
     final = final.replace([np.inf, -np.inf, np.nan], None)
-    # Ensure numeric columns are clean even if they were objects
     final = final.where(pd.notnull(final), None)
     
-    ytd_sorted = stats.sort_values('fpts', ascending=False)
-    ytd_sorted = ytd_sorted.replace([np.inf, -np.inf, np.nan], None)
+    ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
     ytd_sorted = ytd_sorted.where(pd.notnull(ytd_sorted), None)
     
-    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False)
-    injuries_list = injuries_list.replace([np.inf, -np.inf, np.nan], None)
+    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
     injuries_list = injuries_list.where(pd.notnull(injuries_list), None)
 
     output = {
