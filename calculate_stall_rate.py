@@ -49,13 +49,17 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
+        match_index = -1
+        for i, t in enumerate(times):
+            if t.startswith(target):
+                match_index = i
+                break
         
-        if idx == -1: return 0, "No Data"
+        if match_index == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
+        wind = data['hourly']['wind_speed_10m'][match_index]
+        precip = data['hourly']['precipitation_probability'][match_index]
+        temp = data['hourly']['temperature_2m'][match_index]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -137,8 +141,8 @@ def load_injury_data_safe(season, target_week):
         injuries = pd.read_csv(url)
         return injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
     except Exception: pass
-    scraped_data = scrape_cbs_injuries()
-    if not scraped_data.empty: return scraped_data
+    scraped = scrape_cbs_injuries()
+    if not scraped.empty: return scraped
     return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
 
 def clean_nan(val):
@@ -176,13 +180,12 @@ def run_analysis():
     kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
     kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
     
-    # --- FIXED: ADDING MISSING COLUMNS FOR CUSTOM SCORING ---
+    # FIXED: Check result first (Made/Missed) for accurate counts
     kick_plays['is_fg'] = kick_plays['play_type'] == 'field_goal'
     kick_plays['is_xp'] = kick_plays['play_type'] == 'extra_point'
     kick_plays['made'] = ((kick_plays['is_fg'] & (kick_plays['field_goal_result'] == 'made')) | 
                           (kick_plays['is_xp'] & (kick_plays['extra_point_result'] == 'good')))
     
-    # Distance Buckets
     kick_plays['fg_0_19'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'] < 20)
     kick_plays['fg_20_29'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(20, 29))
     kick_plays['fg_30_39'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(30, 39))
@@ -196,8 +199,6 @@ def run_analysis():
     kick_plays['real_pts'] = (kick_plays['is_fg'] & kick_plays['made']) * 3 + (kick_plays['is_xp'] & kick_plays['made']) * 1
     
     kick_plays['is_dome'] = kick_plays['roof'].isin(['dome', 'closed'])
-    
-    # ------------------------------------------------------
     
     rz_drives = pbp[(pbp['yardline_100'] <= 25) & (pbp['yardline_100'].notnull())][['game_id', 'drive', 'posteam']].drop_duplicates()
     rz_counts = rz_drives.groupby('posteam').size().reset_index(name='rz_trips')
@@ -224,7 +225,8 @@ def run_analysis():
     stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
     stats['acc'] = (stats['fg_made'] / stats['fg_att'] * 100).round(1)
     stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
-    # Recalc standard Fantasy Points for display sorting
+    
+    # Calc Standard FPts for sorting
     stats['fpts'] = (stats['fg_0_19']*3 + stats['fg_20_29']*3 + stats['fg_30_39']*3 + 
                      stats['fg_40_49']*4 + stats['fg_50_59']*5 + stats['fg_60_plus']*5 + 
                      stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
@@ -346,15 +348,24 @@ def run_analysis():
     matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
     matchups['total_line'] = matchups['total_line'].fillna(44.0)
     matchups['spread_line'] = matchups['spread_line'].fillna(0.0)
-    matchups['home_imp'] = (matchups['total_line'] - matchups['spread_line'])/2
-    matchups['away_imp'] = (matchups['total_line'] + matchups['spread_line'])/2
     
-    home = matchups.rename(columns={'home_team': 'team', 'away_team': 'opponent', 'home_imp': 'vegas'})
-    home['is_home'] = True
-    away = matchups.rename(columns={'away_team': 'team', 'home_team': 'opponent', 'away_imp': 'vegas'})
-    away['is_home'] = False
-    model = pd.concat([home, away])
-    model['home_field'] = model.apply(lambda x: x['team'] if x['is_home'] else x['opponent'], axis=1)
+    home_view = matchups[['home_team', 'away_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
+    home_view['home_field'] = home_view['home_team']
+    home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
+    home_view['vegas_implied'] = (home_view['total_line'] - home_view['spread_line']) / 2
+    home_view['is_home'] = True
+    # Explicitly format spread string for display
+    home_view['spread_display'] = home_view['spread_line'].apply(lambda x: f"{x:+.1f}" if x > 0 else f"{x:.1f}")
+
+    away_view = matchups[['away_team', 'home_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
+    away_view['home_field'] = away_view['home_team']
+    away_view = away_view.rename(columns={'away_team': 'team', 'home_team': 'opponent'})
+    away_view['vegas_implied'] = (away_view['total_line'] + away_view['spread_line']) / 2
+    away_view['is_home'] = False
+    # Flip spread for away perspective display (If Home is -7, Away sees +7)
+    away_view['spread_display'] = (away_view['spread_line'] * -1).apply(lambda x: f"{x:+.1f}" if x > 0 else f"{x:.1f}")
+    
+    model = pd.concat([home_view, away_view])
     model['is_dome'] = model['roof'].isin(['dome', 'closed'])
     
     print("🌤️ Fetching Weather...")
@@ -391,6 +402,8 @@ def run_analysis():
             
         if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
         if abs(row['spread_line']) < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
+        elif abs(row['spread_line']) > 9.5: bonus_val -= 5; bonuses.append("-5 Blowout Risk")
+        
         if row['fpts'] >= elite_thresh: bonus_val += 5; bonuses.append("+5 Elite Talent")
         if row['aggression_pct'] > 25.0: bonus_val -= 5; bonuses.append("-5 Aggressive Coach")
         
@@ -398,8 +411,8 @@ def run_analysis():
         
         base_proj = row['avg_pts'] * (grade / 90)
         
-        w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
-        w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
+        w_team_score = (row['vegas_implied'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas_implied'] > 0 else row['off_ppg']
+        w_def_allowed = (row['vegas_implied'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas_implied'] > 0 else row['def_pa']
         
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
@@ -424,23 +437,26 @@ def run_analysis():
             'w_team_score': round(w_team_score, 1),
             'w_def_allowed': round(w_def_allowed, 1),
             'off_cap_val': round(off_cap, 1),
-            'def_cap_val': round(def_cap, 1)
+            'def_cap_val': round(def_cap, 1),
+            'details_vegas_total': round(row['total_line'], 1),
+            'details_vegas_spread': row['spread_display'] # Now a string with +/-
         })
 
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
-    final = final.replace({np.nan: None})
-    ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
-    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace({np.nan: None})
+    final = final.replace([np.inf, -np.inf, np.nan], None)
+    final = final.where(pd.notnull(final), None)
+    ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
+    ytd_sorted = ytd_sorted.where(pd.notnull(ytd_sorted), None)
+    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
+    injuries_list = injuries_list.where(pd.notnull(injuries_list), None)
 
-    # Aubrey Check
+    # Debugging Check for Aubrey
     aubrey = final[final['kicker_player_name'].str.contains("Aubrey", na=False)]
     if not aubrey.empty:
         r = aubrey.iloc[0]
-        print("\n🤠 AUBREY DEEP DIVE:")
-        print(f"   • Vegas Total: {r['total_line']}, Spread: {r['spread_line']}")
-        print(f"   • Implied Team Score (Vegas): {r['vegas']:.1f}")
-        print(f"   • Grade: {r['grade']} (Multiplier: {r['grade']/90:.2f})")
+        print(f"\n🤠 AUBREY CHECK: Spread Display = {r['details_vegas_spread']} (Raw Spread: {r['spread_line']})")
+        print(f"   Implied Score: {r['vegas_implied']:.1f}")
 
     output = {
         "meta": {
