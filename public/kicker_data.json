@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 12,
-    "updated": "2025-11-23 12:48",
+    "updated": "2025-11-23 13:28",
     "league_avgs": {
       "fpts": 64.2,
       "off_stall": 41.5,
@@ -113,10 +113,10 @@
       "home_field": "BAL",
       "is_dome": false,
       "weather_data": [
-        10.6,
+        10.3,
         "10mph \u2600\ufe0f"
       ],
-      "wind": 10.6,
+      "wind": 10.3,
       "weather_desc": "10mph \u2600\ufe0f",
       "posteam_y": "NYJ",
       "off_stall_rate": 50.0,
@@ -176,11 +176,11 @@
       "home_field": "CHI",
       "is_dome": false,
       "weather_data": [
-        5.4,
-        "5mph \u2600\ufe0f"
+        6.5,
+        "6mph \u2600\ufe0f"
       ],
-      "wind": 5.4,
-      "weather_desc": "5mph \u2600\ufe0f",
+      "wind": 6.5,
+      "weather_desc": "6mph \u2600\ufe0f",
       "posteam_y": "CHI",
       "off_stall_rate": 33.3,
       "off_ppg": 30.0,
@@ -239,11 +239,11 @@
       "home_field": "TEN",
       "is_dome": false,
       "weather_data": [
-        0.4,
-        "0mph \u2600\ufe0f"
+        0,
+        "API Error"
       ],
-      "wind": 0.4,
-      "weather_desc": "0mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "API Error",
       "posteam_y": "SEA",
       "off_stall_rate": 43.8,
       "off_ppg": 33.666666666666664,
@@ -302,10 +302,10 @@
       "home_field": "TEN",
       "is_dome": false,
       "weather_data": [
-        0.4,
+        0.3,
         "0mph \u2600\ufe0f"
       ],
-      "wind": 0.4,
+      "wind": 0.3,
       "weather_desc": "0mph \u2600\ufe0f",
       "posteam_y": "TEN",
       "off_stall_rate": 75.0,
@@ -363,11 +363,11 @@
       "home_field": "CHI",
       "is_dome": false,
       "weather_data": [
-        5.4,
-        "5mph \u2600\ufe0f"
+        6.5,
+        "6mph \u2600\ufe0f"
       ],
-      "wind": 5.4,
-      "weather_desc": "5mph \u2600\ufe0f",
+      "wind": 6.5,
+      "weather_desc": "6mph \u2600\ufe0f",
       "posteam_y": "PIT",
       "off_stall_rate": 57.1,
       "off_ppg": 23.666666666666668,
@@ -619,10 +619,10 @@
       "home_field": "KC",
       "is_dome": false,
       "weather_data": [
-        5.3,
+        5.0,
         "5mph \u2600\ufe0f"
       ],
-      "wind": 5.3,
+      "wind": 5.0,
       "weather_desc": "5mph \u2600\ufe0f",
       "posteam_y": "IND",
       "off_stall_rate": 22.2,
@@ -808,10 +808,10 @@
       "home_field": "CIN",
       "is_dome": false,
       "weather_data": [
-        4.5,
+        4.7,
         "4mph \u2600\ufe0f"
       ],
-      "wind": 4.5,
+      "wind": 4.7,
       "weather_desc": "4mph \u2600\ufe0f",
       "posteam_y": "CIN",
       "off_stall_rate": 41.7,
@@ -933,10 +933,10 @@
       "home_field": "BAL",
       "is_dome": false,
       "weather_data": [
-        10.6,
+        10.3,
         "10mph \u2600\ufe0f"
       ],
-      "wind": 10.6,
+      "wind": 10.3,
       "weather_desc": "10mph \u2600\ufe0f",
       "posteam_y": "BAL",
       "off_stall_rate": 40.0,
@@ -1122,10 +1122,10 @@
       "home_field": "KC",
       "is_dome": false,
       "weather_data": [
-        5.3,
+        5.0,
         "5mph \u2600\ufe0f"
       ],
-      "wind": 5.3,
+      "wind": 5.0,
       "weather_desc": "5mph \u2600\ufe0f",
       "posteam_y": "KC",
       "off_stall_rate": 37.5,
@@ -1183,10 +1183,10 @@
       "home_field": "GB",
       "is_dome": false,
       "weather_data": [
-        8.5,
+        8.7,
         "8mph \u2600\ufe0f"
       ],
-      "wind": 8.5,
+      "wind": 8.7,
       "weather_desc": "8mph \u2600\ufe0f",
       "posteam_y": "MIN",
       "off_stall_rate": 41.7,
@@ -1373,10 +1373,10 @@
       "home_field": "GB",
       "is_dome": false,
       "weather_data": [
-        8.5,
+        8.7,
         "8mph \u2600\ufe0f"
       ],
-      "wind": 8.5,
+      "wind": 8.7,
       "weather_desc": "8mph \u2600\ufe0f",
       "posteam_y": "GB",
       "off_stall_rate": 36.4,
@@ -1434,10 +1434,10 @@
       "home_field": "GB",
       "is_dome": false,
       "weather_data": [
-        8.5,
+        8.7,
         "8mph \u2600\ufe0f"
       ],
-      "wind": 8.5,
+      "wind": 8.7,
       "weather_desc": "8mph \u2600\ufe0f",
       "posteam_y": "GB",
       "off_stall_rate": 36.4,
@@ -1558,10 +1558,10 @@
       "home_field": "CIN",
       "is_dome": false,
       "weather_data": [
-        4.5,
+        4.7,
         "4mph \u2600\ufe0f"
       ],
-      "wind": 4.5,
+      "wind": 4.7,
       "weather_desc": "4mph \u2600\ufe0f",
       "posteam_y": "NE",
       "off_stall_rate": 21.4,
@@ -1745,11 +1745,11 @@
       "home_field": "SF",
       "is_dome": false,
       "weather_data": [
-        4.6,
-        "4mph \u2600\ufe0f"
+        0,
+        "API Error"
       ],
-      "wind": 4.6,
-      "weather_desc": "4mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "API Error",
       "posteam_y": "CAR",
       "off_stall_rate": 33.3,
       "off_ppg": 17.666666666666668,
