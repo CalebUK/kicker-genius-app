@@ -3,17 +3,83 @@ import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
-  { header: "Grade", title: "Matchup Grade", desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
-  { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
-  { header: "Injury", title: "Injury Status", desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.", why: "Availability Risk", source: "NFL Official + CBS Scraper" },
-  { header: "L4 Off %", title: "Offensive Stall Rate (L4)", desc: "% of drives inside the 25 that fail to score a TD over the last 4 weeks.", why: "Recent Trend Volume", source: "nflreadpy (Play-by-Play)" },
-  { header: "L4 Def %", title: "Opponent Force Rate (L4)", desc: "% of opponent drives allowed inside the 25 that resulted in FGs (Last 4 weeks).", why: "Matchup Difficulty", source: "nflreadpy (Play-by-Play)" },
-  { header: "Vegas", title: "Implied Team Total", desc: "Points Vegas expects this team to score (derived from Spread & Total).", why: "Reality Check", source: "nflreadpy (Lee Sharpe)" },
-  { header: "Weather", title: "Live Forecast", desc: "Wind speed, temperature, and precipitation conditions at kickoff time.", why: "Accuracy Impact", source: "Open-Meteo API" },
-  { header: "Off PF", title: "Offense Points For", desc: "Average points scored by the kicker's team over the last 4 weeks.", why: "Scoring Ceiling", source: "nflreadpy (Schedule)" },
-  { header: "Opp PA", title: "Opponent Points Allowed", desc: "Average points allowed by the opponent over the last 4 weeks.", why: "Defensive Ceiling", source: "nflreadpy (Schedule)" },
-  { header: "FPts", title: "Fantasy Points (YTD)", desc: "Standard Scoring: 3 pts (0-39 yds), 4 pts (40-49 yds), 5 pts (50+ yds). -1 for Misses.", why: "Season Production", source: "nflreadpy (Play-by-Play)" },
-  { header: "Dome %", title: "Dome Percentage", desc: "Percentage of kicks attempted in a Dome or Closed Roof stadium.", why: "Environment Safety", source: "nflreadpy (Stadiums)" }
+  {
+    header: "Grade",
+    title: "Matchup Grade",
+    desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.",
+    why: "Predictive Model",
+    source: "Kicker Genius Model"
+  },
+  {
+    header: "Proj Pts",
+    title: "Projected Points",
+    desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.",
+    why: "Start/Sit Decision",
+    source: "Kicker Genius Model"
+  },
+  {
+    header: "Injury",
+    title: "Injury Status",
+    desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.",
+    why: "Availability Risk",
+    source: "NFL Official + CBS Scraper"
+  },
+  {
+    header: "L4 Off %",
+    title: "Offensive Stall Rate (L4)",
+    desc: "% of drives inside the 25 that fail to score a TD over the last 4 weeks.",
+    why: "Recent Trend Volume",
+    source: "nflreadpy (Play-by-Play)"
+  },
+  {
+    header: "L4 Def %",
+    title: "Opponent Force Rate (L4)",
+    desc: "% of opponent drives allowed inside the 25 that resulted in FGs (Last 4 weeks).",
+    why: "Matchup Difficulty",
+    source: "nflreadpy (Play-by-Play)"
+  },
+  {
+    header: "Vegas",
+    title: "Implied Team Total",
+    desc: "Points Vegas expects this team to score (derived from Spread & Total).",
+    why: "Reality Check",
+    source: "nflreadpy (Lee Sharpe)"
+  },
+  {
+    header: "Weather",
+    title: "Live Forecast",
+    desc: "Wind speed, temperature, and precipitation conditions at kickoff time.",
+    why: "Accuracy Impact",
+    source: "Open-Meteo API"
+  },
+  {
+    header: "Off PF",
+    title: "Offense Points For",
+    desc: "Average points scored by the kicker's team over the last 4 weeks.",
+    why: "Scoring Ceiling",
+    source: "nflreadpy (Schedule)"
+  },
+  {
+    header: "Opp PA",
+    title: "Opponent Points Allowed",
+    desc: "Average points allowed by the opponent over the last 4 weeks.",
+    why: "Defensive Ceiling",
+    source: "nflreadpy (Schedule)"
+  },
+  {
+    header: "FPts",
+    title: "Fantasy Points (YTD)",
+    desc: "Standard Scoring: 3 pts (0-39 yds), 4 pts (40-49 yds), 5 pts (50+ yds). -1 for Misses.",
+    why: "Season Production",
+    source: "nflreadpy (Play-by-Play)"
+  },
+  {
+    header: "Dome %",
+    title: "Dome Percentage",
+    desc: "Percentage of kicks attempted in a Dome or Closed Roof stadium.",
+    why: "Environment Safety",
+    source: "nflreadpy (Stadiums)"
+  }
 ];
 
 // --- DEFAULT SCORING ---
@@ -37,40 +103,49 @@ const HeaderCell = ({ label, description, avg }) => (
 );
 
 const PlayerCell = ({ player, subtext }) => {
-  const borderColor = player.injury_color === 'green' ? 'border-green-500' :
-                      player.injury_color === 'red-700' ? 'border-red-700' :
-                      player.injury_color === 'red-500' ? 'border-red-500' :
-                      player.injury_color === 'yellow-500' ? 'border-yellow-500' : 'border-slate-600';
+  const injuryColor = player.injury_color || 'slate-600'; 
+  const statusText = player.injury_status || '';
+  
+  let borderColor = 'border-slate-600';
+  if (injuryColor.includes('green')) borderColor = 'border-green-500';
+  if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
+  if (injuryColor.includes('red-500')) borderColor = 'border-red-500';
+  if (injuryColor.includes('yellow')) borderColor = 'border-yellow-500';
 
-  const textColor = player.injury_color === 'green' ? 'text-green-400' :
-                    player.injury_color === 'red-700' ? 'text-red-500' :
-                    player.injury_color === 'red-500' ? 'text-red-400' :
-                    player.injury_color === 'yellow-500' ? 'text-yellow-400' :
-                    'text-slate-400';
+  let textColor = 'text-slate-400';
+  if (injuryColor.includes('green')) textColor = 'text-green-400';
+  if (injuryColor.includes('red-700')) textColor = 'text-red-500';
+  if (injuryColor.includes('red-500')) textColor = 'text-red-400';
+  if (injuryColor.includes('yellow')) textColor = 'text-yellow-400';
+
+  const ownPct = player.own_pct || 0;
+  let ownColor = 'text-slate-500';
+  if (ownPct < 10) ownColor = 'text-blue-400 font-bold'; 
+  else if (ownPct > 80) ownColor = 'text-amber-500'; 
 
   return (
     <td className="px-6 py-4 font-medium text-white">
       <div className="flex items-center gap-3">
         <div className="relative group">
           <img 
-            src={player.headshot_url} 
+            src={player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'} 
             alt={player.kicker_player_name}
             className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover ${borderColor}`}
             onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}} 
           />
-          {player.injury_status !== 'Healthy' && (
+          {statusText !== 'Healthy' && statusText !== '' && (
              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
                 <div className={`font-bold ${textColor} mb-1`}>{player.injury_status}</div>
-                <div className="text-slate-300">{player.injury_details}</div>
+                <div className="text-slate-300">{player.injury_details || 'No details'}</div>
              </div>
           )}
         </div>
         <div>
           <div className="text-base leading-tight">{player.kicker_player_name}</div>
           <div className="text-xs text-slate-500">{subtext}</div>
-          {player.own_pct > 0 && (
-             <div className={`text-[10px] mt-1 font-bold ${player.own_pct < 10 ? 'text-blue-400 animate-pulse' : 'text-slate-600'}`}>
-               Own: {player.own_pct.toFixed(1)}%
+          {ownPct > 0 && (
+             <div className={`text-[10px] mt-1 ${ownColor}`}>
+               Own: {ownPct.toFixed(1)}%
              </div>
           )}
         </div>
@@ -108,7 +183,7 @@ const DeepDiveRow = ({ player }) => (
             <div className="text-slate-400 font-semibold mb-2">2. WEIGHTED PROJECTION</div>
             <div className="flex justify-between mb-1">
               <span>Base (50%):</span> 
-              <span className="text-slate-300">{(player.avg_pts * (player.grade/90)).toFixed(1)} pts</span>
+              <span className="text-slate-300">{(player.fpts_ytd / (player.games || 1) * (player.grade/90)).toFixed(1)} pts</span>
             </div>
             <div className="flex justify-between mb-1">
               <span>Offense Est (30%):</span> 
@@ -119,7 +194,7 @@ const DeepDiveRow = ({ player }) => (
               <span className="text-amber-400">{player.def_cap_val} pts</span>
             </div>
             <div className="mt-2 text-[10px] text-slate-500 border-t border-slate-800 pt-1">
-              <div>Spread: {player.details_vegas_spread} | Total: {player.details_vegas_total}</div>
+              <div>Off Share: {((player.off_share || 0) * 100).toFixed(0)}% | Def Share: {((player.def_share || 0) * 100).toFixed(0)}%</div>
             </div>
           </div>
 
@@ -129,6 +204,16 @@ const DeepDiveRow = ({ player }) => (
              {(player.injury_status === 'OUT' || player.injury_status === 'Doubtful') && <div className="text-red-500 font-bold text-xs mt-1">PLAYER IS OUT/DOUBTFUL</div>}
              <div className="text-[10px] text-slate-500 mt-1">Combined Weighted Score</div>
           </div>
+        </div>
+        
+        <div className="mt-3 bg-slate-900 p-3 rounded border border-slate-800/50 text-xs">
+           <div className="text-slate-400 font-bold mb-1">MATCHUP CONTEXT</div>
+           <div className="flex gap-4 text-slate-300">
+              <div><span className="text-slate-500">Vegas:</span> {player.details_vegas_spread} Spread, {player.details_vegas_total} Total</div>
+              <div><span className="text-slate-500">Implied Team Total:</span> {player.vegas ? player.vegas.toFixed(1) : '--'} pts</div>
+              <div><span className="text-slate-500">L4 Team PF:</span> {player.off_ppg ? player.off_ppg.toFixed(1) : '--'} pts</div>
+              <div><span className="text-slate-500">L4 Opp Allowed:</span> {player.def_pa ? player.def_pa.toFixed(1) : '--'} pts</div>
+           </div>
         </div>
       </div>
     </td>
@@ -161,6 +246,7 @@ const App = () => {
         return response.json();
       })
       .then(jsonData => {
+        console.log("Data Loaded:", jsonData); 
         setData(jsonData);
         setLoading(false);
       })
@@ -195,12 +281,16 @@ const App = () => {
 
   const calcProj = (p, grade) => {
     if (grade === 0) return 0;
+    
     const avgPts = p.fpts_ytd / (p.games || 1);
     const base = avgPts * (grade / 90);
+    
+    // Scale Caps based on Custom Scoring Ratio
     const scaleFactor = (p.avg_pts && p.avg_pts > 0) ? (avgPts / p.avg_pts) : 1.0;
     const off_cap_scaled = (p.off_cap_val || 0) * scaleFactor;
     const def_cap_scaled = (p.def_cap_val || 0) * scaleFactor;
     
+    // 50/30/20 Weighted Logic
     const weighted_proj = (base * 0.50) + (off_cap_scaled * 0.30) + (def_cap_scaled * 0.20);
     const proj = weighted_proj > 1.0 ? weighted_proj : base;
     
@@ -208,9 +298,20 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p className="text-slate-400 animate-pulse">Loading Kicker Intelligence...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
+  
+  if (error || !data) {
+    return (
+        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center">
+            <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
+            <h2 className="text-xl font-bold mb-2">Data Not Found</h2>
+            <p className="text-slate-400 mb-6">{error}</p>
+            <p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p>
+        </div>
+    );
+  }
 
   const { rankings, ytd, injuries, meta } = data;
+  const leagueAvgs = meta?.league_avgs || {};
   
   let processed = rankings.map(p => {
      const ytdPts = calcFPts(p);
@@ -223,11 +324,11 @@ const App = () => {
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
   const ytdSorted = ytd.map(p => ({...p, fpts: calcFPts(p)})).sort((a, b) => b.fpts - a.fpts);
-  const outKickers = injuries?.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT') || [];
-  const doubtfulKickers = injuries?.filter(k => k.injury_status === 'Doubtful') || [];
-  const questionableKickers = injuries?.filter(k => k.injury_status === 'Questionable') || [];
-  const otherKickers = injuries?.filter(k => !['OUT', 'CUT', 'Doubtful', 'Questionable', 'Healthy'].includes(k.injury_status)) || [];
-  const leagueAvgs = meta?.league_avgs || {};
+  
+  const outKickers = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT');
+  const doubtfulKickers = injuries.filter(k => k.injury_status === 'Doubtful');
+  const questionableKickers = injuries.filter(k => k.injury_status === 'Questionable');
+  const otherKickers = injuries.filter(k => !['OUT', 'CUT', 'Doubtful', 'Questionable', 'Healthy'].includes(k.injury_status));
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
@@ -251,13 +352,15 @@ const App = () => {
           </div>
         </div>
 
+        {/* Tabs */}
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => setActiveTab('potential')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => setActiveTab('ytd')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
-          <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries && injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
+          <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
+        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -278,6 +381,7 @@ const App = () => {
           </div>
         )}
 
+        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
@@ -369,6 +473,7 @@ const App = () => {
           </div>
         )}
 
+        {/* INJURIES */}
         {activeTab === 'injuries' && (
            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
              {outKickers.length > 0 && (
