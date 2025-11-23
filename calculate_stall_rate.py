@@ -49,17 +49,13 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        match_index = -1
-        for i, t in enumerate(times):
-            if t.startswith(target):
-                match_index = i
-                break
+        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
         
-        if match_index == -1: return 0, "No Data"
+        if idx == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][match_index]
-        precip = data['hourly']['precipitation_probability'][match_index]
-        temp = data['hourly']['temperature_2m'][match_index]
+        wind = data['hourly']['wind_speed_10m'][idx]
+        precip = data['hourly']['precipitation_probability'][idx]
+        temp = data['hourly']['temperature_2m'][idx]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -100,6 +96,64 @@ def scrape_cbs_injuries():
         print(f"   ⚠️ Scraping failed: {e}")
         return pd.DataFrame()
 
+def scrape_fantasy_ownership():
+    """
+    Scrapes FantasyPros for Average Ownership %.
+    """
+    print("   🌐 Scraping FantasyPros for Ownership data...")
+    url = "https://www.fantasypros.com/nfl/ownership/k.php"
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        dfs = pd.read_html(response.text)
+        if not dfs: return pd.DataFrame()
+        
+        df = dfs[0].copy()
+        
+        # Columns usually: Player, Yahoo, ESPN, CBS, FFT, AVG
+        # We want Player and AVG
+        # Rename columns to standard keys
+        df.columns = [c.lower() for c in df.columns]
+        
+        # Find Player and Avg columns
+        player_col = next((c for c in df.columns if 'player' in c), None)
+        avg_col = next((c for c in df.columns if 'avg' in c or 'cons' in c), None)
+        
+        if not player_col or not avg_col:
+            print("   ⚠️ Could not find ownership columns.")
+            return pd.DataFrame()
+
+        df = df[[player_col, avg_col]].rename(columns={player_col: 'full_name', avg_col: 'own_pct'})
+        
+        # Clean Data
+        # "Brandon Aubrey (DAL)" -> "Brandon Aubrey"
+        # Then convert to "B.Aubrey" format for matching
+        def clean_name_to_match(val):
+            if not isinstance(val, str): return val
+            name_part = val.split('(')[0].strip()
+            parts = name_part.split(' ')
+            if len(parts) >= 2:
+                # Convert "Brandon Aubrey" -> "B.Aubrey"
+                return f"{parts[0][0]}.{parts[1]}"
+            return name_part
+
+        df['match_name'] = df['full_name'].apply(clean_name_to_match)
+        
+        # Convert percentage string "95%" to float 95.0
+        def clean_pct(val):
+            if not isinstance(val, str): return 0.0
+            return float(val.replace('%', '').strip())
+
+        df['own_pct'] = df['own_pct'].apply(clean_pct)
+        
+        print(f"   ✅ Scraped ownership for {len(df)} kickers.")
+        return df[['match_name', 'own_pct']]
+
+    except Exception as e:
+        print(f"   ⚠️ Ownership scraping failed: {e}")
+        return pd.DataFrame()
+
 def load_injury_data_safe(season, target_week):
     print("🏥 Fetching Injury Data...")
     try:
@@ -137,6 +191,9 @@ def run_analysis():
     players = nfl.load_players()
     
     injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
+    
+    # Fetch Ownership
+    ownership_data = scrape_fantasy_ownership()
 
     try:
         rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
@@ -202,6 +259,14 @@ def run_analysis():
     else:
         stats['headshot_url'] = None
     stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
+    
+    # MERGE OWNERSHIP
+    if not ownership_data.empty:
+        # Merge on the cleaned name match
+        stats = pd.merge(stats, ownership_data, left_on='kicker_player_name', right_on='match_name', how='left')
+        stats['own_pct'] = stats['own_pct'].fillna(0.0)
+    else:
+        stats['own_pct'] = 0.0
 
     # MERGE INJURIES
     if 'full_name' in injury_report.columns:
@@ -317,6 +382,7 @@ def run_analysis():
     model['is_dome'] = model['roof'].isin(['dome', 'closed'])
     
     print("🌤️ Fetching Weather...")
+    import requests 
     model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
     model['wind'] = model['weather_data'].apply(lambda x: x[0])
     model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
@@ -369,8 +435,7 @@ def run_analysis():
         weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
         proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
         
-        # FIXED: Include Practice Squad in the 0.0 Override
-        if row['injury_status'] in ['OUT', 'CUT', 'Practice Squad']:
+        if row['injury_status'] == 'OUT' or row['injury_status'] == 'CUT' or row['injury_status'] == 'Practice Squad':
             proj = 0.0
             grade = 0.0
             bonuses.append(f"⛔ {row['injury_status'].upper()}")
@@ -389,10 +454,8 @@ def run_analysis():
 
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
-    
     final = final.replace({np.nan: None})
     ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
-    
     injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace({np.nan: None})
 
     output = {

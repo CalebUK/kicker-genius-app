@@ -297,7 +297,6 @@ const App = () => {
           </div>
         )}
 
-        {/* YTD TABLE */}
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="overflow-x-auto">
