@@ -18,6 +18,13 @@ const GLOSSARY_DATA = [
     source: "Kicker Genius Model"
   },
   {
+    header: "Own %",
+    title: "Ownership Percentage",
+    desc: "Percentage of fantasy leagues where this player is rostered (Average across platforms).",
+    why: "Waiver Wire Strategy (<10% = Sleeper)",
+    source: "FantasyPros Scraper"
+  },
+  {
     header: "Injury",
     title: "Injury Status",
     desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.",
@@ -97,10 +104,9 @@ const HeaderCell = ({ label, description, avg }) => (
 );
 
 const PlayerCell = ({ player, subtext }) => {
-  // Map color names to Tailwind classes dynamically
   const borderColor = player.injury_color === 'green' ? 'border-green-500' :
                       player.injury_color === 'red-700' ? 'border-red-700' :
-                      player.injury_color === 'red-500' ? 'border-red-500' : // Doubtful
+                      player.injury_color === 'red-500' ? 'border-red-500' :
                       player.injury_color === 'yellow-500' ? 'border-yellow-500' :
                       'border-slate-600';
 
@@ -130,6 +136,12 @@ const PlayerCell = ({ player, subtext }) => {
         <div>
           <div className="text-base">{player.kicker_player_name}</div>
           <div className="text-xs text-slate-500">{subtext}</div>
+          {/* NEW: Ownership Badge */}
+          {player.own_pct !== undefined && (
+             <div className={`text-[10px] mt-1 font-bold ${player.own_pct < 10 ? 'text-blue-400 animate-pulse' : 'text-slate-600'}`}>
+               Own: {player.own_pct.toFixed(1)}%
+             </div>
+          )}
         </div>
       </div>
     </td>
@@ -138,7 +150,7 @@ const PlayerCell = ({ player, subtext }) => {
 
 const DeepDiveRow = ({ player }) => (
   <tr className="bg-slate-900/50 border-b border-slate-800">
-    <td colSpan="10" className="p-4">
+    <td colSpan="11" className="p-4"> {/* Adjusted colSpan */}
       <div className="bg-slate-950 border border-slate-800 rounded-lg p-4 animate-in slide-in-from-top-2 duration-300">
         <div className="flex items-center gap-2 mb-3">
           <Calculator className="w-4 h-4 text-emerald-400" />
@@ -297,6 +309,7 @@ const App = () => {
           </div>
         )}
 
+        {/* YTD TABLE */}
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="overflow-x-auto">
