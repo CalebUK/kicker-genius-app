@@ -6,3 +6,5 @@ pydantic
 pydantic-settings
 lxml
 pyarrow
+html5lib
+beautifulsoup4
