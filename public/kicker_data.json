@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 12,
-    "updated": "2025-11-23 08:32",
+    "updated": "2025-11-23 09:26",
     "league_avgs": {
       "fpts": 64.2,
       "off_stall": 41.5,
@@ -617,11 +617,11 @@
       "home_field": "KC",
       "is_dome": false,
       "weather_data": [
-        5.1,
-        "5mph \u2600\ufe0f"
+        0,
+        "API Error"
       ],
-      "wind": 5.1,
-      "weather_desc": "5mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "API Error",
       "posteam_y": "IND",
       "off_stall_rate": 22.2,
       "off_ppg": 25.5,
@@ -1179,11 +1179,11 @@
       "home_field": "GB",
       "is_dome": false,
       "weather_data": [
-        8.5,
-        "8mph \u2600\ufe0f"
+        0,
+        "API Error"
       ],
-      "wind": 8.5,
-      "weather_desc": "8mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "API Error",
       "posteam_y": "MIN",
       "off_stall_rate": 41.7,
       "off_ppg": 21.0,
