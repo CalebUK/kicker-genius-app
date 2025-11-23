@@ -49,13 +49,17 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
+        match_index = -1
+        for i, t in enumerate(times):
+            if t.startswith(target):
+                match_index = i
+                break
         
-        if idx == -1: return 0, "No Data"
+        if match_index == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
+        wind = data['hourly']['wind_speed_10m'][match_index]
+        precip = data['hourly']['precipitation_probability'][match_index]
+        temp = data['hourly']['temperature_2m'][match_index]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -305,7 +309,13 @@ def run_analysis():
     lg_off_avg = off_stall['off_stall_rate'].mean()
     lg_def_avg = def_stall['def_stall_rate'].mean()
 
-    # Scoring & Share (L4) - FIXED MATCHING
+    # --- MISSING AGGRESSION BLOCK RESTORED ---
+    fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
+    fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
+    aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
+    aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
+    
+    # Scoring & Share (L4)
     completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
     home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
     away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
@@ -318,11 +328,8 @@ def run_analysis():
     def_pa = all_allowed.groupby('team')['pts_allowed'].mean().reset_index().rename(columns={'pts_allowed': 'def_pa', 'team': 'opponent'})
 
     l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
-    
-    # Corrected: Use 'real_pts' (3 pts per FG, 1 per XP)
     kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
-    kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True) # Rename to match merge logic
-    
+    kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True)
     home_g = completed[['game_id', 'home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'total'})
     away_g = completed[['game_id', 'away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'total'})
     all_g = pd.concat([home_g, away_g])
@@ -362,6 +369,10 @@ def run_analysis():
     final = pd.merge(final, def_stall, left_on='opponent', right_on='defteam', how='left')
     final = pd.merge(final, def_pa, on='opponent', how='left')
     final = pd.merge(final, def_share, on='opponent', how='left')
+    
+    # Merge Aggression
+    final = pd.merge(final, aggression_stats[['posteam', 'aggression_pct']], left_on='team', right_on='posteam', how='left')
+    
     final = final.fillna(0)
 
     def process_row(row):
@@ -421,26 +432,20 @@ def run_analysis():
 
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
-    
-    final = final.replace([np.inf, -np.inf, np.nan], None)
-    final = final.where(pd.notnull(final), None)
-    
-    ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
-    ytd_sorted = ytd_sorted.where(pd.notnull(ytd_sorted), None)
-    
-    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
-    injuries_list = injuries_list.where(pd.notnull(injuries_list), None)
+    final = final.replace({np.nan: None})
+    ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
+    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace({np.nan: None})
 
     output = {
         "meta": {
             "week": int(target_week),
             "updated": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "league_avgs": {
-                "off_stall": clean_nan(round(lg_off_avg, 1)),
-                "def_stall": clean_nan(round(lg_def_avg, 1)),
-                "l4_off_ppg": clean_nan(round(off_ppg['off_ppg'].mean(), 1)),
-                "l4_def_pa": clean_nan(round(def_pa['def_pa'].mean(), 1)),
-                "fpts": clean_nan(round(stats['fpts'].mean(), 1))
+                "fpts": round(stats['fpts'].mean(), 1),
+                "off_stall": round(lg_off_avg, 1),
+                "def_stall": round(lg_def_avg, 1),
+                "l4_off_ppg": round(off_ppg['off_ppg'].mean(), 1),
+                "l4_def_pa": round(def_pa['def_pa'].mean(), 1)
             }
         },
         "rankings": final.to_dict(orient='records'),
