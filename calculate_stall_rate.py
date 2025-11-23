@@ -269,7 +269,6 @@ def run_analysis():
         if pd.isna(report_st):
             if roster_st and roster_st != 'ACT' and roster_st != 'nan': return roster_st, "gray-400", f"Roster: {roster_st}"
             return "Healthy", "green", "Active"
-        
         report_st = str(report_st).title()
         if "Out" in report_st or "Ir" in report_st: return "OUT", "red-700", f"{report_st} ({practice})"
         elif "Doubtful" in report_st: return "Doubtful", "red-400", f"{report_st} ({practice})"
@@ -284,7 +283,6 @@ def run_analysis():
     qualified = stats[stats['fg_att'] >= 5]
     elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
 
-    # --- 2. STALL METRICS (L4) ---
     max_wk = pbp['week'].max()
     start_wk = max(1, max_wk - 3)
     recent_pbp = pbp[pbp['week'] >= start_wk].copy()
@@ -311,7 +309,6 @@ def run_analysis():
     aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
     aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
 
-    # Scoring & Share (L4)
     completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
     home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
     away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
@@ -337,26 +334,25 @@ def run_analysis():
     share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
     def_share = share_df.groupby('opponent')['share'].mean().reset_index().rename(columns={'share': 'def_share'})
 
-    # MATCHUPS
     matchups = schedule[schedule['week'] == target_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']].copy()
     matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
     matchups['total_line'] = matchups['total_line'].fillna(44.0)
     matchups['spread_line'] = matchups['spread_line'].fillna(0.0)
     
-    # UPDATED VEGAS LOGIC: FLIP THE SPREAD SIGN FOR IMPLIED TOTAL
+    # VEGAS LOGIC FIXED: Home = (Total - Spread)/2, Away = (Total + Spread)/2
     home_view = matchups[['home_team', 'away_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     home_view['home_field'] = home_view['home_team']
     home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
-    # New Formula: (Total + Spread) / 2 for Home
-    home_view['vegas_implied'] = (home_view['total_line'] + home_view['spread_line']) / 2
+    # If Spread = -7 (Home Fav), Score should be higher. (47 - (-7)) / 2 = 27.
+    home_view['vegas'] = (home_view['total_line'] - home_view['spread_line']) / 2
     home_view['is_home'] = True
     home_view['spread_display'] = home_view['spread_line'].apply(lambda x: f"{x:+.1f}" if x > 0 else f"{x:.1f}")
 
     away_view = matchups[['away_team', 'home_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     away_view['home_field'] = away_view['home_team']
     away_view = away_view.rename(columns={'away_team': 'team', 'home_team': 'opponent'})
-    # New Formula: (Total - Spread) / 2 for Away
-    away_view['vegas_implied'] = (away_view['total_line'] - away_view['spread_line']) / 2
+    # If Spread = -7 (Home Fav), Away Score should be lower. (47 + (-7)) / 2 = 20.
+    away_view['vegas'] = (away_view['total_line'] + away_view['spread_line']) / 2
     away_view['is_home'] = False
     away_view['spread_display'] = (away_view['spread_line'] * -1).apply(lambda x: f"{x:+.1f}" if x > 0 else f"{x:.1f}")
     
@@ -397,6 +393,8 @@ def run_analysis():
             
         if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
         if abs(row['spread_line']) < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
+        elif abs(row['spread_line']) > 9.5: bonus_val -= 5; bonuses.append("-5 Blowout Risk")
+        
         if row['fpts'] >= elite_thresh: bonus_val += 5; bonuses.append("+5 Elite Talent")
         if row['aggression_pct'] > 25.0: bonus_val -= 5; bonuses.append("-5 Aggressive Coach")
         
@@ -404,8 +402,8 @@ def run_analysis():
         
         base_proj = row['avg_pts'] * (grade / 90)
         
-        w_team_score = (row['vegas_implied'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas_implied'] > 0 else row['off_ppg']
-        w_def_allowed = (row['vegas_implied'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas_implied'] > 0 else row['def_pa']
+        w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
+        w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
@@ -447,7 +445,8 @@ def run_analysis():
         r = aubrey.iloc[0]
         print("\n🤠 AUBREY DEEP DIVE:")
         print(f"   • Vegas Total: {r['details_vegas_total']}, Spread: {r['details_vegas_spread']}")
-        print(f"   • Implied Team Score (Vegas): {r['vegas_implied']:.1f}")
+        # Ensure we check the correct 'vegas' column which now holds the implied score
+        print(f"   • Implied Team Score (Vegas): {r['vegas']:.1f}") 
         print(f"   • Grade: {r['grade']} (Multiplier: {r['grade']/90:.2f})")
 
     output = {
