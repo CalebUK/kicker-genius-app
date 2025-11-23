@@ -5,6 +5,7 @@ import json
 import warnings
 from datetime import datetime
 import numpy as np
+import time
 
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
@@ -49,17 +50,13 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        match_index = -1
-        for i, t in enumerate(times):
-            if t.startswith(target):
-                match_index = i
-                break
+        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
         
-        if match_index == -1: return 0, "No Data"
+        if idx == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][match_index]
-        precip = data['hourly']['precipitation_probability'][match_index]
-        temp = data['hourly']['temperature_2m'][match_index]
+        wind = data['hourly']['wind_speed_10m'][idx]
+        precip = data['hourly']['precipitation_probability'][idx]
+        temp = data['hourly']['temperature_2m'][idx]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -72,9 +69,9 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
 def scrape_cbs_injuries():
     print("   🌐 Scraping CBS Sports for live injury data...")
     url = "https://www.cbssports.com/nfl/injuries/"
-    headers = {'User-Agent': 'Mozilla/5.0'}
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=10)
         dfs = pd.read_html(response.text)
         if not dfs: return pd.DataFrame()
         combined = pd.concat(dfs, ignore_index=True)
@@ -103,30 +100,76 @@ def scrape_cbs_injuries():
 def scrape_fantasy_ownership():
     print("   🌐 Scraping FantasyPros for Ownership data...")
     url = "https://www.fantasypros.com/nfl/ownership/k.php"
-    headers = {'User-Agent': 'Mozilla/5.0'}
+    
+    # Use robust headers to mimic a real browser
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Referer': 'https://www.google.com/'
+    }
+    
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=15)
+        
+        if response.status_code != 200:
+            print(f"   ⚠️ FantasyPros returned status {response.status_code}. Trying backup...")
+            # Fallback URL (Consensus Rankings sometimes has ownership)
+            url = "https://www.fantasypros.com/nfl/rankings/k.php"
+            response = requests.get(url, headers=headers, timeout=15)
+            
         dfs = pd.read_html(response.text)
         if not dfs: return pd.DataFrame()
+        
         df = dfs[0].copy()
-        df.columns = [c.lower() for c in df.columns]
+        df.columns = [str(c).lower() for c in df.columns]
+        
+        # Find Player Column
         player_col = next((c for c in df.columns if 'player' in c), None)
-        avg_col = next((c for c in df.columns if 'avg' in c or 'cons' in c), None)
-        if not player_col or not avg_col: return pd.DataFrame()
+        
+        # Find Ownership Column (could be 'own', '% owned', 'avg', 'cons')
+        avg_col = next((c for c in df.columns if 'own' in c or 'avg' in c or '%' in c), None)
+        
+        if not player_col or not avg_col:
+            print(f"   ⚠️ Could not find ownership columns. Found: {df.columns}")
+            return pd.DataFrame()
+
         df = df[[player_col, avg_col]].rename(columns={player_col: 'full_name', avg_col: 'own_pct'})
+        
+        # Clean Name: "Justin Tucker (BAL)" -> "J.Tucker"
         def clean_name_to_match(val):
             if not isinstance(val, str): return val
+            # Remove team and injury notes like "Justin Tucker (BAL) Q"
             name_part = val.split('(')[0].strip()
             parts = name_part.split(' ')
-            if len(parts) >= 2: return f"{parts[0][0]}.{parts[1]}"
+            
+            # Handle "Cameron Dicker" -> "C.Dicker"
+            # Handle "Ka'imi Fairbairn" -> "K.Fairbairn"
+            if len(parts) >= 2:
+                first = parts[0]
+                last = parts[-1] # Take last part for surname (avoids Jr/III issues mostly)
+                if len(first) > 0:
+                    return f"{first[0]}.{last}"
             return name_part
+
         df['match_name'] = df['full_name'].apply(clean_name_to_match)
+        
+        # Clean Percentage: "95%" -> 95.0
         def clean_pct(val):
             if not isinstance(val, str): return 0.0
-            return float(val.replace('%', '').strip())
+            clean_val = val.replace('%', '').strip()
+            try:
+                return float(clean_val)
+            except:
+                return 0.0
+
         df['own_pct'] = df['own_pct'].apply(clean_pct)
+        
+        print(f"   ✅ Scraped ownership for {len(df)} kickers. Top: {df.iloc[0]['match_name']} ({df.iloc[0]['own_pct']}%)")
         return df[['match_name', 'own_pct']]
+
     except Exception as e:
+        print(f"   ⚠️ Ownership scraping failed: {e}")
         return pd.DataFrame()
 
 def load_injury_data_safe(season, target_week):
@@ -240,12 +283,14 @@ def run_analysis():
         stats['headshot_url'] = None
     stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
     
+    # MERGE OWNERSHIP (Fixed Variable Name)
     if not ownership_data.empty:
         stats = pd.merge(stats, ownership_data, left_on='kicker_player_name', right_on='match_name', how='left')
         stats['own_pct'] = stats['own_pct'].fillna(0.0)
     else:
         stats['own_pct'] = 0.0
 
+    # MERGE INJURIES
     if 'full_name' in injury_report.columns:
         name_map = players[['gsis_id', 'display_name']].rename(columns={'gsis_id': 'kicker_player_id', 'display_name': 'full_name_official'})
         stats = pd.merge(stats, name_map, on='kicker_player_id', how='left')
@@ -309,12 +354,6 @@ def run_analysis():
     lg_off_avg = off_stall['off_stall_rate'].mean()
     lg_def_avg = def_stall['def_stall_rate'].mean()
 
-    # --- MISSING AGGRESSION BLOCK RESTORED ---
-    fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
-    fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
-    aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
-    aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
-    
     # Scoring & Share (L4)
     completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
     home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
@@ -372,7 +411,6 @@ def run_analysis():
     
     # Merge Aggression
     final = pd.merge(final, aggression_stats[['posteam', 'aggression_pct']], left_on='team', right_on='posteam', how='left')
-    
     final = final.fillna(0)
 
     def process_row(row):

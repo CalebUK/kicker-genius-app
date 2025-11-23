@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter } from 'lucide-react';
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -16,6 +16,13 @@ const GLOSSARY_DATA = [
     desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.",
     why: "Start/Sit Decision",
     source: "Kicker Genius Model"
+  },
+  {
+    header: "Own %",
+    title: "Ownership Percentage",
+    desc: "Percentage of fantasy leagues where this player is rostered.",
+    why: "Waiver Wire Strategy (<10% = Sleeper)",
+    source: "FantasyPros Scraper"
   },
   {
     header: "Injury",
@@ -94,7 +101,7 @@ const HeaderCell = ({ label, description, avg }) => (
       {label}
       <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors" />
     </div>
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-800 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
       <div className="text-white font-semibold mb-1">{description}</div>
       {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
       <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 border-l border-t border-slate-700 rotate-45"></div>
@@ -114,6 +121,12 @@ const PlayerCell = ({ player, subtext }) => {
                     player.injury_color === 'yellow-500' ? 'text-yellow-400' :
                     'text-slate-400';
 
+  // Ownership Styling
+  const ownPct = player.own_pct || 0;
+  let ownColor = 'text-slate-500';
+  if (ownPct < 10) ownColor = 'text-blue-400 font-bold'; // Sleeper
+  else if (ownPct > 80) ownColor = 'text-amber-500'; // Chalk
+
   return (
     <td className="px-6 py-4 font-medium text-white">
       <div className="flex items-center gap-3">
@@ -132,13 +145,11 @@ const PlayerCell = ({ player, subtext }) => {
           )}
         </div>
         <div>
-          <div className="text-base">{player.kicker_player_name}</div>
+          <div className="text-base leading-tight">{player.kicker_player_name}</div>
           <div className="text-xs text-slate-500">{subtext}</div>
-          {player.own_pct > 0 && (
-             <div className={`text-[10px] mt-1 font-bold ${player.own_pct < 10 ? 'text-blue-400 animate-pulse' : 'text-slate-600'}`}>
-               Own: {player.own_pct.toFixed(1)}%
-             </div>
-          )}
+          <div className={`text-[10px] mt-1 ${ownColor}`}>
+             Own: {ownPct.toFixed(1)}%
+          </div>
         </div>
       </div>
     </td>
@@ -208,9 +219,12 @@ const App = () => {
   const [scoring, setScoring] = useState(DEFAULT_SCORING);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // --- OWNERSHIP FILTERS ---
+  const [hideHighOwn, setHideHighOwn] = useState(false);
+  const [hideMedOwn, setHideMedOwn] = useState(false);
 
   useEffect(() => {
-    // Fix: Merge saved scoring with default to prevent blanks if keys are missing
     const savedScoring = localStorage.getItem('kicker_scoring');
     if (savedScoring) {
       try {
@@ -238,7 +252,6 @@ const App = () => {
   }, []);
 
   const updateScoring = (key, val) => {
-    // Handle empty input by defaulting to 0
     const numVal = val === '' ? 0 : parseFloat(val);
     const newScoring = { ...scoring, [key]: numVal };
     setScoring(newScoring);
@@ -264,42 +277,31 @@ const App = () => {
   // Re-run projection logic with dynamic scoring base
   const calcProj = (p, grade) => {
     if (grade === 0) return 0;
-    
-    // Recalculate Average Points based on custom scoring
     const avgPts = p.fpts_ytd / p.games;
-    
-    // Base Projection using Grade Multiplier
     const base = avgPts * (grade / 90);
-    
-    // Get the caps (passed from Python) but scale them to new scoring if needed
-    // Since caps in python were based on standard scoring, we scale them by ratio
-    // Ratio = Current Avg PPG / Standard Avg PPG (approx 8.0)
     const scaleFactor = p.avg_pts > 0 ? (avgPts / p.avg_pts) : 1.0;
-    
     const off_cap_scaled = p.off_cap_val * scaleFactor;
     const def_cap_scaled = p.def_cap_val * scaleFactor;
-    
     const cap = Math.min(off_cap_scaled, def_cap_scaled);
-    
-    // Avoid cap if it's broken (too low)
     return (cap < 1) ? base.toFixed(1) : Math.min(base, cap).toFixed(1);
   };
-
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p className="text-slate-400 animate-pulse">Loading Kicker Intelligence...</p></div>;
   if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
 
-  // Process Data
   const { rankings, ytd, injuries, meta } = data;
   
-  // Apply Custom Scoring
-  const processed = rankings.map(p => {
+  // Process & Filter Data
+  let processed = rankings.map(p => {
      const ytdPts = calcFPts(p);
-     // Re-inject calculated FPts into player object for sorting/display
      const pWithYtd = { ...p, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
      return { ...pWithYtd, proj };
   }).sort((a, b) => b.proj - a.proj);
+
+  // Apply Ownership Filters
+  if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
+  if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
   const ytdSorted = rankings.map(p => ({...p, fpts: calcFPts(p)})).sort((a, b) => b.fpts - a.fpts);
 
@@ -361,6 +363,19 @@ const App = () => {
 
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+             {/* FILTERS */}
+             <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
+                <div className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1"><Filter className="w-3 h-3" /> Filters:</div>
+                <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white">
+                   <input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" />
+                   Hide {'>'} 80% Owned
+                </label>
+                <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white">
+                   <input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" />
+                   Hide {'>'} 60% Owned
+                </label>
+             </div>
+
              <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
