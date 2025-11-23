@@ -49,17 +49,13 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        match_index = -1
-        for i, t in enumerate(times):
-            if t.startswith(target):
-                match_index = i
-                break
+        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
         
-        if match_index == -1: return 0, "No Data"
+        if idx == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][match_index]
-        precip = data['hourly']['precipitation_probability'][match_index]
-        temp = data['hourly']['temperature_2m'][match_index]
+        wind = data['hourly']['wind_speed_10m'][idx]
+        precip = data['hourly']['precipitation_probability'][idx]
+        temp = data['hourly']['temperature_2m'][idx]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -101,7 +97,7 @@ def scrape_cbs_injuries():
         return pd.DataFrame()
 
 def scrape_fantasy_ownership():
-    print("   🌐 Scraping FantasyPros for Ownership data...")
+    print("   🌐 Scraping FantasyPros (Stats Page) for Ownership data...")
     url = "https://www.fantasypros.com/nfl/stats/k.php"
     headers = {'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html'}
     try:
@@ -141,8 +137,8 @@ def load_injury_data_safe(season, target_week):
         injuries = pd.read_csv(url)
         return injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
     except Exception: pass
-    scraped = scrape_cbs_injuries()
-    if not scraped.empty: return scraped
+    scraped_data = scrape_cbs_injuries()
+    if not scraped_data.empty: return scraped_data
     return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
 
 def clean_nan(val):
@@ -180,20 +176,28 @@ def run_analysis():
     kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
     kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
     
-    def calc_pts(row):
-        if row['play_type'] == 'field_goal':
-            if row['field_goal_result'] == 'made':
-                if row['kick_distance'] >= 50: return 5
-                elif row['kick_distance'] >= 40: return 4
-                else: return 3
-            else: return -1
-        elif row['play_type'] == 'extra_point':
-            return 1 if row['extra_point_result'] == 'good' else -1
-        return 0
+    # --- FIXED: ADDING MISSING COLUMNS FOR CUSTOM SCORING ---
+    kick_plays['is_fg'] = kick_plays['play_type'] == 'field_goal'
+    kick_plays['is_xp'] = kick_plays['play_type'] == 'extra_point'
+    kick_plays['made'] = ((kick_plays['is_fg'] & (kick_plays['field_goal_result'] == 'made')) | 
+                          (kick_plays['is_xp'] & (kick_plays['extra_point_result'] == 'good')))
     
-    kick_plays['fantasy_pts'] = kick_plays.apply(calc_pts, axis=1)
-    kick_plays['is_50'] = (kick_plays['kick_distance'] >= 50) & (kick_plays['field_goal_result'] == 'made')
+    # Distance Buckets
+    kick_plays['fg_0_19'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'] < 20)
+    kick_plays['fg_20_29'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(20, 29))
+    kick_plays['fg_30_39'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(30, 39))
+    kick_plays['fg_40_49'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(40, 49))
+    kick_plays['fg_50_59'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(50, 59))
+    kick_plays['fg_60_plus'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'] >= 60)
+    
+    kick_plays['fg_miss'] = (kick_plays['is_fg']) & (~kick_plays['made'])
+    kick_plays['xp_made'] = (kick_plays['is_xp']) & (kick_plays['made'])
+    kick_plays['xp_miss'] = (kick_plays['is_xp']) & (~kick_plays['made'])
+    kick_plays['real_pts'] = (kick_plays['is_fg'] & kick_plays['made']) * 3 + (kick_plays['is_xp'] & kick_plays['made']) * 1
+    
     kick_plays['is_dome'] = kick_plays['roof'].isin(['dome', 'closed'])
+    
+    # ------------------------------------------------------
     
     rz_drives = pbp[(pbp['yardline_100'] <= 25) & (pbp['yardline_100'].notnull())][['game_id', 'drive', 'posteam']].drop_duplicates()
     rz_counts = rz_drives.groupby('posteam').size().reset_index(name='rz_trips')
@@ -220,11 +224,13 @@ def run_analysis():
     stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
     stats['acc'] = (stats['fg_made'] / stats['fg_att'] * 100).round(1)
     stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
+    # Recalc standard Fantasy Points for display sorting
     stats['fpts'] = (stats['fg_0_19']*3 + stats['fg_20_29']*3 + stats['fg_30_39']*3 + 
                      stats['fg_40_49']*4 + stats['fg_50_59']*5 + stats['fg_60_plus']*5 + 
                      stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
     stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
+    # HEADSHOTS
     headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
     if headshot_col:
         player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
@@ -233,12 +239,14 @@ def run_analysis():
         stats['headshot_url'] = None
     stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
     
+    # MERGE OWNERSHIP
     if not ownership_data.empty:
         stats = pd.merge(stats, ownership_data, left_on='kicker_player_name', right_on='match_name', how='left')
         stats['own_pct'] = stats['own_pct'].fillna(0.0)
     else:
         stats['own_pct'] = 0.0
 
+    # MERGE INJURIES
     if 'full_name' in injury_report.columns:
         name_map = players[['gsis_id', 'display_name']].rename(columns={'gsis_id': 'kicker_player_id', 'display_name': 'full_name_official'})
         stats = pd.merge(stats, name_map, on='kicker_player_id', how='left')
@@ -333,42 +341,28 @@ def run_analysis():
     share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
     def_share = share_df.groupby('opponent')['share'].mean().reset_index().rename(columns={'share': 'def_share'})
 
-    # B. MATCHUPS
-    cols = ['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']
-    weekly_matchups = schedule[schedule['week'] == target_week][cols].copy()
-    weekly_matchups['game_dt'] = weekly_matchups['gameday'] + ' ' + weekly_matchups['gametime']
-    weekly_matchups['total_line'] = weekly_matchups['total_line'].fillna(44.0)
-    weekly_matchups['spread_line'] = weekly_matchups['spread_line'].fillna(0.0)
+    # MATCHUPS
+    matchups = schedule[schedule['week'] == target_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']].copy()
+    matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
+    matchups['total_line'] = matchups['total_line'].fillna(44.0)
+    matchups['spread_line'] = matchups['spread_line'].fillna(0.0)
+    matchups['home_imp'] = (matchups['total_line'] - matchups['spread_line'])/2
+    matchups['away_imp'] = (matchups['total_line'] + matchups['spread_line'])/2
     
-    # FIX: SPLIT LOGIC (Home vs Away)
-    
-    # Home Team View
-    home_view = weekly_matchups[['home_team', 'away_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
-    home_view['home_field'] = home_view['home_team']
-    home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
-    # Implied = (Total - Spread) / 2 (Standard: Spread is Home-Away)
-    home_view['vegas_implied'] = (home_view['total_line'] - home_view['spread_line']) / 2
-    home_view['is_home'] = True
-    home_view['spread_display'] = home_view['spread_line'] # Keep original spread for display
-
-    # Away Team View
-    away_view = weekly_matchups[['away_team', 'home_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
-    away_view['home_field'] = away_view['home_team']
-    away_view = away_view.rename(columns={'away_team': 'team', 'home_team': 'opponent'})
-    # Implied = (Total + Spread) / 2
-    away_view['vegas_implied'] = (away_view['total_line'] + away_view['spread_line']) / 2
-    away_view['is_home'] = False
-    away_view['spread_display'] = away_view['spread_line'] * -1 # Flip spread for Away team display
-
-    matchup_map = pd.concat([home_view, away_view])
-    matchup_map['game_in_dome'] = matchup_map['roof'].isin(['dome', 'closed'])
+    home = matchups.rename(columns={'home_team': 'team', 'away_team': 'opponent', 'home_imp': 'vegas'})
+    home['is_home'] = True
+    away = matchups.rename(columns={'away_team': 'team', 'home_team': 'opponent', 'away_imp': 'vegas'})
+    away['is_home'] = False
+    model = pd.concat([home, away])
+    model['home_field'] = model.apply(lambda x: x['team'] if x['is_home'] else x['opponent'], axis=1)
+    model['is_dome'] = model['roof'].isin(['dome', 'closed'])
     
     print("🌤️ Fetching Weather...")
     model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
     model['wind'] = model['weather_data'].apply(lambda x: x[0])
     model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
-    final = pd.merge(stats, matchup_map, on='team', how='inner')
+    final = pd.merge(stats, model, on='team', how='inner')
     final = pd.merge(final, off_stall, left_on='team', right_on='posteam', how='left')
     final = pd.merge(final, off_ppg, on='team', how='left')
     final = pd.merge(final, off_share, on='team', how='left')
@@ -404,8 +398,8 @@ def run_analysis():
         
         base_proj = row['avg_pts'] * (grade / 90)
         
-        w_team_score = (row['vegas_implied'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas_implied'] > 0 else row['off_ppg']
-        w_def_allowed = (row['vegas_implied'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas_implied'] > 0 else row['def_pa']
+        w_team_score = (row['vegas'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas'] > 0 else row['off_ppg']
+        w_def_allowed = (row['vegas'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas'] > 0 else row['def_pa']
         
         s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
         off_cap = w_team_score * (s_off * 1.2)
@@ -430,9 +424,7 @@ def run_analysis():
             'w_team_score': round(w_team_score, 1),
             'w_def_allowed': round(w_def_allowed, 1),
             'off_cap_val': round(off_cap, 1),
-            'def_cap_val': round(def_cap, 1),
-            'details_vegas_total': round(row['total_line'], 1),
-            'details_vegas_spread': round(row['spread_display'], 1)
+            'def_cap_val': round(def_cap, 1)
         })
 
     final = final.join(final.apply(process_row, axis=1))
@@ -446,8 +438,8 @@ def run_analysis():
     if not aubrey.empty:
         r = aubrey.iloc[0]
         print("\n🤠 AUBREY DEEP DIVE:")
-        print(f"   • Vegas Total: {r['details_vegas_total']}, Spread: {r['details_vegas_spread']}")
-        print(f"   • Implied Team Score (Vegas): {r['vegas_implied']:.1f}")
+        print(f"   • Vegas Total: {r['total_line']}, Spread: {r['spread_line']}")
+        print(f"   • Implied Team Score (Vegas): {r['vegas']:.1f}")
         print(f"   • Grade: {r['grade']} (Multiplier: {r['grade']/90:.2f})")
 
     output = {
