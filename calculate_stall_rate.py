@@ -146,6 +146,75 @@ def clean_nan(val):
         if pd.isna(val) or np.isinf(val): return None
     return val
 
+# --- NEW: ANALYZE PREVIOUS WEEK ---
+def analyze_previous_week(target_week, pbp, schedule, stats):
+    """
+    Calculates Proj vs Actual for the previous week to serve as a sanity check.
+    """
+    prev_week = target_week - 1
+    if prev_week < 1: return pd.DataFrame()
+    
+    print(f"🔙 Analyzing Week {prev_week} Performance...")
+
+    # 1. Get Actual Points Scored in Prev Week
+    prev_games = pbp[pbp['week'] == prev_week].copy()
+    
+    # Recalculate basic points for prev week (Standard Scoring)
+    def calc_simple_pts(row):
+        if row['play_type'] == 'field_goal':
+            if row['field_goal_result'] == 'made':
+                return 5 if row['kick_distance'] >= 50 else 4 if row['kick_distance'] >= 40 else 3
+            return -1
+        elif row['play_type'] == 'extra_point':
+            return 1 if row['extra_point_result'] == 'good' else -1
+        return 0
+    
+    prev_games['pts'] = prev_games.apply(calc_simple_pts, axis=1)
+    actuals = prev_games.groupby(['kicker_player_id'])['pts'].sum().reset_index().rename(columns={'pts': 'prev_actual'})
+    
+    # 2. Reconstruct Projection Inputs for Prev Week
+    # We use CURRENT Season averages (Hindsight) applied to PAST Matchup
+    prev_matchups = schedule[schedule['week'] == prev_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line', 'home_score', 'away_score']].copy()
+    
+    # Normalize Vegas
+    prev_matchups['total_line'] = prev_matchups['total_line'].fillna(44.0)
+    prev_matchups['spread_line'] = prev_matchups['spread_line'].fillna(0.0)
+    
+    home_view = prev_matchups[['home_team', 'away_team', 'total_line', 'spread_line']].copy()
+    home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
+    home_view['vegas_implied'] = (home_view['total_line'] + home_view['spread_line']) / 2 # Home + Spread
+    home_view['is_home'] = True
+
+    away_view = prev_matchups[['away_team', 'home_team', 'total_line', 'spread_line']].copy()
+    away_view = away_view.rename(columns={'away_team': 'team', 'home_team': 'opponent'})
+    away_view['vegas_implied'] = (away_view['total_line'] - away_view['spread_line']) / 2 # Away - Spread
+    away_view['is_home'] = False
+    
+    prev_model = pd.concat([home_view, away_view])
+    
+    # Merge Stats (Avg Pts) into Prev Model
+    comparison = pd.merge(stats[['kicker_player_id', 'team', 'avg_pts']], prev_model, on='team')
+    
+    # Calculate "Hindsight Projection" using simple version of our formula
+    # (We assume neutral weather for past games to simplify)
+    def calc_simple_proj(row):
+        base = row['avg_pts'] # Use their season average as base
+        
+        # Apply Vegas adjustment
+        # If Team Implied > 24, bump projection. If < 17, lower it.
+        mult = 1.0
+        if row['vegas_implied'] > 24: mult = 1.1
+        elif row['vegas_implied'] < 18: mult = 0.85
+        
+        return round(base * mult, 1)
+    
+    comparison['prev_proj'] = comparison.apply(calc_simple_proj, axis=1)
+    
+    # Merge Actuals
+    comparison = pd.merge(comparison, actuals, on='kicker_player_id', how='left').fillna(0)
+    
+    return comparison[['kicker_player_id', 'prev_proj', 'prev_actual']]
+
 def run_analysis():
     target_week = get_current_nfl_week()
     print(f"🚀 Starting Analysis for Week {target_week}...")
@@ -339,32 +408,19 @@ def run_analysis():
     matchups['total_line'] = matchups['total_line'].fillna(44.0)
     matchups['spread_line'] = matchups['spread_line'].fillna(0.0)
     
-    # VEGAS FIX: Positive Spread = Home Margin (Favorite) in 2025 dataset
-    
+    # FIXED VEGAS LOGIC
     home_view = matchups[['home_team', 'away_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     home_view['home_field'] = home_view['home_team']
     home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
-    
-    # Home Implied: (Total + Spread) / 2
-    # If Spread = 12.5 (Positive), Home gets (Total+12.5)/2 -> Favorite. Correct.
     home_view['vegas_implied'] = (home_view['total_line'] + home_view['spread_line']) / 2
     home_view['is_home'] = True
-    
-    # Display Spread: Flip to Betting Standard (Neg = Favorite)
-    # If Spread = 12.5 (Fav), Display = -12.5
     home_view['spread_display'] = home_view['spread_line'].apply(lambda x: f"{x*-1:+.1f}")
 
     away_view = matchups[['away_team', 'home_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     away_view['home_field'] = away_view['home_team']
     away_view = away_view.rename(columns={'away_team': 'team', 'home_team': 'opponent'})
-    
-    # Away Implied: (Total - Spread) / 2
-    # If Spread = 12.5 (Home Fav), Away gets (Total-12.5)/2 -> Underdog. Correct.
     away_view['vegas_implied'] = (away_view['total_line'] - away_view['spread_line']) / 2
     away_view['is_home'] = False
-    
-    # Display Spread: Away is Underdog (+12.5)
-    # Since Data says 12.5, Away sees +12.5.
     away_view['spread_display'] = away_view['spread_line'].apply(lambda x: f"{x:+.1f}")
     
     model = pd.concat([home_view, away_view])
@@ -385,6 +441,14 @@ def run_analysis():
     final = pd.merge(final, aggression_stats[['posteam', 'aggression_pct']], left_on='team', right_on='posteam', how='left')
     final = final.fillna(0)
 
+    # --- NEW: PREVIOUS WEEK CHECK ---
+    prev_performance = analyze_previous_week(target_week, pbp, schedule, stats)
+    if not prev_performance.empty:
+        final = pd.merge(final, prev_performance, on='kicker_player_id', how='left').fillna(0)
+    else:
+        final['prev_proj'] = 0
+        final['prev_actual'] = 0
+
     def process_row(row):
         off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
         def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
@@ -404,8 +468,7 @@ def run_analysis():
             
         if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
         
-        # Spread Logic: Use Absolute Value to check tightness
-        # Since we flipped signs for display, convert back to float
+        # Use absolute spread for logic
         spread_val = abs(float(row['spread_display']))
         if spread_val < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
         elif spread_val > 9.5: bonus_val -= 5; bonuses.append("-5 Blowout Risk")
@@ -450,18 +513,15 @@ def run_analysis():
 
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
-    final = final.replace({np.nan: None})
-    ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
-    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace({np.nan: None})
-
-    # Aubrey Check
-    aubrey = final[final['kicker_player_name'].str.contains("Aubrey", na=False)]
-    if not aubrey.empty:
-        r = aubrey.iloc[0]
-        print("\n🤠 AUBREY DEEP DIVE:")
-        print(f"   • Vegas Total: {r['details_vegas_total']}, Spread: {r['details_vegas_spread']}")
-        print(f"   • Implied Team Score (Vegas): {r['vegas_implied']:.1f}")
-        print(f"   • Grade: {r['grade']} (Multiplier: {r['grade']/90:.2f})")
+    
+    final = final.replace([np.inf, -np.inf, np.nan], None)
+    final = final.where(pd.notnull(final), None)
+    
+    ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
+    ytd_sorted = ytd_sorted.where(pd.notnull(ytd_sorted), None)
+    
+    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
+    injuries_list = injuries_list.where(pd.notnull(injuries_list), None)
 
     output = {
         "meta": {
