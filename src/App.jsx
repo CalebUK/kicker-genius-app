@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw } from 'lucide-react';
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -94,7 +94,7 @@ const HeaderCell = ({ label, description, avg }) => (
       {label}
       <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors" />
     </div>
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-800 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
       <div className="text-white font-semibold mb-1">{description}</div>
       {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
       <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 border-l border-t border-slate-700 rotate-45"></div>
@@ -106,8 +106,7 @@ const PlayerCell = ({ player, subtext }) => {
   const borderColor = player.injury_color === 'green' ? 'border-green-500' :
                       player.injury_color === 'red-700' ? 'border-red-700' :
                       player.injury_color === 'red-500' ? 'border-red-500' :
-                      player.injury_color === 'yellow-500' ? 'border-yellow-500' :
-                      'border-slate-600';
+                      player.injury_color === 'yellow-500' ? 'border-yellow-500' : 'border-slate-600';
 
   const textColor = player.injury_color === 'green' ? 'text-green-400' :
                     player.injury_color === 'red-700' ? 'text-red-500' :
@@ -126,7 +125,7 @@ const PlayerCell = ({ player, subtext }) => {
             onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}} 
           />
           {player.injury_status !== 'Healthy' && (
-             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl">
                 <div className={`font-bold ${textColor} mb-1`}>{player.injury_status}</div>
                 <div className="text-slate-300">{player.injury_details}</div>
              </div>
@@ -210,12 +209,18 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // --- LIVE DATA FETCH ---
   useEffect(() => {
+    // Fix: Merge saved scoring with default to prevent blanks if keys are missing
     const savedScoring = localStorage.getItem('kicker_scoring');
-    if (savedScoring) setScoring(JSON.parse(savedScoring));
+    if (savedScoring) {
+      try {
+        const parsed = JSON.parse(savedScoring);
+        setScoring({ ...DEFAULT_SCORING, ...parsed });
+      } catch (e) {
+        console.error("Error parsing saved scoring", e);
+      }
+    }
 
-    // Use absolute path with cache buster to prevent loading old/broken data
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(response => {
         if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
@@ -233,9 +238,16 @@ const App = () => {
   }, []);
 
   const updateScoring = (key, val) => {
-    const newScoring = { ...scoring, [key]: parseFloat(val) };
+    // Handle empty input by defaulting to 0
+    const numVal = val === '' ? 0 : parseFloat(val);
+    const newScoring = { ...scoring, [key]: numVal };
     setScoring(newScoring);
     localStorage.setItem('kicker_scoring', JSON.stringify(newScoring));
+  };
+  
+  const resetScoring = () => {
+    setScoring(DEFAULT_SCORING);
+    localStorage.setItem('kicker_scoring', JSON.stringify(DEFAULT_SCORING));
   };
 
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
@@ -262,7 +274,7 @@ const App = () => {
     // Get the caps (passed from Python) but scale them to new scoring if needed
     // Since caps in python were based on standard scoring, we scale them by ratio
     // Ratio = Current Avg PPG / Standard Avg PPG (approx 8.0)
-    const scaleFactor = avgPts / (p.avg_pts || 8.0); 
+    const scaleFactor = p.avg_pts > 0 ? (avgPts / p.avg_pts) : 1.0;
     
     const off_cap_scaled = p.off_cap_val * scaleFactor;
     const def_cap_scaled = p.def_cap_val * scaleFactor;
@@ -313,7 +325,7 @@ const App = () => {
              <div className="bg-slate-900 border border-slate-800 rounded-lg p-2 flex items-center gap-3 shadow-sm px-4">
                <div className="text-right">
                  <div className="text-[10px] text-slate-500 uppercase font-bold">Last Update</div>
-                 <div className="text-xs font-semibold text-white">{meta.updated}</div>
+                 <div className="text-xs font-semibold text-white">{meta.updated} (Week {meta.week})</div>
                </div>
              </div>
           </div>
@@ -329,7 +341,10 @@ const App = () => {
         {/* VIEW: SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><Settings className="w-5 h-5"/> Scoring Settings</h2>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2"><Settings className="w-5 h-5"/> Scoring Settings</h2>
+                <button onClick={resetScoring} className="text-xs bg-red-900/30 text-red-400 px-3 py-1 rounded border border-red-800/50 hover:bg-red-900/50 flex items-center gap-1"><RotateCcw className="w-3 h-3" /> Reset to Default</button>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {Object.entries(scoring).map(([key, val]) => (
                 <div key={key}>
