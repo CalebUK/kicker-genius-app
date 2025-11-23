@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 12,
-    "updated": "2025-11-23 19:48",
+    "updated": "2025-11-23 20:02",
     "league_avgs": {
       "fpts": 64.2,
       "off_stall": 41.5,
@@ -821,11 +821,11 @@
       "spread_display": "-3.5",
       "is_dome": false,
       "weather_data": [
-        4.7,
-        "4mph \u2600\ufe0f"
+        0,
+        "API Error"
       ],
-      "wind": 4.7,
-      "weather_desc": "4mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "API Error",
       "posteam_y": "IND",
       "off_stall_rate": 22.2,
       "off_ppg": 25.5,
@@ -1424,11 +1424,11 @@
       "spread_display": "+7.5",
       "is_dome": false,
       "weather_data": [
-        5.0,
-        "5mph \u2600\ufe0f"
+        4.0,
+        "4mph \u2600\ufe0f"
       ],
-      "wind": 5.0,
-      "weather_desc": "5mph \u2600\ufe0f",
+      "wind": 4.0,
+      "weather_desc": "4mph \u2600\ufe0f",
       "posteam_y": "SF",
       "off_stall_rate": 18.8,
       "off_ppg": 33.666666666666664,
@@ -2721,11 +2721,11 @@
       "spread_display": "-3.5",
       "is_dome": false,
       "weather_data": [
-        4.7,
-        "4mph \u2600\ufe0f"
+        0,
+        "API Error"
       ],
-      "wind": 4.7,
-      "weather_desc": "4mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "API Error",
       "posteam_y": "IND",
       "off_stall_rate": 22.2,
       "off_ppg": 25.5,
