@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter } from 'lucide-react';
 
-// ... [Keep GLOSSARY_DATA and DEFAULT_SCORING unchanged] ...
+// --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
   { header: "Grade", title: "Matchup Grade", desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
@@ -16,6 +16,7 @@ const GLOSSARY_DATA = [
   { header: "Dome %", title: "Dome Percentage", desc: "Percentage of kicks attempted in a Dome or Closed Roof stadium.", why: "Environment Safety", source: "nflreadpy (Stadiums)" }
 ];
 
+// --- DEFAULT SCORING ---
 const DEFAULT_SCORING = {
   fg0_19: 3, fg20_29: 3, fg30_39: 3, fg40_49: 4, fg50_59: 5, fg60_plus: 5,
   fg_miss: -1, xp_made: 1, xp_miss: -1
@@ -65,7 +66,7 @@ const PlayerCell = ({ player, subtext }) => {
           )}
         </div>
         <div>
-          <div className="text-base">{player.kicker_player_name}</div>
+          <div className="text-base leading-tight">{player.kicker_player_name}</div>
           <div className="text-xs text-slate-500">{subtext}</div>
           {player.own_pct > 0 && (
              <div className={`text-[10px] mt-1 font-bold ${player.own_pct < 10 ? 'text-blue-400 animate-pulse' : 'text-slate-600'}`}>
@@ -107,7 +108,7 @@ const DeepDiveRow = ({ player }) => (
             <div className="text-slate-400 font-semibold mb-2">2. WEIGHTED PROJECTION</div>
             <div className="flex justify-between mb-1">
               <span>Base (50%):</span> 
-              <span className="text-slate-300">{(player.fpts_ytd / (player.games || 1) * (player.grade/90)).toFixed(1)} pts</span>
+              <span className="text-slate-300">{(player.avg_pts * (player.grade/90)).toFixed(1)} pts</span>
             </div>
             <div className="flex justify-between mb-1">
               <span>Offense Est (30%):</span> 
@@ -155,8 +156,8 @@ const App = () => {
     }
 
     fetch('/kicker_data.json?v=' + new Date().getTime())
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
         return response.json();
       })
       .then(jsonData => {
@@ -207,7 +208,7 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p className="text-slate-400 animate-pulse">Loading Kicker Intelligence...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   
@@ -231,7 +232,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header, Tabs, etc. Same as before */}
+        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
@@ -483,6 +484,7 @@ const App = () => {
              </div>
           </div>
         )}
+        
       </div>
     </div>
   );
