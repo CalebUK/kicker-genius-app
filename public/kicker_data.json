@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 12,
-    "updated": "2025-11-23 21:54",
+    "updated": "2025-11-23 22:26",
     "league_avgs": {
       "fpts": 64.2,
       "off_stall": 41.5,
@@ -2160,11 +2160,11 @@
       "spread_display": "+7.5",
       "is_dome": false,
       "weather_data": [
-        4.0,
-        "4mph \u2600\ufe0f"
+        0,
+        "API Error"
       ],
-      "wind": 4.0,
-      "weather_desc": "4mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "API Error",
       "posteam_y": "CAR",
       "off_stall_rate": 33.3,
       "off_ppg": 17.666666666666668,
