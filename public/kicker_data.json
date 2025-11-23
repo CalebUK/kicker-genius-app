@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 12,
-    "updated": "2025-11-23 07:24",
+    "updated": "2025-11-23 08:13",
     "league_avgs": {
       "fpts": 64.2,
       "off_stall": 41.5,
@@ -996,11 +996,11 @@
       "home_field": "SF",
       "is_dome": false,
       "weather_data": [
-        5.4,
-        "5mph \u2600\ufe0f"
+        4.6,
+        "4mph \u2600\ufe0f"
       ],
-      "wind": 5.4,
-      "weather_desc": "5mph \u2600\ufe0f",
+      "wind": 4.6,
+      "weather_desc": "4mph \u2600\ufe0f",
       "posteam_y": "SF",
       "off_stall_rate": 18.8,
       "off_ppg": 33.666666666666664,
