@@ -74,7 +74,7 @@ def scrape_cbs_injuries():
     url = "https://www.cbssports.com/nfl/injuries/"
     headers = {'User-Agent': 'Mozilla/5.0'}
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers)
         dfs = pd.read_html(response.text)
         if not dfs: return pd.DataFrame()
         combined = pd.concat(dfs, ignore_index=True)
@@ -176,11 +176,10 @@ def run_analysis():
     if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
     if hasattr(players, "to_pandas"): players = players.to_pandas()
 
-    # --- KICKER STATS ---
+    # --- RAW STATS AGGREGATION ---
     kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
     kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
     
-    # FIXED: Check result first (Made/Missed) for accurate counts
     kick_plays['is_fg'] = kick_plays['play_type'] == 'field_goal'
     kick_plays['is_xp'] = kick_plays['play_type'] == 'extra_point'
     kick_plays['made'] = ((kick_plays['is_fg'] & (kick_plays['field_goal_result'] == 'made')) | 
@@ -225,14 +224,12 @@ def run_analysis():
     stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
     stats['acc'] = (stats['fg_made'] / stats['fg_att'] * 100).round(1)
     stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
-    
-    # Calc Standard FPts for sorting
+    # Recalc standard FPts for sorting
     stats['fpts'] = (stats['fg_0_19']*3 + stats['fg_20_29']*3 + stats['fg_30_39']*3 + 
                      stats['fg_40_49']*4 + stats['fg_50_59']*5 + stats['fg_60_plus']*5 + 
                      stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
     stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-    # HEADSHOTS
     headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
     if headshot_col:
         player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
@@ -241,14 +238,12 @@ def run_analysis():
         stats['headshot_url'] = None
     stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
     
-    # MERGE OWNERSHIP
     if not ownership_data.empty:
         stats = pd.merge(stats, ownership_data, left_on='kicker_player_name', right_on='match_name', how='left')
         stats['own_pct'] = stats['own_pct'].fillna(0.0)
     else:
         stats['own_pct'] = 0.0
 
-    # MERGE INJURIES
     if 'full_name' in injury_report.columns:
         name_map = players[['gsis_id', 'display_name']].rename(columns={'gsis_id': 'kicker_player_id', 'display_name': 'full_name_official'})
         stats = pd.merge(stats, name_map, on='kicker_player_id', how='left')
@@ -349,20 +344,28 @@ def run_analysis():
     matchups['total_line'] = matchups['total_line'].fillna(44.0)
     matchups['spread_line'] = matchups['spread_line'].fillna(0.0)
     
+    # FIXED VEGAS LOGIC (Flip signs)
     home_view = matchups[['home_team', 'away_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     home_view['home_field'] = home_view['home_team']
     home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
+    # Home Implied = (Total + Spread) / 2  (Assuming spread is like -3.0 for favorite, adding negative reduces total)
+    # Wait, spread_line from nflreadr is typically negative for home favorite.
+    # If Spread is -3 (Home Fav), Score should be higher.
+    # (Total - Spread)/2 => (47 - (-3))/2 = 50/2 = 25.
+    # (Total + Spread)/2 => (47 + (-3))/2 = 44/2 = 22.
+    # So SUBTRACTING spread (if neg=fav) adds points to home.
+    # Correct logic for Home: (Total - Spread) / 2
     home_view['vegas_implied'] = (home_view['total_line'] - home_view['spread_line']) / 2
     home_view['is_home'] = True
-    # Explicitly format spread string for display
     home_view['spread_display'] = home_view['spread_line'].apply(lambda x: f"{x:+.1f}" if x > 0 else f"{x:.1f}")
 
     away_view = matchups[['away_team', 'home_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     away_view['home_field'] = away_view['home_team']
     away_view = away_view.rename(columns={'away_team': 'team', 'home_team': 'opponent'})
+    # Away Implied = Total - Home Implied = (Total + Spread) / 2
+    # Check: 47 - 25 = 22. Correct.
     away_view['vegas_implied'] = (away_view['total_line'] + away_view['spread_line']) / 2
     away_view['is_home'] = False
-    # Flip spread for away perspective display (If Home is -7, Away sees +7)
     away_view['spread_display'] = (away_view['spread_line'] * -1).apply(lambda x: f"{x:+.1f}" if x > 0 else f"{x:.1f}")
     
     model = pd.concat([home_view, away_view])
@@ -439,7 +442,7 @@ def run_analysis():
             'off_cap_val': round(off_cap, 1),
             'def_cap_val': round(def_cap, 1),
             'details_vegas_total': round(row['total_line'], 1),
-            'details_vegas_spread': row['spread_display'] # Now a string with +/-
+            'details_vegas_spread': row['spread_display']
         })
 
     final = final.join(final.apply(process_row, axis=1))
@@ -451,12 +454,14 @@ def run_analysis():
     injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
     injuries_list = injuries_list.where(pd.notnull(injuries_list), None)
 
-    # Debugging Check for Aubrey
+    # Aubrey Check
     aubrey = final[final['kicker_player_name'].str.contains("Aubrey", na=False)]
     if not aubrey.empty:
         r = aubrey.iloc[0]
-        print(f"\n🤠 AUBREY CHECK: Spread Display = {r['details_vegas_spread']} (Raw Spread: {r['spread_line']})")
-        print(f"   Implied Score: {r['vegas_implied']:.1f}")
+        print("\n🤠 AUBREY DEEP DIVE:")
+        print(f"   • Vegas Total: {r['details_vegas_total']}, Spread: {r['details_vegas_spread']}")
+        print(f"   • Implied Team Score (Vegas): {r['vegas_implied']:.1f}")
+        print(f"   • Grade: {r['grade']} (Multiplier: {r['grade']/90:.2f})")
 
     output = {
         "meta": {
