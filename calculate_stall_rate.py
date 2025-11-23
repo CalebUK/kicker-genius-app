@@ -265,6 +265,7 @@ def run_analysis():
         if pd.isna(report_st):
             if roster_st and roster_st != 'ACT' and roster_st != 'nan': return roster_st, "gray-400", f"Roster: {roster_st}"
             return "Healthy", "green", "Active"
+        
         report_st = str(report_st).title()
         if "Out" in report_st or "Ir" in report_st: return "OUT", "red-700", f"{report_st} ({practice})"
         elif "Doubtful" in report_st: return "Doubtful", "red-400", f"{report_st} ({practice})"
@@ -279,6 +280,7 @@ def run_analysis():
     qualified = stats[stats['fg_att'] >= 5]
     elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
 
+    # --- 2. STALL METRICS (L4) ---
     max_wk = pbp['week'].max()
     start_wk = max(1, max_wk - 3)
     recent_pbp = pbp[pbp['week'] >= start_wk].copy()
@@ -305,6 +307,7 @@ def run_analysis():
     aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
     aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
 
+    # Scoring & Share (L4)
     completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
     home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
     away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
@@ -330,39 +333,44 @@ def run_analysis():
     share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
     def_share = share_df.groupby('opponent')['share'].mean().reset_index().rename(columns={'share': 'def_share'})
 
+    # MATCHUPS
     matchups = schedule[schedule['week'] == target_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']].copy()
     matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
     matchups['total_line'] = matchups['total_line'].fillna(44.0)
     matchups['spread_line'] = matchups['spread_line'].fillna(0.0)
     
-    # FIXED SPREAD LOGIC: Calculate Implied Score based on Point Difference
+    # VEGAS FIX: Positive Spread = Home Margin (Favorite) in 2025 dataset
+    
     home_view = matchups[['home_team', 'away_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     home_view['home_field'] = home_view['home_team']
     home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
-    # HOME IMPLIED: (Total - Spread) / 2. (e.g. 40 - (-10) = 50 / 2 = 25)
-    home_view['vegas_implied'] = (home_view['total_line'] - home_view['spread_line']) / 2
+    
+    # Home Implied: (Total + Spread) / 2
+    # If Spread = 12.5 (Positive), Home gets (Total+12.5)/2 -> Favorite. Correct.
+    home_view['vegas_implied'] = (home_view['total_line'] + home_view['spread_line']) / 2
     home_view['is_home'] = True
-    home_view['spread_val'] = home_view['spread_line'] # Store raw spread
+    
+    # Display Spread: Flip to Betting Standard (Neg = Favorite)
+    # If Spread = 12.5 (Fav), Display = -12.5
+    home_view['spread_display'] = home_view['spread_line'].apply(lambda x: f"{x*-1:+.1f}")
 
     away_view = matchups[['away_team', 'home_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     away_view['home_field'] = away_view['home_team']
     away_view = away_view.rename(columns={'away_team': 'team', 'home_team': 'opponent'})
-    # AWAY IMPLIED: (Total + Spread) / 2. (e.g. 40 + (-10) = 30 / 2 = 15)
-    away_view['vegas_implied'] = (away_view['total_line'] + away_view['spread_line']) / 2
+    
+    # Away Implied: (Total - Spread) / 2
+    # If Spread = 12.5 (Home Fav), Away gets (Total-12.5)/2 -> Underdog. Correct.
+    away_view['vegas_implied'] = (away_view['total_line'] - away_view['spread_line']) / 2
     away_view['is_home'] = False
-    away_view['spread_val'] = away_view['spread_line'] * -1 # Flip spread for away view
-
+    
+    # Display Spread: Away is Underdog (+12.5)
+    # Since Data says 12.5, Away sees +12.5.
+    away_view['spread_display'] = away_view['spread_line'].apply(lambda x: f"{x:+.1f}")
+    
     model = pd.concat([home_view, away_view])
     model['is_dome'] = model['roof'].isin(['dome', 'closed'])
     
-    # CALCULATE DISPLAY SPREAD (Based on Point Difference)
-    # If Implied > 50% of Total, you are favorite (Negative Spread)
-    # Calculated Spread = -(Team_Implied - Opponent_Implied)
-    model['opp_implied'] = model['total_line'] - model['vegas_implied']
-    model['spread_display'] = (model['opp_implied'] - model['vegas_implied']).apply(lambda x: f"{x:+.1f}" if x > 0 else f"{x:.1f}")
-
     print("🌤️ Fetching Weather...")
-    import requests 
     model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
     model['wind'] = model['weather_data'].apply(lambda x: x[0])
     model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
@@ -396,7 +404,8 @@ def run_analysis():
             
         if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
         
-        # Spread Logic using the recalculated display spread
+        # Spread Logic: Use Absolute Value to check tightness
+        # Since we flipped signs for display, convert back to float
         spread_val = abs(float(row['spread_display']))
         if spread_val < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
         elif spread_val > 9.5: bonus_val -= 5; bonuses.append("-5 Blowout Risk")
@@ -444,6 +453,15 @@ def run_analysis():
     final = final.replace({np.nan: None})
     ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
     injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace({np.nan: None})
+
+    # Aubrey Check
+    aubrey = final[final['kicker_player_name'].str.contains("Aubrey", na=False)]
+    if not aubrey.empty:
+        r = aubrey.iloc[0]
+        print("\n🤠 AUBREY DEEP DIVE:")
+        print(f"   • Vegas Total: {r['details_vegas_total']}, Spread: {r['details_vegas_spread']}")
+        print(f"   • Implied Team Score (Vegas): {r['vegas_implied']:.1f}")
+        print(f"   • Grade: {r['grade']} (Multiplier: {r['grade']/90:.2f})")
 
     output = {
         "meta": {
