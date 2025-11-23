@@ -224,7 +224,6 @@ def run_analysis():
     stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
     stats['acc'] = (stats['fg_made'] / stats['fg_att'] * 100).round(1)
     stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
-    # Recalc standard FPts for sorting
     stats['fpts'] = (stats['fg_0_19']*3 + stats['fg_20_29']*3 + stats['fg_30_39']*3 + 
                      stats['fg_40_49']*4 + stats['fg_50_59']*5 + stats['fg_60_plus']*5 + 
                      stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
@@ -344,27 +343,20 @@ def run_analysis():
     matchups['total_line'] = matchups['total_line'].fillna(44.0)
     matchups['spread_line'] = matchups['spread_line'].fillna(0.0)
     
-    # FIXED VEGAS LOGIC (Flip signs)
+    # UPDATED VEGAS LOGIC: FLIP THE SPREAD SIGN FOR IMPLIED TOTAL
     home_view = matchups[['home_team', 'away_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     home_view['home_field'] = home_view['home_team']
     home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
-    # Home Implied = (Total + Spread) / 2  (Assuming spread is like -3.0 for favorite, adding negative reduces total)
-    # Wait, spread_line from nflreadr is typically negative for home favorite.
-    # If Spread is -3 (Home Fav), Score should be higher.
-    # (Total - Spread)/2 => (47 - (-3))/2 = 50/2 = 25.
-    # (Total + Spread)/2 => (47 + (-3))/2 = 44/2 = 22.
-    # So SUBTRACTING spread (if neg=fav) adds points to home.
-    # Correct logic for Home: (Total - Spread) / 2
-    home_view['vegas_implied'] = (home_view['total_line'] - home_view['spread_line']) / 2
+    # New Formula: (Total + Spread) / 2 for Home
+    home_view['vegas_implied'] = (home_view['total_line'] + home_view['spread_line']) / 2
     home_view['is_home'] = True
     home_view['spread_display'] = home_view['spread_line'].apply(lambda x: f"{x:+.1f}" if x > 0 else f"{x:.1f}")
 
     away_view = matchups[['away_team', 'home_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     away_view['home_field'] = away_view['home_team']
     away_view = away_view.rename(columns={'away_team': 'team', 'home_team': 'opponent'})
-    # Away Implied = Total - Home Implied = (Total + Spread) / 2
-    # Check: 47 - 25 = 22. Correct.
-    away_view['vegas_implied'] = (away_view['total_line'] + away_view['spread_line']) / 2
+    # New Formula: (Total - Spread) / 2 for Away
+    away_view['vegas_implied'] = (away_view['total_line'] - away_view['spread_line']) / 2
     away_view['is_home'] = False
     away_view['spread_display'] = (away_view['spread_line'] * -1).apply(lambda x: f"{x:+.1f}" if x > 0 else f"{x:.1f}")
     
@@ -405,8 +397,6 @@ def run_analysis():
             
         if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
         if abs(row['spread_line']) < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
-        elif abs(row['spread_line']) > 9.5: bonus_val -= 5; bonuses.append("-5 Blowout Risk")
-        
         if row['fpts'] >= elite_thresh: bonus_val += 5; bonuses.append("+5 Elite Talent")
         if row['aggression_pct'] > 25.0: bonus_val -= 5; bonuses.append("-5 Aggressive Coach")
         
@@ -447,12 +437,9 @@ def run_analysis():
 
     final = final.join(final.apply(process_row, axis=1))
     final = final.sort_values('proj', ascending=False)
-    final = final.replace([np.inf, -np.inf, np.nan], None)
-    final = final.where(pd.notnull(final), None)
-    ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
-    ytd_sorted = ytd_sorted.where(pd.notnull(ytd_sorted), None)
-    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
-    injuries_list = injuries_list.where(pd.notnull(injuries_list), None)
+    final = final.replace({np.nan: None})
+    ytd_sorted = stats.sort_values('fpts', ascending=False).replace({np.nan: None})
+    injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace({np.nan: None})
 
     # Aubrey Check
     aubrey = final[final['kicker_player_name'].str.contains("Aubrey", na=False)]
