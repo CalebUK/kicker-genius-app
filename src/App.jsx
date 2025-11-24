@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -115,6 +115,8 @@ const PlayerCell = ({ player, subtext }) => {
   const imageUrl = isAubrey 
     ? '/assets/aubrey_custom.png' 
     : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
+    
+  const fallbackImage = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
 
   return (
     <td className="px-6 py-4 font-medium text-white">
@@ -125,10 +127,9 @@ const PlayerCell = ({ player, subtext }) => {
             alt={player.kicker_player_name}
             className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`}
             onError={(e) => {
-                if (e.target.src.includes('aubrey_custom.png') && player.headshot_url) {
-                    e.target.src = player.headshot_url;
-                } else {
-                    e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
+                // Prevent infinite loop if fallback fails
+                if (e.target.src !== fallbackImage) {
+                    e.target.src = fallbackImage;
                 }
             }} 
           />
@@ -248,7 +249,10 @@ const App = () => {
       catch (e) { console.error(e); }
     }
 
-    fetch('/kicker_data.json?v=' + new Date().getTime())
+    // Cache Busting Strategy: Round to the nearest minute to allow some caching but ensure freshness
+    // This prevents "flickering" caused by constantly unique URLs
+    const cacheBuster = Math.floor(new Date().getTime() / 60000); 
+    fetch(`/kicker_data.json?v=${cacheBuster}`)
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
@@ -309,7 +313,6 @@ const App = () => {
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
-      // Safe addition for long makes
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
       
       return {
