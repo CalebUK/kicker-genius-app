@@ -349,9 +349,18 @@ def run_analysis():
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
+        # Explicit Rename of conflicting columns before merge
+        if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
+        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'opponent'})
+        
         # Merge into stats (Left Join to keep all kickers)
-        stats = pd.merge(stats, off_stall_seas, left_on='team', right_on='posteam', how='left')
-        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='defteam', how='left')
+        stats = pd.merge(stats, off_stall_seas, on='team', how='left')
+        # stats doesn't have 'opponent', but def_stall_seas logic is "How often does THIS team force FGs?"
+        # We usually map Def Stall to the Kicker's Team Defense for YTD stats.
+        # So we merge on 'team' -> 'opponent' (which we renamed from defteam) ?? No.
+        # Correction: 'def_stall_seas' has 'opponent' (the defense team). We want to merge this to the kicker's team.
+        # So we merge stats['team'] with def_stall_seas['opponent']
+        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='opponent', how='left')
         
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
@@ -495,7 +504,7 @@ def run_analysis():
         final = pd.merge(final, off_stall_l4, on='team', how='left') # L4 Off Stall
         final = pd.merge(final, off_ppg, on='team', how='left')
         final = pd.merge(final, off_share, on='team', how='left')
-        final = pd.merge(final, def_stall_l4, left_on='opponent', right_on='defteam', how='left') # L4 Def Stall
+        final = pd.merge(final, def_stall_l4, left_on='opponent', right_on='opponent', how='left') # L4 Def Stall (FIXED JOIN KEY)
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
