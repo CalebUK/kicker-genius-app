@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 12,
-    "updated": "2025-11-24 09:27",
+    "updated": "2025-11-24 10:40",
     "league_avgs": {
       "fpts": 69.4,
       "off_stall": 42.2,
@@ -87,34 +87,9 @@
       "details_vegas_total": 43.5,
       "details_vegas_spread": "+5.5",
       "history": {
-        "l3_actual": 17,
-        "l3_proj": 11.6,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "DNS",
-            "opp": "TEN",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "DNS",
-            "opp": "JAX",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "DEN",
-            "proj": 11.6,
-            "act": 17,
-            "diff": 5.4
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -144,7 +119,7 @@
       "avg_pts": 10.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/rnw5znsm0hrekqvztiog",
       "match_name": "J.Myers",
-      "own_pct": 76.6,
+      "own_pct": 77.5,
       "full_name_official": "Jason Myers",
       "report_status": 0,
       "practice_status": 0,
@@ -193,34 +168,9 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "-12.5",
       "history": {
-        "l3_actual": 38,
-        "l3_proj": 35.9,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "LA",
-            "proj": 10.9,
-            "act": 14,
-            "diff": 3.1
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "ARI",
-            "proj": 12.5,
-            "act": 15,
-            "diff": 2.5
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "WAS",
-            "proj": 12.5,
-            "act": 9,
-            "diff": -3.5
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -250,7 +200,7 @@
       "avg_pts": 9.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vp3vows5aq3sgnadgtjf",
       "match_name": "T.Loop",
-      "own_pct": 82.3,
+      "own_pct": 83.2,
       "full_name_official": "Tyler Loop",
       "report_status": 0,
       "practice_status": 0,
@@ -299,34 +249,9 @@
       "details_vegas_total": 44.5,
       "details_vegas_spread": "-14.0",
       "history": {
-        "l3_actual": 29,
-        "l3_proj": 29.6,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "CLE",
-            "proj": 9.0,
-            "act": 12,
-            "diff": 3.0
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "MIN",
-            "proj": 10.3,
-            "act": 13,
-            "diff": 2.7
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "MIA",
-            "proj": 10.3,
-            "act": 4,
-            "diff": -6.3
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -356,7 +281,7 @@
       "avg_pts": 8.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/ove4pmnrtqtuyta6rrlc",
       "match_name": "H.Butker",
-      "own_pct": 73.2,
+      "own_pct": 74.2,
       "full_name_official": "Harrison Butker",
       "report_status": 0,
       "practice_status": 0,
@@ -402,34 +327,9 @@
       "details_vegas_total": 50.5,
       "details_vegas_spread": "-3.5",
       "history": {
-        "l3_actual": 14,
-        "l3_proj": 17.4,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "DEN",
-            "proj": 8.1,
-            "act": 6,
-            "diff": -2.1
-          },
-          {
-            "week": 10,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "BUF",
-            "proj": 9.3,
-            "act": 8,
-            "diff": -1.3
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -459,7 +359,7 @@
       "avg_pts": 8.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/jgxnjxhysqwqk4fgf1ke",
       "match_name": "A.Borregales",
-      "own_pct": 37.0,
+      "own_pct": 39.6,
       "full_name_official": "Andy Borregales",
       "report_status": 0,
       "practice_status": 0,
@@ -505,34 +405,9 @@
       "details_vegas_total": 50.5,
       "details_vegas_spread": "-7.5",
       "history": {
-        "l3_actual": 19,
-        "l3_proj": 26.7,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "NYJ",
-            "proj": 9.3,
-            "act": 9,
-            "diff": -0.3
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "TB",
-            "proj": 8.1,
-            "act": 4,
-            "diff": -4.1
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "ATL",
-            "proj": 9.3,
-            "act": 6,
-            "diff": -3.3
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -562,7 +437,7 @@
       "avg_pts": 7.4,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qvwi9b1vfkn0wlmdl7ej",
       "match_name": "B.McManus",
-      "own_pct": 11.4,
+      "own_pct": 11.5,
       "full_name_official": "Brandon McManus",
       "report_status": 0,
       "practice_status": 0,
@@ -608,34 +483,9 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "-6.5",
       "history": {
-        "l3_actual": 7,
-        "l3_proj": 15.9,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "DNS",
-            "opp": "NYG",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "PHI",
-            "proj": 7.4,
-            "act": 0,
-            "diff": -7.4
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "CAR",
-            "proj": 8.5,
-            "act": 7,
-            "diff": -1.5
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -665,7 +515,7 @@
       "avg_pts": 9.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/w5mfvjfuflbitwuji1yx",
       "match_name": "C.Santos",
-      "own_pct": 31.2,
+      "own_pct": 32.1,
       "full_name_official": "Cairo Santos",
       "report_status": 0,
       "practice_status": 0,
@@ -714,34 +564,9 @@
       "details_vegas_total": 46.5,
       "details_vegas_spread": "-3.0",
       "history": {
-        "l3_actual": 31,
-        "l3_proj": 30.7,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "MIN",
-            "proj": 9.3,
-            "act": 15,
-            "diff": 5.7
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "NYG",
-            "proj": 10.7,
-            "act": 6,
-            "diff": -4.7
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "CIN",
-            "proj": 10.7,
-            "act": 10,
-            "diff": -0.7
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -771,7 +596,7 @@
       "avg_pts": 6.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
       "match_name": "L.Havrisik",
-      "own_pct": 1.5,
+      "own_pct": 1.3,
       "full_name_official": "Lucas Havrisik",
       "report_status": 0,
       "practice_status": 0,
@@ -817,34 +642,9 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "-6.5",
       "history": {
-        "l3_actual": -1,
-        "l3_proj": 7.7,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "NYG",
-            "proj": 7.7,
-            "act": -1,
-            "diff": -8.7
-          },
-          {
-            "week": 10,
-            "status": "DNS",
-            "opp": "PHI",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "DNS",
-            "opp": "CAR",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -874,7 +674,7 @@
       "avg_pts": 9.6,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/ynyyootbeabm5sx4ejgt",
       "match_name": "B.Aubrey",
-      "own_pct": 98.4,
+      "own_pct": 98.5,
       "full_name_official": "Brandon Aubrey",
       "report_status": 0,
       "practice_status": 0,
@@ -925,34 +725,9 @@
       "details_vegas_total": 47.5,
       "details_vegas_spread": "+3.0",
       "history": {
-        "l3_actual": 13,
-        "l3_proj": 22.0,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "LV",
-            "proj": 11.0,
-            "act": 9,
-            "diff": -2.0
-          },
-          {
-            "week": 10,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "ARI",
-            "proj": 11.0,
-            "act": 4,
-            "diff": -7.0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -982,7 +757,7 @@
       "avg_pts": 8.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qcfiv2cc7ky37yq9iklp",
       "match_name": "N.Folk",
-      "own_pct": 5.2,
+      "own_pct": 5.4,
       "full_name_official": "Nick Folk",
       "report_status": 0,
       "practice_status": 0,
@@ -1030,34 +805,9 @@
       "details_vegas_total": 44.5,
       "details_vegas_spread": "+14.0",
       "history": {
-        "l3_actual": 11,
-        "l3_proj": 15.4,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "NE",
-            "proj": 7.1,
-            "act": 2,
-            "diff": -5.1
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "CLE",
-            "proj": 8.3,
-            "act": 9,
-            "diff": 0.7
-          },
-          {
-            "week": 9,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -1137,34 +887,9 @@
       "details_vegas_total": 46.5,
       "details_vegas_spread": "+3.0",
       "history": {
-        "l3_actual": 25,
-        "l3_proj": 29.9,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "CIN",
-            "proj": 10.9,
-            "act": 10,
-            "diff": -0.9
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "LAC",
-            "proj": 9.5,
-            "act": 5,
-            "diff": -4.5
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "IND",
-            "proj": 9.5,
-            "act": 10,
-            "diff": 0.5
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -1194,7 +919,7 @@
       "avg_pts": 8.2,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pfdod5cds77uznkotipk",
       "match_name": "C.Little",
-      "own_pct": 54.1,
+      "own_pct": 56.7,
       "full_name_official": "Cam Little",
       "report_status": 0,
       "practice_status": 0,
@@ -1244,34 +969,9 @@
       "details_vegas_total": 47.5,
       "details_vegas_spread": "-2.5",
       "history": {
-        "l3_actual": 33,
-        "l3_proj": 24.6,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "LAC",
-            "proj": 8.2,
-            "act": 5,
-            "diff": -3.2
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "HOU",
-            "proj": 8.2,
-            "act": 13,
-            "diff": 4.8
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "LV",
-            "proj": 8.2,
-            "act": 15,
-            "diff": 6.8
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -1301,7 +1001,7 @@
       "avg_pts": 8.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vws2nawkkxxb8s82ny1s",
       "match_name": "M.Badgley",
-      "own_pct": 20.7,
+      "own_pct": 20.8,
       "full_name_official": "Mike Badgley",
       "report_status": 0,
       "practice_status": 0,
@@ -1349,34 +1049,9 @@
       "details_vegas_total": 50.5,
       "details_vegas_spread": "+3.5",
       "history": {
-        "l3_actual": 18,
-        "l3_proj": 18.4,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "ATL",
-            "proj": 9.2,
-            "act": 6,
-            "diff": -3.2
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "PIT",
-            "proj": 9.2,
-            "act": 12,
-            "diff": 2.8
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -1456,34 +1131,9 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "-1.5",
       "history": {
-        "l3_actual": 9,
-        "l3_proj": 10.8,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "CAR",
-            "proj": 5.4,
-            "act": 5,
-            "diff": -0.4
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "LA",
-            "proj": 5.4,
-            "act": 4,
-            "diff": -1.4
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -1513,7 +1163,7 @@
       "avg_pts": 10.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/l4rrfcuczjau7q02h2iz",
       "match_name": "E.Pineiro",
-      "own_pct": 26.6,
+      "own_pct": 19.0,
       "full_name_official": "Eddy Pineiro",
       "report_status": 0,
       "practice_status": 0,
@@ -1532,10 +1182,10 @@
       "spread_display": "-7.5",
       "is_dome": false,
       "weather_data": [
-        5.7,
+        5.1,
         "5mph \u2600\ufe0f"
       ],
-      "wind": 5.7,
+      "wind": 5.1,
       "weather_desc": "5mph \u2600\ufe0f",
       "posteam_y": "SF",
       "off_stall_rate": 18.8,
@@ -1562,34 +1212,9 @@
       "details_vegas_total": 49.5,
       "details_vegas_spread": "-7.5",
       "history": {
-        "l3_actual": 25,
-        "l3_proj": 33.0,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "ARI",
-            "proj": 11.5,
-            "act": 12,
-            "diff": 0.5
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "LA",
-            "proj": 10.0,
-            "act": 1,
-            "diff": -9.0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "NYG",
-            "proj": 11.5,
-            "act": 12,
-            "diff": 0.5
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -1619,7 +1244,7 @@
       "avg_pts": 9.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/r1g0mqxqc23tmqmgdbwm",
       "match_name": "W.Reichard",
-      "own_pct": 31.0,
+      "own_pct": 30.4,
       "full_name_official": "Will Reichard",
       "report_status": 0,
       "practice_status": 0,
@@ -1668,34 +1293,9 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "+6.5",
       "history": {
-        "l3_actual": 25,
-        "l3_proj": 28.3,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "CHI",
-            "proj": 10.3,
-            "act": 5,
-            "diff": -5.3
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "BAL",
-            "proj": 9.0,
-            "act": 9,
-            "diff": 0.0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "DET",
-            "proj": 9.0,
-            "act": 11,
-            "diff": 2.0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -1725,7 +1325,7 @@
       "avg_pts": 6.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/v35j7b3tofdn0kfskdhj",
       "match_name": "J.Elliott",
-      "own_pct": 62.7,
+      "own_pct": 64.5,
       "full_name_official": "Jake Elliott",
       "report_status": 0,
       "practice_status": 0,
@@ -1774,34 +1374,9 @@
       "details_vegas_total": 47.5,
       "details_vegas_spread": "-3.0",
       "history": {
-        "l3_actual": 15,
-        "l3_proj": 13.5,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "DET",
-            "proj": 7.2,
-            "act": 11,
-            "diff": 3.8
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "GB",
-            "proj": 6.3,
-            "act": 4,
-            "diff": -2.3
-          },
-          {
-            "week": 9,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -1831,7 +1406,7 @@
       "avg_pts": 6.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/gsvj7rtvqwbwdeho8whf",
       "match_name": "D.Carlson",
-      "own_pct": 12.0,
+      "own_pct": 12.8,
       "full_name_official": "Daniel Carlson",
       "report_status": 0,
       "practice_status": 0,
@@ -1881,34 +1456,9 @@
       "details_vegas_total": 35.5,
       "details_vegas_spread": "-3.0",
       "history": {
-        "l3_actual": 15,
-        "l3_proj": 18.5,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "DAL",
-            "proj": 6.5,
-            "act": 11,
-            "diff": 4.5
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "DEN",
-            "proj": 5.5,
-            "act": 0,
-            "diff": -5.5
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "JAX",
-            "proj": 6.5,
-            "act": 4,
-            "diff": -2.5
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -1938,7 +1488,7 @@
       "avg_pts": 6.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tkah6glpysuyq2a54gts",
       "match_name": "A.Szmyt",
-      "own_pct": 0.7,
+      "own_pct": 0.8,
       "full_name_official": "Andre Szmyt",
       "report_status": 0,
       "practice_status": 0,
@@ -1987,34 +1537,9 @@
       "details_vegas_total": 35.5,
       "details_vegas_spread": "+3.0",
       "history": {
-        "l3_actual": 20,
-        "l3_proj": 12.0,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "BAL",
-            "proj": 5.5,
-            "act": 11,
-            "diff": 5.5
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "NYJ",
-            "proj": 6.5,
-            "act": 9,
-            "diff": 2.5
-          },
-          {
-            "week": 9,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -2044,7 +1569,7 @@
       "avg_pts": 7.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hqbrncv4ktphfcmkf23g",
       "match_name": "C.Ryland",
-      "own_pct": 3.6,
+      "own_pct": 4.0,
       "full_name_official": "Chad Ryland",
       "report_status": 0,
       "practice_status": 0,
@@ -2094,34 +1619,9 @@
       "details_vegas_total": 47.5,
       "details_vegas_spread": "+2.5",
       "history": {
-        "l3_actual": 15,
-        "l3_proj": 23.6,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "SF",
-            "proj": 7.5,
-            "act": 3,
-            "diff": -4.5
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "SEA",
-            "proj": 7.5,
-            "act": 2,
-            "diff": -5.5
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "DAL",
-            "proj": 8.6,
-            "act": 10,
-            "diff": 1.4
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -2151,7 +1651,7 @@
       "avg_pts": 8.6,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vwefhtevyn2qxauchan5",
       "match_name": "C.McLaughlin",
-      "own_pct": 80.6,
+      "own_pct": 81.1,
       "full_name_official": "Chase McLaughlin",
       "report_status": 0,
       "practice_status": 0,
@@ -2200,34 +1700,9 @@
       "details_vegas_total": 49.5,
       "details_vegas_spread": "+7.0",
       "history": {
-        "l3_actual": 13,
-        "l3_proj": 18.5,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "BUF",
-            "proj": 8.6,
-            "act": 8,
-            "diff": -0.6
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "NE",
-            "proj": 9.9,
-            "act": 5,
-            "diff": -4.9
-          },
-          {
-            "week": 9,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -2257,7 +1732,7 @@
       "avg_pts": 8.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/xokfs27mtqrbb0y47ahn",
       "match_name": "J.Slye",
-      "own_pct": 1.5,
+      "own_pct": 1.9,
       "full_name_official": "Joey Slye",
       "report_status": 0,
       "practice_status": 0,
@@ -2306,34 +1781,9 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "+12.5",
       "history": {
-        "l3_actual": 19,
-        "l3_proj": 14.8,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "HOU",
-            "proj": 7.4,
-            "act": 10,
-            "diff": 2.6
-          },
-          {
-            "week": 10,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "LAC",
-            "proj": 7.4,
-            "act": 9,
-            "diff": 1.6
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -2363,7 +1813,7 @@
       "avg_pts": 7.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/cpvujaqwscupzvbbx7oe",
       "match_name": "E.McPherson",
-      "own_pct": 25.1,
+      "own_pct": 25.0,
       "full_name_official": "Evan McPherson",
       "report_status": 0,
       "practice_status": 0,
@@ -2411,34 +1861,9 @@
       "details_vegas_total": 50.5,
       "details_vegas_spread": "+7.5",
       "history": {
-        "l3_actual": 18,
-        "l3_proj": 16.8,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "PIT",
-            "proj": 7.8,
-            "act": 8,
-            "diff": 0.2
-          },
-          {
-            "week": 10,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "CHI",
-            "proj": 9.0,
-            "act": 10,
-            "diff": 1.0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -2468,7 +1893,7 @@
       "avg_pts": 8.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/heh3zqyv3tqapnpnzgoj",
       "match_name": "J.Bates",
-      "own_pct": 93.3,
+      "own_pct": 94.0,
       "full_name_official": "Jake Bates",
       "report_status": 0,
       "practice_status": 0,
@@ -2518,34 +1943,9 @@
       "details_vegas_total": 50.5,
       "details_vegas_spread": "-14.0",
       "history": {
-        "l3_actual": 22,
-        "l3_proj": 26.4,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "PHI",
-            "proj": 8.0,
-            "act": 4,
-            "diff": -4.0
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "WAS",
-            "proj": 9.2,
-            "act": 12,
-            "diff": 2.8
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "MIN",
-            "proj": 9.2,
-            "act": 6,
-            "diff": -3.2
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -2575,7 +1975,7 @@
       "avg_pts": 7.4,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pj981bi535y4jwy6skr1",
       "match_name": "M.Prater",
-      "own_pct": 54.4,
+      "own_pct": 54.2,
       "full_name_official": "Matt Prater",
       "report_status": 0,
       "practice_status": 0,
@@ -2624,34 +2024,9 @@
       "details_vegas_total": 43.5,
       "details_vegas_spread": "-5.5",
       "history": {
-        "l3_actual": 12,
-        "l3_proj": 25.5,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "TB",
-            "proj": 8.5,
-            "act": 8,
-            "diff": -0.5
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "MIA",
-            "proj": 8.5,
-            "act": 1,
-            "diff": -7.5
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "KC",
-            "proj": 8.5,
-            "act": 3,
-            "diff": -5.5
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -2731,34 +2106,9 @@
       "details_vegas_total": 50.5,
       "details_vegas_spread": "+14.0",
       "history": {
-        "l3_actual": 9,
-        "l3_proj": 12.6,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "GB",
-            "proj": 5.8,
-            "act": 1,
-            "diff": -4.8
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "CHI",
-            "proj": 6.8,
-            "act": 8,
-            "diff": 1.2
-          },
-          {
-            "week": 9,
-            "status": "DNS",
-            "opp": "SF",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -2788,7 +2138,7 @@
       "avg_pts": 11.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tytaxive5qhdumjqy2o2",
       "match_name": "Z.Gonzalez",
-      "own_pct": 3.8,
+      "own_pct": 4.2,
       "full_name_official": "Zane Gonzalez",
       "report_status": 0,
       "practice_status": 0,
@@ -2838,34 +2188,9 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "+1.5",
       "history": {
-        "l3_actual": 18,
-        "l3_proj": 22.0,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "CAR",
-            "proj": 11.0,
-            "act": 12,
-            "diff": 1.0
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "IND",
-            "proj": 11.0,
-            "act": 6,
-            "diff": -5.0
-          },
-          {
-            "week": 9,
-            "status": "DNS",
-            "opp": "NE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -2895,7 +2220,7 @@
       "avg_pts": 7.3,
       "headshot_url": "https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png",
       "match_name": "H.Mevis",
-      "own_pct": 7.8,
+      "own_pct": 9.0,
       "full_name_official": "Harrison Mevis",
       "report_status": 0,
       "practice_status": 0,
@@ -2944,34 +2269,9 @@
       "details_vegas_total": 49.5,
       "details_vegas_spread": "-7.0",
       "history": {
-        "l3_actual": 9,
-        "l3_proj": 16.8,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "SEA",
-            "proj": 8.4,
-            "act": 3,
-            "diff": -5.4
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "SF",
-            "proj": 8.4,
-            "act": 6,
-            "diff": -2.4
-          },
-          {
-            "week": 9,
-            "status": "DNS",
-            "opp": "NO",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -3001,7 +2301,7 @@
       "avg_pts": 6.2,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/j51z79en8vs3qdgkvnn5",
       "match_name": "J.Karty",
-      "own_pct": 6.6,
+      "own_pct": 6.2,
       "full_name_official": "Joshua Karty",
       "report_status": 0,
       "practice_status": 0,
@@ -3050,34 +2350,9 @@
       "details_vegas_total": 49.5,
       "details_vegas_spread": "-7.0",
       "history": {
-        "l3_actual": 2,
-        "l3_proj": 7.1,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "DNS",
-            "opp": "SEA",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "DNS",
-            "opp": "SF",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "NO",
-            "proj": 7.1,
-            "act": 2,
-            "diff": -5.1
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -3107,7 +2382,7 @@
       "avg_pts": 6.4,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/abfug5vjak5ixdcqca7x",
       "match_name": "R.Fitzgerald",
-      "own_pct": 3.0,
+      "own_pct": 3.8,
       "full_name_official": "Ryan Fitzgerald",
       "report_status": 0,
       "practice_status": 0,
@@ -3155,34 +2430,9 @@
       "details_vegas_total": 49.5,
       "details_vegas_spread": "+7.5",
       "history": {
-        "l3_actual": 14,
-        "l3_proj": 18.2,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "ATL",
-            "proj": 6.4,
-            "act": 10,
-            "diff": 3.6
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "NO",
-            "proj": 6.4,
-            "act": 0,
-            "diff": -6.4
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "GB",
-            "proj": 5.4,
-            "act": 4,
-            "diff": -1.4
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -3263,33 +2513,8 @@
       "details_vegas_spread": "+14.0",
       "history": {
         "l3_actual": 0,
-        "l3_proj": -2.0,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "DNS",
-            "opp": "GB",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "CHI",
-            "proj": -1.0,
-            "act": 0,
-            "diff": 1.0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "SF",
-            "proj": -1.0,
-            "act": 0,
-            "diff": 1.0
-          }
-        ]
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -3371,33 +2596,8 @@
       "details_vegas_spread": "+14.0",
       "history": {
         "l3_actual": 0,
-        "l3_proj": 0.0,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "DNS",
-            "opp": "GB",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "DNS",
-            "opp": "CHI",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "DNS",
-            "opp": "SF",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -3434,7 +2634,7 @@
       "roster_status": "RES",
       "injury_status": "OUT",
       "injury_color": "red-700",
-      "injury_details": "Roster: RES",
+      "injury_details": "Roster: IR",
       "opponent": "DET",
       "roof": "dome",
       "game_dt": "2025-11-23 13:00",
@@ -3478,34 +2678,9 @@
       "details_vegas_total": 50.5,
       "details_vegas_spread": "+14.0",
       "history": {
-        "l3_actual": 5,
-        "l3_proj": 7.6,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "DNS",
-            "opp": "GB",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "DNS",
-            "opp": "CHI",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "SF",
-            "proj": 7.6,
-            "act": 5,
-            "diff": -2.6
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -3586,33 +2761,8 @@
       "details_vegas_spread": "-3.0",
       "history": {
         "l3_actual": 0,
-        "l3_proj": 0.0,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "DNS",
-            "opp": "MIN",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "DNS",
-            "opp": "NYG",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "DNS",
-            "opp": "CIN",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -3693,34 +2843,9 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "+1.5",
       "history": {
-        "l3_actual": 4,
-        "l3_proj": 6.3,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "DNS",
-            "opp": "CAR",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "DNS",
-            "opp": "IND",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "ACTIVE",
-            "opp": "NE",
-            "proj": 6.3,
-            "act": 4,
-            "diff": -2.3
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -3757,7 +2882,7 @@
       "roster_status": "RES",
       "injury_status": "OUT",
       "injury_color": "red-700",
-      "injury_details": "Roster: RES",
+      "injury_details": "Roster: IR",
       "opponent": "KC",
       "roof": "outdoors",
       "game_dt": "2025-11-23 13:00",
@@ -3800,33 +2925,8 @@
       "details_vegas_spread": "+3.5",
       "history": {
         "l3_actual": 0,
-        "l3_proj": 0.0,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "BYE",
-            "opp": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 10,
-            "status": "DNS",
-            "opp": "ATL",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          },
-          {
-            "week": 9,
-            "status": "DNS",
-            "opp": "PIT",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_proj": 0,
+        "l3_games": []
       }
     },
     {
@@ -3905,34 +3005,9 @@
       "details_vegas_total": 43.5,
       "details_vegas_spread": "+5.5",
       "history": {
-        "l3_actual": 16,
-        "l3_proj": 11.0,
-        "l3_games": [
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "opp": "TEN",
-            "proj": 5.5,
-            "act": 12,
-            "diff": 6.5
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "opp": "JAX",
-            "proj": 5.5,
-            "act": 4,
-            "diff": -1.5
-          },
-          {
-            "week": 9,
-            "status": "DNS",
-            "opp": "DEN",
-            "proj": 0,
-            "act": 0,
-            "diff": 0
-          }
-        ]
+        "l3_actual": 0,
+        "l3_proj": 0,
+        "l3_games": []
       }
     }
   ],
@@ -3964,7 +3039,7 @@
       "avg_pts": 10.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/rnw5znsm0hrekqvztiog",
       "match_name": "J.Myers",
-      "own_pct": 76.6,
+      "own_pct": 77.5,
       "full_name_official": "Jason Myers",
       "report_status": null,
       "practice_status": null,
@@ -4000,7 +3075,7 @@
       "avg_pts": 10.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vd4nd1hoax82j7fi2bx0",
       "match_name": "C.Dicker",
-      "own_pct": 85.9,
+      "own_pct": 84.5,
       "full_name_official": "Cameron Dicker",
       "report_status": null,
       "practice_status": null,
@@ -4036,7 +3111,7 @@
       "avg_pts": 9.6,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/ynyyootbeabm5sx4ejgt",
       "match_name": "B.Aubrey",
-      "own_pct": 98.4,
+      "own_pct": 98.5,
       "full_name_official": "Brandon Aubrey",
       "report_status": null,
       "practice_status": null,
@@ -4144,7 +3219,7 @@
       "avg_pts": 10.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/l4rrfcuczjau7q02h2iz",
       "match_name": "E.Pineiro",
-      "own_pct": 26.6,
+      "own_pct": 19.0,
       "full_name_official": "Eddy Pineiro",
       "report_status": null,
       "practice_status": null,
@@ -4180,7 +3255,7 @@
       "avg_pts": 9.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vp3vows5aq3sgnadgtjf",
       "match_name": "T.Loop",
-      "own_pct": 82.3,
+      "own_pct": 83.2,
       "full_name_official": "Tyler Loop",
       "report_status": null,
       "practice_status": null,
@@ -4216,7 +3291,7 @@
       "avg_pts": 9.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/r1g0mqxqc23tmqmgdbwm",
       "match_name": "W.Reichard",
-      "own_pct": 31.0,
+      "own_pct": 30.4,
       "full_name_official": "Will Reichard",
       "report_status": null,
       "practice_status": null,
@@ -4252,7 +3327,7 @@
       "avg_pts": 8.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/jgxnjxhysqwqk4fgf1ke",
       "match_name": "A.Borregales",
-      "own_pct": 37.0,
+      "own_pct": 39.6,
       "full_name_official": "Andy Borregales",
       "report_status": null,
       "practice_status": null,
@@ -4288,7 +3363,7 @@
       "avg_pts": 8.6,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vwefhtevyn2qxauchan5",
       "match_name": "C.McLaughlin",
-      "own_pct": 80.6,
+      "own_pct": 81.1,
       "full_name_official": "Chase McLaughlin",
       "report_status": null,
       "practice_status": null,
@@ -4324,7 +3399,7 @@
       "avg_pts": 8.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qcfiv2cc7ky37yq9iklp",
       "match_name": "N.Folk",
-      "own_pct": 5.2,
+      "own_pct": 5.4,
       "full_name_official": "Nick Folk",
       "report_status": null,
       "practice_status": null,
@@ -4360,7 +3435,7 @@
       "avg_pts": 8.2,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pfdod5cds77uznkotipk",
       "match_name": "C.Little",
-      "own_pct": 54.1,
+      "own_pct": 56.7,
       "full_name_official": "Cam Little",
       "report_status": null,
       "practice_status": null,
@@ -4396,7 +3471,7 @@
       "avg_pts": 8.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/ove4pmnrtqtuyta6rrlc",
       "match_name": "H.Butker",
-      "own_pct": 73.2,
+      "own_pct": 74.2,
       "full_name_official": "Harrison Butker",
       "report_status": null,
       "practice_status": null,
@@ -4432,7 +3507,7 @@
       "avg_pts": 8.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/heh3zqyv3tqapnpnzgoj",
       "match_name": "J.Bates",
-      "own_pct": 93.3,
+      "own_pct": 94.0,
       "full_name_official": "Jake Bates",
       "report_status": null,
       "practice_status": null,
@@ -4468,7 +3543,7 @@
       "avg_pts": 8.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/xokfs27mtqrbb0y47ahn",
       "match_name": "J.Slye",
-      "own_pct": 1.5,
+      "own_pct": 1.9,
       "full_name_official": "Joey Slye",
       "report_status": null,
       "practice_status": null,
@@ -4504,7 +3579,7 @@
       "avg_pts": 7.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/cpvujaqwscupzvbbx7oe",
       "match_name": "E.McPherson",
-      "own_pct": 25.1,
+      "own_pct": 25.0,
       "full_name_official": "Evan McPherson",
       "report_status": null,
       "practice_status": null,
@@ -4540,7 +3615,7 @@
       "avg_pts": 9.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/w5mfvjfuflbitwuji1yx",
       "match_name": "C.Santos",
-      "own_pct": 31.2,
+      "own_pct": 32.1,
       "full_name_official": "Cairo Santos",
       "report_status": null,
       "practice_status": null,
@@ -4576,7 +3651,7 @@
       "avg_pts": 7.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hqbrncv4ktphfcmkf23g",
       "match_name": "C.Ryland",
-      "own_pct": 3.6,
+      "own_pct": 4.0,
       "full_name_official": "Chad Ryland",
       "report_status": null,
       "practice_status": null,
@@ -4612,7 +3687,7 @@
       "avg_pts": 7.4,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pj981bi535y4jwy6skr1",
       "match_name": "M.Prater",
-      "own_pct": 54.4,
+      "own_pct": 54.2,
       "full_name_official": "Matt Prater",
       "report_status": null,
       "practice_status": null,
@@ -4648,7 +3723,7 @@
       "avg_pts": 7.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/lcfurzhyjudmrwjxkgfs",
       "match_name": "W.Lutz",
-      "own_pct": 25.3,
+      "own_pct": 22.7,
       "full_name_official": "Wil Lutz",
       "report_status": null,
       "practice_status": null,
@@ -4684,7 +3759,7 @@
       "avg_pts": 8.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/gzvyb1u3dueikfy3otlq",
       "match_name": "R.Patterson",
-      "own_pct": 1.2,
+      "own_pct": 1.1,
       "full_name_official": "Riley Patterson",
       "report_status": null,
       "practice_status": null,
@@ -4720,7 +3795,7 @@
       "avg_pts": 6.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tkah6glpysuyq2a54gts",
       "match_name": "A.Szmyt",
-      "own_pct": 0.7,
+      "own_pct": 0.8,
       "full_name_official": "Andre Szmyt",
       "report_status": null,
       "practice_status": null,
@@ -4756,7 +3831,7 @@
       "avg_pts": 6.4,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/abfug5vjak5ixdcqca7x",
       "match_name": "R.Fitzgerald",
-      "own_pct": 3.0,
+      "own_pct": 3.8,
       "full_name_official": "Ryan Fitzgerald",
       "report_status": null,
       "practice_status": null,
@@ -4792,7 +3867,7 @@
       "avg_pts": 6.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/v35j7b3tofdn0kfskdhj",
       "match_name": "J.Elliott",
-      "own_pct": 62.7,
+      "own_pct": 64.5,
       "full_name_official": "Jake Elliott",
       "report_status": null,
       "practice_status": null,
@@ -4864,7 +3939,7 @@
       "avg_pts": 6.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qeca8ofwxhytcioy29wc",
       "match_name": "M.Gay",
-      "own_pct": 19.2,
+      "own_pct": 21.8,
       "full_name_official": "Matt Gay",
       "report_status": null,
       "practice_status": null,
@@ -4900,7 +3975,7 @@
       "avg_pts": 6.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/gsvj7rtvqwbwdeho8whf",
       "match_name": "D.Carlson",
-      "own_pct": 12.0,
+      "own_pct": 12.8,
       "full_name_official": "Daniel Carlson",
       "report_status": null,
       "practice_status": null,
@@ -4936,7 +4011,7 @@
       "avg_pts": 7.4,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qvwi9b1vfkn0wlmdl7ej",
       "match_name": "B.McManus",
-      "own_pct": 11.4,
+      "own_pct": 11.5,
       "full_name_official": "Brandon McManus",
       "report_status": null,
       "practice_status": null,
@@ -4979,7 +4054,7 @@
       "roster_status": "RES",
       "injury_status": "OUT",
       "injury_color": "red-700",
-      "injury_details": "Roster: RES"
+      "injury_details": "Roster: IR"
     },
     {
       "kicker_player_name": "J.Karty",
@@ -5008,7 +4083,7 @@
       "avg_pts": 6.2,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/j51z79en8vs3qdgkvnn5",
       "match_name": "J.Karty",
-      "own_pct": 6.6,
+      "own_pct": 6.2,
       "full_name_official": "Joshua Karty",
       "report_status": null,
       "practice_status": null,
@@ -5044,7 +4119,7 @@
       "avg_pts": 8.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vws2nawkkxxb8s82ny1s",
       "match_name": "M.Badgley",
-      "own_pct": 20.7,
+      "own_pct": 20.8,
       "full_name_official": "Mike Badgley",
       "report_status": null,
       "practice_status": null,
@@ -5123,7 +4198,7 @@
       "roster_status": "RES",
       "injury_status": "OUT",
       "injury_color": "red-700",
-      "injury_details": "Roster: RES"
+      "injury_details": "Roster: IR"
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -5152,7 +4227,7 @@
       "avg_pts": 11.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tytaxive5qhdumjqy2o2",
       "match_name": "Z.Gonzalez",
-      "own_pct": 3.8,
+      "own_pct": 4.2,
       "full_name_official": "Zane Gonzalez",
       "report_status": null,
       "practice_status": null,
@@ -5260,7 +4335,7 @@
       "avg_pts": 7.3,
       "headshot_url": "https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png",
       "match_name": "H.Mevis",
-      "own_pct": 7.8,
+      "own_pct": 9.0,
       "full_name_official": "Harrison Mevis",
       "report_status": null,
       "practice_status": null,
@@ -5332,7 +4407,7 @@
       "avg_pts": 6.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
       "match_name": "L.Havrisik",
-      "own_pct": 1.5,
+      "own_pct": 1.3,
       "full_name_official": "Lucas Havrisik",
       "report_status": null,
       "practice_status": null,
@@ -5442,7 +4517,7 @@
       "avg_pts": 6.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qeca8ofwxhytcioy29wc",
       "match_name": "M.Gay",
-      "own_pct": 19.2,
+      "own_pct": 21.8,
       "full_name_official": "Matt Gay",
       "report_status": null,
       "practice_status": null,
@@ -5485,7 +4560,7 @@
       "roster_status": "RES",
       "injury_status": "OUT",
       "injury_color": "red-700",
-      "injury_details": "Roster: RES"
+      "injury_details": "Roster: IR"
     },
     {
       "kicker_player_name": "J.Romo",
@@ -5557,7 +4632,7 @@
       "roster_status": "RES",
       "injury_status": "OUT",
       "injury_color": "red-700",
-      "injury_details": "Roster: RES"
+      "injury_details": "Roster: IR"
     },
     {
       "kicker_player_name": "J.Moody",
