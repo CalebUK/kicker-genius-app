@@ -9,7 +9,7 @@ import time
 import traceback
 import io
 import math
-import sys # Added for exit codes
+import sys
 
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
@@ -255,6 +255,7 @@ def run_analysis():
         injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
         ownership_data = scrape_fantasy_ownership()
 
+        # --- 1. ROSTER DATA ---
         try:
             rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
@@ -272,7 +273,7 @@ def run_analysis():
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         if hasattr(players, "to_pandas"): players = players.to_pandas()
 
-        # --- STATS AGGREGATION ---
+        # --- RAW STATS AGGREGATION ---
         kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
         kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
         
@@ -325,17 +326,22 @@ def run_analysis():
                          stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
         stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-        # --- SEASON STALL RATES ---
+        # --- CALCULATE SEASON STALL RATES (YTD) - FAST VECTORIZED ---
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
+        
+        # Merge into stats (Left Join to keep all kickers)
         stats = pd.merge(stats, off_stall_seas, left_on='team', right_on='posteam', how='left')
         stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='defteam', how='left')
+        
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
 
+        # HISTORY
         history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
 
+        # HEADSHOTS
         headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
         if headshot_col:
             player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
@@ -344,12 +350,14 @@ def run_analysis():
             stats['headshot_url'] = None
         stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
         
+        # OWNERSHIP
         if not ownership_data.empty:
             stats = pd.merge(stats, ownership_data, left_on='kicker_player_name', right_on='match_name', how='left')
             stats['own_pct'] = stats['own_pct'].fillna(0.0)
         else:
             stats['own_pct'] = 0.0
 
+        # INJURIES
         if 'full_name' in injury_report.columns:
             name_map = players[['gsis_id', 'display_name']].rename(columns={'gsis_id': 'kicker_player_id', 'display_name': 'full_name_official'})
             stats = pd.merge(stats, name_map, on='kicker_player_id', how='left')
@@ -392,7 +400,7 @@ def run_analysis():
         qualified = stats[stats['fg_att'] >= 5]
         elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
 
-        # --- MATCHUP METRICS ---
+        # --- MATCHUP METRICS (L4) ---
         max_wk = pbp['week'].max()
         start_wk = max(1, max_wk - 3)
         recent_pbp = pbp[pbp['week'] >= start_wk].copy()
@@ -405,7 +413,7 @@ def run_analysis():
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
         aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
 
-        # Scoring & Share
+        # Scoring & Share (L4)
         completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
         home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
         away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
@@ -437,7 +445,6 @@ def run_analysis():
         matchups['total_line'] = matchups['total_line'].fillna(44.0)
         matchups['spread_line'] = matchups['spread_line'].fillna(0.0)
         
-        # FIXED VEGAS LOGIC (Home=Total+Spread, Away=Total-Spread)
         home_view = matchups[['home_team', 'away_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
         home_view['home_field'] = home_view['home_team']
         home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
@@ -460,14 +467,21 @@ def run_analysis():
         model['wind'] = model['weather_data'].apply(lambda x: x[0])
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
+        # Explicitly drop potential duplicate columns (like 'posteam' or 'defteam') before final merge to avoid collisions
+        if 'posteam' in off_stall.columns: off_stall = off_stall.rename(columns={'posteam': 'team'})
+        if 'defteam' in def_stall.columns: def_stall = def_stall.rename(columns={'defteam': 'opponent'})
+        if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
+        
+        # Perform final merges
         final = pd.merge(stats, model, on='team', how='inner')
-        final = pd.merge(final, off_stall_l4, left_on='team', right_on='posteam', how='left')
+        final = pd.merge(final, off_stall, on='team', how='left') # L4 Off Stall
         final = pd.merge(final, off_ppg, on='team', how='left')
         final = pd.merge(final, off_share, on='team', how='left')
-        final = pd.merge(final, def_stall_l4, left_on='opponent', right_on='defteam', how='left')
+        final = pd.merge(final, def_stall, left_on='opponent', right_on='defteam', how='left') # L4 Def Stall
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
-        final = pd.merge(final, aggression_stats[['posteam', 'aggression_pct']], left_on='team', right_on='posteam', how='left')
+        final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
+        
         final = final.fillna(0)
 
         def process_row(row):
@@ -534,6 +548,7 @@ def run_analysis():
 
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
+        
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
         ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
