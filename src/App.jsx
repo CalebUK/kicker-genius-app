@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
 
-// --- GLOSSARY DATA ---
+// ... [KEEP GLOSSARY/CONSTANTS/HEADER CELL/HISTORY BARS/PLAYER CELL/DEEP DIVE AS IS] ...
 const GLOSSARY_DATA = [
   { header: "Grade", title: "Matchup Grade", desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
@@ -153,22 +153,20 @@ const PlayerCell = ({ player, subtext }) => {
   );
 };
 
-const DeepDiveRow = ({ player }) => {
+const MathCard = ({ player }) => {
+  if (!player) return null;
+
   const l3_diff = (player.history?.l3_actual || 0) - (player.history?.l3_proj || 0);
   let trendColor = "text-slate-500";
   let trendSign = "";
   if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
   else if (l3_diff < -2.5) { trendColor = "text-red-400"; }
-  
+
   return (
-  <tr className="bg-slate-900/50 border-b border-slate-800">
-    <td colSpan="11" className="p-4">
-      <div className="bg-slate-950 border border-slate-800 rounded-lg p-4 animate-in slide-in-from-top-2 duration-300">
-        <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-                <Calculator className="w-4 h-4 text-emerald-400" />
-                <h3 className="font-bold text-white text-sm">Deep Dive: {player.kicker_player_name}</h3>
-            </div>
+    <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Calculator className="w-4 h-4 text-emerald-400" />
+          <h3 className="font-bold text-white text-sm">Math Worksheet: {player.kicker_player_name}</h3>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
@@ -219,39 +217,6 @@ const DeepDiveRow = ({ player }) => {
             <span><strong className="text-slate-200">Implied Score:</strong> {player.vegas ? Number(player.vegas).toFixed(1) : '--'} pts</span>
             <span><strong className="text-slate-200">L4 Team PF:</strong> {player.off_ppg ? Number(player.off_ppg).toFixed(1) : '--'} pts</span>
             <span><strong className="text-slate-200">L4 Opp PA:</strong> {player.def_pa ? Number(player.def_pa).toFixed(1) : '--'} pts</span>
-        </div>
-      </div>
-    </td>
-  </tr>
-  );
-};
-
-const MathCard = ({ player }) => {
-  if (!player) return null;
-
-  return (
-    <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Calculator className="w-4 h-4 text-emerald-400" />
-          <h3 className="font-bold text-white text-sm">Math Worksheet: {player.kicker_player_name}</h3>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-          <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
-            <div className="text-blue-300 font-bold mb-2">1. GRADE</div>
-            <div>Off: {player.off_score_val} | Def: {player.def_score_val}</div>
-            <div className="text-emerald-400 mt-1">{player.grade_details?.join(', ')}</div>
-          </div>
-          <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
-            <div className="text-amber-400 font-bold mb-2">2. WEIGHTED PROJ</div>
-            <div>Base (50%): {(player.avg_pts * (player.grade/90)).toFixed(1)}</div>
-            <div>Off Cap (30%): {player.off_cap_val}</div>
-            <div>Def Cap (20%): {player.def_cap_val}</div>
-          </div>
-          <div className="bg-slate-900 p-3 rounded border border-slate-800/50 text-center">
-            <div className="text-emerald-400 font-bold text-xl">{player.proj}</div>
-            <div className="text-[10px]">Projected Points</div>
-          </div>
         </div>
     </div>
   );
@@ -333,7 +298,6 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
-  // YTD Table Data: Recalc with dynamic scoring
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
@@ -345,16 +309,20 @@ const App = () => {
   const questionableKickers = injuries.filter(k => k.injury_status === 'Questionable');
   const otherKickers = injuries.filter(k => !['OUT', 'CUT', 'Doubtful', 'Questionable', 'Healthy', 'IR'].includes(k.injury_status));
 
+  // Live Example for Glossary: Try to find Aubrey, else top ranked
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
-              <Trophy className="w-8 h-8 text-yellow-500" /> Kicker<span className="text-blue-500">Genius</span>
+              <Trophy className="w-8 h-8 text-yellow-500" /> 
+              <div>
+                Kicker<span className="text-blue-500">Genius</span>
+                <img src="/assets/logo.png" alt="Logo" className="w-10 h-10 object-contain inline-block ml-3" />
+              </div>
             </h1>
             <p className="text-slate-400">Advanced Stall Rate Analytics & Fantasy Projections</p>
           </div>
@@ -369,7 +337,6 @@ const App = () => {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => setActiveTab('potential')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => setActiveTab('ytd')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
@@ -377,7 +344,6 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -398,7 +364,6 @@ const App = () => {
           </div>
         )}
 
-        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
@@ -505,6 +470,7 @@ const App = () => {
                       <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded ${row.longs >= 4 ? 'bg-amber-500/20 text-amber-400' : 'text-slate-500'}`}>{row.longs}</span></td>
                       <td className="px-6 py-4 text-center text-blue-300">{row.dome_pct}%</td>
                       <td className="px-6 py-4 text-center text-slate-300">{row.rz_trips}</td>
+                      {/* FIXED: Now using correct YTD columns from updated python script */}
                       <td className="px-6 py-4 text-center font-mono text-blue-300">{row.off_stall_rate_ytd}%</td>
                       <td className="px-6 py-4 text-center font-mono text-slate-400">{row.def_stall_rate_ytd}%</td>
                     </tr>
@@ -518,12 +484,77 @@ const App = () => {
         {/* INJURIES */}
         {activeTab === 'injuries' && (
            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             {/* BUCKET 1: QUESTIONABLE */}
-             {/* ... (Code same as before) ... */}
-             {/* BUCKET 2: DOUBTFUL & OUT */}
-             {/* ... (Code same as before) ... */}
-             {/* BUCKET 3: PRACTICE SQUAD / RESERVE */}
-             {/* ... (Code same as before) ... */}
+             {/* BUCKET 1: QUESTIONABLE (YELLOW) */}
+             {questionableKickers.length > 0 && (
+               <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden">
+                 <div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                    <h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3>
+                 </div>
+                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {questionableKickers.map((k, i) => (
+                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+                          <div>
+                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+                             <div className="text-xs text-yellow-300">{k.injury_details}</div>
+                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+               </div>
+             )}
+
+             {/* BUCKET 2: DOUBTFUL & OUT (RED) */}
+             {(outKickers.length > 0 || doubtfulKickers.length > 0) && (
+               <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden">
+                 <div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5 text-red-500" />
+                    <h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3>
+                 </div>
+                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[...outKickers, ...doubtfulKickers].map((k, i) => (
+                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-red-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+                          <div>
+                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+                             <div className="text-xs text-red-300">{k.injury_details}</div>
+                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+               </div>
+             )}
+
+             {/* BUCKET 3: PRACTICE SQUAD / RESERVE (DARK RED) */}
+             {otherKickers.length > 0 && (
+               <div className="bg-slate-800/30 rounded-xl border border-slate-700 overflow-hidden">
+                 <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex items-center gap-2">
+                    <UserMinus className="w-5 h-5 text-slate-400" />
+                    <h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD / RELEASED</h3>
+                 </div>
+                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {otherKickers.map((k, i) => (
+                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+                          <div>
+                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+                             <div className="text-xs text-slate-300">{k.injury_details}</div>
+                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+               </div>
+             )}
+
+             {(!outKickers.length && !doubtfulKickers.length && !questionableKickers.length && !otherKickers.length) && (
+                <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">
+                   No kickers currently listed on the injury report!
+                </div>
+             )}
            </div>
         )}
 
