@@ -326,19 +326,21 @@ def run_analysis():
                          stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
         stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-        # --- CALCULATE SEASON STALL RATES (YTD) ---
+        # --- CALCULATE SEASON STALL RATES (YTD) - FIXED ---
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
-        # Explicit Rename to prevent collisions
+        # Explicit Rename to prevent collisions (KEY FIX: defteam -> team, not opponent)
         if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
-        # FIX: Rename defteam -> opponent here so we can merge
-        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'opponent'})
+        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) # RENAME TO TEAM
         
+        # Merge into stats (Left Join)
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
-        # MERGE SEASON DEF STALL: Match Kicker's Team -> Season Defense Stall (which uses 'opponent' key now)
-        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='opponent', how='left')
+        
+        # MERGE SEASON DEF STALL: Match Kicker's Team -> Season Defense Stall
+        # Since we renamed it to 'team', we can join directly on 'team'
+        stats = pd.merge(stats, def_stall_seas, on='team', how='left')
         
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
@@ -474,8 +476,6 @@ def run_analysis():
 
         # Explicitly drop potential duplicate columns (like 'posteam' or 'defteam') before final merge to avoid collisions
         if 'posteam' in off_stall_l4.columns: off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
-        # FIX: Remove 'opponent' (old defteam) column from def_stall_l4 before merge to avoid key collision with existing 'opponent' column in final
-        # Actually, we need to merge ON opponent.
         if 'defteam' in def_stall_l4.columns: def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
         if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         
