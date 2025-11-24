@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -70,14 +70,12 @@ const HistoryBars = ({ games }) => {
               </span>
             </div>
             
-            {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
                </div>
             </div>
 
-            {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -170,7 +168,6 @@ const MathCard = ({ player }) => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-          {/* 1. GRADE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
             <div className="text-blue-300 font-bold mb-2 pb-1 border-b border-slate-800">1. MATCHUP</div>
             <div className="flex justify-between mb-1"><span>Off Score:</span> <span className="text-white">{player.off_score_val}</span></div>
@@ -185,7 +182,6 @@ const MathCard = ({ player }) => {
             </div>
           </div>
 
-          {/* 2. CAPS */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
             <div className="text-amber-400 font-bold mb-2 pb-1 border-b border-slate-800">2. CAPS</div>
             <div className="flex justify-between mb-1"><span>Off Cap:</span> <span className="text-white">{player.off_cap_val}</span></div>
@@ -194,7 +190,6 @@ const MathCard = ({ player }) => {
             <div className="text-[10px] text-slate-500">Opp Allow {player.w_def_allowed} x Share</div>
           </div>
           
-          {/* 3. HISTORY */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
              <div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> TREND (L3)</div>
@@ -203,7 +198,6 @@ const MathCard = ({ player }) => {
              <HistoryBars games={player.history?.l3_games} />
           </div>
 
-          {/* 4. FINAL */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col justify-center items-center text-center">
              <div className="text-slate-400 font-semibold mb-1">FINAL</div>
              <div className="text-3xl font-bold text-emerald-400">{player.proj}</div>
@@ -221,14 +215,6 @@ const MathCard = ({ player }) => {
     </div>
   );
 };
-
-const DeepDiveRow = ({ player }) => (
-  <tr className="bg-slate-900/50 border-b border-slate-800">
-    <td colSpan="11" className="p-4">
-      <MathCard player={player} />
-    </td>
-  </tr>
-);
 
 const App = () => {
   const [data, setData] = useState(null);
@@ -248,9 +234,10 @@ const App = () => {
       catch (e) { console.error(e); }
     }
 
+    // Use absolute path relative to domain root
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
-      .then(json => { setData(json); setLoading(false); })
+      .then(jsonData => { setData(jsonData); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
   }, []);
 
@@ -290,8 +277,12 @@ const App = () => {
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
   if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
 
-  const { rankings, ytd, injuries, meta } = data;
-  const leagueAvgs = meta?.league_avgs || {};
+  // Crash-Proof Destructuring with Defaults
+  const rankings = data.rankings || [];
+  const ytd = data.ytd || [];
+  const injuries = data.injuries || [];
+  const meta = data.meta || { week: '?', updated: 'Unknown', league_avgs: {} };
+  const leagueAvgs = meta.league_avgs || {};
   
   let processed = rankings.map(p => {
      const pWithVegas = { ...p, vegas: p.vegas_implied || 0 }; 
@@ -306,11 +297,10 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
-  // YTD SORTED (Recalculating stats for YTD view)
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
-      // NEW: Calculate 50+ makes
+      // Safe addition for long makes
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
       
       return {
@@ -318,7 +308,7 @@ const App = () => {
           fpts: pts, 
           avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), 
           pct,
-          longs: longMakes // EXPLICITLY SET LONGS HERE
+          longs: longMakes 
       };
   }).sort((a, b) => b.fpts - a.fpts);
   
@@ -361,7 +351,6 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -382,7 +371,6 @@ const App = () => {
           </div>
         )}
 
-        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
