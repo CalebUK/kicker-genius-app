@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, BrainCircuit, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -99,12 +99,14 @@ const HistoryBars = ({ games }) => {
               </span>
             </div>
             
+            {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
                </div>
             </div>
 
+            {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -230,12 +232,14 @@ const MathCard = ({ player }) => {
              <HistoryBars games={player.history?.l3_games} />
           </div>
 
-          {/* 4. FINAL */}
-          <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col justify-center items-center text-center">
-             <div className="text-slate-400 font-semibold mb-1">FINAL</div>
-             <div className="text-3xl font-bold text-emerald-400">{player.proj}</div>
-             {(player.injury_status === 'OUT' || player.injury_status === 'Doubtful' || player.injury_status === 'IR') && <div className="text-red-500 font-bold text-xs mt-1">UNAVAILABLE</div>}
-             <div className="text-[10px] text-slate-500 mt-1">Weighted Score</div>
+          {/* 4. NARRATIVE (REPLACES FINAL SCORE) */}
+          <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col">
+             <div className="text-emerald-400 font-bold mb-2 pb-1 border-b border-slate-800 flex items-center gap-2">
+               <BrainCircuit className="w-3 h-3" /> KICKERGENIUS INSIGHT
+             </div>
+             <div className="text-xs text-slate-300 leading-relaxed h-full flex items-center">
+               {player.narrative || "No specific analysis available for this player yet."}
+             </div>
           </div>
         </div>
         
@@ -264,7 +268,7 @@ const App = () => {
   const [scoring, setScoring] = useState(DEFAULT_SCORING);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
+  
   const [hideHighOwn, setHideHighOwn] = useState(false);
   const [hideMedOwn, setHideMedOwn] = useState(false);
 
@@ -274,6 +278,7 @@ const App = () => {
       try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
       catch (e) { console.error(e); }
     }
+
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
@@ -297,6 +302,7 @@ const App = () => {
     if (sortConfig.key === key && sortConfig.direction === 'desc') direction = 'asc';
     setSortConfig({ key, direction });
   };
+  const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
 
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
 
@@ -320,7 +326,7 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
@@ -354,8 +360,8 @@ const App = () => {
           ...p, 
           fpts: pts, 
           avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), 
-          pct_val: pct, // For sorting
-          pct: pct, // For display
+          pct_val: pct, 
+          pct: pct, 
           longs: longMakes 
       };
   }).sort((a, b) => {
@@ -371,7 +377,6 @@ const App = () => {
       return 0;
   });
 
-  // FIXED: BUCKET LOGIC MATCHING VARIABLE NAMES
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
   const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful' || k.injury_status === 'Inactive');
   const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
@@ -573,7 +578,7 @@ const App = () => {
              )}
 
              {/* BUCKET 2: DOUBTFUL & OUT (RED) */}
-             {bucketOutDoubtful.length > 0 && (
+             {(bucketOutDoubtful.length > 0) && (
                <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden">
                  <div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2">
                     <ShieldAlert className="w-5 h-5 text-red-500" />
