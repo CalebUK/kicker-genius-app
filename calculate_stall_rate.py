@@ -33,9 +33,25 @@ STADIUM_COORDS = {
     'TEN': (36.1665, -86.7713), 'WAS': (38.9076, -76.8645)
 }
 
+# --- RETRY HELPER ---
+def load_data_with_retry(func, name, max_retries=5, delay=5):
+    """Helper to load NFL data with exponential backoff for 503 errors."""
+    for attempt in range(max_retries):
+        try:
+            print(f"   📥 Loading {name} (Attempt {attempt + 1}/{max_retries})...")
+            return func()
+        except Exception as e:
+            print(f"   ⚠️ {name} failed: {e}")
+            if attempt < max_retries - 1:
+                sleep_time = delay * (2 ** attempt) 
+                print(f"   ⏳ Waiting {sleep_time}s before retry...")
+                time.sleep(sleep_time)
+            else:
+                raise e
+
 def get_current_nfl_week():
     try:
-        schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
+        schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         today = datetime.now().strftime('%Y-%m-%d')
         upcoming = schedule[schedule['gameday'] >= today]
@@ -51,7 +67,19 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     lat, lon = coords
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-        data = requests.get(url, timeout=5).json()
+        
+        data = None
+        for i in range(3):
+            try:
+                resp = requests.get(url, timeout=5)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    break
+            except: 
+                time.sleep(1)
+        
+        if not data: return 0, "API Error"
+        
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
         idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
@@ -244,21 +272,6 @@ def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
         history_data[pid] = {'l3_actual': int(total_act), 'l3_proj': round(float(total_proj), 1), 'l3_games': games_list}
     return history_data
 
-def load_data_with_retry(func, name, max_retries=5, delay=5):
-    """Helper to load NFL data with exponential backoff for 503 errors."""
-    for attempt in range(max_retries):
-        try:
-            print(f"   📥 Loading {name} (Attempt {attempt + 1}/{max_retries})...")
-            return func()
-        except Exception as e:
-            print(f"   ⚠️ {name} failed: {e}")
-            if attempt < max_retries - 1:
-                sleep_time = delay * (2 ** attempt) 
-                print(f"   ⏳ Waiting {sleep_time}s before retry...")
-                time.sleep(sleep_time)
-            else:
-                raise e
-
 def run_analysis():
     try:
         target_week = get_current_nfl_week()
@@ -348,12 +361,12 @@ def run_analysis():
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
-        # Explicit Rename to prevent collisions
+        # RENAME KEYS TO AVOID COLLISION
         if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
-        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'opponent'})
+        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) # FIX: Rename to 'team' for YTD
         
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
-        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='opponent', how='left')
+        stats = pd.merge(stats, def_stall_seas, on='team', how='left') # Now merge on 'team', no 'opponent' created
         
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
@@ -403,9 +416,7 @@ def run_analysis():
                 return "Healthy", "green", "Active"
             
             report_st = str(report_st).title()
-            if "Ir" in report_st: return "IR", "red-700", f"{report_st} ({practice})"
-            if "Inactive" in report_st: return "Inactive", "red-700", f"{report_st} ({practice})"
-            if "Out" in report_st: return "OUT", "red-700", f"{report_st} ({practice})"
+            if "Out" in report_st or "Ir" in report_st: return "OUT", "red-700", f"{report_st} ({practice})"
             elif "Doubtful" in report_st: return "Doubtful", "red-400", f"{report_st} ({practice})"
             elif "Questionable" in report_st: return "Questionable", "yellow-500", f"{report_st} ({practice})"
             else: return "Healthy", "green", "Active"
@@ -499,6 +510,7 @@ def run_analysis():
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
+        
         final = final.fillna(0)
 
         def process_row(row):
