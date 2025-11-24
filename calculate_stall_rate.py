@@ -1,606 +1,603 @@
-import nflreadpy as nfl
-import pandas as pd
-import requests
-import json
-import warnings
-from datetime import datetime
-import numpy as np
-import time
-import traceback
-import io
-import math
+import React, { useState, useEffect } from 'react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
 
-# Suppress warnings
-warnings.simplefilter(action='ignore', category=RuntimeWarning)
-warnings.simplefilter(action='ignore', category=FutureWarning)
+// ... [KEEP GLOSSARY/CONSTANTS/HEADER CELL/HISTORY BARS/PLAYER CELL/DEEP DIVE AS IS] ...
+const GLOSSARY_DATA = [
+  { header: "Grade", title: "Matchup Grade", desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
+  { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
+  { header: "Proj Acc", title: "Projection Accuracy (L3)", desc: "Total Actual Points vs Total Projected Points over the last 3 weeks.", why: "Model Trust Check", source: "Historical Backtest" },
+  { header: "Injury", title: "Injury Status", desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.", why: "Availability Risk", source: "NFL Official + CBS Scraper" },
+  { header: "Avg FPts", title: "Average Fantasy Points", desc: "Average points scored per game played this season.", why: "Consistency Metric", source: "nflreadpy (Play-by-Play)" },
+  { header: "L4 Off %", title: "Offensive Stall Rate (L4)", desc: "% of drives inside the 25 that fail to score a TD over the last 4 weeks.", why: "Recent Trend Volume", source: "nflreadpy (Play-by-Play)" },
+  { header: "L4 Def %", title: "Opponent Force Rate (L4)", desc: "% of opponent drives allowed inside the 25 that resulted in FGs (Last 4 weeks).", why: "Matchup Difficulty", source: "nflreadpy (Play-by-Play)" },
+  { header: "Off Stall (YTD)", title: "Season Offense Stall Rate", desc: "Percentage of the kicker's team drives inside the 25 that ended in a FG attempt (Full Season).", why: "Long Term Efficiency", source: "nflreadpy (Season)" },
+  { header: "Def Stall (YTD)", title: "Season Defense Stall Rate", desc: "Percentage of the kicker's team defense forcing FG attempts inside the 25 (Full Season).", why: "Game Script Indicator", source: "nflreadpy (Season)" },
+  { header: "Vegas", title: "Implied Team Total", desc: "Points Vegas expects this team to score (derived from Spread & Total).", why: "Reality Check", source: "nflreadpy (Lee Sharpe)" },
+  { header: "Weather", title: "Live Forecast", desc: "Wind speed, temperature, and precipitation conditions at kickoff time.", why: "Accuracy Impact", source: "Open-Meteo API" },
+  { header: "Off PF", title: "Offense Points For", desc: "Average points scored by the kicker's team over the last 4 weeks.", why: "Scoring Ceiling", source: "nflreadpy (Schedule)" },
+  { header: "Opp PA", title: "Opponent Points Allowed", desc: "Average points allowed by the opponent over the last 4 weeks.", why: "Defensive Ceiling", source: "nflreadpy (Schedule)" },
+  { header: "FPts", title: "Fantasy Points (YTD)", desc: "Standard Scoring: 3 pts (0-39 yds), 4 pts (40-49 yds), 5 pts (50+ yds). -1 for Misses.", why: "Season Production", source: "nflreadpy (Play-by-Play)" },
+  { header: "Dome %", title: "Dome Percentage", desc: "Percentage of kicks attempted in a Dome or Closed Roof stadium.", why: "Environment Safety", source: "nflreadpy (Stadiums)" }
+];
 
-# --- CONFIGURATION ---
-CURRENT_SEASON = 2025
+const DEFAULT_SCORING = {
+  fg0_19: 3, fg20_29: 3, fg30_39: 3, fg40_49: 4, fg50_59: 5, fg60_plus: 5,
+  fg_miss: -1, xp_made: 1, xp_miss: -1
+};
 
-# --- STADIUM COORDINATES ---
-STADIUM_COORDS = {
-    'ARI': (33.5276, -112.2626), 'ATL': (33.7554, -84.4010), 'BAL': (39.2780, -76.6227),
-    'BUF': (42.7738, -78.7870), 'CAR': (35.2258, -80.8528), 'CHI': (41.8623, -87.6167),
-    'CIN': (39.0955, -84.5161), 'CLE': (41.5061, -81.6995), 'DAL': (32.7473, -97.0945),
-    'DEN': (39.7439, -105.0201), 'DET': (42.3400, -83.0456), 'GB': (44.5013, -88.0622),
-    'HOU': (29.6847, -95.4107), 'IND': (39.7601, -86.1639), 'JAX': (30.3240, -81.6373),
-    'KC': (39.0489, -94.4839), 'LA': (33.9534, -118.3390), 'LAC': (33.9534, -118.3390),
-    'LV': (36.0909, -115.1833), 'MIA': (25.9580, -80.2389), 'MIN': (44.9735, -93.2575),
-    'NE': (42.0909, -71.2643), 'NO': (29.9511, -90.0812), 'NYG': (40.8135, -74.0745),
-    'NYJ': (40.8135, -74.0745), 'PHI': (39.9008, -75.1675), 'PIT': (40.4468, -80.0158),
-    'SEA': (47.5952, -122.3316), 'SF': (37.4023, -121.9690), 'TB': (27.9759, -82.5033),
-    'TEN': (36.1665, -86.7713), 'WAS': (38.9076, -76.8645)
-}
+const HeaderCell = ({ label, description, avg }) => (
+  <th className="px-3 py-3 text-center group relative cursor-help">
+    <div className="flex items-center justify-center gap-1">
+      {label}
+      <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors" />
+    </div>
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+      <div className="text-white font-semibold mb-1">{description}</div>
+      {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
+      <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 border-l border-t border-slate-700 rotate-45"></div>
+    </div>
+  </th>
+);
 
-def get_current_nfl_week():
-    try:
-        schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
-        if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
-        today = datetime.now().strftime('%Y-%m-%d')
-        upcoming = schedule[schedule['gameday'] >= today]
-        return int(upcoming['week'].min()) if not upcoming.empty else 18
-    except:
-        return 1
+const HistoryBars = ({ games }) => {
+  if (!games || games.length === 0) return <div className="text-xs text-slate-500">No recent data</div>;
 
-def get_weather_forecast(home_team, game_dt_str, is_dome=False):
-    if is_dome: return 0, "Dome"
-    coords = STADIUM_COORDS.get(home_team)
-    if not coords: return 0, "Unknown"
-    
-    lat, lon = coords
-    try:
-        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-        data = requests.get(url, timeout=5).json()
-        target = game_dt_str.replace(" ", "T")[:13]
-        times = data['hourly']['time']
-        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
-        
-        if idx == -1: return 0, "No Data"
-        
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
-        
-        cond = f"{int(wind)}mph"
-        if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
-        elif wind > 15: cond += " 🌬️"
-        else: cond += " ☀️"
-        return wind, cond
-    except:
-        return 0, "API Error"
-
-def scrape_cbs_injuries():
-    print("   🌐 Scraping CBS Sports for live injury data...")
-    url = "https://www.cbssports.com/nfl/injuries/"
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    try:
-        response = requests.get(url, headers=headers, timeout=10)
-        dfs = pd.read_html(io.StringIO(response.text), flavor='html5lib')
-        if not dfs: return pd.DataFrame()
-        combined = pd.concat(dfs, ignore_index=True)
-        combined.columns = [c.lower().strip() for c in combined.columns]
-        col_map = {}
-        for col in combined.columns:
-            if 'player' in col: col_map[col] = 'full_name'
-            elif 'status' in col: col_map[col] = 'report_status'
-            elif 'injury' in col: col_map[col] = 'practice_status'
-        combined.rename(columns=col_map, inplace=True)
-        
-        if 'full_name' not in combined.columns: return pd.DataFrame()
-        if 'report_status' not in combined.columns: combined['report_status'] = 'Questionable'
-        if 'practice_status' not in combined.columns: combined['practice_status'] = 'Unknown'
-
-        def clean_name(val):
-            if not isinstance(val, str): return val
-            return val.split(' (')[0].strip()
-        combined['full_name'] = combined['full_name'].apply(clean_name)
-        combined['gsis_id'] = None 
-        
-        # Create normalized name for joining (e.g. "Eddy Pineiro" -> "E.Pineiro")
-        def normalize_for_join(val):
-             parts = val.split(' ')
-             if len(parts) >= 2:
-                 return f"{parts[0][0]}.{parts[-1]}"
-             return val
-        combined['join_name'] = combined['full_name'].apply(normalize_for_join)
-
-        print(f"   ✅ CBS Scrape Successful: Found {len(combined)} records.")
-        return combined[['join_name', 'report_status', 'practice_status']]
-    except Exception as e:
-        print(f"   ⚠️ Scraping failed: {e}")
-        return pd.DataFrame()
-
-def scrape_fantasy_ownership():
-    print("   🌐 Scraping FantasyPros (Stats Page) for Ownership data...")
-    url = "https://www.fantasypros.com/nfl/stats/k.php"
-    headers = {'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html'}
-    try:
-        response = requests.get(url, headers=headers, timeout=15)
-        dfs = pd.read_html(response.text)
-        if not dfs: return pd.DataFrame()
-        df = dfs[0].copy()
-        df.columns = [str(c).lower() for c in df.columns]
-        player_col = next((c for c in df.columns if 'player' in c), None)
-        rost_col = next((c for c in df.columns if 'rost' in c or 'own' in c), None)
-        if not player_col or not rost_col: return pd.DataFrame()
-        df = df[[player_col, rost_col]].rename(columns={player_col: 'full_name', rost_col: 'own_pct'})
-        def clean_name_to_match(val):
-            if not isinstance(val, str): return val
-            name_part = val.split('(')[0].strip()
-            parts = name_part.split(' ')
-            if len(parts) >= 2: return f"{parts[0][0]}.{parts[1]}"
-            return name_part
-        df['match_name'] = df['full_name'].apply(clean_name_to_match)
-        def clean_pct(val):
-            if not isinstance(val, str): return 0.0 if not isinstance(val, (int, float)) else float(val)
-            return float(val.replace('%', '').strip())
-        df['own_pct'] = df['own_pct'].apply(clean_pct)
-        return df[['match_name', 'own_pct']]
-    except Exception:
-        return pd.DataFrame()
-
-def load_injury_data_safe(season, target_week):
-    print("🏥 Fetching Injury Data...")
-    
-    # ATTEMPT 1: SCRAPE (Primary Source of Truth)
-    scraped = scrape_cbs_injuries()
-    if not scraped.empty: 
-        return scraped
-    
-    print("   ⚠️ Scraper failed, trying official nflreadpy source...")
-
-    # ATTEMPT 2: NFLREADPY (Parquet)
-    try:
-        injuries = nfl.load_injuries(seasons=[season])
-        if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
-        df = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
-        df.rename(columns={'practice_status': 'practice_status'}, inplace=True) 
-        return df
-    except Exception: pass
-    
-    # ATTEMPT 3: DIRECT CSV
-    try:
-        url = f"https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_{season}.csv"
-        injuries = pd.read_csv(url)
-        return injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
-    except Exception: pass
-    
-    return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
-
-def clean_nan(val):
-    if isinstance(val, float):
-        if pd.isna(val) or np.isinf(val): return None
-    return val
-
-# --- NEW: HELPER FOR STALL METRICS ---
-def calculate_stall_metrics(df_pbp):
-    """Calculates stall rates for offense and defense from a PBP dataframe."""
-    # Filter for drives inside 25 (True Red Zone for Kickers)
-    rz_drives = df_pbp[(df_pbp['yardline_100'] <= 25) & (df_pbp['yardline_100'].notnull())]
-    drives = rz_drives[['game_id', 'drive', 'posteam', 'defteam']].drop_duplicates()
-    
-    if drives.empty:
-        empty_df = pd.DataFrame(columns=['posteam', 'off_stall_rate'])
-        empty_df_def = pd.DataFrame(columns=['defteam', 'def_stall_rate'])
-        return empty_df, empty_df_def
-
-    drive_results = []
-    for _, row in drives.iterrows():
-        d_plays = df_pbp[(df_pbp['game_id'] == row['game_id']) & (df_pbp['drive'] == row['drive'])]
-        is_td = (d_plays['touchdown'] == 1).sum() > 0
-        is_to = ((d_plays['interception'] == 1).sum() > 0) or ((d_plays['fumble_lost'] == 1).sum() > 0)
-        drive_results.append({'posteam': row['posteam'], 'defteam': row['defteam'], 'stalled': (not is_td and not is_to)})
-        
-    df_res = pd.DataFrame(drive_results)
-    
-    off = df_res.groupby('posteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'off_stall_rate'})
-    defs = df_res.groupby('defteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'def_stall_rate'})
-    
-    off['off_stall_rate'] = (off['off_stall_rate'] * 100).round(1)
-    defs['def_stall_rate'] = (defs['def_stall_rate'] * 100).round(1)
-    
-    return off, defs
-
-# --- HISTORY ENGINE ---
-def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
-    print(f"🔙 Analyzing Last 3 Weeks (Strict Window: Weeks {target_week-3} to {target_week-1})...")
-    weeks_to_analyze = [target_week - 1, target_week - 2, target_week - 3]
-    weeks_to_analyze = [w for w in weeks_to_analyze if w >= 1]
-    
-    def calc_simple_pts(row):
-        if row['play_type'] == 'field_goal':
-            if row['field_goal_result'] == 'made':
-                return 5 if row['kick_distance'] >= 50 else 4 if row['kick_distance'] >= 40 else 3
-            return -1
-        elif row['play_type'] == 'extra_point':
-            return 1 if row['extra_point_result'] == 'good' else -1
-        return 0
-    
-    relevant_pbp = pbp[pbp['week'].isin(weeks_to_analyze)].copy()
-    relevant_pbp['pts'] = relevant_pbp.apply(calc_simple_pts, axis=1)
-    actuals_map = relevant_pbp.groupby(['week', 'kicker_player_id'])['pts'].sum().to_dict()
-
-    history_data = {}
-    for _, kicker in current_stats.iterrows():
-        pid = kicker['kicker_player_id']
-        team = kicker['team']
-        team_schedule = schedule[(schedule['week'].isin(weeks_to_analyze)) & 
-                                 ((schedule['home_team'] == team) | (schedule['away_team'] == team))].copy()
-        games_list = []
-        total_act = 0
-        total_proj = 0
-        
-        for wk in weeks_to_analyze:
-            game = team_schedule[team_schedule['week'] == wk]
-            if game.empty:
-                games_list.append({'week': int(wk), 'status': 'BYE', 'opp': 'BYE', 'proj': 0, 'act': 0, 'diff': 0})
-                continue
-            game = game.iloc[0]
-            is_home = (game['home_team'] == team)
-            opp = game['away_team'] if is_home else game['home_team']
-            player_played = not relevant_pbp[(relevant_pbp['week'] == wk) & (relevant_pbp['kicker_player_id'] == pid)].empty
-            
-            if not player_played:
-                games_list.append({'week': int(wk), 'status': 'DNS', 'opp': opp, 'proj': 0, 'act': 0, 'diff': 0})
-                continue
-            
-            total_line = game['total_line'] if pd.notna(game['total_line']) else 44.0
-            spread_line = game['spread_line'] if pd.notna(game['spread_line']) else 0.0
-            
-            if is_home: vegas_implied = (total_line + spread_line) / 2
-            else: vegas_implied = (total_line - spread_line) / 2
-                
-            base = kicker['avg_pts']
-            mult = 1.0
-            if vegas_implied > 24: mult = 1.15
-            elif vegas_implied < 18: mult = 0.85
-            
-            proj = round(base * mult, 1)
-            act = int(actuals_map.get((wk, pid), 0))
-            total_act += act
-            total_proj += proj
-            games_list.append({'week': int(wk), 'status': 'ACTIVE', 'opp': opp, 'proj': proj, 'act': act, 'diff': round(act - proj, 1)})
-            
-        history_data[pid] = {'l3_actual': int(total_act), 'l3_proj': round(float(total_proj), 1), 'l3_games': games_list}
-    return history_data
-
-def run_analysis():
-    try:
-        target_week = get_current_nfl_week()
-        print(f"🚀 Starting Analysis for Week {target_week}...")
-        
-        pbp = nfl.load_pbp(seasons=[CURRENT_SEASON])
-        schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
-        players = nfl.load_players()
-        injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
-        ownership_data = scrape_fantasy_ownership()
-
-        # Load Roster
-        try:
-            rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
-            if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
-            if rosters.empty:
-                 rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
-                 if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
-            
-            inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
-            inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
-            inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
-        except Exception:
-            inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
-
-        if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
-        if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
-        if hasattr(players, "to_pandas"): players = players.to_pandas()
-
-        # --- RAW STATS AGGREGATION ---
-        kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
-        kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
-        
-        kick_plays['is_fg'] = kick_plays['play_type'] == 'field_goal'
-        kick_plays['is_xp'] = kick_plays['play_type'] == 'extra_point'
-        kick_plays['made'] = ((kick_plays['is_fg'] & (kick_plays['field_goal_result'] == 'made')) | 
-                              (kick_plays['is_xp'] & (kick_plays['extra_point_result'] == 'good')))
-        
-        kick_plays['fg_0_19'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'] < 20)
-        kick_plays['fg_20_29'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(20, 29))
-        kick_plays['fg_30_39'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(30, 39))
-        kick_plays['fg_40_49'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(40, 49))
-        kick_plays['fg_50_59'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(50, 59))
-        kick_plays['fg_60_plus'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'] >= 60)
-        
-        kick_plays['fg_miss'] = (kick_plays['is_fg']) & (~kick_plays['made'])
-        kick_plays['xp_made'] = (kick_plays['is_xp']) & (kick_plays['made'])
-        kick_plays['xp_miss'] = (kick_plays['is_xp']) & (~kick_plays['made'])
-        kick_plays['real_pts'] = (kick_plays['is_fg'] & kick_plays['made']) * 3 + (kick_plays['is_xp'] & kick_plays['made']) * 1
-        
-        kick_plays['is_dome'] = kick_plays['roof'].isin(['dome', 'closed'])
-        
-        rz_drives = pbp[(pbp['yardline_100'] <= 25) & (pbp['yardline_100'].notnull())][['game_id', 'drive', 'posteam']].drop_duplicates()
-        rz_counts = rz_drives.groupby('posteam').size().reset_index(name='rz_trips')
-
-        stats = kick_plays.groupby(['kicker_player_name', 'kicker_player_id']).agg(
-            team=('posteam', 'last'),
-            fg_made=('is_fg', lambda x: (x & kick_plays.loc[x.index, 'made']).sum()),
-            fg_att=('is_fg', 'sum'),
-            fg_0_19=('fg_0_19', 'sum'),
-            fg_20_29=('fg_20_29', 'sum'),
-            fg_30_39=('fg_30_39', 'sum'),
-            fg_40_49=('fg_40_49', 'sum'),
-            fg_50_59=('fg_50_59', 'sum'),
-            fg_60_plus=('fg_60_plus', 'sum'),
-            fg_miss=('fg_miss', 'sum'),
-            xp_made=('xp_made', 'sum'),
-            xp_miss=('xp_miss', 'sum'),
-            real_pts=('real_pts', 'sum'),
-            dome_kicks=('is_dome', 'sum'),
-            total_kicks=('play_id', 'count'),
-            games=('game_id', 'nunique')
-        ).reset_index()
-        
-        stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
-        stats['acc'] = (stats['fg_made'] / stats['fg_att'] * 100).round(1)
-        stats['dome_pct'] = (stats['dome_kicks'] / stats['total_kicks'] * 100).round(0)
-        stats['fpts'] = (stats['fg_0_19']*3 + stats['fg_20_29']*3 + stats['fg_30_39']*3 + 
-                         stats['fg_40_49']*4 + stats['fg_50_59']*5 + stats['fg_60_plus']*5 + 
-                         stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
-        stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
-
-        # HEADSHOTS
-        headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
-        if headshot_col:
-            player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
-            stats = pd.merge(stats, player_map, on='kicker_player_id', how='left')
-        else:
-            stats['headshot_url'] = None
-        stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
-        
-        # MERGE OWNERSHIP
-        if not ownership_data.empty:
-            stats = pd.merge(stats, ownership_data, left_on='kicker_player_name', right_on='match_name', how='left')
-            stats['own_pct'] = stats['own_pct'].fillna(0.0)
-        else:
-            stats['own_pct'] = 0.0
-
-        # MERGE INJURIES
-        if 'full_name' in injury_report.columns:
-            name_map = players[['gsis_id', 'display_name']].rename(columns={'gsis_id': 'kicker_player_id', 'display_name': 'full_name_official'})
-            stats = pd.merge(stats, name_map, on='kicker_player_id', how='left')
-            injury_report = injury_report.rename(columns={'full_name': 'full_name_official'})
-            injury_report = injury_report.drop_duplicates(subset=['full_name_official'])
-            stats = pd.merge(stats, injury_report, on='full_name_official', how='left')
-        elif 'gsis_id' in injury_report.columns:
-            injury_report = injury_report.rename(columns={'gsis_id': 'kicker_player_id'})
-            stats = pd.merge(stats, injury_report, on='kicker_player_id', how='left')
-        else:
-            stats['report_status'] = None
-            stats['practice_status'] = None
-
-        stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
-        
-        def get_injury_meta(row):
-            roster_st = str(row['roster_status']) if pd.notna(row['roster_status']) else ""
-            
-            if roster_st in ['RES', 'NON', 'SUS', 'PUP']: 
-                 return "IR", "red-700", f"Roster: {roster_st}"
-            if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']:
-                 return "CUT", "red-700", "Released"
-            if roster_st == 'DEV':
-                 return "Practice Squad", "yellow-500", "Roster: Practice Squad"
-
-            report_st = row['report_status']
-            practice = row['practice_status']
-            
-            if pd.isna(report_st):
-                if roster_st and roster_st != 'ACT' and roster_st != 'nan':
-                     return roster_st, "gray-400", f"Roster: {roster_st}"
-                return "Healthy", "green", "Active"
-            
-            report_st = str(report_st).title()
-            if "Out" in report_st or "Ir" in report_st: return "OUT", "red-700", f"{report_st} ({practice})"
-            elif "Doubtful" in report_st: return "Doubtful", "red-400", f"{report_st} ({practice})"
-            elif "Questionable" in report_st: return "Questionable", "yellow-500", f"{report_st} ({practice})"
-            else: return "Healthy", "green", "Active"
-
-        injury_meta = stats.apply(get_injury_meta, axis=1)
-        stats['injury_status'] = [x[0] for x in injury_meta]
-        stats['injury_color'] = [x[1] for x in injury_meta]
-        stats['injury_details'] = [x[2] for x in injury_meta]
-
-        qualified = stats[stats['fg_att'] >= 5]
-        elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
-
-        # --- 2. STALL METRICS (L4 & SEASON) ---
-        max_wk = pbp['week'].max()
-        start_wk = max(1, max_wk - 3)
-        recent_pbp = pbp[pbp['week'] >= start_wk].copy()
-        rz_plays_l4 = recent_pbp[(recent_pbp['yardline_100'] <= 25) & (recent_pbp['yardline_100'].notnull())]
-        
-        # L4 Stalls
-        off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
-        
-        # Season Stalls (for YTD)
-        off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
-        off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
-        def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
-
-        lg_off_avg = off_stall_l4['off_stall_rate'].mean() if not off_stall_l4.empty else 0
-        lg_def_avg = def_stall_l4['def_stall_rate'].mean() if not def_stall_l4.empty else 0
-
-        # MERGE SEASON STALLS INTO STATS (For YTD Tab)
-        stats = pd.merge(stats, off_stall_seas, left_on='team', right_on='posteam', how='left')
-        # We don't have a 'defteam' in 'stats', so we merge Defensive Stall Rate (Season) based on Team
-        # (This means: "How often does THIS team's defense force field goals?")
-        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='defteam', how='left').fillna(0)
-
-        fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
-        fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
-        aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
-        aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
-
-        # Scoring & Share (L4)
-        completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
-        home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
-        away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
-        all_scores = pd.concat([home_scores, away_scores])
-        off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
-        
-        home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
-        away_allowed = completed[['away_team', 'home_score']].rename(columns={'away_team': 'team', 'home_score': 'pts_allowed'})
-        all_allowed = pd.concat([home_allowed, away_allowed])
-        def_pa = all_allowed.groupby('team')['pts_allowed'].mean().reset_index().rename(columns={'pts_allowed': 'def_pa', 'team': 'opponent'})
-
-        l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
-        kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
-        kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True)
-        home_g = completed[['game_id', 'home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'total'})
-        away_g = completed[['game_id', 'away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'total'})
-        all_g = pd.concat([home_g, away_g])
-        share_df = pd.merge(all_g, kicker_game_pts, left_on=['game_id', 'team'], right_on=['game_id', 'posteam'], how='left').fillna(0)
-        share_df['share'] = share_df.apply(lambda x: x['kicker_pts'] / x['total'] if x['total'] > 0 else 0, axis=1)
-        off_share = share_df.groupby('team')['share'].mean().reset_index().rename(columns={'share': 'off_share'})
-        matchup_lookup = schedule[['game_id', 'home_team', 'away_team']]
-        share_df = pd.merge(share_df, matchup_lookup, on='game_id')
-        share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
-        def_share = share_df.groupby('opponent')['share'].mean().reset_index().rename(columns={'share': 'def_share'})
-
-        # MATCHUPS
-        matchups = schedule[schedule['week'] == target_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']].copy()
-        matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
-        matchups['total_line'] = matchups['total_line'].fillna(44.0)
-        matchups['spread_line'] = matchups['spread_line'].fillna(0.0)
-        
-        home_view = matchups[['home_team', 'away_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
-        home_view['home_field'] = home_view['home_team']
-        home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
-        home_view['vegas_implied'] = (home_view['total_line'] + home_view['spread_line']) / 2
-        home_view['is_home'] = True
-        home_view['spread_display'] = home_view['spread_line'].apply(lambda x: f"{x*-1:+.1f}")
-
-        away_view = matchups[['away_team', 'home_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
-        away_view['home_field'] = away_view['home_team']
-        away_view = away_view.rename(columns={'away_team': 'team', 'home_team': 'opponent'})
-        away_view['vegas_implied'] = (away_view['total_line'] - away_view['spread_line']) / 2
-        away_view['is_home'] = False
-        away_view['spread_display'] = away_view['spread_line'].apply(lambda x: f"{x:+.1f}")
-        
-        model = pd.concat([home_view, away_view])
-        model['is_dome'] = model['roof'].isin(['dome', 'closed'])
-        
-        print("🌤️ Fetching Weather...")
-        model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
-        model['wind'] = model['weather_data'].apply(lambda x: x[0])
-        model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
-
-        final = pd.merge(stats, model, on='team', how='inner')
-        final = pd.merge(final, off_stall_l4, left_on='team', right_on='posteam', how='left')
-        final = pd.merge(final, off_ppg, on='team', how='left')
-        final = pd.merge(final, off_share, on='team', how='left')
-        final = pd.merge(final, def_stall_l4, left_on='opponent', right_on='defteam', how='left')
-        final = pd.merge(final, def_pa, on='opponent', how='left')
-        final = pd.merge(final, def_share, on='opponent', how='left')
-        final = pd.merge(final, aggression_stats[['posteam', 'aggression_pct']], left_on='team', right_on='posteam', how='left')
-        final = final.fillna(0)
-        
-        history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
-
-        def process_row(row):
-            off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
-            def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
-            
-            bonuses = []
-            bonus_val = 0
-            
-            if row['is_dome']: 
-                bonus_val += 10; bonuses.append("+10 Dome")
-            else:
-                wind = row['wind']
-                weather_desc = row['weather_desc']
-                if wind > 15: bonus_val -= 10; bonuses.append("-10 Heavy Wind")
-                elif wind > 10: bonus_val -= 5; bonuses.append("-5 Wind")
-                if "🌨️" in weather_desc: bonus_val -= 10; bonuses.append("-10 Snow")
-                elif "🌧️" in weather_desc: bonus_val -= 5; bonuses.append("-5 Rain")
-                
-            if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
-            if abs(float(row['spread_display'])) < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
-            elif abs(float(row['spread_display'])) > 9.5: bonus_val -= 5; bonuses.append("-5 Blowout Risk")
-            
-            if row['fpts'] >= elite_thresh: bonus_val += 5; bonuses.append("+5 Elite Talent")
-            if row['aggression_pct'] > 25.0: bonus_val -= 5; bonuses.append("-5 Aggressive Coach")
-            
-            grade = round(off_score + def_score + bonus_val, 1)
-            
-            base_proj = row['avg_pts'] * (grade / 90)
-            
-            w_team_score = (row['vegas_implied'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas_implied'] > 0 else row['off_ppg']
-            w_def_allowed = (row['vegas_implied'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas_implied'] > 0 else row['def_pa']
-            
-            s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
-            off_cap = w_team_score * (s_off * 1.2)
-            s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
-            def_cap = w_def_allowed * (s_def * 1.2)
-            
-            final_cap = min(off_cap, def_cap)
-            weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
-            proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
-            
-            if row['injury_status'] in ['OUT', 'CUT', 'Practice Squad', 'IR']:
-                proj = 0.0
-                grade = 0.0
-                bonuses.append(f"⛔ {row['injury_status'].upper()}")
-            
-            history_obj = history_data.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
-
-            return pd.Series({
-                'grade': grade,
-                'proj': proj,
-                'grade_details': bonuses,
-                'off_score_val': round(off_score, 1),
-                'def_score_val': round(def_score, 1),
-                'w_team_score': round(w_team_score, 1),
-                'w_def_allowed': round(w_def_allowed, 1),
-                'off_cap_val': round(off_cap, 1),
-                'def_cap_val': round(def_cap, 1),
-                'details_vegas_total': round(row['total_line'], 1),
-                'details_vegas_spread': row['spread_display'],
-                'history': history_obj
-            })
-
-        final = final.join(final.apply(process_row, axis=1))
-        final = final.sort_values('proj', ascending=False)
-        
-        final = final.replace([np.inf, -np.inf, np.nan], None)
-        final = final.where(pd.notnull(final), None)
-        ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
-        ytd_sorted = ytd_sorted.where(pd.notnull(ytd_sorted), None)
-        injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
-        injuries_list = injuries_list.where(pd.notnull(injuries_list), None)
-
-        output = {
-            "meta": {
-                "week": int(target_week),
-                "updated": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                "league_avgs": {
-                    "fpts": clean_nan(round(stats['fpts'].mean(), 1)),
-                    "off_stall": clean_nan(round(lg_off_avg, 1)),
-                    "def_stall": clean_nan(round(lg_def_avg, 1)),
-                    "l4_off_ppg": clean_nan(round(off_ppg['off_ppg'].mean(), 1)),
-                    "l4_def_pa": clean_nan(round(def_pa['def_pa'].mean(), 1))
-                }
-            },
-            "rankings": final.to_dict(orient='records'),
-            "ytd": ytd_sorted.to_dict(orient='records'),
-            "injuries": injuries_list.to_dict(orient='records')
+  return (
+    <div className="space-y-3">
+      {games.map((g, i) => {
+        if (g.status === 'BYE' || g.status === 'DNS') {
+           return (
+             <div key={i} className="text-[10px]">
+               <div className="text-slate-500 mb-0.5">Wk {g.week}: {g.status}</div>
+               <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
+                 <div className="bg-slate-700 h-full rounded-full" style={{width: '100%'}}></div>
+               </div>
+             </div>
+           );
         }
-        
-        with open("public/kicker_data.json", "w") as f:
-            json.dump(output, f, indent=2)
-        
-        print(f"✅ Success! Data saved.")
-    
-    except Exception as e:
-        print(f"❌ Fatal Error: {e}")
-        traceback.print_exc()
 
-if __name__ == "__main__":
-    run_analysis()
+        const maxVal = Math.max(20, g.proj, g.act); 
+        const projPct = (g.proj / maxVal) * 100;
+        const actPct = (g.act / maxVal) * 100;
+        const isBeat = g.act >= g.proj;
+        
+        return (
+          <div key={i} className="text-[10px]">
+            <div className="flex justify-between text-slate-400 mb-0.5 font-bold">
+              <span>Wk {g.week} vs {g.opp}</span>
+              <span className={isBeat ? "text-green-400" : "text-red-400"}>
+                {isBeat ? "+" : ""}{g.diff}
+              </span>
+            </div>
+            
+            {/* Projection Bar (Gray) */}
+            <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
+               <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
+                  <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
+               </div>
+            </div>
+
+            {/* Actual Bar (Color) */}
+            <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
+               <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
+                  <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
+               </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const PlayerCell = ({ player, subtext }) => {
+  const injuryColor = player.injury_color || 'slate-600'; 
+  const statusText = player.injury_status || '';
+  
+  let borderColor = 'border-slate-600';
+  if (injuryColor.includes('green')) borderColor = 'border-green-500';
+  if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
+  if (injuryColor.includes('red-500')) borderColor = 'border-red-500';
+  if (injuryColor.includes('yellow')) borderColor = 'border-yellow-500';
+
+  let textColor = 'text-slate-400';
+  if (injuryColor.includes('green')) textColor = 'text-green-400';
+  if (injuryColor.includes('red-700')) textColor = 'text-red-500';
+  if (injuryColor.includes('red-500')) textColor = 'text-red-400';
+  if (injuryColor.includes('yellow')) textColor = 'text-yellow-400';
+
+  const ownPct = player.own_pct || 0;
+  let ownColor = 'text-slate-500';
+  if (ownPct < 10) ownColor = 'text-blue-400 font-bold'; 
+  else if (ownPct > 80) ownColor = 'text-amber-500'; 
+
+  const isAubrey = player.kicker_player_name.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
+  const imageUrl = isAubrey 
+    ? '/assets/aubrey_custom.png' 
+    : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
+
+  return (
+    <td className="px-6 py-4 font-medium text-white">
+      <div className="flex items-center gap-3">
+        <div className="relative group flex-shrink-0">
+          <img 
+            src={imageUrl} 
+            alt={player.kicker_player_name}
+            className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`}
+            onError={(e) => {
+                if (e.target.src.includes('aubrey_custom.png') && player.headshot_url) {
+                    e.target.src = player.headshot_url;
+                } else {
+                    e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
+                }
+            }} 
+          />
+          {statusText !== 'Healthy' && statusText !== '' && (
+             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
+                <div className={`font-bold ${textColor} mb-1`}>{player.injury_status}</div>
+                <div className="text-slate-300">{player.injury_details || 'No details'}</div>
+             </div>
+          )}
+        </div>
+        <div className="min-w-0">
+          <div className="text-base leading-tight truncate">{player.kicker_player_name}</div>
+          <div className="text-xs text-slate-500 truncate">{subtext}</div>
+          {player.own_pct > 0 && (
+             <div className={`text-[10px] mt-1 font-bold ${ownColor}`}>
+               Own: {player.own_pct.toFixed(1)}%
+             </div>
+          )}
+        </div>
+      </div>
+    </td>
+  );
+};
+
+const MathCard = ({ player }) => {
+  if (!player) return null;
+
+  const l3_diff = (player.history?.l3_actual || 0) - (player.history?.l3_proj || 0);
+  let trendColor = "text-slate-500";
+  let trendSign = "";
+  if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
+  else if (l3_diff < -2.5) { trendColor = "text-red-400"; }
+
+  return (
+    <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Calculator className="w-4 h-4 text-emerald-400" />
+          <h3 className="font-bold text-white text-sm">Math Worksheet: {player.kicker_player_name}</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+          <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
+            <div className="text-blue-300 font-bold mb-2 pb-1 border-b border-slate-800">1. MATCHUP</div>
+            <div className="flex justify-between mb-1"><span>Off Score:</span> <span className="text-white">{player.off_score_val}</span></div>
+            <div className="flex justify-between mb-1"><span>Def Score:</span> <span className="text-white">{player.def_score_val}</span></div>
+            <div className="mt-2 pt-1 border-t border-slate-800">
+              <div className="text-[10px] text-slate-400 mb-1">Bonuses:</div>
+              <div className="text-emerald-400 text-right">
+                  {player.grade_details && player.grade_details.length > 0 
+                    ? player.grade_details.map((d, i) => <div key={i}>{d}</div>) 
+                    : 'None'}
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
+            <div className="text-amber-400 font-bold mb-2 pb-1 border-b border-slate-800">2. CAPS</div>
+            <div className="flex justify-between mb-1"><span>Off Cap:</span> <span className="text-white">{player.off_cap_val}</span></div>
+            <div className="text-[10px] text-slate-500 mb-2">Tm Score {player.w_team_score} x Share</div>
+            <div className="flex justify-between mb-1"><span>Def Cap:</span> <span className="text-white">{player.def_cap_val}</span></div>
+            <div className="text-[10px] text-slate-500">Opp Allow {player.w_def_allowed} x Share</div>
+          </div>
+          
+          <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
+             <div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> TREND (L3)</div>
+                <span className={`text-[10px] font-mono ${trendColor}`}>{trendSign}{l3_diff.toFixed(1)}</span>
+             </div>
+             <HistoryBars games={player.history?.l3_games} />
+          </div>
+
+          <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col justify-center items-center text-center">
+             <div className="text-slate-400 font-semibold mb-1">FINAL</div>
+             <div className="text-3xl font-bold text-emerald-400">{player.proj}</div>
+             {(player.injury_status === 'OUT' || player.injury_status === 'Doubtful' || player.injury_status === 'IR') && <div className="text-red-500 font-bold text-xs mt-1">UNAVAILABLE</div>}
+             <div className="text-[10px] text-slate-500 mt-1">Weighted Score</div>
+          </div>
+        </div>
+        
+        <div className="mt-3 bg-slate-800/40 p-2 rounded border border-slate-800 text-[10px] text-slate-400 flex gap-6 justify-center">
+            <span><strong className="text-slate-200">Vegas:</strong> {player.details_vegas_spread} / {player.details_vegas_total} Total</span>
+            <span><strong className="text-slate-200">Implied Score:</strong> {player.vegas ? Number(player.vegas).toFixed(1) : '--'} pts</span>
+            <span><strong className="text-slate-200">L4 Team PF:</strong> {player.off_ppg ? Number(player.off_ppg).toFixed(1) : '--'} pts</span>
+            <span><strong className="text-slate-200">L4 Opp PA:</strong> {player.def_pa ? Number(player.def_pa).toFixed(1) : '--'} pts</span>
+        </div>
+    </div>
+  );
+};
+
+const DeepDiveRow = ({ player }) => (
+  <tr className="bg-slate-900/50 border-b border-slate-800">
+    <td colSpan="11" className="p-4">
+      <MathCard player={player} />
+    </td>
+  </tr>
+);
+
+const App = () => {
+  const [data, setData] = useState(null);
+  const [activeTab, setActiveTab] = useState('potential');
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [scoring, setScoring] = useState(DEFAULT_SCORING);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [hideHighOwn, setHideHighOwn] = useState(false);
+  const [hideMedOwn, setHideMedOwn] = useState(false);
+
+  useEffect(() => {
+    const savedScoring = localStorage.getItem('kicker_scoring');
+    if (savedScoring) {
+      try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
+      catch (e) { console.error(e); }
+    }
+
+    fetch('/kicker_data.json?v=' + new Date().getTime())
+      .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
+      .then(json => { setData(json); setLoading(false); })
+      .catch(err => { setError(err.message); setLoading(false); });
+  }, []);
+
+  const updateScoring = (key, val) => {
+    const numVal = val === '' ? 0 : parseFloat(val);
+    const newScoring = { ...scoring, [key]: numVal };
+    setScoring(newScoring);
+    localStorage.setItem('kicker_scoring', JSON.stringify(newScoring));
+  };
+  
+  const resetScoring = () => {
+    setScoring(DEFAULT_SCORING);
+    localStorage.setItem('kicker_scoring', JSON.stringify(DEFAULT_SCORING));
+  };
+
+  const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
+
+  const calcFPts = (p) => {
+    if (!p) return 0;
+    return ((p.fg_0_19||0)*scoring.fg0_19) + ((p.fg_20_29||0)*scoring.fg20_29) + ((p.fg_30_39||0)*scoring.fg30_39) + 
+           ((p.fg_40_49||0)*scoring.fg40_49) + ((p.fg_50_59||0)*scoring.fg50_59) + ((p.fg_60_plus||0)*scoring.fg60_plus) + 
+           ((p.fg_miss||0)*scoring.fg_miss) + ((p.xp_made||0)*scoring.xp_made) + ((p.xp_miss||0)*scoring.xp_miss);
+  };
+
+  const calcProj = (p, grade) => {
+    if (grade === 0) return 0;
+    const avgPts = p.fpts_ytd / (p.games || 1);
+    const base = avgPts * (grade / 90);
+    const scaleFactor = (p.avg_pts && p.avg_pts > 0) ? (avgPts / p.avg_pts) : 1.0;
+    const off_cap_scaled = (p.off_cap_val || 0) * scaleFactor;
+    const def_cap_scaled = (p.def_cap_val || 0) * scaleFactor;
+    const weighted_proj = (base * 0.50) + (off_cap_scaled * 0.30) + (def_cap_scaled * 0.20);
+    const proj = weighted_proj > 1.0 ? weighted_proj : base;
+    return proj.toFixed(1);
+  };
+
+  if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
+
+  const { rankings, ytd, injuries, meta } = data;
+  const leagueAvgs = meta?.league_avgs || {};
+  
+  let processed = rankings.map(p => {
+     const pWithVegas = { ...p, vegas: p.vegas_implied || 0 }; 
+     const ytdPts = calcFPts(pWithVegas);
+     const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
+     const proj = calcProj(pWithYtd, p.grade);
+     return { ...pWithYtd, proj: parseFloat(proj) };
+  })
+  .filter(p => p.proj > 0) 
+  .sort((a, b) => b.proj - a.proj);
+
+  if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
+  if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
+  
+  const ytdSorted = ytd.map(p => {
+      const pts = calcFPts(p);
+      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
+      return {...p, fpts: pts, avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), pct };
+  }).sort((a, b) => b.fpts - a.fpts);
+  
+  const outKickers = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT' || k.injury_status === 'IR');
+  const doubtfulKickers = injuries.filter(k => k.injury_status === 'Doubtful');
+  const questionableKickers = injuries.filter(k => k.injury_status === 'Questionable');
+  const otherKickers = injuries.filter(k => !['OUT', 'CUT', 'Doubtful', 'Questionable', 'Healthy', 'IR'].includes(k.injury_status));
+  const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
+              <Trophy className="w-8 h-8 text-yellow-500" /> 
+              <div>
+                Kicker<span className="text-blue-500">Genius</span>
+                <img src="/assets/logo.png" alt="Logo" className="w-10 h-10 object-contain inline-block ml-3" />
+              </div>
+            </h1>
+            <p className="text-slate-400">Advanced Stall Rate Analytics & Fantasy Projections</p>
+          </div>
+          <div className="flex gap-3">
+             <button onClick={() => setActiveTab('settings')} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded flex items-center gap-2 border border-slate-700 transition-colors"><Settings className="w-4 h-4" /> League Settings</button>
+             <div className="bg-slate-900 border border-slate-800 rounded-lg p-2 flex items-center gap-3 shadow-sm px-4">
+               <div className="text-right">
+                 <div className="text-[10px] text-slate-500 uppercase font-bold">Last Update</div>
+                 <div className="text-xs font-semibold text-white">{meta.updated} (Week {meta.week})</div>
+               </div>
+             </div>
+          </div>
+        </div>
+
+        <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
+          <button onClick={() => setActiveTab('potential')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
+          <button onClick={() => setActiveTab('ytd')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
+          <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
+          <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
+        </div>
+
+        {/* ... [SETTINGS, POTENTIAL MODEL, INJURIES TABS - No Changes needed] ... */}
+        {activeTab === 'settings' && (
+          <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2"><Settings className="w-5 h-5"/> Scoring Settings</h2>
+                <button onClick={resetScoring} className="text-xs bg-red-900/30 text-red-400 px-3 py-1 rounded border border-red-800/50 hover:bg-red-900/50 flex items-center gap-1"><RotateCcw className="w-3 h-3" /> Reset to Default</button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              {Object.entries(scoring).map(([key, val]) => (
+                <div key={key}>
+                  <label className="block text-xs uppercase text-slate-500 font-bold mb-1">{key.replace(/_/g, ' ')}</label>
+                  <input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 p-4 bg-blue-900/20 border border-blue-800 rounded text-sm text-blue-300 flex items-center gap-2">
+              <Save className="w-4 h-4" /> Changes save automatically and update all projections instantly.
+            </div>
+          </div>
+        )}
+
+        {/* POTENTIAL MODEL */}
+        {activeTab === 'potential' && (
+          <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+             <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
+                <div className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1"><Filter className="w-3 h-3" /> Filters:</div>
+                <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white">
+                   <input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" />
+                   Hide {'>'} 80% Owned
+                </label>
+                <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white">
+                   <input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" />
+                   Hide {'>'} 60% Owned
+                </label>
+             </div>
+             <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="text-xs text-slate-400 uppercase bg-slate-950">
+                  <tr>
+                    <th className="px-6 py-3">Rank</th>
+                    <th className="px-6 py-3">Player</th>
+                    <HeaderCell label="Proj" description="Projected Points (Custom Scoring)" />
+                    <HeaderCell label="Grade" description="Matchup Grade (0-100)" />
+                    <th className="px-6 py-3 text-center">Weather</th>
+                    <HeaderCell label="Off Stall%" description="Offense Stall Rate (L4)" avg={leagueAvgs.off_stall} />
+                    <HeaderCell label="Def Stall%" description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
+                    <HeaderCell label="Proj Acc" description="Total Actual vs Projected Points (Last 3 Games)" />
+                    <HeaderCell label="Vegas" description="Implied Team Total (Vegas Line & Spread)/2" />
+                    <HeaderCell label="Off PF (L4)" description="Team Points For (L4)" />
+                    <HeaderCell label="Opp PA (L4)" description="Opp Points Allowed (L4)" />
+                    <th className="px-6 py-3"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800">
+                  {processed.map((row, idx) => (
+                    <React.Fragment key={idx}>
+                      <tr onClick={() => toggleRow(idx)} className="hover:bg-slate-800/50 cursor-pointer transition-colors">
+                        <td className="px-6 py-4 font-mono text-slate-500">#{idx + 1}</td>
+                        <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} />
+                        <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
+                        <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
+                        <td className="px-6 py-4 text-center text-xs font-mono text-slate-400">{row.weather_desc}</td>
+                        <td className="px-6 py-4 text-center text-blue-300">{row.off_stall_rate}%</td>
+                        <td className="px-6 py-4 text-center text-slate-400">{row.def_stall_rate}%</td>
+                        
+                        {/* PROJ ACCURACY COLUMN */}
+                        <td className="px-6 py-4 text-center">
+                           <div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.history?.l3_actual >= row.history?.l3_proj ? 'text-green-400' : 'text-red-400'}`}>
+                             <span>{row.history?.l3_actual || 0}</span>
+                             <span className="mx-1 text-slate-600">/</span>
+                             <span className="text-slate-500">{row.history?.l3_proj || 0}</span>
+                           </div>
+                           <div className="text-[9px] text-slate-500 uppercase">Act / Proj</div>
+                        </td>
+
+                        <td className="px-6 py-4 text-center font-mono text-amber-400">{Number(row.vegas).toFixed(1)}</td>
+                        <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.off_ppg).toFixed(1)} {row.off_ppg < 15 && "❄️"}</td>
+                        <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && "🛡️"}</td>
+                        <td className="px-6 py-4 text-slate-600">{expandedRow === idx ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</td>
+                      </tr>
+                      {expandedRow === idx && <DeepDiveRow player={row} />}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* YTD TABLE */}
+        {activeTab === 'ytd' && (
+          <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+             <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="text-xs text-slate-400 uppercase bg-slate-950">
+                  <tr>
+                    <th className="px-6 py-3">Rank</th>
+                    <th className="px-6 py-3">Player</th>
+                    <HeaderCell label="FPts" description="Total Fantasy Points (Custom Scoring)" avg={leagueAvgs.fpts} />
+                    <HeaderCell label="Avg FPts" description="Average Fantasy Points per Game" />
+                    <th className="px-6 py-3 text-center">FG (M/A)</th>
+                    <HeaderCell label="50+ Yds" description="Long Distance Makes" />
+                    <HeaderCell label="Dome %" description="Dome Games Played" />
+                    <HeaderCell label="FG RZ Trips" description="Drives reaching FG Range" />
+                    <HeaderCell label="Off Stall (YTD)" description="Season-Long Offensive Stall Rate" />
+                    <HeaderCell label="Def Stall (YTD)" description="Season-Long Defensive Stall Rate (Team's own defense)" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800">
+                  {ytdSorted.map((row, idx) => (
+                    <tr key={idx} className="hover:bg-slate-800/50 transition-colors">
+                      <td className="px-6 py-4 font-mono text-slate-500">#{idx + 1}</td>
+                      <PlayerCell player={row} subtext={row.team} />
+                      
+                      <td className="px-6 py-4 text-center font-bold text-emerald-400 text-lg">{row.fpts}</td>
+
+                      <td className="px-6 py-4 text-center">
+                        <div className="font-bold text-white">{row.avg_fpts}</div>
+                        <div className="text-[10px] text-slate-500 uppercase font-bold">Games: {row.games}</div>
+                      </td>
+
+                      <td className="px-6 py-4 text-center">
+                        <div className="text-slate-300">{row.fg_made}/{row.fg_att}</div>
+                        <div className="text-[10px] text-blue-400 font-mono">{row.pct}%</div>
+                      </td>
+
+                      <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded ${row.longs >= 4 ? 'bg-amber-500/20 text-amber-400' : 'text-slate-500'}`}>{row.longs}</span></td>
+                      <td className="px-6 py-4 text-center text-blue-300">{row.dome_pct}%</td>
+                      <td className="px-6 py-4 text-center text-slate-300">{row.rz_trips}</td>
+                      {/* FIXED: Now using correct YTD columns from updated python script */}
+                      <td className="px-6 py-4 text-center font-mono text-blue-300">{row.off_stall_rate_ytd}%</td>
+                      <td className="px-6 py-4 text-center font-mono text-slate-400">{row.def_stall_rate_ytd}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* INJURIES */}
+        {activeTab === 'injuries' && (
+           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+             {/* BUCKET 1: QUESTIONABLE (YELLOW) */}
+             {questionableKickers.length > 0 && (
+               <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden">
+                 <div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                    <h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3>
+                 </div>
+                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {questionableKickers.map((k, i) => (
+                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+                          <div>
+                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+                             <div className="text-xs text-yellow-300">{k.injury_details}</div>
+                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+               </div>
+             )}
+
+             {/* BUCKET 2: DOUBTFUL & OUT (RED) */}
+             {(outKickers.length > 0 || doubtfulKickers.length > 0) && (
+               <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden">
+                 <div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5 text-red-500" />
+                    <h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3>
+                 </div>
+                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[...outKickers, ...doubtfulKickers].map((k, i) => (
+                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-red-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+                          <div>
+                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+                             <div className="text-xs text-red-300">{k.injury_details}</div>
+                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+               </div>
+             )}
+
+             {/* BUCKET 3: PRACTICE SQUAD / RESERVE (DARK RED) */}
+             {otherKickers.length > 0 && (
+               <div className="bg-slate-800/30 rounded-xl border border-slate-700 overflow-hidden">
+                 <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex items-center gap-2">
+                    <UserMinus className="w-5 h-5 text-slate-400" />
+                    <h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD / RELEASED</h3>
+                 </div>
+                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {otherKickers.map((k, i) => (
+                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+                          <div>
+                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+                             <div className="text-xs text-slate-300">{k.injury_details}</div>
+                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+               </div>
+             )}
+
+             {(!outKickers.length && !doubtfulKickers.length && !questionableKickers.length && !otherKickers.length) && (
+                <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">
+                   No kickers currently listed on the injury report!
+                </div>
+             )}
+           </div>
+        )}
+
+        {activeTab === 'glossary' && (
+          <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+             {/* LIVE CALCULATION EXAMPLE */}
+             {aubreyExample && (
+               <div className="p-4 border-b border-slate-800 bg-slate-900/50">
+                  <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                    <Calculator className="w-4 h-4 text-emerald-400" /> How It Works: Live Example
+                  </h3>
+                  <MathCard player={aubreyExample} />
+               </div>
+             )}
+
+             <div className="overflow-x-auto">
+               <table className="w-full text-sm text-left">
+                  <thead className="text-xs text-slate-400 uppercase bg-slate-950"><tr><th className="px-6 py-4 w-24">Metric</th><th className="px-6 py-4 w-64">Definition</th><th className="px-6 py-4">Source</th></tr></thead>
+                  <tbody className="divide-y divide-slate-800">
+                    {GLOSSARY_DATA.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-slate-800/50 transition-colors">
+                        <td className="px-6 py-4 font-mono font-bold text-blue-300 whitespace-nowrap">{item.header}</td>
+                        <td className="px-6 py-4 text-slate-300 font-medium">
+                           <div>{item.title}</div>
+                           <div className="text-xs text-slate-500 font-normal mt-1">{item.desc}</div>
+                        </td>
+                        <td className="px-6 py-4 text-emerald-400 text-xs flex items-center gap-2 w-32">
+                          <Database className="w-3 h-3 flex-shrink-0"/> {item.source}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+               </table>
+             </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default App;
