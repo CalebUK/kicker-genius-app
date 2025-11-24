@@ -98,12 +98,14 @@ const HistoryBars = ({ games }) => {
               </span>
             </div>
             
+            {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
                </div>
             </div>
 
+            {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -264,11 +266,11 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Sorting State: separate for potential and ytd to maintain context
-  const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
-
   const [hideHighOwn, setHideHighOwn] = useState(false);
   const [hideMedOwn, setHideMedOwn] = useState(false);
+
+  // Sorting State
+  const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
 
   useEffect(() => {
     const savedScoring = localStorage.getItem('kicker_scoring');
@@ -330,32 +332,29 @@ const App = () => {
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
   
-  // PROCESS & SORT POTENTIAL
   let processed = rankings.map(p => {
      const pWithVegas = { ...p, vegas: p.vegas_implied || 0 }; 
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
      
-     // Calculate Accuracy Diff for sorting
      const accDiff = (p.history?.l3_actual || 0) - (p.history?.l3_proj || 0);
-     
+
      return { 
        ...pWithYtd, 
        proj: parseFloat(proj),
-       acc_diff: accDiff // For sorting
+       acc_diff: accDiff
      };
-  }).filter(p => p.proj > 0);
+  })
+  .filter(p => p.proj > 0);
 
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
-  
-  // Sort Logic for Potential
+
+  // Sorting Logic
   processed.sort((a, b) => {
       let valA = a[sortConfig.key];
       let valB = b[sortConfig.key];
-      
-      // Handle special keys
       if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
       
       if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -363,26 +362,23 @@ const App = () => {
       return 0;
   });
   
-  // PROCESS & SORT YTD
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
-      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
+      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
       
       return {
           ...p, 
           fpts: pts, 
-          avg_fpts: (p.games > 0 ? (pts/p.games) : 0), 
-          pct_val: pct, // For sorting
-          pct: pct.toFixed(1), // For display
+          avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), 
+          pct_val: (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0),
+          pct,
           longs: longMakes 
       };
   });
 
-  // Sort Logic for YTD
   ytdSorted.sort((a, b) => {
       let key = sortConfig.key;
-      // Map display keys to data keys
       if (key === 'pct') key = 'pct_val';
       if (key === 'avg_fpts') key = 'avg_fpts';
       
@@ -394,10 +390,9 @@ const App = () => {
       return 0;
   });
   
-  const outKickers = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT' || k.injury_status === 'IR');
-  const doubtfulKickers = injuries.filter(k => k.injury_status === 'Doubtful');
-  const questionableKickers = injuries.filter(k => k.injury_status === 'Questionable');
-  const otherKickers = injuries.filter(k => !['OUT', 'CUT', 'Doubtful', 'Questionable', 'Healthy', 'IR'].includes(k.injury_status));
+  const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
+  const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful');
+  const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad', 'Inactive'].includes(k.injury_status) || k.injury_status.includes('Roster'));
 
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
@@ -535,8 +530,8 @@ const App = () => {
                     <HeaderCell label="50+ FGs" sortKey="longs" currentSort={sortConfig} onSort={handleSort} description="Long Distance Makes" />
                     <HeaderCell label="Dome Games (%)" sortKey="dome_pct" currentSort={sortConfig} onSort={handleSort} description="Dome Games Played" />
                     <HeaderCell label="FG Red Zone Trips" sortKey="rz_trips" currentSort={sortConfig} onSort={handleSort} description="Drives reaching FG Range" />
-                    <HeaderCell label="Opponent Stall % (Season)" sortKey="off_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Offensive Stall Rate" />
-                    <HeaderCell label="Def Stall (YTD)" sortKey="def_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Defensive Stall Rate (Team's own defense)" />
+                    <HeaderCell label="Offense Stall % (Season)" sortKey="off_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Offensive Stall Rate" />
+                    <HeaderCell label="Opponent Stall % (Season)" sortKey="def_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Defensive Stall Rate (Team's own defense)" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
