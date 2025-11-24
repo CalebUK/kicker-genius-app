@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
-  { header: "Grade", title: "Matchup Grade", desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
+  { header: "Grade", title: "Matchup Grade", desc: "Composite score (Baseline 90) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
   { header: "Proj Acc", title: "Projection Accuracy (L3)", desc: "Total Actual Points vs Total Projected Points over the last 3 weeks.", why: "Model Trust Check", source: "Historical Backtest" },
   { header: "Injury", title: "Injury Status", desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.", why: "Availability Risk", source: "NFL Official + CBS Scraper" },
@@ -17,7 +17,8 @@ const GLOSSARY_DATA = [
   { header: "Off PF", title: "Offense Points For", desc: "Average points scored by the kicker's team over the last 4 weeks.", why: "Scoring Ceiling", source: "nflreadpy (Schedule)" },
   { header: "Opp PA", title: "Opponent Points Allowed", desc: "Average points allowed by the opponent over the last 4 weeks.", why: "Defensive Ceiling", source: "nflreadpy (Schedule)" },
   { header: "FPts", title: "Fantasy Points (YTD)", desc: "Standard Scoring: 3 pts (0-39 yds), 4 pts (40-49 yds), 5 pts (50+ yds). -1 for Misses.", why: "Season Production", source: "nflreadpy (Play-by-Play)" },
-  { header: "Dome %", title: "Dome Percentage", desc: "Percentage of kicks attempted in a Dome or Closed Roof stadium.", why: "Environment Safety", source: "nflreadpy (Stadiums)" }
+  { header: "Dome %", title: "Dome Percentage", desc: "Percentage of kicks attempted in a Dome or Closed Roof stadium.", why: "Environment Safety", source: "nflreadpy (Stadiums)" },
+  { header: "FG RZ Trips", title: "FG Red Zone Trips", desc: "Number of drives reaching the Red Zone that resulted in a Field Goal attempt.", why: "Volume Opportunity", source: "nflreadpy (Play-by-Play)" }
 ];
 
 const DEFAULT_SCORING = {
@@ -37,19 +38,34 @@ const SETTING_LABELS = {
   xp_miss: "PAT Missed"
 };
 
-const HeaderCell = ({ label, description, avg }) => (
-  <th className="px-2 py-3 text-center align-middle group relative cursor-help leading-tight min-w-[90px]">
-    <div className="flex flex-col items-center justify-center h-full gap-1">
-      <span className="block">{label}</span>
-      <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
-    </div>
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal">
-      <div className="text-white font-semibold mb-1">{description}</div>
-      {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
-      <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 border-l border-t border-slate-700 rotate-45"></div>
-    </div>
-  </th>
-);
+// Sortable Header Cell
+const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) => {
+  const isActive = currentSort.key === sortKey;
+  
+  return (
+    <th 
+      onClick={() => onSort(sortKey)}
+      className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}
+    >
+      <div className="flex flex-col items-center justify-center h-full gap-1">
+        <div className="flex items-center gap-1">
+          <span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>
+          {isActive ? (
+            currentSort.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-blue-400" /> : <ArrowDown className="w-3 h-3 text-blue-400" />
+          ) : (
+            <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+          )}
+        </div>
+        <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
+      </div>
+      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto">
+        <div className="text-white font-semibold mb-1">{description}</div>
+        {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
+        <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 border-l border-t border-slate-700 rotate-45"></div>
+      </div>
+    </th>
+  );
+};
 
 const HistoryBars = ({ games }) => {
   if (!games || games.length === 0) return <div className="text-xs text-slate-500">No recent data</div>;
@@ -82,14 +98,12 @@ const HistoryBars = ({ games }) => {
               </span>
             </div>
             
-            {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
                </div>
             </div>
 
-            {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -250,6 +264,9 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  // Sorting State: separate for potential and ytd to maintain context
+  const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
+
   const [hideHighOwn, setHideHighOwn] = useState(false);
   const [hideMedOwn, setHideMedOwn] = useState(false);
 
@@ -276,6 +293,14 @@ const App = () => {
   const resetScoring = () => {
     setScoring(DEFAULT_SCORING);
     localStorage.setItem('kicker_scoring', JSON.stringify(DEFAULT_SCORING));
+  };
+
+  const handleSort = (key) => {
+    let direction = 'desc';
+    if (sortConfig.key === key && sortConfig.direction === 'desc') {
+      direction = 'asc';
+    }
+    setSortConfig({ key, direction });
   };
 
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
@@ -305,32 +330,69 @@ const App = () => {
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
   
+  // PROCESS & SORT POTENTIAL
   let processed = rankings.map(p => {
      const pWithVegas = { ...p, vegas: p.vegas_implied || 0 }; 
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-     return { ...pWithYtd, proj: parseFloat(proj) };
-  })
-  .filter(p => p.proj > 0) 
-  .sort((a, b) => b.proj - a.proj);
+     
+     // Calculate Accuracy Diff for sorting
+     const accDiff = (p.history?.l3_actual || 0) - (p.history?.l3_proj || 0);
+     
+     return { 
+       ...pWithYtd, 
+       proj: parseFloat(proj),
+       acc_diff: accDiff // For sorting
+     };
+  }).filter(p => p.proj > 0);
 
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
+  // Sort Logic for Potential
+  processed.sort((a, b) => {
+      let valA = a[sortConfig.key];
+      let valB = b[sortConfig.key];
+      
+      // Handle special keys
+      if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
+      
+      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+  });
+  
+  // PROCESS & SORT YTD
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
-      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
+      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
       
       return {
           ...p, 
           fpts: pts, 
-          avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), 
-          pct,
+          avg_fpts: (p.games > 0 ? (pts/p.games) : 0), 
+          pct_val: pct, // For sorting
+          pct: pct.toFixed(1), // For display
           longs: longMakes 
       };
-  }).sort((a, b) => b.fpts - a.fpts);
+  });
+
+  // Sort Logic for YTD
+  ytdSorted.sort((a, b) => {
+      let key = sortConfig.key;
+      // Map display keys to data keys
+      if (key === 'pct') key = 'pct_val';
+      if (key === 'avg_fpts') key = 'avg_fpts';
+      
+      let valA = a[key];
+      let valB = b[key];
+      
+      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+  });
   
   const outKickers = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT' || k.injury_status === 'IR');
   const doubtfulKickers = injuries.filter(k => k.injury_status === 'Doubtful');
@@ -364,12 +426,13 @@ const App = () => {
         </div>
 
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
-          <button onClick={() => setActiveTab('potential')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
-          <button onClick={() => setActiveTab('ytd')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
+          <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
+          <button onClick={() => { setActiveTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
           <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
+        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -390,6 +453,7 @@ const App = () => {
           </div>
         )}
 
+        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
@@ -407,17 +471,17 @@ const App = () => {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="px-6 py-3">Rank</th>
-                    <th className="px-6 py-3">Player</th>
-                    <HeaderCell label="Projection" description="Projected Points (Custom Scoring)" />
-                    <HeaderCell label="Matchup Grade" description="Matchup Grade (0-100)" />
-                    <th className="px-6 py-3 text-center">Weather</th>
-                    <HeaderCell label="Offensive Stall % (L4)" description="Offense Stall Rate (L4)" avg={leagueAvgs.off_stall} />
-                    <HeaderCell label="Opponent Stall % (L4)" description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
-                    <HeaderCell label="Projection Accuracy (L3)" description="Total Actual vs Projected Points (Last 3 Games)" />
-                    <HeaderCell label="Implied Vegas Score Line" description="Implied Team Total (Vegas Line & Spread)/2" />
-                    <HeaderCell label="Offensive Points For (L4)" description="Team Points For (L4)" />
-                    <HeaderCell label="Opponent Points Allowed (L4)" description="Opp Points Allowed (L4)" />
+                    <th className="px-6 py-3 align-middle text-center">Rank</th>
+                    <th className="px-6 py-3 align-middle text-left">Player</th>
+                    <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
+                    <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description="Matchup Grade (Baseline 90)" />
+                    <th className="px-6 py-3 text-center align-middle">Weather</th>
+                    <HeaderCell label="Offensive Stall % (L4)" sortKey="off_stall_rate" currentSort={sortConfig} onSort={handleSort} description="Offense Stall Rate (L4)" avg={leagueAvgs.off_stall} />
+                    <HeaderCell label="Opponent Stall % (L4)" sortKey="def_stall_rate" currentSort={sortConfig} onSort={handleSort} description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
+                    <HeaderCell label="Projection Accuracy (L3)" sortKey="proj_acc" currentSort={sortConfig} onSort={handleSort} description="Total Actual vs Projected Points (Last 3 Games)" />
+                    <HeaderCell label="Implied Vegas Score Line" sortKey="vegas" currentSort={sortConfig} onSort={handleSort} description="Implied Team Total (Vegas Line & Spread)/2" />
+                    <HeaderCell label="Offensive PF (L4)" sortKey="off_ppg" currentSort={sortConfig} onSort={handleSort} description="Team Points For (L4)" />
+                    <HeaderCell label="Opponent PA (L4)" sortKey="def_pa" currentSort={sortConfig} onSort={handleSort} description="Opp Points Allowed (L4)" />
                     <th className="px-6 py-3"></th>
                   </tr>
                 </thead>
@@ -425,7 +489,7 @@ const App = () => {
                   {processed.map((row, idx) => (
                     <React.Fragment key={idx}>
                       <tr onClick={() => toggleRow(idx)} className="hover:bg-slate-800/50 cursor-pointer transition-colors">
-                        <td className="px-6 py-4 font-mono text-slate-500">#{idx + 1}</td>
+                        <td className="px-6 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                         <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} />
                         <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
                         <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
@@ -463,28 +527,28 @@ const App = () => {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="px-6 py-3">Rank</th>
-                    <th className="px-6 py-3">Player</th>
-                    <HeaderCell label="FPts" description="Total Fantasy Points (Custom Scoring)" avg={leagueAvgs.fpts} />
-                    <HeaderCell label="Avg FPts" description="Average Fantasy Points per Game" />
-                    <th className="px-6 py-3 text-center">FG (M/A)</th>
-                    <HeaderCell label="Long Distance (50+ Yards)" description="Long Distance Makes" />
-                    <HeaderCell label="Dome Games (%)" description="Dome Games Played" />
-                    <HeaderCell label="Red Zone Trips (Resulting in FG)" description="Drives reaching FG Range" />
-                    <HeaderCell label="Offense Stall % (Season)" description="Season-Long Offensive Stall Rate" />
-                    <HeaderCell label="Defense Stall % (Season)" description="Season-Long Defensive Stall Rate (Team's own defense)" />
+                    <th className="px-6 py-3 align-middle text-center">Rank</th>
+                    <th className="px-6 py-3 align-middle text-left">Player</th>
+                    <HeaderCell label="Fantasy Points" sortKey="fpts" currentSort={sortConfig} onSort={handleSort} description="Total Fantasy Points (Custom Scoring)" avg={leagueAvgs.fpts} />
+                    <HeaderCell label="Average Fantasy Points" sortKey="avg_fpts" currentSort={sortConfig} onSort={handleSort} description="Average Fantasy Points per Game" />
+                    <HeaderCell label="FG (Made/Attempts)" sortKey="pct" currentSort={sortConfig} onSort={handleSort} description="Field Goal Accuracy" />
+                    <HeaderCell label="50+ FGs" sortKey="longs" currentSort={sortConfig} onSort={handleSort} description="Long Distance Makes" />
+                    <HeaderCell label="Dome Games (%)" sortKey="dome_pct" currentSort={sortConfig} onSort={handleSort} description="Dome Games Played" />
+                    <HeaderCell label="FG Red Zone Trips" sortKey="rz_trips" currentSort={sortConfig} onSort={handleSort} description="Drives reaching FG Range" />
+                    <HeaderCell label="Opponent Stall % (Season)" sortKey="off_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Offensive Stall Rate" />
+                    <HeaderCell label="Def Stall (YTD)" sortKey="def_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Defensive Stall Rate (Team's own defense)" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {ytdSorted.map((row, idx) => (
                     <tr key={idx} className="hover:bg-slate-800/50 transition-colors">
-                      <td className="px-6 py-4 font-mono text-slate-500">#{idx + 1}</td>
+                      <td className="px-6 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                       <PlayerCell player={row} subtext={row.team} />
                       
                       <td className="px-6 py-4 text-center font-bold text-emerald-400 text-lg">{row.fpts}</td>
 
                       <td className="px-6 py-4 text-center">
-                        <div className="font-bold text-white">{row.avg_fpts}</div>
+                        <div className="font-bold text-white">{Number(row.avg_fpts).toFixed(1)}</div>
                         <div className="text-[10px] text-slate-500 uppercase font-bold">Games: {row.games}</div>
                       </td>
 
