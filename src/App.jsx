@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
+import { TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
 
-// ... [KEEP GLOSSARY/CONSTANTS/HEADER CELL/HISTORY BARS/PLAYER CELL/DEEP DIVE AS IS] ...
+// --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
   { header: "Grade", title: "Matchup Grade", desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
@@ -222,6 +222,14 @@ const MathCard = ({ player }) => {
   );
 };
 
+const DeepDiveRow = ({ player }) => (
+  <tr className="bg-slate-900/50 border-b border-slate-800">
+    <td colSpan="11" className="p-4">
+      <MathCard player={player} />
+    </td>
+  </tr>
+);
+
 const App = () => {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState('potential');
@@ -298,10 +306,20 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
+  // YTD SORTED (Recalculating stats for YTD view)
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
-      return {...p, fpts: pts, avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), pct };
+      // NEW: Calculate 50+ makes
+      const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
+      
+      return {
+          ...p, 
+          fpts: pts, 
+          avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), 
+          pct,
+          longs: longMakes // EXPLICITLY SET LONGS HERE
+      };
   }).sort((a, b) => b.fpts - a.fpts);
   
   const outKickers = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT' || k.injury_status === 'IR');
@@ -309,7 +327,6 @@ const App = () => {
   const questionableKickers = injuries.filter(k => k.injury_status === 'Questionable');
   const otherKickers = injuries.filter(k => !['OUT', 'CUT', 'Doubtful', 'Questionable', 'Healthy', 'IR'].includes(k.injury_status));
 
-  // Live Example for Glossary: Try to find Aubrey, else top ranked
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
   return (
@@ -344,6 +361,7 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
+        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -364,6 +382,7 @@ const App = () => {
           </div>
         )}
 
+        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
@@ -470,7 +489,6 @@ const App = () => {
                       <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded ${row.longs >= 4 ? 'bg-amber-500/20 text-amber-400' : 'text-slate-500'}`}>{row.longs}</span></td>
                       <td className="px-6 py-4 text-center text-blue-300">{row.dome_pct}%</td>
                       <td className="px-6 py-4 text-center text-slate-300">{row.rz_trips}</td>
-                      {/* FIXED: Now using correct YTD columns from updated python script */}
                       <td className="px-6 py-4 text-center font-mono text-blue-300">{row.off_stall_rate_ytd}%</td>
                       <td className="px-6 py-4 text-center font-mono text-slate-400">{row.def_stall_rate_ytd}%</td>
                     </tr>
