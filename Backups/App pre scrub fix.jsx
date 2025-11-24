@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
 
-// ... [GLOSSARY_DATA and DEFAULT_SCORING constants remain the same] ...
+// --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
   { header: "Grade", title: "Matchup Grade", desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
@@ -66,11 +66,15 @@ const HistoryBars = ({ games }) => {
                 {isBeat ? "+" : ""}{g.diff}
               </span>
             </div>
+            
+            {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
                </div>
             </div>
+
+            {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -165,6 +169,7 @@ const DeepDiveRow = ({ player }) => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+          {/* 1. GRADE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
             <div className="text-blue-300 font-bold mb-2 pb-1 border-b border-slate-800">1. MATCHUP</div>
             <div className="flex justify-between mb-1"><span>Off Score:</span> <span className="text-white">{player.off_score_val}</span></div>
@@ -179,6 +184,7 @@ const DeepDiveRow = ({ player }) => {
             </div>
           </div>
 
+          {/* 2. CAPS */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
             <div className="text-amber-400 font-bold mb-2 pb-1 border-b border-slate-800">2. CAPS</div>
             <div className="flex justify-between mb-1"><span>Off Cap:</span> <span className="text-white">{player.off_cap_val}</span></div>
@@ -187,6 +193,7 @@ const DeepDiveRow = ({ player }) => {
             <div className="text-[10px] text-slate-500">Opp Allow {player.w_def_allowed} x Share</div>
           </div>
           
+          {/* 3. HISTORY (UPDATED) */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
              <div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> TREND (L3)</div>
@@ -195,6 +202,7 @@ const DeepDiveRow = ({ player }) => {
              <HistoryBars games={player.history?.l3_games} />
           </div>
 
+          {/* 4. FINAL */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col justify-center items-center text-center">
              <div className="text-slate-400 font-semibold mb-1">FINAL</div>
              <div className="text-3xl font-bold text-emerald-400">{player.proj}</div>
@@ -289,11 +297,10 @@ const App = () => {
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
   const ytdSorted = ytd.map(p => ({...p, fpts: calcFPts(p)})).sort((a, b) => b.fpts - a.fpts);
-  
-  // NEW BUCKETS
-  const bucket1 = injuries.filter(k => k.injury_status === 'Questionable');
-  const bucket2 = injuries.filter(k => k.injury_status === 'Doubtful' || k.injury_status === 'OUT');
-  const bucket3 = injuries.filter(k => !['Questionable', 'Doubtful', 'OUT', 'Healthy'].includes(k.injury_status));
+  const outKickers = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT');
+  const doubtfulKickers = injuries.filter(k => k.injury_status === 'Doubtful');
+  const questionableKickers = injuries.filter(k => k.injury_status === 'Questionable');
+  const otherKickers = injuries.filter(k => !['OUT', 'CUT', 'Doubtful', 'Questionable', 'Healthy'].includes(k.injury_status));
 
   // Live Example for Glossary: Try to find Aubrey, else top ranked
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
@@ -301,6 +308,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
@@ -319,6 +327,7 @@ const App = () => {
           </div>
         </div>
 
+        {/* Tabs */}
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => setActiveTab('potential')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => setActiveTab('ytd')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
@@ -326,6 +335,7 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
+        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -346,6 +356,7 @@ const App = () => {
           </div>
         )}
 
+        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
@@ -366,11 +377,11 @@ const App = () => {
                     <th className="px-6 py-3">Rank</th>
                     <th className="px-6 py-3">Player</th>
                     <HeaderCell label="Proj" description="Projected Points (Custom Scoring)" />
-                    <HeaderCell label="Grade" description="Matchup Grade (0-100)" />
+                    <HeaderCell label="Grade" description="Matchup Grade (Baseline 90)" />
                     <th className="px-6 py-3 text-center">Weather</th>
                     <HeaderCell label="Off Stall%" description="Offense Stall Rate (L4)" avg={leagueAvgs.off_stall} />
                     <HeaderCell label="Def Stall%" description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
-                    <HeaderCell label="Proj Acc" description="Total Actual vs Projected Points (Last 3 Games)" />
+                    <HeaderCell label="Projection Accuracy (L3)" description="Total Actual vs Projected Points (Last 3 Games)" />
                     <HeaderCell label="Vegas" description="Implied Team Total (Vegas Line & Spread)/2" />
                     <HeaderCell label="Off PF (L4)" description="Team Points For (L4)" />
                     <HeaderCell label="Opp PA (L4)" description="Opp Points Allowed (L4)" />
@@ -389,6 +400,7 @@ const App = () => {
                         <td className="px-6 py-4 text-center text-blue-300">{row.off_stall_rate}%</td>
                         <td className="px-6 py-4 text-center text-slate-400">{row.def_stall_rate}%</td>
                         
+                        {/* PROJ ACCURACY COLUMN */}
                         <td className="px-6 py-4 text-center">
                            <div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.history?.l3_actual >= row.history?.l3_proj ? 'text-green-400' : 'text-red-400'}`}>
                              <span>{row.history?.l3_actual || 0}</span>
@@ -448,39 +460,17 @@ const App = () => {
           </div>
         )}
 
+        {/* INJURIES */}
         {activeTab === 'injuries' && (
            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             {/* BUCKET 1: QUESTIONABLE */}
-             {bucket1.length > 0 && (
-               <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden">
-                 <div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                    <h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3>
-                 </div>
-                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {bucket1.map((k, i) => (
-                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
-                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
-                          <div>
-                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-                             <div className="text-xs text-yellow-300">{k.injury_details}</div>
-                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
-                          </div>
-                       </div>
-                    ))}
-                 </div>
-               </div>
-             )}
-
-             {/* BUCKET 2: DOUBTFUL & OUT */}
-             {bucket2.length > 0 && (
+             {outKickers.length > 0 && (
                <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden">
                  <div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2">
                     <ShieldAlert className="w-5 h-5 text-red-500" />
-                    <h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3>
+                    <h3 className="font-bold text-white">OUT / IR</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {bucket2.map((k, i) => (
+                    {outKickers.map((k, i) => (
                        <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
                           <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-red-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
@@ -493,16 +483,55 @@ const App = () => {
                  </div>
                </div>
              )}
-
-             {/* BUCKET 3: IR / INACTIVE / PS / RELEASED */}
-             {bucket3.length > 0 && (
+             {doubtfulKickers.length > 0 && (
+               <div className="bg-orange-900/20 rounded-xl border border-orange-800/50 overflow-hidden">
+                 <div className="p-4 bg-orange-900/40 border-b border-orange-800/50 flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5 text-orange-500" />
+                    <h3 className="font-bold text-white">DOUBTFUL</h3>
+                 </div>
+                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {doubtfulKickers.map((k, i) => (
+                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-orange-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+                          <div>
+                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+                             <div className="text-xs text-orange-300">{k.injury_details}</div>
+                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+               </div>
+             )}
+             {questionableKickers.length > 0 && (
+               <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden">
+                 <div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                    <h3 className="font-bold text-white">QUESTIONABLE</h3>
+                 </div>
+                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {questionableKickers.map((k, i) => (
+                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+                          <div>
+                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+                             <div className="text-xs text-yellow-300">{k.injury_details}</div>
+                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+               </div>
+             )}
+             {/* NEW SECTION: PRACTICE SQUAD / RESERVE */}
+             {otherKickers.length > 0 && (
                <div className="bg-slate-800/30 rounded-xl border border-slate-700 overflow-hidden">
                  <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex items-center gap-2">
                     <UserMinus className="w-5 h-5 text-slate-400" />
-                    <h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD</h3>
+                    <h3 className="font-bold text-white">PRACTICE SQUAD / RESERVE</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {bucket3.map((k, i) => (
+                    {otherKickers.map((k, i) => (
                        <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
                           <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
@@ -516,7 +545,7 @@ const App = () => {
                </div>
              )}
 
-             {(!bucket1.length && !bucket2.length && !bucket3.length) && (
+             {(!outKickers.length && !doubtfulKickers.length && !questionableKickers.length && !otherKickers.length) && (
                 <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">
                    No kickers currently listed on the injury report!
                 </div>
@@ -557,6 +586,7 @@ const App = () => {
              </div>
           </div>
         )}
+        
       </div>
     </div>
   );
