@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
 
-// ... [GLOSSARY and DEFAULT SCORING OMITTED FOR BREVITY - SAME AS BEFORE] ...
+// --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
   { header: "Grade", title: "Matchup Grade", desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
@@ -146,22 +146,15 @@ const PlayerCell = ({ player, subtext }) => {
   );
 };
 
-const DeepDiveRow = ({ player }) => {
-  const l3_diff = (player.history?.l3_actual || 0) - (player.history?.l3_proj || 0);
-  let trendColor = "text-slate-500";
-  let trendSign = "";
-  if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
-  else if (l3_diff < -2.5) { trendColor = "text-red-400"; }
-  
+// --- REUSABLE MATH CARD (Fixes Crash) ---
+const MathCard = ({ player }) => {
+  if (!player) return null;
+
   return (
-  <tr className="bg-slate-900/50 border-b border-slate-800">
-    <td colSpan="11" className="p-4">
-      <div className="bg-slate-950 border border-slate-800 rounded-lg p-4 animate-in slide-in-from-top-2 duration-300">
-        <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-                <Calculator className="w-4 h-4 text-emerald-400" />
-                <h3 className="font-bold text-white text-sm">Deep Dive: {player.kicker_player_name}</h3>
-            </div>
+    <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Calculator className="w-4 h-4 text-emerald-400" />
+          <h3 className="font-bold text-white text-sm">Math Worksheet: {player.kicker_player_name}</h3>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
@@ -189,11 +182,10 @@ const DeepDiveRow = ({ player }) => {
             <div className="text-[10px] text-slate-500">Opp Allow {player.w_def_allowed} x Share</div>
           </div>
           
-          {/* 3. HISTORY (UPDATED) */}
+          {/* 3. HISTORY */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
              <div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> TREND (L3)</div>
-                <span className={`text-[10px] font-mono ${trendColor}`}>{trendSign}{l3_diff.toFixed(1)}</span>
              </div>
              <HistoryBars games={player.history?.l3_games} />
           </div>
@@ -213,11 +205,17 @@ const DeepDiveRow = ({ player }) => {
             <span><strong className="text-slate-200">L4 Team PF:</strong> {player.off_ppg ? Number(player.off_ppg).toFixed(1) : '--'} pts</span>
             <span><strong className="text-slate-200">L4 Opp PA:</strong> {player.def_pa ? Number(player.def_pa).toFixed(1) : '--'} pts</span>
         </div>
-      </div>
-    </td>
-  </tr>
+    </div>
   );
 };
+
+const DeepDiveRow = ({ player }) => (
+  <tr className="bg-slate-900/50 border-b border-slate-800">
+    <td colSpan="11" className="p-4">
+      <MathCard player={player} />
+    </td>
+  </tr>
+);
 
 const App = () => {
   const [data, setData] = useState(null);
@@ -258,6 +256,7 @@ const App = () => {
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
 
   const calcFPts = (p) => {
+    if (!p) return 0;
     return ((p.fg_0_19||0)*scoring.fg0_19) + ((p.fg_20_29||0)*scoring.fg20_29) + ((p.fg_30_39||0)*scoring.fg30_39) + 
            ((p.fg_40_49||0)*scoring.fg40_49) + ((p.fg_50_59||0)*scoring.fg50_59) + ((p.fg_60_plus||0)*scoring.fg60_plus) + 
            ((p.fg_miss||0)*scoring.fg_miss) + ((p.xp_made||0)*scoring.xp_made) + ((p.xp_miss||0)*scoring.xp_miss);
@@ -281,20 +280,22 @@ const App = () => {
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
   
+  // Dynamic Processing
   let processed = rankings.map(p => {
      const pWithVegas = { ...p, vegas: p.vegas_implied || 0 }; 
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
      return { ...pWithYtd, proj: parseFloat(proj) };
-  }).sort((a, b) => b.proj - a.proj);
+  })
+  .filter(p => p.proj > 0) // REMOVES PLAYERS WITH 0 PROJECTION (OUT/IR/ETC)
+  .sort((a, b) => b.proj - a.proj);
 
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
   const ytdSorted = ytd.map(p => ({...p, fpts: calcFPts(p)})).sort((a, b) => b.fpts - a.fpts);
   
-  // FIXED: Included 'IR' in the bucket logic so they don't disappear
   const outKickers = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT' || k.injury_status === 'IR');
   const doubtfulKickers = injuries.filter(k => k.injury_status === 'Doubtful');
   const questionableKickers = injuries.filter(k => k.injury_status === 'Questionable');
@@ -306,6 +307,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
@@ -324,6 +326,7 @@ const App = () => {
           </div>
         </div>
 
+        {/* Tabs */}
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => setActiveTab('potential')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => setActiveTab('ytd')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
@@ -331,6 +334,7 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
+        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -351,6 +355,7 @@ const App = () => {
           </div>
         )}
 
+        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
@@ -456,37 +461,14 @@ const App = () => {
         {/* INJURIES */}
         {activeTab === 'injuries' && (
            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             {/* BUCKET 1: QUESTIONABLE */}
-             {bucket1.length > 0 && (
-               <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden">
-                 <div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                    <h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3>
-                 </div>
-                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {bucket1.map((k, i) => (
-                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
-                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
-                          <div>
-                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-                             <div className="text-xs text-yellow-300">{k.injury_details}</div>
-                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
-                          </div>
-                       </div>
-                    ))}
-                 </div>
-               </div>
-             )}
-
-             {/* BUCKET 2: DOUBTFUL & OUT & IR (Added IR here) */}
-             {bucket2.length > 0 && (
+             {outKickers.length > 0 && (
                <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden">
                  <div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2">
                     <ShieldAlert className="w-5 h-5 text-red-500" />
-                    <h3 className="font-bold text-white">OUT / DOUBTFUL / IR</h3>
+                    <h3 className="font-bold text-white">OUT / IR</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {bucket2.map((k, i) => (
+                    {outKickers.map((k, i) => (
                        <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
                           <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-red-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
@@ -499,16 +481,55 @@ const App = () => {
                  </div>
                </div>
              )}
-
-             {/* BUCKET 3: PRACTICE SQUAD / RESERVE (Removed IR from here) */}
-             {bucket3.length > 0 && (
+             {doubtfulKickers.length > 0 && (
+               <div className="bg-orange-900/20 rounded-xl border border-orange-800/50 overflow-hidden">
+                 <div className="p-4 bg-orange-900/40 border-b border-orange-800/50 flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5 text-orange-500" />
+                    <h3 className="font-bold text-white">DOUBTFUL</h3>
+                 </div>
+                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {doubtfulKickers.map((k, i) => (
+                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-orange-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+                          <div>
+                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+                             <div className="text-xs text-orange-300">{k.injury_details}</div>
+                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+               </div>
+             )}
+             {questionableKickers.length > 0 && (
+               <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden">
+                 <div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                    <h3 className="font-bold text-white">QUESTIONABLE</h3>
+                 </div>
+                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {questionableKickers.map((k, i) => (
+                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+                          <div>
+                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+                             <div className="text-xs text-yellow-300">{k.injury_details}</div>
+                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+               </div>
+             )}
+             {/* NEW SECTION: PRACTICE SQUAD / RESERVE */}
+             {otherKickers.length > 0 && (
                <div className="bg-slate-800/30 rounded-xl border border-slate-700 overflow-hidden">
                  <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex items-center gap-2">
                     <UserMinus className="w-5 h-5 text-slate-400" />
                     <h3 className="font-bold text-white">PRACTICE SQUAD / RESERVE</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {bucket3.map((k, i) => (
+                    {otherKickers.map((k, i) => (
                        <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
                           <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
@@ -522,7 +543,7 @@ const App = () => {
                </div>
              )}
 
-             {(!bucket1.length && !bucket2.length && !bucket3.length) && (
+             {(!outKickers.length && !doubtfulKickers.length && !questionableKickers.length && !otherKickers.length) && (
                 <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">
                    No kickers currently listed on the injury report!
                 </div>
@@ -538,7 +559,7 @@ const App = () => {
                   <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
                     <Calculator className="w-4 h-4 text-emerald-400" /> How It Works: Live Example
                   </h3>
-                  <MathCard player={aubreyExample} leagueAvgs={leagueAvgs} />
+                  <MathCard player={aubreyExample} />
                </div>
              )}
 
