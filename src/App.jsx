@@ -38,22 +38,23 @@ const SETTING_LABELS = {
   xp_miss: "PAT Missed"
 };
 
-// Sortable Header Cell
 const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) => {
-  const isActive = currentSort.key === sortKey;
+  const isActive = currentSort?.key === sortKey;
   
   return (
     <th 
-      onClick={() => onSort(sortKey)}
+      onClick={() => onSort && onSort(sortKey)}
       className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}
     >
       <div className="flex flex-col items-center justify-center h-full gap-1">
         <div className="flex items-center gap-1">
           <span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>
-          {isActive ? (
-            currentSort.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-blue-400" /> : <ArrowDown className="w-3 h-3 text-blue-400" />
-          ) : (
-            <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+          {onSort && (
+            isActive ? (
+              currentSort.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-blue-400" /> : <ArrowDown className="w-3 h-3 text-blue-400" />
+            ) : (
+              <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+            )
           )}
         </div>
         <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
@@ -97,15 +98,11 @@ const HistoryBars = ({ games }) => {
                 {isBeat ? "+" : ""}{g.diff}
               </span>
             </div>
-            
-            {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
                </div>
             </div>
-
-            {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -139,7 +136,7 @@ const PlayerCell = ({ player, subtext }) => {
   if (ownPct < 10) ownColor = 'text-blue-400 font-bold'; 
   else if (ownPct > 80) ownColor = 'text-amber-500'; 
 
-  const isAubrey = player.kicker_player_name.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
+  const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
   const imageUrl = isAubrey 
     ? '/assets/aubrey_custom.png' 
     : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
@@ -198,7 +195,6 @@ const MathCard = ({ player }) => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-          {/* 1. GRADE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
             <div className="text-blue-300 font-bold mb-2 pb-1 border-b border-slate-800">1. MATCHUP</div>
             <div className="flex justify-between mb-1"><span>Off Score:</span> <span className="text-white">{player.off_score_val}</span></div>
@@ -213,7 +209,6 @@ const MathCard = ({ player }) => {
             </div>
           </div>
 
-          {/* 2. CAPS */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
             <div className="text-amber-400 font-bold mb-2 pb-1 border-b border-slate-800">2. CAPS</div>
             <div className="flex justify-between mb-1"><span>Off Cap:</span> <span className="text-white">{player.off_cap_val}</span></div>
@@ -222,7 +217,6 @@ const MathCard = ({ player }) => {
             <div className="text-[10px] text-slate-500">Opp Allow {player.w_def_allowed} x Share</div>
           </div>
           
-          {/* 3. HISTORY */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
              <div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> TREND (L3)</div>
@@ -231,11 +225,10 @@ const MathCard = ({ player }) => {
              <HistoryBars games={player.history?.l3_games} />
           </div>
 
-          {/* 4. FINAL */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col justify-center items-center text-center">
              <div className="text-slate-400 font-semibold mb-1">FINAL</div>
              <div className="text-3xl font-bold text-emerald-400">{player.proj}</div>
-             {(player.injury_status === 'OUT' || player.injury_status === 'Doubtful' || player.injury_status === 'IR') && <div className="text-red-500 font-bold text-xs mt-1">UNAVAILABLE</div>}
+             {(player.injury_status !== 'Healthy') && <div className="text-red-500 font-bold text-xs mt-1">{player.injury_status}</div>}
              <div className="text-[10px] text-slate-500 mt-1">Weighted Score</div>
           </div>
         </div>
@@ -265,12 +258,9 @@ const App = () => {
   const [scoring, setScoring] = useState(DEFAULT_SCORING);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+  const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
   const [hideHighOwn, setHideHighOwn] = useState(false);
   const [hideMedOwn, setHideMedOwn] = useState(false);
-
-  // Sorting State
-  const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
 
   useEffect(() => {
     const savedScoring = localStorage.getItem('kicker_scoring');
@@ -278,7 +268,6 @@ const App = () => {
       try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
       catch (e) { console.error(e); }
     }
-
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
@@ -299,9 +288,7 @@ const App = () => {
 
   const handleSort = (key) => {
     let direction = 'desc';
-    if (sortConfig.key === key && sortConfig.direction === 'desc') {
-      direction = 'asc';
-    }
+    if (sortConfig.key === key && sortConfig.direction === 'desc') direction = 'asc';
     setSortConfig({ key, direction });
   };
 
@@ -327,7 +314,7 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
@@ -337,62 +324,39 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-     
-     const accDiff = (p.history?.l3_actual || 0) - (p.history?.l3_proj || 0);
-
-     return { 
-       ...pWithYtd, 
-       proj: parseFloat(proj),
-       acc_diff: accDiff
-     };
+     return { ...pWithYtd, proj: parseFloat(proj), acc_diff: (p.history?.l3_actual||0) - (p.history?.l3_proj||0) };
   })
-  .filter(p => p.proj > 0);
+  .filter(p => p.proj > 0) 
+  .sort((a, b) => {
+     let valA = a[sortConfig.key];
+     let valB = b[sortConfig.key];
+     if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
+     if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+     if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+     return 0;
+  });
 
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
-
-  // Sorting Logic
-  processed.sort((a, b) => {
-      let valA = a[sortConfig.key];
-      let valB = b[sortConfig.key];
-      if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
-      
-      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
-  });
   
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
-      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
-      const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
-      
-      return {
-          ...p, 
-          fpts: pts, 
-          avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), 
-          pct_val: (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0),
-          pct,
-          longs: longMakes 
-      };
-  });
-
-  ytdSorted.sort((a, b) => {
+      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
+      return { ...p, fpts: pts, avg_fpts: (p.games > 0 ? (pts/p.games) : 0), pct_val: pct, pct: pct.toFixed(1), longs: (p.fg_50_59||0) + (p.fg_60_plus||0) };
+  }).sort((a, b) => {
       let key = sortConfig.key;
       if (key === 'pct') key = 'pct_val';
-      if (key === 'avg_fpts') key = 'avg_fpts';
-      
       let valA = a[key];
       let valB = b[key];
-      
       if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
       if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
   });
-  
+
+  // STRICT BUCKET LOGIC FOR INJURIES
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
-  const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful');
-  const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad', 'Inactive'].includes(k.injury_status) || k.injury_status.includes('Roster'));
+  const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful' || k.injury_status === 'Inactive');
+  const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
 
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
@@ -591,14 +555,14 @@ const App = () => {
              )}
 
              {/* BUCKET 2: DOUBTFUL & OUT (RED) */}
-             {(outKickers.length > 0 || doubtfulKickers.length > 0) && (
+             {(bucketOutDoubtful.length > 0) && (
                <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden">
                  <div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2">
                     <ShieldAlert className="w-5 h-5 text-red-500" />
                     <h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[...outKickers, ...doubtfulKickers].map((k, i) => (
+                    {bucketOutDoubtful.map((k, i) => (
                        <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
                           <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-red-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
@@ -613,14 +577,14 @@ const App = () => {
              )}
 
              {/* BUCKET 3: PRACTICE SQUAD / RESERVE (DARK RED) */}
-             {otherKickers.length > 0 && (
+             {bucketRest.length > 0 && (
                <div className="bg-slate-800/30 rounded-xl border border-slate-700 overflow-hidden">
                  <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex items-center gap-2">
                     <UserMinus className="w-5 h-5 text-slate-400" />
                     <h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD / RELEASED</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {otherKickers.map((k, i) => (
+                    {bucketRest.map((k, i) => (
                        <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
                           <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
@@ -634,7 +598,7 @@ const App = () => {
                </div>
              )}
 
-             {(!outKickers.length && !doubtfulKickers.length && !questionableKickers.length && !otherKickers.length) && (
+             {(!questionableKickers.length && !bucketOutDoubtful.length && !bucketRest.length) && (
                 <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">
                    No kickers currently listed on the injury report!
                 </div>
