@@ -16,7 +16,7 @@ on:
 jobs:
   update-data:
     runs-on: ubuntu-latest
-    timeout-minutes: 15 # Increased slightly for safety
+    timeout-minutes: 15
     permissions:
       contents: write 
 
@@ -40,11 +40,28 @@ jobs:
       - name: 5. Run Analysis Script
         run: python calculate_stall_rate.py
         
-      - name: 6. Commit and Push Changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Data Bot Update: Week ${{ github.event.inputs.week }} Kicker Projections"
-          file_pattern: 'public/kicker_data.json'
-          commit_user_name: KickerGenius Bot
-          commit_user_email: bot@kickergenius.com
-          branch: main
+      - name: 6. Commit and Push (Manual Force)
+        run: |
+          # Configure the Bot Identity
+          git config --global user.name "KickerGenius Bot"
+          git config --global user.email "bot@kickergenius.com"
+          
+          # Check status before adding
+          echo "--- Git Status Before Add ---"
+          git status
+          
+          # Force add the specific file
+          git add public/kicker_data.json
+          
+          # Check status after adding
+          echo "--- Git Status After Add ---"
+          git status
+          
+          # Commit and Push if there are changes
+          if git diff-index --quiet HEAD --; then
+            echo "No changes detected (file matched exactly)."
+          else
+            git commit -m "Data Bot Update: Week ${{ github.event.inputs.week }} Kicker Projections"
+            git push
+            echo "✅ Changes pushed successfully."
+          fi
