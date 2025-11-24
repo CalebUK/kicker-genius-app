@@ -76,6 +76,7 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     lat, lon = coords
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
+        
         data = None
         for i in range(3):
             try:
@@ -163,8 +164,7 @@ def scrape_fantasy_ownership():
         return pd.DataFrame()
 
 def load_injury_data_safe(season, target_week):
-    print("🏥 Fetching Injury Data...")
-    # Only rely on Scraper and Official Roster, avoiding stale nflreadpy injury file
+    # We rely on CBS Scraper + Roster Data now.
     return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
 
 def clean_nan(val):
@@ -259,36 +259,27 @@ def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
 def generate_narrative(row):
     """Generates a 2-sentence 'AI' analysis for the kicker."""
     
-    # 1. Status Check
     if row['injury_status'] != 'Healthy':
         return f"Monitor status closely as they are currently listed as {row['injury_status']}. This significantly impacts their viability for Week {row.get('week', '')}."
 
-    name = row['kicker_player_name'].split('.')[-1] # Last name
+    name = row['kicker_player_name'].split('.')[-1]
     grade = row['grade']
     vegas = row['vegas_implied']
     off_stall = row['off_stall_rate']
     
-    # Sentence 1: The Verdict
     s1 = ""
     if grade >= 100: s1 = f"{name} is a must-start option this week with an elite Matchup Grade of {grade}."
     elif grade >= 90: s1 = f"{name} is a strong play this week, boasting a solid Grade of {grade}."
     elif grade >= 80: s1 = f"{name} is a viable streaming option with a respectable Grade of {grade}."
     else: s1 = f"{name} is a risky option this week with a below-average Grade of {grade}."
     
-    # Sentence 2: The Context (Why?)
     s2 = ""
-    if vegas > 27:
-        s2 = f"The offense has a massive implied total of {vegas:.1f} points, offering a high ceiling."
-    elif row['wind'] > 15:
-        s2 = f"However, heavy winds ({row['wind']} mph) could severely limit kicking opportunities."
-    elif off_stall > 40:
-        s2 = f"The offense has a high stall rate ({off_stall}%), which often leads to field goal attempts."
-    elif row['def_stall_rate'] > 40:
-        s2 = f"The matchup is favorable against a defense that frequently forces field goals in the red zone."
-    elif vegas < 18:
-        s2 = f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting scoring chances."
-    else:
-        s2 = f"They face a neutral matchup with standard scoring expectations."
+    if vegas > 27: s2 = f"The offense has a massive implied total of {vegas:.1f} points, offering a high ceiling."
+    elif row['wind'] > 15: s2 = f"However, heavy winds ({row['wind']} mph) could severely limit kicking opportunities."
+    elif off_stall > 40: s2 = f"The offense has a high stall rate ({off_stall}%), which often leads to field goal attempts."
+    elif row['def_stall_rate'] > 40: s2 = f"The matchup is favorable against a defense that frequently forces field goals in the red zone."
+    elif vegas < 18: s2 = f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting scoring chances."
+    else: s2 = f"They face a neutral matchup with standard scoring expectations."
         
     return f"{s1} {s2}"
 
@@ -304,7 +295,6 @@ def run_analysis():
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
         
-        # Roster Data
         try:
             rosters = load_data_with_retry(lambda: nfl.load_rosters(seasons=[CURRENT_SEASON]), "Rosters")
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
@@ -320,7 +310,7 @@ def run_analysis():
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         if hasattr(players, "to_pandas"): players = players.to_pandas()
 
-        # Base Stats
+        # --- RAW STATS ---
         kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
         kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
         
@@ -403,7 +393,7 @@ def run_analysis():
         else:
             stats['own_pct'] = 0.0
 
-        # 1. Separate Columns for CBS and NFL Injuries to avoid overwriting
+        # 1. Separate Columns for CBS and NFL Injuries
         if 'join_name' in cbs_injuries.columns:
             stats = pd.merge(stats, cbs_injuries, left_on='join_name', right_on='join_name', how='left')
         else:
@@ -418,7 +408,6 @@ def run_analysis():
             if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']: return "CUT", "red-700", "Released"
             if roster_st == 'DEV': return "Practice Squad", "yellow-500", "Roster: Practice Squad"
             
-            # 1. Check CBS Status (Primary)
             cbs_st = str(row.get('cbs_status', '')).title()
             cbs_det = str(row.get('cbs_injury', ''))
             
@@ -429,7 +418,6 @@ def run_analysis():
             if "Questionable" in cbs_st: 
                 return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
             
-            # Default
             return "Healthy", "green", "Active"
 
         injury_meta = stats.apply(get_injury_meta, axis=1)
@@ -440,7 +428,7 @@ def run_analysis():
         qualified = stats[stats['fg_att'] >= 5]
         elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
 
-        # --- MATCHUP METRICS (L4) ---
+        # Matchups
         max_wk = pbp['week'].max()
         start_wk = max(1, max_wk - 3)
         recent_pbp = pbp[pbp['week'] >= start_wk].copy()
@@ -453,7 +441,7 @@ def run_analysis():
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
         aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
 
-        # Scoring & Share (L4)
+        # Scoring & Share
         completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
         home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
         away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
@@ -479,7 +467,6 @@ def run_analysis():
         share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
         def_share = share_df.groupby('opponent')['share'].mean().reset_index().rename(columns={'share': 'def_share'})
 
-        # MATCHUPS
         matchups = schedule[schedule['week'] == target_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']].copy()
         matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
         matchups['total_line'] = matchups['total_line'].fillna(44.0)
@@ -507,12 +494,10 @@ def run_analysis():
         model['wind'] = model['weather_data'].apply(lambda x: x[0])
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
-        # Explicitly drop potential duplicate columns (like 'posteam' or 'defteam') before final merge to avoid collisions
         if 'posteam' in off_stall_l4.columns: off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
         if 'defteam' in def_stall_l4.columns: def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
         if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         
-        # Perform final merges
         final = pd.merge(stats, model, on='team', how='inner')
         final = pd.merge(final, off_stall_l4, on='team', how='left')
         final = pd.merge(final, off_ppg, on='team', how='left')
@@ -523,7 +508,7 @@ def run_analysis():
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
         final = final.fillna(0)
 
-        # --- APPLY NARRATIVE ---
+        # --- NARRATIVE GENERATION ---
         final['narrative'] = final.apply(generate_narrative, axis=1)
 
         def process_row(row):
