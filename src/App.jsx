@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
+import { TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -70,14 +70,12 @@ const HistoryBars = ({ games }) => {
               </span>
             </div>
             
-            {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
                </div>
             </div>
 
-            {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -115,8 +113,6 @@ const PlayerCell = ({ player, subtext }) => {
   const imageUrl = isAubrey 
     ? '/assets/aubrey_custom.png' 
     : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
-    
-  const fallbackImage = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
 
   return (
     <td className="px-6 py-4 font-medium text-white">
@@ -127,9 +123,10 @@ const PlayerCell = ({ player, subtext }) => {
             alt={player.kicker_player_name}
             className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`}
             onError={(e) => {
-                // Prevent infinite loop if fallback fails
-                if (e.target.src !== fallbackImage) {
-                    e.target.src = fallbackImage;
+                if (e.target.src.includes('aubrey_custom.png') && player.headshot_url) {
+                    e.target.src = player.headshot_url;
+                } else {
+                    e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
                 }
             }} 
           />
@@ -249,10 +246,7 @@ const App = () => {
       catch (e) { console.error(e); }
     }
 
-    // Cache Busting Strategy: Round to the nearest minute to allow some caching but ensure freshness
-    // This prevents "flickering" caused by constantly unique URLs
-    const cacheBuster = Math.floor(new Date().getTime() / 60000); 
-    fetch(`/kicker_data.json?v=${cacheBuster}`)
+    fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
@@ -337,6 +331,7 @@ const App = () => {
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
+              {/* REPLACED TROPHY WITH LOGO */}
               <img src="/assets/logo.png" alt="KickerGenius" className="w-12 h-12 object-contain" />
               <h1 className="text-3xl md:text-4xl font-bold text-white">
                 Kicker<span className="text-blue-500">Genius</span>
@@ -362,7 +357,6 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -383,7 +377,6 @@ const App = () => {
           </div>
         )}
 
-        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
@@ -490,7 +483,8 @@ const App = () => {
                       <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded ${row.longs >= 4 ? 'bg-amber-500/20 text-amber-400' : 'text-slate-500'}`}>{row.longs}</span></td>
                       <td className="px-6 py-4 text-center text-blue-300">{row.dome_pct}%</td>
                       <td className="px-6 py-4 text-center text-slate-300">{row.rz_trips}</td>
-                      {/* SAFE NULL HANDLING FOR STALL RATES */}
+                      
+                      {/* STALL RATES (WITH NULL SAFETY) */}
                       <td className="px-6 py-4 text-center font-mono text-blue-300">{row.off_stall_rate_ytd ?? 0}%</td>
                       <td className="px-6 py-4 text-center font-mono text-slate-400">{row.def_stall_rate_ytd ?? 0}%</td>
                     </tr>
@@ -590,24 +584,23 @@ const App = () => {
                </div>
              )}
 
-             <div className="overflow-x-auto">
-               <table className="w-full text-sm text-left">
-                  <thead className="text-xs text-slate-400 uppercase bg-slate-950"><tr><th className="px-6 py-4 w-24">Metric</th><th className="px-6 py-4 w-64">Definition</th><th className="px-6 py-4">Source</th></tr></thead>
-                  <tbody className="divide-y divide-slate-800">
-                    {GLOSSARY_DATA.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-slate-800/50 transition-colors">
-                        <td className="px-6 py-4 font-mono font-bold text-blue-300 whitespace-nowrap">{item.header}</td>
-                        <td className="px-6 py-4 text-slate-300 font-medium">
-                           <div>{item.title}</div>
-                           <div className="text-xs text-slate-500 font-normal mt-1">{item.desc}</div>
-                        </td>
-                        <td className="px-6 py-4 text-emerald-400 text-xs flex items-center gap-2 w-32">
-                          <Database className="w-3 h-3 flex-shrink-0"/> {item.source}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-               </table>
+             {/* GLOSSARY GRID LAYOUT */}
+             <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {GLOSSARY_DATA.map((item, idx) => (
+                  <div key={idx} className="bg-slate-800/50 p-4 rounded border border-slate-700">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="font-mono font-bold text-blue-300">{item.header}</span>
+                      <span className="text-[10px] text-emerald-400 flex items-center gap-1 bg-emerald-900/20 px-2 py-1 rounded border border-emerald-900/50">
+                         <Database className="w-3 h-3"/> {item.source}
+                      </span>
+                    </div>
+                    <div className="text-sm font-semibold text-white mb-1">{item.title}</div>
+                    <div className="text-xs text-slate-400">{item.desc}</div>
+                    <div className="mt-2 text-[10px] text-slate-500 italic border-t border-slate-700 pt-1">
+                      Why: {item.why}
+                    </div>
+                  </div>
+                ))}
              </div>
           </div>
         )}
