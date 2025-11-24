@@ -26,10 +26,12 @@ const DEFAULT_SCORING = {
 };
 
 const HeaderCell = ({ label, description, avg }) => (
-  <th className="px-3 py-3 text-center group relative cursor-help whitespace-nowrap">
-    <div className="flex items-center justify-center gap-1">
-      {label}
-      <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors" />
+  // REMOVED: whitespace-nowrap
+  // ADDED: leading-tight, min-w class to encourage wrapping
+  <th className="px-3 py-3 text-center group relative cursor-help leading-tight min-w-[80px] align-bottom">
+    <div className="flex items-center justify-center gap-1 h-full">
+      <span>{label}</span>
+      <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
     </div>
     <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal">
       <div className="text-white font-semibold mb-1">{description}</div>
@@ -222,14 +224,6 @@ const MathCard = ({ player }) => {
   );
 };
 
-const DeepDiveRow = ({ player }) => (
-  <tr className="bg-slate-900/50 border-b border-slate-800">
-    <td colSpan="11" className="p-4">
-      <MathCard player={player} />
-    </td>
-  </tr>
-);
-
 const App = () => {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState('potential');
@@ -399,15 +393,15 @@ const App = () => {
                   <tr>
                     <th className="px-6 py-3">Rank</th>
                     <th className="px-6 py-3">Player</th>
-                    <HeaderCell label="Projection" description="Projected Points (Custom Scoring)" />
-                    <HeaderCell label="Matchup Grade" description="Matchup Grade (0-100)" />
+                    <HeaderCell label="Proj" description="Projected Points (Custom Scoring)" />
+                    <HeaderCell label="Grade" description="Matchup Grade (0-100)" />
                     <th className="px-6 py-3 text-center">Weather</th>
                     <HeaderCell label="Offensive Stall % (L4)" description="Offense Stall Rate (L4)" avg={leagueAvgs.off_stall} />
-                    <HeaderCell label="Defensive Stall % (L4)" description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
+                    <HeaderCell label="Opponent Stall % (L4)" description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
                     <HeaderCell label="Projection Accuracy (L3)" description="Total Actual vs Projected Points (Last 3 Games)" />
                     <HeaderCell label="Implied Vegas Score Line" description="Implied Team Total (Vegas Line & Spread)/2" />
                     <HeaderCell label="Offensive Points For (L4)" description="Team Points For (L4)" />
-                    <HeaderCell label="Opp Points Allowed (L4)" description="Opp Points Allowed (L4)" />
+                    <HeaderCell label="Opponent Points Allowed (L4)" description="Opp Points Allowed (L4)" />
                     <th className="px-6 py-3"></th>
                   </tr>
                 </thead>
