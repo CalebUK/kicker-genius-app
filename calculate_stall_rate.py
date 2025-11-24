@@ -227,6 +227,7 @@ def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
             total_line = game['total_line'] if pd.notna(game['total_line']) else 44.0
             spread_line = game['spread_line'] if pd.notna(game['spread_line']) else 0.0
             
+            # Historic Implied Logic
             if is_home: vegas_implied = (total_line + spread_line) / 2
             else: vegas_implied = (total_line - spread_line) / 2
                 
@@ -468,16 +469,16 @@ def run_analysis():
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
         # Explicitly drop potential duplicate columns (like 'posteam' or 'defteam') before final merge to avoid collisions
-        if 'posteam' in off_stall.columns: off_stall = off_stall.rename(columns={'posteam': 'team'})
-        if 'defteam' in def_stall.columns: def_stall = def_stall.rename(columns={'defteam': 'opponent'})
+        if 'posteam' in off_stall_l4.columns: off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
+        if 'defteam' in def_stall_l4.columns: def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
         if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         
         # Perform final merges
         final = pd.merge(stats, model, on='team', how='inner')
-        final = pd.merge(final, off_stall, on='team', how='left') # L4 Off Stall
+        final = pd.merge(final, off_stall_l4, on='team', how='left') # L4 Off Stall
         final = pd.merge(final, off_ppg, on='team', how='left')
         final = pd.merge(final, off_share, on='team', how='left')
-        final = pd.merge(final, def_stall, left_on='opponent', right_on='defteam', how='left') # L4 Def Stall
+        final = pd.merge(final, def_stall_l4, left_on='opponent', right_on='defteam', how='left') # L4 Def Stall
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
