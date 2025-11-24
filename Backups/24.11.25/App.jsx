@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
+import { TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -26,12 +26,12 @@ const DEFAULT_SCORING = {
 };
 
 const HeaderCell = ({ label, description, avg }) => (
-  <th className="px-3 py-3 text-center group relative cursor-help whitespace-nowrap">
+  <th className="px-3 py-3 text-center group relative cursor-help">
     <div className="flex items-center justify-center gap-1">
       {label}
       <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors" />
     </div>
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
       <div className="text-white font-semibold mb-1">{description}</div>
       {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
       <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 border-l border-t border-slate-700 rotate-45"></div>
@@ -70,14 +70,12 @@ const HistoryBars = ({ games }) => {
               </span>
             </div>
             
-            {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
                </div>
             </div>
 
-            {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -333,6 +331,7 @@ const App = () => {
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
+              {/* REPLACED TROPHY WITH LOGO */}
               <img src="/assets/logo.png" alt="KickerGenius" className="w-12 h-12 object-contain" />
               <h1 className="text-3xl md:text-4xl font-bold text-white">
                 Kicker<span className="text-blue-500">Genius</span>
@@ -358,7 +357,6 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -379,7 +377,6 @@ const App = () => {
           </div>
         )}
 
-        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
@@ -399,15 +396,15 @@ const App = () => {
                   <tr>
                     <th className="px-6 py-3">Rank</th>
                     <th className="px-6 py-3">Player</th>
-                    <HeaderCell label="Projection" description="Projected Points (Custom Scoring)" />
-                    <HeaderCell label="Matchup Grade" description="Matchup Grade (0-100)" />
+                    <HeaderCell label="Proj" description="Projected Points (Custom Scoring)" />
+                    <HeaderCell label="Grade" description="Matchup Grade (0-100)" />
                     <th className="px-6 py-3 text-center">Weather</th>
-                    <HeaderCell label="Offensive Stall % (L4)" description="Offense Stall Rate (L4)" avg={leagueAvgs.off_stall} />
-                    <HeaderCell label="Defensive Stall % (L4)" description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
-                    <HeaderCell label="Projection Accuracy (L3)" description="Total Actual vs Projected Points (Last 3 Games)" />
-                    <HeaderCell label="Implied Vegas Score Line" description="Implied Team Total (Vegas Line & Spread)/2" />
-                    <HeaderCell label="Offensive Points For (L4)" description="Team Points For (L4)" />
-                    <HeaderCell label="Opp Points Allowed (L4)" description="Opp Points Allowed (L4)" />
+                    <HeaderCell label="Off Stall%" description="Offense Stall Rate (L4)" avg={leagueAvgs.off_stall} />
+                    <HeaderCell label="Def Stall%" description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
+                    <HeaderCell label="Proj Acc" description="Total Actual vs Projected Points (Last 3 Games)" />
+                    <HeaderCell label="Vegas" description="Implied Team Total (Vegas Line & Spread)/2" />
+                    <HeaderCell label="Off PF (L4)" description="Team Points For (L4)" />
+                    <HeaderCell label="Opp PA (L4)" description="Opp Points Allowed (L4)" />
                     <th className="px-6 py-3"></th>
                   </tr>
                 </thead>
