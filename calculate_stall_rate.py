@@ -35,7 +35,7 @@ STADIUM_COORDS = {
 
 def get_current_nfl_week():
     try:
-        schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
+        schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         today = datetime.now().strftime('%Y-%m-%d')
         upcoming = schedule[schedule['gameday'] >= today]
@@ -51,7 +51,15 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     lat, lon = coords
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-        data = requests.get(url, timeout=5).json()
+        # Retry logic for weather API
+        for i in range(3):
+            try:
+                data = requests.get(url, timeout=5).json()
+                break
+            except:
+                time.sleep(2)
+        else: return 0, "API Error"
+
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
         idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
@@ -141,7 +149,7 @@ def load_injury_data_safe(season, target_week):
     if not scraped.empty: return scraped
     
     try:
-        injuries = nfl.load_injuries(seasons=[season])
+        injuries = load_data_with_retry(lambda: nfl.load_injuries(seasons=[season]), "Injuries")
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
         df = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
         df.rename(columns={'practice_status': 'practice_status'}, inplace=True) 
@@ -227,7 +235,6 @@ def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
             total_line = game['total_line'] if pd.notna(game['total_line']) else 44.0
             spread_line = game['spread_line'] if pd.notna(game['spread_line']) else 0.0
             
-            # Historic Implied Logic
             if is_home: vegas_implied = (total_line + spread_line) / 2
             else: vegas_implied = (total_line - spread_line) / 2
                 
@@ -245,20 +252,38 @@ def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
         history_data[pid] = {'l3_actual': int(total_act), 'l3_proj': round(float(total_proj), 1), 'l3_games': games_list}
     return history_data
 
+def load_data_with_retry(func, name, max_retries=5, delay=5):
+    """Helper to load NFL data with exponential backoff for 503 errors."""
+    for attempt in range(max_retries):
+        try:
+            print(f"   📥 Loading {name} (Attempt {attempt + 1}/{max_retries})...")
+            return func()
+        except Exception as e:
+            print(f"   ⚠️ {name} failed: {e}")
+            if attempt < max_retries - 1:
+                sleep_time = delay * (2 ** attempt) # Exponential backoff: 5, 10, 20, 40s
+                print(f"   ⏳ Waiting {sleep_time}s before retry...")
+                time.sleep(sleep_time)
+            else:
+                raise e
+
 def run_analysis():
     try:
+        # Use retry logic for initial schedule load
         target_week = get_current_nfl_week()
         print(f"🚀 Starting Analysis for Week {target_week}...")
         
-        pbp = nfl.load_pbp(seasons=[CURRENT_SEASON])
-        schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
-        players = nfl.load_players()
+        # Load main data sources with retry
+        pbp = load_data_with_retry(lambda: nfl.load_pbp(seasons=[CURRENT_SEASON]), "Play-by-Play")
+        schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule")
+        players = load_data_with_retry(lambda: nfl.load_players(), "Players")
+        
         injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
         ownership_data = scrape_fantasy_ownership()
 
         # --- 1. ROSTER DATA ---
         try:
-            rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
+            rosters = load_data_with_retry(lambda: nfl.load_rosters(seasons=[CURRENT_SEASON]), "Rosters")
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
             if rosters.empty:
                  rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
@@ -332,10 +357,8 @@ def run_analysis():
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
-        # Merge into stats (Left Join to keep all kickers)
         stats = pd.merge(stats, off_stall_seas, left_on='team', right_on='posteam', how='left')
         stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='defteam', how='left')
-        
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
 
