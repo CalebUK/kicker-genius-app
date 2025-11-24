@@ -33,9 +33,26 @@ STADIUM_COORDS = {
     'TEN': (36.1665, -86.7713), 'WAS': (38.9076, -76.8645)
 }
 
+# --- RETRY HELPER ---
+def load_data_with_retry(func, name, max_retries=5, delay=5):
+    """Helper to load NFL data with exponential backoff for 503 errors."""
+    for attempt in range(max_retries):
+        try:
+            print(f"   📥 Loading {name} (Attempt {attempt + 1}/{max_retries})...")
+            return func()
+        except Exception as e:
+            print(f"   ⚠️ {name} failed: {e}")
+            if attempt < max_retries - 1:
+                sleep_time = delay * (2 ** attempt) # Exponential backoff: 5, 10, 20, 40s
+                print(f"   ⏳ Waiting {sleep_time}s before retry...")
+                time.sleep(sleep_time)
+            else:
+                raise e
+
 def get_current_nfl_week():
     try:
-        schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
+        # Use retry wrapper
+        schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         today = datetime.now().strftime('%Y-%m-%d')
         upcoming = schedule[schedule['gameday'] >= today]
@@ -51,7 +68,20 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     lat, lon = coords
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-        data = requests.get(url, timeout=5).json()
+        
+        # Manual retry for Weather API
+        data = None
+        for i in range(3):
+            try:
+                resp = requests.get(url, timeout=5)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    break
+            except: 
+                time.sleep(1)
+        
+        if not data: return 0, "API Error"
+        
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
         idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
@@ -141,6 +171,7 @@ def load_injury_data_safe(season, target_week):
     if not scraped.empty: return scraped
     
     try:
+        # Wrapped in retry logic manually if called here, but better handled in run_analysis
         injuries = nfl.load_injuries(seasons=[season])
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
         df = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
@@ -249,24 +280,28 @@ def run_analysis():
         target_week = get_current_nfl_week()
         print(f"🚀 Starting Analysis for Week {target_week}...")
         
-        pbp = nfl.load_pbp(seasons=[CURRENT_SEASON])
-        schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
-        players = nfl.load_players()
+        # WRAPPED WITH RETRY LOGIC
+        pbp = load_data_with_retry(lambda: nfl.load_pbp(seasons=[CURRENT_SEASON]), "Play-by-Play")
+        schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule")
+        players = load_data_with_retry(lambda: nfl.load_players(), "Players")
+        
         injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
         ownership_data = scrape_fantasy_ownership()
 
-        # --- 1. ROSTER DATA ---
+        # --- 1. ROSTER DATA (WITH RETRY) ---
         try:
-            rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
+            rosters = load_data_with_retry(lambda: nfl.load_rosters(seasons=[CURRENT_SEASON]), "Rosters")
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
             if rosters.empty:
+                 print("   ⚠️ 2025 Roster empty, falling back to 2024...")
                  rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
                  if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
             
             inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
             inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
             inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
-        except Exception:
+        except Exception as e:
+            print(f"⚠️ Could not load Roster data: {e}")
             inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
 
         if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
@@ -326,21 +361,16 @@ def run_analysis():
                          stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
         stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-        # --- CALCULATE SEASON STALL RATES (YTD) - FIXED ---
+        # --- CALCULATE SEASON STALL RATES (YTD) ---
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
-        # Explicit Rename to prevent collisions (KEY FIX: defteam -> team, not opponent)
         if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
-        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) # RENAME TO TEAM
+        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'opponent'})
         
-        # Merge into stats (Left Join)
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
-        
-        # MERGE SEASON DEF STALL: Match Kicker's Team -> Season Defense Stall
-        # Since we renamed it to 'team', we can join directly on 'team'
-        stats = pd.merge(stats, def_stall_seas, on='team', how='left')
+        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='opponent', how='left')
         
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
@@ -365,12 +395,8 @@ def run_analysis():
             stats['own_pct'] = 0.0
 
         # INJURIES
-        if 'full_name' in injury_report.columns:
-            name_map = players[['gsis_id', 'display_name']].rename(columns={'gsis_id': 'kicker_player_id', 'display_name': 'full_name_official'})
-            stats = pd.merge(stats, name_map, on='kicker_player_id', how='left')
-            injury_report = injury_report.rename(columns={'full_name': 'full_name_official'})
-            injury_report = injury_report.drop_duplicates(subset=['full_name_official'])
-            stats = pd.merge(stats, injury_report, on='full_name_official', how='left')
+        if 'join_name' in injury_report.columns:
+            stats = pd.merge(stats, injury_report, left_on='kicker_player_name', right_on='join_name', how='left')
         elif 'gsis_id' in injury_report.columns:
             injury_report = injury_report.rename(columns={'gsis_id': 'kicker_player_id'})
             stats = pd.merge(stats, injury_report, on='kicker_player_id', how='left')
@@ -386,10 +412,10 @@ def run_analysis():
             if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']: return "CUT", "red-700", "Released"
             if roster_st == 'DEV': return "Practice Squad", "yellow-500", "Roster: Practice Squad"
             
-            report_st = row['report_status']
-            practice = row['practice_status']
+            report_st = row.get('report_status', '')
+            practice = row.get('practice_status', '')
             
-            if pd.isna(report_st):
+            if pd.isna(report_st) or report_st == 'nan' or report_st == '':
                 if roster_st and roster_st != 'ACT' and roster_st != 'nan': return roster_st, "gray-400", f"Roster: {roster_st}"
                 return "Healthy", "green", "Active"
             
@@ -474,7 +500,6 @@ def run_analysis():
         model['wind'] = model['weather_data'].apply(lambda x: x[0])
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
-        # Explicitly drop potential duplicate columns (like 'posteam' or 'defteam') before final merge to avoid collisions
         if 'posteam' in off_stall_l4.columns: off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
         if 'defteam' in def_stall_l4.columns: def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
         if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
@@ -484,11 +509,10 @@ def run_analysis():
         final = pd.merge(final, off_stall_l4, on='team', how='left') # L4 Off Stall
         final = pd.merge(final, off_ppg, on='team', how='left')
         final = pd.merge(final, off_share, on='team', how='left')
-        final = pd.merge(final, def_stall_l4, on='opponent', how='left') # L4 Def Stall (MERGE ON SHARED KEY)
+        final = pd.merge(final, def_stall_l4, on='opponent', how='left') # L4 Def Stall
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
-        
         final = final.fillna(0)
 
         def process_row(row):
