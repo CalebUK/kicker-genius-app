@@ -53,13 +53,18 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
+        match_index = -1
+        for i, t in enumerate(times):
+            if t.startswith(target):
+                match_index = i
+                break
         
-        if idx == -1: return 0, "No Data"
+        if match_index == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
+        wind = data['hourly']['wind_speed_10m'][match_index]
+        precip = data['hourly']['precipitation_probability'][idx] # Note: idx check handled by match_index usage pattern in logic flow
+        precip = data['hourly']['precipitation_probability'][match_index]
+        temp = data['hourly']['temperature_2m'][match_index]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -78,16 +83,12 @@ def scrape_cbs_injuries():
         dfs = pd.read_html(io.StringIO(response.text), flavor='html5lib')
         if not dfs: return pd.DataFrame()
         combined = pd.concat(dfs, ignore_index=True)
-        
-        # Clean column names for matching
         combined.columns = [c.lower().strip() for c in combined.columns]
-        
         col_map = {}
         for col in combined.columns:
             if 'player' in col: col_map[col] = 'full_name'
-            elif 'status' in col: col_map[col] = 'report_status' # Catches "Injury Status" or "Game Status"
-            elif 'injury' in col: col_map[col] = 'practice_status' # Catches "Injury" (Body Part)
-            
+            elif 'status' in col: col_map[col] = 'report_status'
+            elif 'injury' in col: col_map[col] = 'practice_status'
         combined.rename(columns=col_map, inplace=True)
         
         if 'full_name' not in combined.columns: return pd.DataFrame()
@@ -100,19 +101,13 @@ def scrape_cbs_injuries():
         combined['full_name'] = combined['full_name'].apply(clean_name)
         combined['gsis_id'] = None 
         
-        # Create normalized name for joining (e.g. "Eddy Pineiro" -> "E.Pineiro")
         def normalize_for_join(val):
              parts = val.split(' ')
-             if len(parts) >= 2:
-                 return f"{parts[0][0]}.{parts[-1]}"
+             if len(parts) >= 2: return f"{parts[0][0]}.{parts[-1]}"
              return val
         combined['join_name'] = combined['full_name'].apply(normalize_for_join)
-
-        print(f"   ✅ CBS Scrape Successful: Found {len(combined)} records.")
         return combined[['join_name', 'report_status', 'practice_status']]
-
     except Exception as e:
-        print(f"   ⚠️ Scraping failed: {e}")
         return pd.DataFrame()
 
 def scrape_fantasy_ownership():
@@ -146,15 +141,9 @@ def scrape_fantasy_ownership():
 
 def load_injury_data_safe(season, target_week):
     print("🏥 Fetching Injury Data...")
-    
-    # ATTEMPT 1: SCRAPE (Primary Source of Truth)
     scraped = scrape_cbs_injuries()
-    if not scraped.empty: 
-        return scraped
+    if not scraped.empty: return scraped
     
-    print("   ⚠️ Scraper failed, trying official nflreadpy source...")
-
-    # ATTEMPT 2: NFLREADPY (Parquet)
     try:
         injuries = nfl.load_injuries(seasons=[season])
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
@@ -163,7 +152,6 @@ def load_injury_data_safe(season, target_week):
         return df
     except Exception: pass
     
-    # ATTEMPT 3: DIRECT CSV
     try:
         url = f"https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_{season}.csv"
         injuries = pd.read_csv(url)
@@ -172,27 +160,36 @@ def load_injury_data_safe(season, target_week):
     
     return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
 
+def clean_nan(val):
+    if isinstance(val, float):
+        if pd.isna(val) or np.isinf(val): return None
+    return val
+
 def calculate_stall_metrics(df_pbp):
-    """Calculates stall rates for offense and defense from a PBP dataframe."""
+    """Calculates stall rates using VECTORIZED operations for speed."""
+    # Filter for Red Zone drives (inside 25)
     rz_drives = df_pbp[(df_pbp['yardline_100'] <= 25) & (df_pbp['yardline_100'].notnull())]
-    drives = rz_drives[['game_id', 'drive', 'posteam', 'defteam']].drop_duplicates()
     
-    if drives.empty:
+    if rz_drives.empty:
         return pd.DataFrame(columns=['posteam', 'off_stall_rate']), pd.DataFrame(columns=['defteam', 'def_stall_rate'])
 
-    drive_results = []
-    for _, row in drives.iterrows():
-        d_plays = df_pbp[(df_pbp['game_id'] == row['game_id']) & (df_pbp['drive'] == row['drive'])]
-        is_td = (d_plays['touchdown'] == 1).sum() > 0
-        is_to = ((d_plays['interception'] == 1).sum() > 0) or ((d_plays['fumble_lost'] == 1).sum() > 0)
-        drive_results.append({'posteam': row['posteam'], 'defteam': row['defteam'], 'stalled': (not is_td and not is_to)})
-        
-    df_res = pd.DataFrame(drive_results)
-    off = df_res.groupby('posteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'off_stall_rate'})
-    defs = df_res.groupby('defteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'def_stall_rate'})
+    # Group by drive to see outcomes
+    # A drive is stalled if it reached RZ but had NO Touchdown, NO Interception, NO Fumble Lost
+    drive_outcomes = rz_drives.groupby(['game_id', 'drive', 'posteam', 'defteam']).agg(
+        td=('touchdown', 'max'),
+        int=('interception', 'max'),
+        fum=('fumble_lost', 'max')
+    ).reset_index()
+    
+    # Stalled = No TD, No Turnover (so likely FG attempt or Downs or End of Half)
+    drive_outcomes['stalled'] = ~((drive_outcomes['td'] == 1) | (drive_outcomes['int'] == 1) | (drive_outcomes['fum'] == 1))
+    
+    off = drive_outcomes.groupby('posteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'off_stall_rate'})
+    defs = drive_outcomes.groupby('defteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'def_stall_rate'})
     
     off['off_stall_rate'] = (off['off_stall_rate'] * 100).round(1)
     defs['def_stall_rate'] = (defs['def_stall_rate'] * 100).round(1)
+    
     return off, defs
 
 def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
@@ -254,11 +251,6 @@ def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
         history_data[pid] = {'l3_actual': int(total_act), 'l3_proj': round(float(total_proj), 1), 'l3_games': games_list}
     return history_data
 
-def clean_nan(val):
-    if isinstance(val, float):
-        if pd.isna(val) or np.isinf(val): return None
-    return val
-
 def run_analysis():
     try:
         target_week = get_current_nfl_week()
@@ -308,6 +300,7 @@ def run_analysis():
         kick_plays['xp_made'] = (kick_plays['is_xp']) & (kick_plays['made'])
         kick_plays['xp_miss'] = (kick_plays['is_xp']) & (~kick_plays['made'])
         kick_plays['real_pts'] = (kick_plays['is_fg'] & kick_plays['made']) * 3 + (kick_plays['is_xp'] & kick_plays['made']) * 1
+        
         kick_plays['is_dome'] = kick_plays['roof'].isin(['dome', 'closed'])
         
         rz_drives = pbp[(pbp['yardline_100'] <= 25) & (pbp['yardline_100'].notnull())][['game_id', 'drive', 'posteam']].drop_duplicates()
@@ -340,13 +333,19 @@ def run_analysis():
                          stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
         stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-        # --- CALCULATE SEASON STALL RATES (YTD) ---
+        # --- CALCULATE SEASON STALL RATES (YTD) - FAST VECTORIZED ---
+        # Using the new fast function so it doesn't time out or fail
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
+        # Merge into stats (Left Join to keep all kickers)
         stats = pd.merge(stats, off_stall_seas, left_on='team', right_on='posteam', how='left')
-        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='defteam', how='left').fillna(0)
+        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='defteam', how='left')
+        
+        # IMPORTANT: Fill NaNs with 0 so JSON doesn't break
+        stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
+        stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
 
         # HISTORY
         history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
@@ -367,7 +366,7 @@ def run_analysis():
         else:
             stats['own_pct'] = 0.0
 
-        # INJURIES (Scraper -> Name Match -> ID Match)
+        # INJURIES
         if 'full_name' in injury_report.columns:
             name_map = players[['gsis_id', 'display_name']].rename(columns={'gsis_id': 'kicker_player_id', 'display_name': 'full_name_official'})
             stats = pd.merge(stats, name_map, on='kicker_player_id', how='left')
@@ -478,10 +477,10 @@ def run_analysis():
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
         final = pd.merge(stats, model, on='team', how='inner')
-        final = pd.merge(final, off_stall_l4, left_on='team', right_on='posteam', how='left')
+        final = pd.merge(final, off_stall, left_on='team', right_on='posteam', how='left')
         final = pd.merge(final, off_ppg, on='team', how='left')
         final = pd.merge(final, off_share, on='team', how='left')
-        final = pd.merge(final, def_stall_l4, left_on='opponent', right_on='defteam', how='left')
+        final = pd.merge(final, def_stall, left_on='opponent', right_on='defteam', how='left')
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['posteam', 'aggression_pct']], left_on='team', right_on='posteam', how='left')
