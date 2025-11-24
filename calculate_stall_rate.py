@@ -76,7 +76,6 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     lat, lon = coords
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-        
         data = None
         for i in range(3):
             try:
@@ -108,7 +107,6 @@ def scrape_cbs_injuries():
         if not dfs: return pd.DataFrame()
         combined = pd.concat(dfs, ignore_index=True)
         combined.columns = [c.lower().strip() for c in combined.columns]
-        
         col_map = {}
         for col in combined.columns:
             if 'player' in col: col_map[col] = 'full_name'
@@ -135,10 +133,9 @@ def scrape_cbs_injuries():
         return pd.DataFrame()
 
 def scrape_fantasy_ownership():
-    print("   🌐 Scraping FantasyPros (Stats Page) for Ownership data...")
-    url = "https://www.fantasypros.com/nfl/stats/k.php"
-    headers = {'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html'}
     try:
+        url = "https://www.fantasypros.com/nfl/stats/k.php"
+        headers = {'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html'}
         response = requests.get(url, headers=headers, timeout=15)
         dfs = pd.read_html(response.text)
         if not dfs: return pd.DataFrame()
@@ -242,10 +239,7 @@ def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
             else: vegas_implied = (total_line - spread_line) / 2
                 
             base = kicker['avg_pts']
-            mult = 1.0
-            if vegas_implied > 24: mult = 1.15
-            elif vegas_implied < 18: mult = 0.85
-            
+            mult = 1.15 if vegas_implied > 24 else (0.85 if vegas_implied < 18 else 1.0)
             proj = round(base * mult, 1)
             act = int(actuals_map.get((wk, pid), 0))
             total_act += act
@@ -404,10 +398,8 @@ def run_analysis():
         
         def get_injury_meta(row):
             roster_st = str(row.get('roster_status', '')) if pd.notna(row.get('roster_status', '')) else ""
-            if roster_st in ['RES', 'NON', 'SUS', 'PUP']: return "IR", "red-700", f"Roster: {roster_st}"
-            if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']: return "CUT", "red-700", "Released"
-            if roster_st == 'DEV': return "Practice Squad", "yellow-500", "Roster: Practice Squad"
             
+            # Check Scraped CBS Data First
             cbs_st = str(row.get('cbs_status', '')).title()
             cbs_det = str(row.get('cbs_injury', ''))
             
@@ -417,6 +409,11 @@ def run_analysis():
                 return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
             if "Questionable" in cbs_st: 
                 return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
+            
+            # Fallback to Official Roster
+            if roster_st in ['RES', 'NON', 'SUS', 'PUP']: return "IR", "red-700", f"Roster: {roster_st}"
+            if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']: return "CUT", "red-700", "Released"
+            if roster_st == 'DEV': return "Practice Squad", "yellow-500", "Roster: Practice Squad"
             
             return "Healthy", "green", "Active"
 
@@ -498,6 +495,7 @@ def run_analysis():
         if 'defteam' in def_stall_l4.columns: def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
         if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         
+        # Perform final merges (WITH PROCESS ORDER FIX)
         final = pd.merge(stats, model, on='team', how='inner')
         final = pd.merge(final, off_stall_l4, on='team', how='left')
         final = pd.merge(final, off_ppg, on='team', how='left')
@@ -507,9 +505,6 @@ def run_analysis():
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
         final = final.fillna(0)
-
-        # --- NARRATIVE GENERATION ---
-        final['narrative'] = final.apply(generate_narrative, axis=1)
 
         def process_row(row):
             off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
@@ -575,6 +570,9 @@ def run_analysis():
 
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
+        
+        # Generate Narrative LAST (After Grade exists)
+        final['narrative'] = final.apply(generate_narrative, axis=1)
         
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
