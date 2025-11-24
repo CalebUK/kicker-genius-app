@@ -53,18 +53,13 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        match_index = -1
-        for i, t in enumerate(times):
-            if t.startswith(target):
-                match_index = i
-                break
+        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
         
-        if match_index == -1: return 0, "No Data"
+        if idx == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][match_index]
-        precip = data['hourly']['precipitation_probability'][idx] # Note: idx check handled by match_index usage pattern in logic flow
-        precip = data['hourly']['precipitation_probability'][match_index]
-        temp = data['hourly']['temperature_2m'][match_index]
+        wind = data['hourly']['wind_speed_10m'][idx]
+        precip = data['hourly']['precipitation_probability'][idx]
+        temp = data['hourly']['temperature_2m'][idx]
         
         cond = f"{int(wind)}mph"
         if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -167,21 +162,18 @@ def clean_nan(val):
 
 def calculate_stall_metrics(df_pbp):
     """Calculates stall rates using VECTORIZED operations for speed."""
-    # Filter for Red Zone drives (inside 25)
     rz_drives = df_pbp[(df_pbp['yardline_100'] <= 25) & (df_pbp['yardline_100'].notnull())]
+    drives = rz_drives[['game_id', 'drive', 'posteam', 'defteam']].drop_duplicates()
     
-    if rz_drives.empty:
+    if drives.empty:
         return pd.DataFrame(columns=['posteam', 'off_stall_rate']), pd.DataFrame(columns=['defteam', 'def_stall_rate'])
 
-    # Group by drive to see outcomes
-    # A drive is stalled if it reached RZ but had NO Touchdown, NO Interception, NO Fumble Lost
     drive_outcomes = rz_drives.groupby(['game_id', 'drive', 'posteam', 'defteam']).agg(
         td=('touchdown', 'max'),
         int=('interception', 'max'),
         fum=('fumble_lost', 'max')
     ).reset_index()
     
-    # Stalled = No TD, No Turnover (so likely FG attempt or Downs or End of Half)
     drive_outcomes['stalled'] = ~((drive_outcomes['td'] == 1) | (drive_outcomes['int'] == 1) | (drive_outcomes['fum'] == 1))
     
     off = drive_outcomes.groupby('posteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'off_stall_rate'})
@@ -262,7 +254,6 @@ def run_analysis():
         injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
         ownership_data = scrape_fantasy_ownership()
 
-        # --- 1. ROSTER DATA ---
         try:
             rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
@@ -280,7 +271,7 @@ def run_analysis():
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         if hasattr(players, "to_pandas"): players = players.to_pandas()
 
-        # --- RAW STATS ---
+        # --- RAW STATS AGGREGATION ---
         kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
         kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
         
@@ -334,16 +325,17 @@ def run_analysis():
         stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
         # --- CALCULATE SEASON STALL RATES (YTD) - FAST VECTORIZED ---
-        # Using the new fast function so it doesn't time out or fail
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
-        # Merge into stats (Left Join to keep all kickers)
+        # DEBUG: Check if we have season data
+        print(f"   📊 Season Off Stall Rows: {len(off_stall_seas)}")
+        
+        # Merge into stats
         stats = pd.merge(stats, off_stall_seas, left_on='team', right_on='posteam', how='left')
         stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='defteam', how='left')
         
-        # IMPORTANT: Fill NaNs with 0 so JSON doesn't break
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
 
@@ -550,7 +542,6 @@ def run_analysis():
 
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
-        
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
         ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
