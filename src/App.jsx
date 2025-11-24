@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target } from 'lucide-react';
 
-// ... [GLOSSARY_DATA and DEFAULT_SCORING constants remain the same] ...
+// ... [GLOSSARY and DEFAULT SCORING OMITTED FOR BREVITY - SAME AS BEFORE] ...
 const GLOSSARY_DATA = [
   { header: "Grade", title: "Matchup Grade", desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
@@ -165,6 +165,7 @@ const DeepDiveRow = ({ player }) => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+          {/* 1. GRADE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
             <div className="text-blue-300 font-bold mb-2 pb-1 border-b border-slate-800">1. MATCHUP</div>
             <div className="flex justify-between mb-1"><span>Off Score:</span> <span className="text-white">{player.off_score_val}</span></div>
@@ -179,6 +180,7 @@ const DeepDiveRow = ({ player }) => {
             </div>
           </div>
 
+          {/* 2. CAPS */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
             <div className="text-amber-400 font-bold mb-2 pb-1 border-b border-slate-800">2. CAPS</div>
             <div className="flex justify-between mb-1"><span>Off Cap:</span> <span className="text-white">{player.off_cap_val}</span></div>
@@ -187,6 +189,7 @@ const DeepDiveRow = ({ player }) => {
             <div className="text-[10px] text-slate-500">Opp Allow {player.w_def_allowed} x Share</div>
           </div>
           
+          {/* 3. HISTORY (UPDATED) */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
              <div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> TREND (L3)</div>
@@ -195,10 +198,11 @@ const DeepDiveRow = ({ player }) => {
              <HistoryBars games={player.history?.l3_games} />
           </div>
 
+          {/* 4. FINAL */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col justify-center items-center text-center">
              <div className="text-slate-400 font-semibold mb-1">FINAL</div>
              <div className="text-3xl font-bold text-emerald-400">{player.proj}</div>
-             {(player.injury_status === 'OUT' || player.injury_status === 'Doubtful') && <div className="text-red-500 font-bold text-xs mt-1">UNAVAILABLE</div>}
+             {(player.injury_status === 'OUT' || player.injury_status === 'Doubtful' || player.injury_status === 'IR') && <div className="text-red-500 font-bold text-xs mt-1">UNAVAILABLE</div>}
              <div className="text-[10px] text-slate-500 mt-1">Weighted Score</div>
           </div>
         </div>
@@ -290,10 +294,11 @@ const App = () => {
   
   const ytdSorted = ytd.map(p => ({...p, fpts: calcFPts(p)})).sort((a, b) => b.fpts - a.fpts);
   
-  // NEW BUCKETS
-  const bucket1 = injuries.filter(k => k.injury_status === 'Questionable');
-  const bucket2 = injuries.filter(k => k.injury_status === 'Doubtful' || k.injury_status === 'OUT');
-  const bucket3 = injuries.filter(k => !['Questionable', 'Doubtful', 'OUT', 'Healthy'].includes(k.injury_status));
+  // FIXED: Included 'IR' in the bucket logic so they don't disappear
+  const outKickers = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT' || k.injury_status === 'IR');
+  const doubtfulKickers = injuries.filter(k => k.injury_status === 'Doubtful');
+  const questionableKickers = injuries.filter(k => k.injury_status === 'Questionable');
+  const otherKickers = injuries.filter(k => !['OUT', 'CUT', 'Doubtful', 'Questionable', 'Healthy', 'IR'].includes(k.injury_status));
 
   // Live Example for Glossary: Try to find Aubrey, else top ranked
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
@@ -448,6 +453,7 @@ const App = () => {
           </div>
         )}
 
+        {/* INJURIES */}
         {activeTab === 'injuries' && (
            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
              {/* BUCKET 1: QUESTIONABLE */}
@@ -472,12 +478,12 @@ const App = () => {
                </div>
              )}
 
-             {/* BUCKET 2: DOUBTFUL & OUT */}
+             {/* BUCKET 2: DOUBTFUL & OUT & IR (Added IR here) */}
              {bucket2.length > 0 && (
                <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden">
                  <div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2">
                     <ShieldAlert className="w-5 h-5 text-red-500" />
-                    <h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3>
+                    <h3 className="font-bold text-white">OUT / DOUBTFUL / IR</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     {bucket2.map((k, i) => (
@@ -494,12 +500,12 @@ const App = () => {
                </div>
              )}
 
-             {/* BUCKET 3: IR / INACTIVE / PS / RELEASED */}
+             {/* BUCKET 3: PRACTICE SQUAD / RESERVE (Removed IR from here) */}
              {bucket3.length > 0 && (
                <div className="bg-slate-800/30 rounded-xl border border-slate-700 overflow-hidden">
                  <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex items-center gap-2">
                     <UserMinus className="w-5 h-5 text-slate-400" />
-                    <h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD</h3>
+                    <h3 className="font-bold text-white">PRACTICE SQUAD / RESERVE</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     {bucket3.map((k, i) => (
@@ -557,6 +563,7 @@ const App = () => {
              </div>
           </div>
         )}
+        
       </div>
     </div>
   );
