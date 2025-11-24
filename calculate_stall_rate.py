@@ -344,23 +344,19 @@ def run_analysis():
                          stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
         stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-        # --- CALCULATE SEASON STALL RATES (YTD) - FAST VECTORIZED ---
+        # --- CALCULATE SEASON STALL RATES (YTD) - FIXED ---
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
-        # Explicit Rename of conflicting columns before merge
+        # Explicit Rename of conflicting columns
         if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
-        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'opponent'})
         
-        # Merge into stats (Left Join to keep all kickers)
+        # Merge into stats (Left Join)
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
-        # stats doesn't have 'opponent', but def_stall_seas logic is "How often does THIS team force FGs?"
-        # We usually map Def Stall to the Kicker's Team Defense for YTD stats.
-        # So we merge on 'team' -> 'opponent' (which we renamed from defteam) ?? No.
-        # Correction: 'def_stall_seas' has 'opponent' (the defense team). We want to merge this to the kicker's team.
-        # So we merge stats['team'] with def_stall_seas['opponent']
-        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='opponent', how='left')
+        # Merge Def Stall (Note: defteam in stall calc maps to kicker's team defense)
+        # So we keep defteam in def_stall_seas and merge right_on='defteam'
+        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='defteam', how='left')
         
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
