@@ -147,15 +147,15 @@ def clean_nan(val):
         if pd.isna(val) or np.isinf(val): return None
     return val
 
-# --- NEW: ANALYZE LAST 3 WEEKS (Time Machine) ---
-def analyze_past_3_weeks(target_week, pbp, schedule, stats):
-    """
-    Calculates Proj vs Actual for the last 3 played games (ignoring byes).
-    """
-    print(f"🔙 Analyzing Last 3 Weeks Performance...")
+# --- NEW: ANALYZE PAST 3 WEEKS (Strict Window with Bye/DNS Detection) ---
+def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
+    print(f"🔙 Analyzing Last 3 Weeks (Strict Window: Weeks {target_week-3} to {target_week-1})...")
     
-    # 1. Calculate Actual Points for EVERY game in past
-    # Standard scoring calc for history
+    # Get the specific weeks
+    weeks_to_analyze = [target_week - 1, target_week - 2, target_week - 3]
+    weeks_to_analyze = [w for w in weeks_to_analyze if w >= 1] # Filter out preseason/invalid
+    
+    # Pre-calculate actuals per player/week
     def calc_simple_pts(row):
         if row['play_type'] == 'field_goal':
             if row['field_goal_result'] == 'made':
@@ -165,75 +165,101 @@ def analyze_past_3_weeks(target_week, pbp, schedule, stats):
             return 1 if row['extra_point_result'] == 'good' else -1
         return 0
     
-    past_pbp = pbp[pbp['week'] < target_week].copy()
-    past_pbp['pts'] = past_pbp.apply(calc_simple_pts, axis=1)
-    game_actuals = past_pbp.groupby(['week', 'posteam'])['pts'].sum().reset_index().rename(columns={'pts': 'actual', 'posteam': 'team'})
+    relevant_pbp = pbp[pbp['week'].isin(weeks_to_analyze)].copy()
+    relevant_pbp['pts'] = relevant_pbp.apply(calc_simple_pts, axis=1)
     
-    # 2. Get Schedule for all past weeks
-    past_sched = schedule[schedule['week'] < target_week][['week', 'home_team', 'away_team', 'total_line', 'spread_line']].copy()
-    past_sched['total_line'] = past_sched['total_line'].fillna(44.0)
-    past_sched['spread_line'] = past_sched['spread_line'].fillna(0.0)
-    
-    # Unstack schedule to get 1 row per team per week
-    home_v = past_sched.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
-    home_v['vegas_implied'] = (home_v['total_line'] + home_v['spread_line']) / 2
-    
-    away_v = past_sched.rename(columns={'away_team': 'team', 'home_team': 'opponent'})
-    away_v['vegas_implied'] = (away_v['total_line'] - away_v['spread_line']) / 2
-    
-    all_past_games = pd.concat([home_v, away_v])
-    
-    # 3. Merge Actuals with Matchup Context
-    history = pd.merge(all_past_games, game_actuals, on=['week', 'team'], how='inner')
-    
-    # 4. Merge Kicker Stats (Avg Pts) to calculate Hindsight Projection
-    # We assume their season average is their talent level
-    history = pd.merge(history, stats[['team', 'avg_pts']], on='team', how='left')
-    
-    # Simple Hindsight Projection (Simplified version of main model)
-    def calc_hindsight_proj(row):
-        base = row['avg_pts'] if pd.notna(row['avg_pts']) else 8.0
+    # Aggregate actual points by PLAYER and WEEK
+    actuals_map = relevant_pbp.groupby(['week', 'kicker_player_id'])['pts'].sum().to_dict()
+
+    history_data = {}
+
+    # Iterate through each active kicker in our current rankings
+    for _, kicker in current_stats.iterrows():
+        pid = kicker['kicker_player_id']
+        team = kicker['team']
         
-        # Vegas adjustment
-        mult = 1.0
-        if row['vegas_implied'] > 24: mult = 1.15
-        elif row['vegas_implied'] < 18: mult = 0.85
-        
-        return round(base * mult, 1)
-        
-    history['proj'] = history.apply(calc_hindsight_proj, axis=1)
-    history['diff'] = history['actual'] - history['proj']
-    
-    # 5. Aggregate Last 3 Games per Team
-    # Sort by week descending
-    history = history.sort_values(['team', 'week'], ascending=[True, False])
-    
-    # Take top 3
-    last_3 = history.groupby('team').head(3)
-    
-    # Create summary structures
-    team_history = {}
-    for team, group in last_3.groupby('team'):
-        total_act = group['actual'].sum()
-        total_proj = group['proj'].sum()
+        # Get their schedule for these weeks
+        team_schedule = schedule[(schedule['week'].isin(weeks_to_analyze)) & 
+                                 ((schedule['home_team'] == team) | (schedule['away_team'] == team))].copy()
         
         games_list = []
-        for _, row in group.iterrows():
+        total_act = 0
+        total_proj = 0
+        
+        for wk in weeks_to_analyze:
+            game = team_schedule[team_schedule['week'] == wk]
+            
+            # Case 1: BYE WEEK
+            if game.empty:
+                games_list.append({
+                    'week': int(wk),
+                    'status': 'BYE',
+                    'opp': 'BYE',
+                    'proj': 0,
+                    'act': 0,
+                    'diff': 0
+                })
+                continue
+
+            # Case 2: GAME EXISTS
+            game = game.iloc[0]
+            is_home = (game['home_team'] == team)
+            opp = game['away_team'] if is_home else game['home_team']
+            
+            # Did the kicker play? (Check if they have points recorded)
+            # Note: This ignores kickers who played but scored 0. Assuming >0 attempts implies playing.
+            # Better check: Did they have any rows in PBP?
+            player_played = not relevant_pbp[(relevant_pbp['week'] == wk) & (relevant_pbp['kicker_player_id'] == pid)].empty
+            
+            if not player_played:
+                games_list.append({
+                    'week': int(wk),
+                    'status': 'DNS',
+                    'opp': opp,
+                    'proj': 0,
+                    'act': 0,
+                    'diff': 0
+                })
+                continue
+            
+            # Case 3: ACTIVE
+            # Calculate Hindsight Projection
+            total_line = game['total_line'] if pd.notna(game['total_line']) else 44.0
+            spread_line = game['spread_line'] if pd.notna(game['spread_line']) else 0.0
+            
+            # Spread Logic (Home - Away)
+            if is_home:
+                vegas_implied = (total_line + spread_line) / 2
+            else:
+                vegas_implied = (total_line - spread_line) / 2
+                
+            base = kicker['avg_pts']
+            mult = 1.0
+            if vegas_implied > 24: mult = 1.15
+            elif vegas_implied < 18: mult = 0.85
+            
+            proj = round(base * mult, 1)
+            act = int(actuals_map.get((wk, pid), 0))
+            
+            total_act += act
+            total_proj += proj
+            
             games_list.append({
-                'week': int(row['week']),
-                'opp': row['opponent'],
-                'proj': float(row['proj']),
-                'act': int(row['actual']),
-                'diff': round(float(row['diff']), 1)
+                'week': int(wk),
+                'status': 'ACTIVE',
+                'opp': opp,
+                'proj': proj,
+                'act': act,
+                'diff': round(act - proj, 1)
             })
             
-        team_history[team] = {
+        history_data[pid] = {
             'l3_actual': int(total_act),
             'l3_proj': round(float(total_proj), 1),
             'l3_games': games_list
         }
-        
-    return team_history
+            
+    return history_data
 
 def run_analysis():
     target_week = get_current_nfl_week()
@@ -314,8 +340,8 @@ def run_analysis():
                      stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
     stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-    # --- HISTORY ENGINE (Last 3 Weeks) ---
-    history_data = analyze_past_3_weeks(target_week, pbp, schedule, stats)
+    # --- HISTORY ENGINE (New Logic) ---
+    history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
 
     headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
     if headshot_col:
@@ -379,25 +405,34 @@ def run_analysis():
     rz_plays_l4 = recent_pbp[(recent_pbp['yardline_100'] <= 25) & (recent_pbp['yardline_100'].notnull())]
     drives = rz_plays_l4[['game_id', 'drive', 'posteam', 'defteam']].drop_duplicates()
     
-    drive_results = []
-    for _, row in drives.iterrows():
-        d_plays = recent_pbp[(recent_pbp['game_id'] == row['game_id']) & (recent_pbp['drive'] == row['drive'])]
-        is_td = (d_plays['touchdown'] == 1).sum() > 0
-        is_to = ((d_plays['interception'] == 1).sum() > 0) or ((d_plays['fumble_lost'] == 1).sum() > 0)
-        drive_results.append({'posteam': row['posteam'], 'defteam': row['defteam'], 'stalled': (not is_td and not is_to)})
-        
-    df_drives = pd.DataFrame(drive_results)
-    off_stall = df_drives.groupby('posteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'off_stall_rate'})
-    def_stall = df_drives.groupby('defteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'def_stall_rate'})
-    off_stall['off_stall_rate'] = (off_stall['off_stall_rate'] * 100).round(1)
-    def_stall['def_stall_rate'] = (def_stall['def_stall_rate'] * 100).round(1)
-    lg_off_avg = off_stall['off_stall_rate'].mean()
-    lg_def_avg = def_stall['def_stall_rate'].mean()
+    df_drives = pd.DataFrame()
+    if not drives.empty:
+        drive_results = []
+        for _, row in drives.iterrows():
+            d_plays = recent_pbp[(recent_pbp['game_id'] == row['game_id']) & (recent_pbp['drive'] == row['drive'])]
+            is_td = (d_plays['touchdown'] == 1).sum() > 0
+            is_to = ((d_plays['interception'] == 1).sum() > 0) or ((d_plays['fumble_lost'] == 1).sum() > 0)
+            drive_results.append({'posteam': row['posteam'], 'defteam': row['defteam'], 'stalled': (not is_td and not is_to)})
+        df_drives = pd.DataFrame(drive_results)
 
-    fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
-    fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
-    aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
-    aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
+    if not df_drives.empty:
+        off_stall = df_drives.groupby('posteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'off_stall_rate'})
+        def_stall = df_drives.groupby('defteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'def_stall_rate'})
+        off_stall['off_stall_rate'] = (off_stall['off_stall_rate'] * 100).round(1)
+        def_stall['def_stall_rate'] = (def_stall['def_stall_rate'] * 100).round(1)
+        lg_off_avg = off_stall['off_stall_rate'].mean()
+        lg_def_avg = def_stall['def_stall_rate'].mean()
+    else:
+        off_stall = pd.DataFrame(columns=['posteam', 'off_stall_rate'])
+        def_stall = pd.DataFrame(columns=['defteam', 'def_stall_rate'])
+        lg_off_avg, lg_def_avg = 0, 0
+
+    aggression_stats = pd.DataFrame(columns=['posteam', 'aggression_pct'])
+    if not recent_pbp.empty:
+        fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
+        fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
+        aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
+        aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
 
     # Scoring & Share (L4)
     completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
@@ -431,15 +466,12 @@ def run_analysis():
     matchups['total_line'] = matchups['total_line'].fillna(44.0)
     matchups['spread_line'] = matchups['spread_line'].fillna(0.0)
     
-    # VEGAS LOGIC FIXED: Flip signs for accurate projection
     home_view = matchups[['home_team', 'away_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
     home_view['home_field'] = home_view['home_team']
     home_view = home_view.rename(columns={'home_team': 'team', 'away_team': 'opponent'})
-    # Positive Spread = Home Points (if database uses spread as margin)
-    # NOTE: If Spread is +12.5 (Sea), Implied should be higher. (40+12.5)/2 = 26.25
+    # Positive Spread = Home Points (Favorite)
     home_view['vegas_implied'] = (home_view['total_line'] + home_view['spread_line']) / 2
     home_view['is_home'] = True
-    # Flip sign for betting notation (Positive spread in db = Negative display)
     home_view['spread_display'] = home_view['spread_line'].apply(lambda x: f"{x*-1:+.1f}")
 
     away_view = matchups[['away_team', 'home_team', 'roof', 'game_dt', 'total_line', 'spread_line']].copy()
@@ -486,11 +518,8 @@ def run_analysis():
             elif "🌧️" in weather_desc: bonus_val -= 5; bonuses.append("-5 Rain")
             
         if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
-        
-        # Use absolute spread for logic
-        spread_val = abs(float(row['spread_display']))
-        if spread_val < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
-        elif spread_val > 9.5: bonus_val -= 5; bonuses.append("-5 Blowout Risk")
+        if abs(row['spread_line']) < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
+        elif abs(row['spread_line']) > 9.5: bonus_val -= 5; bonuses.append("-5 Blowout Risk")
         
         if row['fpts'] >= elite_thresh: bonus_val += 5; bonuses.append("+5 Elite Talent")
         if row['aggression_pct'] > 25.0: bonus_val -= 5; bonuses.append("-5 Aggressive Coach")
@@ -516,8 +545,7 @@ def run_analysis():
             grade = 0.0
             bonuses.append(f"⛔ {row['injury_status'].upper()}")
         
-        # Prepare history object for JSON
-        history_obj = history_data.get(row['team'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
+        history_obj = history_data.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
 
         return pd.Series({
             'grade': grade,
@@ -531,7 +559,7 @@ def run_analysis():
             'def_cap_val': round(def_cap, 1),
             'details_vegas_total': round(row['total_line'], 1),
             'details_vegas_spread': row['spread_display'],
-            'history': history_obj # Embed history
+            'history': history_obj
         })
 
     final = final.join(final.apply(process_row, axis=1))

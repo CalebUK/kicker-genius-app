@@ -5,7 +5,7 @@ import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert
 const GLOSSARY_DATA = [
   { header: "Grade", title: "Matchup Grade", desc: "Composite score (0-100) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
-  { header: "Accuracy", title: "Projection Accuracy (L3)", desc: "Total Actual Points vs Total Projected Points over the last 3 active games.", why: "Model Trust Check", source: "Historical Backtest" },
+  { header: "Proj Acc", title: "Projection Accuracy (L3)", desc: "Total Actual Points vs Total Projected Points over the last 3 weeks.", why: "Model Trust Check", source: "Historical Backtest" },
   { header: "Injury", title: "Injury Status", desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.", why: "Availability Risk", source: "NFL Official + CBS Scraper" },
   { header: "L4 Off %", title: "Offensive Stall Rate (L4)", desc: "% of drives inside the 25 that fail to score a TD over the last 4 weeks.", why: "Recent Trend Volume", source: "nflreadpy (Play-by-Play)" },
   { header: "L4 Def %", title: "Opponent Force Rate (L4)", desc: "% of opponent drives allowed inside the 25 that resulted in FGs (Last 4 weeks).", why: "Matchup Difficulty", source: "nflreadpy (Play-by-Play)" },
@@ -40,9 +40,20 @@ const HistoryBars = ({ games }) => {
   if (!games || games.length === 0) return <div className="text-xs text-slate-500">No recent data</div>;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {games.map((g, i) => {
-        const maxVal = Math.max(g.proj, g.act) * 1.2; // Scale factor
+        if (g.status === 'BYE' || g.status === 'DNS') {
+           return (
+             <div key={i} className="text-[10px]">
+               <div className="text-slate-500 mb-0.5">Wk {g.week}: {g.status}</div>
+               <div className="w-full bg-slate-800/50 h-2.5 rounded-full relative">
+                 <div className="bg-slate-700 h-full rounded-full" style={{width: '100%'}}></div>
+               </div>
+             </div>
+           );
+        }
+
+        const maxVal = Math.max(20, g.proj, g.act); // Fixed scale for visibility
         const projPct = (g.proj / maxVal) * 100;
         const actPct = (g.act / maxVal) * 100;
         const isBeat = g.act >= g.proj;
@@ -56,13 +67,14 @@ const HistoryBars = ({ games }) => {
               </span>
             </div>
             {/* Projection Bar (Gray) */}
-            <div className="w-full bg-slate-800/50 h-1.5 rounded-full mb-1 overflow-hidden">
+            <div className="w-full bg-slate-800/50 h-2.5 rounded-full mb-1 overflow-hidden relative">
               <div className="bg-slate-600 h-full rounded-full" style={{ width: `${projPct}%` }}></div>
+              <span className="absolute right-1 top-0 h-full flex items-center text-[8px] text-white font-bold leading-none z-10 mix-blend-difference">{g.proj}</span>
             </div>
             {/* Actual Bar (Color) */}
-            <div className="w-full bg-slate-800/50 h-1.5 rounded-full overflow-hidden flex items-center relative">
+            <div className="w-full bg-slate-800/50 h-2.5 rounded-full overflow-hidden relative">
                <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full`} style={{ width: `${actPct}%` }}></div>
-               <span className="absolute right-1 text-[9px] text-slate-500">{g.act}</span>
+               <span className="absolute right-1 top-0 h-full flex items-center text-[8px] text-white font-bold leading-none z-10 mix-blend-difference">{g.act}</span>
             </div>
           </div>
         );
@@ -133,9 +145,7 @@ const DeepDiveRow = ({ player }) => (
                 <h3 className="font-bold text-white text-sm">Deep Dive: {player.kicker_player_name}</h3>
             </div>
             <div className="text-xs text-slate-500">
-                Last 3 Accuracy: <span className={player.history?.l3_actual >= player.history?.l3_proj ? "text-green-400" : "text-red-400"}>
-                    {player.history?.l3_actual} Act
-                </span> vs {player.history?.l3_proj} Proj
+               {/* Placeholder for future accuracy metric if needed */}
             </div>
         </div>
         
@@ -160,7 +170,7 @@ const DeepDiveRow = ({ player }) => (
             <div className="text-[10px] text-slate-500">Opp Allow {player.w_def_allowed} x Share</div>
           </div>
           
-          {/* 3. HISTORY (NEW) */}
+          {/* 3. HISTORY (UPDATED) */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
              <div className="text-purple-400 font-bold mb-2 pb-1 border-b border-slate-800 flex items-center gap-2">
                 <Target className="w-3 h-3"/> TREND (L3)
@@ -213,7 +223,8 @@ const App = () => {
   }, []);
 
   const updateScoring = (key, val) => {
-    const newScoring = { ...scoring, [key]: val === '' ? 0 : parseFloat(val) };
+    const numVal = val === '' ? 0 : parseFloat(val);
+    const newScoring = { ...scoring, [key]: numVal };
     setScoring(newScoring);
     localStorage.setItem('kicker_scoring', JSON.stringify(newScoring));
   };
@@ -338,7 +349,7 @@ const App = () => {
                     <th className="px-6 py-3 text-center">Weather</th>
                     <HeaderCell label="Off Stall%" description="Offense Stall Rate (L4)" avg={leagueAvgs.off_stall} />
                     <HeaderCell label="Def Stall%" description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
-                    <HeaderCell label="Accuracy" description="Total Actual vs Predicted for Last 3 Games" />
+                    <HeaderCell label="Proj Acc" description="Total Actual vs Projected Points (Last 3 Games)" />
                     <HeaderCell label="Vegas" description="Implied Team Total" />
                     <HeaderCell label="Off PF" description="Team Points For (L4)" />
                     <HeaderCell label="Opp PA" description="Opp Points Allowed (L4)" />
@@ -357,9 +368,9 @@ const App = () => {
                         <td className="px-6 py-4 text-center text-blue-300">{row.off_stall_rate}%</td>
                         <td className="px-6 py-4 text-center text-slate-400">{row.def_stall_rate}%</td>
                         
-                        {/* NEW: Accuracy Column */}
+                        {/* PROJ ACCURACY COLUMN */}
                         <td className="px-6 py-4 text-center">
-                           <div className="text-sm font-bold text-slate-300">
+                           <div className={`text-sm font-bold ${row.history?.l3_actual >= row.history?.l3_proj ? 'text-green-400' : 'text-red-400'}`}>
                              {row.history?.l3_actual || 0} / {row.history?.l3_proj || 0}
                            </div>
                            <div className="text-[9px] text-slate-500 uppercase">Act / Proj</div>
@@ -415,6 +426,7 @@ const App = () => {
           </div>
         )}
 
+        {/* INJURIES */}
         {activeTab === 'injuries' && (
            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
              {outKickers.length > 0 && (
