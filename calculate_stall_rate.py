@@ -163,9 +163,11 @@ def scrape_fantasy_ownership():
     except Exception:
         return pd.DataFrame()
 
-def load_official_injury_data(season, target_week):
-    """Loads ONLY official data from nflreadpy for fallback."""
-    print("🏥 Fetching Official NFL Injury Data (Fallback)...")
+def load_injury_data_safe(season, target_week):
+    print("🏥 Fetching Injury Data...")
+    scraped = scrape_cbs_injuries()
+    if not scraped.empty: return scraped
+    
     try:
         injuries = nfl.load_injuries(seasons=[season])
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
@@ -180,7 +182,7 @@ def load_official_injury_data(season, target_week):
         return injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
     except Exception: pass
     
-    return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status'])
+    return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
 
 def clean_nan(val):
     if isinstance(val, float):
@@ -279,10 +281,7 @@ def run_analysis():
         schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule")
         players = load_data_with_retry(lambda: nfl.load_players(), "Players")
         
-        # LOAD BOTH INJURY SOURCES
-        scraped_injuries = scrape_cbs_injuries()
-        official_injuries = load_official_injury_data(CURRENT_SEASON, target_week)
-        
+        injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
         ownership_data = scrape_fantasy_ownership()
 
         # --- 1. ROSTER DATA ---
@@ -290,6 +289,7 @@ def run_analysis():
             rosters = load_data_with_retry(lambda: nfl.load_rosters(seasons=[CURRENT_SEASON]), "Rosters")
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
             if rosters.empty:
+                 print("   ⚠️ 2025 Roster empty, falling back to 2024...")
                  rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1])
                  if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
             
@@ -356,16 +356,21 @@ def run_analysis():
                          stats['xp_made']*1 - stats['fg_miss']*1 - stats['xp_miss']*1)
         stats['avg_pts'] = (stats['fpts'] / stats['games']).round(1)
 
-        # --- CALCULATE SEASON STALL RATES (YTD) - FAST VECTORIZED ---
+        # --- CALCULATE SEASON STALL RATES (YTD) - FIXED ---
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
-        if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
-        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) 
+        # 1. OFFENSE: Rename posteam -> team to match stats
+        if 'posteam' in off_stall_seas.columns: 
+            off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
+            
+        # 2. DEFENSE: Rename defteam -> team (This kicker's team's defense)
+        if 'defteam' in def_stall_seas.columns: 
+            def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) 
         
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
-        stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='opponent', how='left')
+        stats = pd.merge(stats, def_stall_seas, on='team', how='left') # FIX: Match on TEAM, not opponent
         
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
@@ -389,22 +394,15 @@ def run_analysis():
         else:
             stats['own_pct'] = 0.0
 
-        # INJURIES: MERGE CBS (JOIN_NAME) THEN NFL (ID)
-        if not scraped_injuries.empty:
-            stats = pd.merge(stats, scraped_injuries, left_on='kicker_player_name', right_on='join_name', how='left')
-            
-        if not official_injuries.empty:
-            official_injuries = official_injuries.rename(columns={'gsis_id': 'kicker_player_id', 'report_status': 'rs_nfl', 'practice_status': 'ps_nfl'})
-            stats = pd.merge(stats, official_injuries, on='kicker_player_id', how='left')
-            
-            # BACKFILL IF CBS IS MISSING
-            if 'report_status' in stats.columns:
-                stats['report_status'] = stats['report_status'].fillna(stats['rs_nfl'])
-                stats['practice_status'] = stats['practice_status'].fillna(stats['ps_nfl'])
-            else:
-                # If CBS failed completely, use NFL cols
-                stats['report_status'] = stats['rs_nfl']
-                stats['practice_status'] = stats['ps_nfl']
+        # INJURIES
+        if 'join_name' in injury_report.columns:
+            stats = pd.merge(stats, injury_report, left_on='kicker_player_name', right_on='join_name', how='left')
+        elif 'gsis_id' in injury_report.columns:
+            injury_report = injury_report.rename(columns={'gsis_id': 'kicker_player_id'})
+            stats = pd.merge(stats, injury_report, on='kicker_player_id', how='left')
+        else:
+            stats['report_status'] = None
+            stats['practice_status'] = None
 
         stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
         
@@ -516,6 +514,7 @@ def run_analysis():
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
+        
         final = final.fillna(0)
 
         def process_row(row):
