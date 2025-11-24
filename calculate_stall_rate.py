@@ -95,19 +95,15 @@ def scrape_cbs_injuries():
             if not isinstance(val, str): return val
             return val.split(' (')[0].strip()
         combined['full_name'] = combined['full_name'].apply(clean_name)
+        combined['gsis_id'] = None 
         
-        # Create normalized name for joining (e.g. "Eddy Pineiro" -> "E.Pineiro")
         def normalize_for_join(val):
              parts = val.split(' ')
              if len(parts) >= 2: return f"{parts[0][0]}.{parts[-1]}"
              return val
-             
         combined['join_name'] = combined['full_name'].apply(normalize_for_join)
-        
-        print(f"   ✅ CBS Scrape Successful: Found {len(combined)} records.")
         return combined[['join_name', 'report_status', 'practice_status']]
     except Exception as e:
-        print(f"   ⚠️ Scraping failed: {e}")
         return pd.DataFrame()
 
 def scrape_fantasy_ownership():
@@ -141,19 +137,21 @@ def scrape_fantasy_ownership():
 
 def load_injury_data_safe(season, target_week):
     print("🏥 Fetching Injury Data...")
-    
-    # ATTEMPT 1: SCRAPE (Primary)
     scraped = scrape_cbs_injuries()
     if not scraped.empty: return scraped
     
-    # ATTEMPT 2: OFFICIAL (Fallback)
-    print("   ⚠️ Scraper failed, trying official nflreadpy source...")
     try:
         injuries = nfl.load_injuries(seasons=[season])
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
         df = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
         df.rename(columns={'practice_status': 'practice_status'}, inplace=True) 
         return df
+    except Exception: pass
+    
+    try:
+        url = f"https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_{season}.csv"
+        injuries = pd.read_csv(url)
+        return injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
     except Exception: pass
     
     return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
@@ -164,6 +162,7 @@ def clean_nan(val):
     return val
 
 def calculate_stall_metrics(df_pbp):
+    """Calculates stall rates using VECTORIZED operations for speed."""
     rz_drives = df_pbp[(df_pbp['yardline_100'] <= 25) & (df_pbp['yardline_100'].notnull())]
     drives = rz_drives[['game_id', 'drive', 'posteam', 'defteam']].drop_duplicates()
     
@@ -256,6 +255,7 @@ def run_analysis():
         injury_report = load_injury_data_safe(CURRENT_SEASON, target_week)
         ownership_data = scrape_fantasy_ownership()
 
+        # --- 1. ROSTER DATA ---
         try:
             rosters = nfl.load_rosters(seasons=[CURRENT_SEASON])
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
@@ -273,7 +273,7 @@ def run_analysis():
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         if hasattr(players, "to_pandas"): players = players.to_pandas()
 
-        # --- STATS AGGREGATION ---
+        # --- RAW STATS AGGREGATION ---
         kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
         kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
         
@@ -333,12 +333,11 @@ def run_analysis():
         
         # Explicit Rename to prevent collisions
         if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
+        # FIX: Rename defteam -> opponent here so we can merge
         if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'opponent'})
         
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
-        # NOTE: We merge Def Stall YTD onto the Kicker's TEAM. 
-        # This answers: "How often does THIS team's defense force field goals?"
-        # We must merge stats['team'] against def_stall_seas['opponent'] (which holds the defense team name)
+        # MERGE SEASON DEF STALL: Match Kicker's Team -> Season Defense Stall (which uses 'opponent' key now)
         stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='opponent', how='left')
         
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
@@ -363,12 +362,14 @@ def run_analysis():
         else:
             stats['own_pct'] = 0.0
 
-        # MERGE INJURIES (FIXED: Scraper = Primary)
-        if 'join_name' in injury_report.columns:
-            # 1. Join via Name Match (Scraper)
-            stats = pd.merge(stats, injury_report, left_on='kicker_player_name', right_on='join_name', how='left')
+        # INJURIES
+        if 'full_name' in injury_report.columns:
+            name_map = players[['gsis_id', 'display_name']].rename(columns={'gsis_id': 'kicker_player_id', 'display_name': 'full_name_official'})
+            stats = pd.merge(stats, name_map, on='kicker_player_id', how='left')
+            injury_report = injury_report.rename(columns={'full_name': 'full_name_official'})
+            injury_report = injury_report.drop_duplicates(subset=['full_name_official'])
+            stats = pd.merge(stats, injury_report, on='full_name_official', how='left')
         elif 'gsis_id' in injury_report.columns:
-            # 2. Join via ID (Official)
             injury_report = injury_report.rename(columns={'gsis_id': 'kicker_player_id'})
             stats = pd.merge(stats, injury_report, on='kicker_player_id', how='left')
         else:
@@ -378,15 +379,15 @@ def run_analysis():
         stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
         
         def get_injury_meta(row):
-            roster_st = str(row.get('roster_status', '')) if pd.notna(row.get('roster_status', '')) else ""
+            roster_st = str(row['roster_status']) if pd.notna(row['roster_status']) else ""
             if roster_st in ['RES', 'NON', 'SUS', 'PUP']: return "IR", "red-700", f"Roster: {roster_st}"
             if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']: return "CUT", "red-700", "Released"
             if roster_st == 'DEV': return "Practice Squad", "yellow-500", "Roster: Practice Squad"
             
-            report_st = row.get('report_status', '')
-            practice = row.get('practice_status', '')
+            report_st = row['report_status']
+            practice = row['practice_status']
             
-            if pd.isna(report_st) or report_st == 'nan' or report_st == '':
+            if pd.isna(report_st):
                 if roster_st and roster_st != 'ACT' and roster_st != 'nan': return roster_st, "gray-400", f"Roster: {roster_st}"
                 return "Healthy", "green", "Active"
             
@@ -473,6 +474,8 @@ def run_analysis():
 
         # Explicitly drop potential duplicate columns (like 'posteam' or 'defteam') before final merge to avoid collisions
         if 'posteam' in off_stall_l4.columns: off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
+        # FIX: Remove 'opponent' (old defteam) column from def_stall_l4 before merge to avoid key collision with existing 'opponent' column in final
+        # Actually, we need to merge ON opponent.
         if 'defteam' in def_stall_l4.columns: def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
         if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         
@@ -481,7 +484,7 @@ def run_analysis():
         final = pd.merge(final, off_stall_l4, on='team', how='left') # L4 Off Stall
         final = pd.merge(final, off_ppg, on='team', how='left')
         final = pd.merge(final, off_share, on='team', how='left')
-        final = pd.merge(final, def_stall_l4, left_on='opponent', right_on='opponent', how='left') # L4 Def Stall (FIXED JOIN KEY)
+        final = pd.merge(final, def_stall_l4, on='opponent', how='left') # L4 Def Stall (MERGE ON SHARED KEY)
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
