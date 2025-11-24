@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 12,
-    "updated": "2025-11-24 17:07",
+    "updated": "2025-11-24 19:19",
     "league_avgs": {
       "fpts": 69.4,
       "off_stall": 50.5,
@@ -36,12 +36,13 @@
       "dome_pct": 67.0,
       "fpts": 104,
       "avg_pts": 11.6,
+      "join_name_x": "K.Fairbairn",
       "off_stall_rate_ytd": 63.3,
       "def_stall_rate_ytd": 45.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/nbrs7doetqydf2rzhjjl",
       "match_name": "K.Fairbairn",
       "own_pct": 46.1,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -92,26 +93,26 @@
           {
             "week": 11,
             "status": "DNS",
-            "opp": "TEN",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "TEN"
           },
           {
             "week": 10,
             "status": "DNS",
-            "opp": "JAX",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "JAX"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "DEN",
             "proj": 11.6,
             "act": 17,
-            "diff": 5.4
+            "diff": 5.4,
+            "opp": "DEN"
           }
         ]
       }
@@ -141,12 +142,13 @@
       "dome_pct": 18.0,
       "fpts": 120,
       "avg_pts": 10.9,
+      "join_name_x": "J.Myers",
       "off_stall_rate_ytd": 43.1,
       "def_stall_rate_ytd": 45.2,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/rnw5znsm0hrekqvztiog",
       "match_name": "J.Myers",
       "own_pct": 77.5,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -197,26 +199,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "LA",
             "proj": 10.9,
             "act": 14,
-            "diff": 3.1
+            "diff": 3.1,
+            "opp": "LA"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "ARI",
             "proj": 12.5,
             "act": 15,
-            "diff": 2.5
+            "diff": 2.5,
+            "opp": "ARI"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "WAS",
             "proj": 12.5,
             "act": 9,
-            "diff": -3.5
+            "diff": -3.5,
+            "opp": "WAS"
           }
         ]
       }
@@ -246,12 +248,13 @@
       "dome_pct": 12.0,
       "fpts": 99,
       "avg_pts": 9.0,
+      "join_name_x": "T.Loop",
       "off_stall_rate_ytd": 57.4,
       "def_stall_rate_ytd": 50.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vp3vows5aq3sgnadgtjf",
       "match_name": "T.Loop",
       "own_pct": 83.2,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -302,26 +305,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "CLE",
             "proj": 9.0,
             "act": 12,
-            "diff": 3.0
+            "diff": 3.0,
+            "opp": "CLE"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "MIN",
             "proj": 10.3,
             "act": 13,
-            "diff": 2.7
+            "diff": 2.7,
+            "opp": "MIN"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "MIA",
             "proj": 10.3,
             "act": 4,
-            "diff": -6.3
+            "diff": -6.3,
+            "opp": "MIA"
           }
         ]
       }
@@ -351,12 +354,13 @@
       "dome_pct": 8.0,
       "fpts": 89,
       "avg_pts": 8.1,
+      "join_name_x": "H.Butker",
       "off_stall_rate_ytd": 37.7,
       "def_stall_rate_ytd": 37.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/ove4pmnrtqtuyta6rrlc",
       "match_name": "H.Butker",
       "own_pct": 74.2,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -404,26 +408,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "DEN",
             "proj": 8.1,
             "act": 6,
-            "diff": -2.1
+            "diff": -2.1,
+            "opp": "DEN"
           },
           {
             "week": 10,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "BUF",
             "proj": 9.3,
             "act": 8,
-            "diff": -1.3
+            "diff": -1.3,
+            "opp": "BUF"
           }
         ]
       }
@@ -453,12 +457,13 @@
       "dome_pct": 5.0,
       "fpts": 97,
       "avg_pts": 8.1,
+      "join_name_x": "A.Borregales",
       "off_stall_rate_ytd": 50.0,
       "def_stall_rate_ytd": 37.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/jgxnjxhysqwqk4fgf1ke",
       "match_name": "A.Borregales",
       "own_pct": 39.6,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -506,26 +511,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "NYJ",
             "proj": 9.3,
             "act": 9,
-            "diff": -0.3
+            "diff": -0.3,
+            "opp": "NYJ"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "TB",
             "proj": 8.1,
             "act": 4,
-            "diff": -4.1
+            "diff": -4.1,
+            "opp": "TB"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "ATL",
             "proj": 9.3,
             "act": 6,
-            "diff": -3.3
+            "diff": -3.3,
+            "opp": "ATL"
           }
         ]
       }
@@ -555,12 +560,13 @@
       "dome_pct": 30.0,
       "fpts": 84,
       "avg_pts": 9.3,
+      "join_name_x": "C.Santos",
       "off_stall_rate_ytd": 54.5,
       "def_stall_rate_ytd": 38.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/w5mfvjfuflbitwuji1yx",
       "match_name": "C.Santos",
       "own_pct": 32.1,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -611,26 +617,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "MIN",
             "proj": 9.3,
             "act": 15,
-            "diff": 5.7
+            "diff": 5.7,
+            "opp": "MIN"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "NYG",
             "proj": 10.7,
             "act": 6,
-            "diff": -4.7
+            "diff": -4.7,
+            "opp": "NYG"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "CIN",
             "proj": 10.7,
             "act": 10,
-            "diff": -0.7
+            "diff": -0.7,
+            "opp": "CIN"
           }
         ]
       }
@@ -660,12 +666,13 @@
       "dome_pct": 18.0,
       "fpts": 59,
       "avg_pts": 7.4,
+      "join_name_x": "B.McManus",
       "off_stall_rate_ytd": 36.0,
       "def_stall_rate_ytd": 39.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qvwi9b1vfkn0wlmdl7ej",
       "match_name": "B.McManus",
       "own_pct": 11.5,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -713,26 +720,26 @@
           {
             "week": 11,
             "status": "DNS",
-            "opp": "NYG",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "NYG"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "PHI",
             "proj": 7.4,
             "act": 0,
-            "diff": -7.4
+            "diff": -7.4,
+            "opp": "PHI"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "CAR",
             "proj": 8.5,
             "act": 7,
-            "diff": -1.5
+            "diff": -1.5,
+            "opp": "CAR"
           }
         ]
       }
@@ -762,12 +769,13 @@
       "dome_pct": 68.0,
       "fpts": 69,
       "avg_pts": 6.3,
+      "join_name_x": "B.Grupe",
       "off_stall_rate_ytd": 65.8,
       "def_stall_rate_ytd": 47.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/de3vz6xjjo9paba6encd",
       "match_name": "B.Grupe",
       "own_pct": 0.9,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -819,26 +827,26 @@
           {
             "week": 11,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "CAR",
             "proj": 5.4,
             "act": 5,
-            "diff": -0.4
+            "diff": -0.4,
+            "opp": "CAR"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "LA",
             "proj": 5.4,
             "act": 4,
-            "diff": -1.4
+            "diff": -1.4,
+            "opp": "LA"
           }
         ]
       }
@@ -868,12 +876,13 @@
       "dome_pct": 38.0,
       "fpts": 20,
       "avg_pts": 6.7,
+      "join_name_x": "L.Havrisik",
       "off_stall_rate_ytd": 36.0,
       "def_stall_rate_ytd": 39.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
       "match_name": "L.Havrisik",
       "own_pct": 1.3,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -921,26 +930,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "NYG",
             "proj": 7.7,
             "act": -1,
-            "diff": -8.7
+            "diff": -8.7,
+            "opp": "NYG"
           },
           {
             "week": 10,
             "status": "DNS",
-            "opp": "PHI",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "PHI"
           },
           {
             "week": 9,
             "status": "DNS",
-            "opp": "CAR",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "CAR"
           }
         ]
       }
@@ -970,12 +979,13 @@
       "dome_pct": 72.0,
       "fpts": 48,
       "avg_pts": 8.0,
+      "join_name_x": "M.Badgley",
       "off_stall_rate_ytd": 39.7,
       "def_stall_rate_ytd": 40.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vws2nawkkxxb8s82ny1s",
       "match_name": "M.Badgley",
       "own_pct": 20.8,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -1025,26 +1035,26 @@
           {
             "week": 11,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "ATL",
             "proj": 9.2,
             "act": 6,
-            "diff": -3.2
+            "diff": -3.2,
+            "opp": "ATL"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "PIT",
             "proj": 9.2,
             "act": 12,
-            "diff": 2.8
+            "diff": 2.8,
+            "opp": "PIT"
           }
         ]
       }
@@ -1074,12 +1084,13 @@
       "dome_pct": 74.0,
       "fpts": 65,
       "avg_pts": 6.5,
+      "join_name_x": "D.Carlson",
       "off_stall_rate_ytd": 55.6,
       "def_stall_rate_ytd": 47.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/gsvj7rtvqwbwdeho8whf",
       "match_name": "D.Carlson",
       "own_pct": 12.8,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -1131,26 +1142,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "DAL",
             "proj": 6.5,
             "act": 11,
-            "diff": 4.5
+            "diff": 4.5,
+            "opp": "DAL"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "DEN",
             "proj": 5.5,
             "act": 0,
-            "diff": -5.5
+            "diff": -5.5,
+            "opp": "DEN"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "JAX",
             "proj": 6.5,
             "act": 4,
-            "diff": -2.5
+            "diff": -2.5,
+            "opp": "JAX"
           }
         ]
       }
@@ -1180,12 +1191,13 @@
       "dome_pct": 0.0,
       "fpts": 91,
       "avg_pts": 8.3,
+      "join_name_x": "N.Folk",
       "off_stall_rate_ytd": 53.8,
       "def_stall_rate_ytd": 49.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qcfiv2cc7ky37yq9iklp",
       "match_name": "N.Folk",
       "own_pct": 5.4,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -1235,26 +1247,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "NE",
             "proj": 7.1,
             "act": 2,
-            "diff": -5.1
+            "diff": -5.1,
+            "opp": "NE"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "CLE",
             "proj": 8.3,
             "act": 9,
-            "diff": 0.7
+            "diff": 0.7,
+            "opp": "CLE"
           },
           {
             "week": 9,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           }
         ]
       }
@@ -1284,12 +1296,13 @@
       "dome_pct": 12.0,
       "fpts": 81,
       "avg_pts": 7.4,
+      "join_name_x": "M.Prater",
       "off_stall_rate_ytd": 43.9,
       "def_stall_rate_ytd": 51.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pj981bi535y4jwy6skr1",
       "match_name": "M.Prater",
       "own_pct": 54.2,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -1340,26 +1353,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "TB",
             "proj": 8.5,
             "act": 8,
-            "diff": -0.5
+            "diff": -0.5,
+            "opp": "TB"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "MIA",
             "proj": 8.5,
             "act": 1,
-            "diff": -7.5
+            "diff": -7.5,
+            "opp": "MIA"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "KC",
             "proj": 8.5,
             "act": 3,
-            "diff": -5.5
+            "diff": -5.5,
+            "opp": "KC"
           }
         ]
       }
@@ -1389,12 +1402,13 @@
       "dome_pct": 20.0,
       "fpts": 69,
       "avg_pts": 6.3,
+      "join_name_x": "J.Elliott",
       "off_stall_rate_ytd": 42.5,
       "def_stall_rate_ytd": 48.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/v35j7b3tofdn0kfskdhj",
       "match_name": "J.Elliott",
       "own_pct": 64.5,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -1445,26 +1459,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "DET",
             "proj": 7.2,
             "act": 11,
-            "diff": 3.8
+            "diff": 3.8,
+            "opp": "DET"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "GB",
             "proj": 6.3,
             "act": 4,
-            "diff": -2.3
+            "diff": -2.3,
+            "opp": "GB"
           },
           {
             "week": 9,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           }
         ]
       }
@@ -1494,12 +1508,13 @@
       "dome_pct": 32.0,
       "fpts": 90,
       "avg_pts": 8.2,
+      "join_name_x": "C.Little",
       "off_stall_rate_ytd": 40.8,
       "def_stall_rate_ytd": 46.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pfdod5cds77uznkotipk",
       "match_name": "C.Little",
       "own_pct": 56.7,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -1551,26 +1566,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "LAC",
             "proj": 8.2,
             "act": 5,
-            "diff": -3.2
+            "diff": -3.2,
+            "opp": "LAC"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "HOU",
             "proj": 8.2,
             "act": 13,
-            "diff": 4.8
+            "diff": 4.8,
+            "opp": "HOU"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "LV",
             "proj": 8.2,
             "act": 15,
-            "diff": 6.8
+            "diff": 6.8,
+            "opp": "LV"
           }
         ]
       }
@@ -1600,12 +1615,13 @@
       "dome_pct": 71.0,
       "fpts": 99,
       "avg_pts": 9.0,
+      "join_name_x": "W.Reichard",
       "off_stall_rate_ytd": 48.6,
       "def_stall_rate_ytd": 66.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/r1g0mqxqc23tmqmgdbwm",
       "match_name": "W.Reichard",
       "own_pct": 30.4,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -1624,10 +1640,10 @@
       "is_dome": false,
       "weather_data": [
         0,
-        "API Error"
+        "No Data"
       ],
       "wind": 0.0,
-      "weather_desc": "API Error",
+      "weather_desc": "No Data",
       "off_stall_rate": 46.2,
       "off_ppg": 17.25,
       "off_share": 0.49896800825593396,
@@ -1656,26 +1672,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "CHI",
             "proj": 10.3,
             "act": 5,
-            "diff": -5.3
+            "diff": -5.3,
+            "opp": "CHI"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "BAL",
             "proj": 9.0,
             "act": 9,
-            "diff": 0.0
+            "diff": 0.0,
+            "opp": "BAL"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "DET",
             "proj": 9.0,
             "act": 11,
-            "diff": 2.0
+            "diff": 2.0,
+            "opp": "DET"
           }
         ]
       }
@@ -1705,12 +1721,13 @@
       "dome_pct": 6.0,
       "fpts": 105,
       "avg_pts": 9.5,
+      "join_name_x": "C.Boswell",
       "off_stall_rate_ytd": 39.5,
       "def_stall_rate_ytd": 45.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/rxbnhvnfjmheuryvdmuf",
       "match_name": "C.Boswell",
       "own_pct": 90.7,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -1762,26 +1779,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "CIN",
             "proj": 10.9,
             "act": 10,
-            "diff": -0.9
+            "diff": -0.9,
+            "opp": "CIN"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "LAC",
             "proj": 9.5,
             "act": 5,
-            "diff": -4.5
+            "diff": -4.5,
+            "opp": "LAC"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "IND",
             "proj": 9.5,
             "act": 10,
-            "diff": 0.5
+            "diff": 0.5,
+            "opp": "IND"
           }
         ]
       }
@@ -1811,12 +1828,13 @@
       "dome_pct": 53.0,
       "fpts": 88,
       "avg_pts": 8.0,
+      "join_name_x": "J.Bates",
       "off_stall_rate_ytd": 42.6,
       "def_stall_rate_ytd": 46.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/heh3zqyv3tqapnpnzgoj",
       "match_name": "J.Bates",
       "own_pct": 94.0,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -1868,26 +1886,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "PHI",
             "proj": 8.0,
             "act": 4,
-            "diff": -4.0
+            "diff": -4.0,
+            "opp": "PHI"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "WAS",
             "proj": 9.2,
             "act": 12,
-            "diff": 2.8
+            "diff": 2.8,
+            "opp": "WAS"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "MIN",
             "proj": 9.2,
             "act": 6,
-            "diff": -3.2
+            "diff": -3.2,
+            "opp": "MIN"
           }
         ]
       }
@@ -1917,12 +1935,13 @@
       "dome_pct": 63.0,
       "fpts": 106,
       "avg_pts": 9.6,
+      "join_name_x": "B.Aubrey",
       "off_stall_rate_ytd": 42.9,
       "def_stall_rate_ytd": 41.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/ynyyootbeabm5sx4ejgt",
       "match_name": "B.Aubrey",
       "own_pct": 98.5,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -1975,26 +1994,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "LV",
             "proj": 11.0,
             "act": 9,
-            "diff": -2.0
+            "diff": -2.0,
+            "opp": "LV"
           },
           {
             "week": 10,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "ARI",
             "proj": 11.0,
             "act": 4,
-            "diff": -7.0
+            "diff": -7.0,
+            "opp": "ARI"
           }
         ]
       }
@@ -2024,12 +2043,13 @@
       "dome_pct": 18.0,
       "fpts": 71,
       "avg_pts": 6.5,
+      "join_name_x": "A.Szmyt",
       "off_stall_rate_ytd": 52.9,
       "def_stall_rate_ytd": 56.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tkah6glpysuyq2a54gts",
       "match_name": "A.Szmyt",
       "own_pct": 0.8,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -2080,26 +2100,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "BAL",
             "proj": 5.5,
             "act": 11,
-            "diff": 5.5
+            "diff": 5.5,
+            "opp": "BAL"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "NYJ",
             "proj": 6.5,
             "act": 9,
-            "diff": 2.5
+            "diff": 2.5,
+            "opp": "NYJ"
           },
           {
             "week": 9,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           }
         ]
       }
@@ -2129,12 +2149,13 @@
       "dome_pct": 87.0,
       "fpts": 82,
       "avg_pts": 7.5,
+      "join_name_x": "C.Ryland",
       "off_stall_rate_ytd": 42.0,
       "def_stall_rate_ytd": 42.6,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hqbrncv4ktphfcmkf23g",
       "match_name": "C.Ryland",
       "own_pct": 4.0,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -2186,26 +2207,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "SF",
             "proj": 7.5,
             "act": 3,
-            "diff": -4.5
+            "diff": -4.5,
+            "opp": "SF"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "SEA",
             "proj": 7.5,
             "act": 2,
-            "diff": -5.5
+            "diff": -5.5,
+            "opp": "SEA"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "DAL",
             "proj": 8.6,
             "act": 10,
-            "diff": 1.4
+            "diff": 1.4,
+            "opp": "DAL"
           }
         ]
       }
@@ -2235,12 +2256,13 @@
       "dome_pct": 33.0,
       "fpts": 95,
       "avg_pts": 8.6,
+      "join_name_x": "C.McLaughlin",
       "off_stall_rate_ytd": 51.1,
       "def_stall_rate_ytd": 51.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vwefhtevyn2qxauchan5",
       "match_name": "C.McLaughlin",
       "own_pct": 81.1,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -2291,26 +2313,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "BUF",
             "proj": 8.6,
             "act": 8,
-            "diff": -0.6
+            "diff": -0.6,
+            "opp": "BUF"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "NE",
             "proj": 9.9,
             "act": 5,
-            "diff": -4.9
+            "diff": -4.9,
+            "opp": "NE"
           },
           {
             "week": 9,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           }
         ]
       }
@@ -2340,12 +2362,13 @@
       "dome_pct": 100.0,
       "fpts": 33,
       "avg_pts": 11.0,
+      "join_name_x": "Z.Gonzalez",
       "off_stall_rate_ytd": 47.5,
       "def_stall_rate_ytd": 51.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tytaxive5qhdumjqy2o2",
       "match_name": "Z.Gonzalez",
       "own_pct": 4.2,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -2397,26 +2420,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "CAR",
             "proj": 11.0,
             "act": 12,
-            "diff": 1.0
+            "diff": 1.0,
+            "opp": "CAR"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "IND",
             "proj": 11.0,
             "act": 6,
-            "diff": -5.0
+            "diff": -5.0,
+            "opp": "IND"
           },
           {
             "week": 9,
             "status": "DNS",
-            "opp": "NE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "NE"
           }
         ]
       }
@@ -2446,12 +2469,13 @@
       "dome_pct": 4.0,
       "fpts": 86,
       "avg_pts": 7.8,
+      "join_name_x": "E.McPherson",
       "off_stall_rate_ytd": 50.0,
       "def_stall_rate_ytd": 37.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/cpvujaqwscupzvbbx7oe",
       "match_name": "E.McPherson",
       "own_pct": 25.0,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -2501,26 +2525,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "PIT",
             "proj": 7.8,
             "act": 8,
-            "diff": 0.2
+            "diff": 0.2,
+            "opp": "PIT"
           },
           {
             "week": 10,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "CHI",
             "proj": 9.0,
             "act": 10,
-            "diff": 1.0
+            "diff": 1.0,
+            "opp": "CHI"
           }
         ]
       }
@@ -2550,12 +2574,13 @@
       "dome_pct": 59.0,
       "fpts": 27,
       "avg_pts": 6.8,
+      "join_name_x": "Y.Koo",
       "off_stall_rate_ytd": 52.7,
       "def_stall_rate_ytd": 42.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/j70hqvbaerk5ft50appk",
       "match_name": "Y.Koo",
       "own_pct": 20.3,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -2607,26 +2632,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "GB",
             "proj": 5.8,
             "act": 1,
-            "diff": -4.8
+            "diff": -4.8,
+            "opp": "GB"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "CHI",
             "proj": 6.8,
             "act": 8,
-            "diff": 1.2
+            "diff": 1.2,
+            "opp": "CHI"
           },
           {
             "week": 9,
             "status": "DNS",
-            "opp": "SF",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "SF"
           }
         ]
       }
@@ -2656,12 +2681,13 @@
       "dome_pct": 26.0,
       "fpts": 87,
       "avg_pts": 8.7,
+      "join_name_x": "J.Slye",
       "off_stall_rate_ytd": 57.1,
       "def_stall_rate_ytd": 45.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/xokfs27mtqrbb0y47ahn",
       "match_name": "J.Slye",
       "own_pct": 1.9,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -2712,26 +2738,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "HOU",
             "proj": 7.4,
             "act": 10,
-            "diff": 2.6
+            "diff": 2.6,
+            "opp": "HOU"
           },
           {
             "week": 10,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "LAC",
             "proj": 7.4,
             "act": 9,
-            "diff": 1.6
+            "diff": 1.6,
+            "opp": "LAC"
           }
         ]
       }
@@ -2761,12 +2787,13 @@
       "dome_pct": 60.0,
       "fpts": 22,
       "avg_pts": 7.3,
+      "join_name_x": "H.Mevis",
       "off_stall_rate_ytd": 36.8,
       "def_stall_rate_ytd": 57.5,
       "headshot_url": "https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png",
       "match_name": "H.Mevis",
       "own_pct": 9.0,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -2817,26 +2844,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "SEA",
             "proj": 8.4,
             "act": 3,
-            "diff": -5.4
+            "diff": -5.4,
+            "opp": "SEA"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "SF",
             "proj": 8.4,
             "act": 6,
-            "diff": -2.4
+            "diff": -2.4,
+            "opp": "SF"
           },
           {
             "week": 9,
             "status": "DNS",
-            "opp": "NO",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "NO"
           }
         ]
       }
@@ -2866,12 +2893,13 @@
       "dome_pct": 44.0,
       "fpts": 50,
       "avg_pts": 6.2,
+      "join_name_x": "J.Karty",
       "off_stall_rate_ytd": 36.8,
       "def_stall_rate_ytd": 57.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/j51z79en8vs3qdgkvnn5",
       "match_name": "J.Karty",
       "own_pct": 6.2,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -2922,26 +2950,26 @@
           {
             "week": 11,
             "status": "DNS",
-            "opp": "SEA",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "SEA"
           },
           {
             "week": 10,
             "status": "DNS",
-            "opp": "SF",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "SF"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "NO",
             "proj": 7.1,
             "act": 2,
-            "diff": -5.1
+            "diff": -5.1,
+            "opp": "NO"
           }
         ]
       }
@@ -2971,12 +2999,13 @@
       "dome_pct": 15.0,
       "fpts": 70,
       "avg_pts": 6.4,
+      "join_name_x": "R.Fitzgerald",
       "off_stall_rate_ytd": 46.3,
       "def_stall_rate_ytd": 52.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/abfug5vjak5ixdcqca7x",
       "match_name": "R.Fitzgerald",
       "own_pct": 3.8,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -2994,11 +3023,11 @@
       "spread_display": "+7.5",
       "is_dome": false,
       "weather_data": [
-        4.8,
-        "4mph \u2600\ufe0f"
+        5.0,
+        "5mph"
       ],
-      "wind": 4.8,
-      "weather_desc": "4mph \u2600\ufe0f",
+      "wind": 5.0,
+      "weather_desc": "5mph",
       "off_stall_rate": 41.7,
       "off_ppg": 17.666666666666668,
       "off_share": 0.24206349206349206,
@@ -3026,26 +3055,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "ATL",
             "proj": 6.4,
             "act": 10,
-            "diff": 3.6
+            "diff": 3.6,
+            "opp": "ATL"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "NO",
             "proj": 6.4,
             "act": 0,
-            "diff": -6.4
+            "diff": -6.4,
+            "opp": "NO"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "GB",
             "proj": 5.4,
             "act": 4,
-            "diff": -1.4
+            "diff": -1.4,
+            "opp": "GB"
           }
         ]
       }
@@ -3075,12 +3104,13 @@
       "dome_pct": 0.0,
       "fpts": -1,
       "avg_pts": -1.0,
+      "join_name_x": "J.Gillan",
       "off_stall_rate_ytd": 52.7,
       "def_stall_rate_ytd": 42.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/kxwddoiqqghc1kxaajco",
       "match_name": 0,
       "own_pct": 0.0,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": 0,
@@ -3132,26 +3162,26 @@
           {
             "week": 11,
             "status": "DNS",
-            "opp": "GB",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "GB"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "CHI",
             "proj": -1.0,
             "act": 0,
-            "diff": 1.0
+            "diff": 1.0,
+            "opp": "CHI"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "SF",
             "proj": -1.0,
             "act": 0,
-            "diff": 1.0
+            "diff": 1.0,
+            "opp": "SF"
           }
         ]
       }
@@ -3181,12 +3211,13 @@
       "dome_pct": 14.0,
       "fpts": 12,
       "avg_pts": 3.0,
+      "join_name_x": "J.McAtamney",
       "off_stall_rate_ytd": 52.7,
       "def_stall_rate_ytd": 42.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/k4klhpsp9mlcrpd8kcst",
       "match_name": "J.McAtamney",
       "own_pct": 0.6,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": "DEV",
@@ -3234,31 +3265,31 @@
       "details_vegas_spread": "+14.0",
       "history": {
         "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_proj": 0,
         "l3_games": [
           {
             "week": 11,
             "status": "DNS",
-            "opp": "GB",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "GB"
           },
           {
             "week": 10,
             "status": "DNS",
-            "opp": "CHI",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "CHI"
           },
           {
             "week": 9,
             "status": "DNS",
-            "opp": "SF",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "SF"
           }
         ]
       }
@@ -3288,12 +3319,13 @@
       "dome_pct": 43.0,
       "fpts": 100,
       "avg_pts": 10.0,
+      "join_name_x": "E.Pineiro",
       "off_stall_rate_ytd": 43.8,
       "def_stall_rate_ytd": 43.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/l4rrfcuczjau7q02h2iz",
       "match_name": "E.Pineiro",
       "own_pct": 19.0,
-      "join_name": "E.Pineiro",
+      "join_name_y": "E.Pineiro",
       "report_status": "Out for Week 12 vs. Carolina. Expected Return - Week 13",
       "practice_status": "Hamstring",
       "roster_status": 0,
@@ -3311,11 +3343,11 @@
       "spread_display": "-7.5",
       "is_dome": false,
       "weather_data": [
-        4.8,
-        "4mph \u2600\ufe0f"
+        5.0,
+        "5mph"
       ],
-      "wind": 4.8,
-      "weather_desc": "4mph \u2600\ufe0f",
+      "wind": 5.0,
+      "weather_desc": "5mph",
       "off_stall_rate": 25.0,
       "off_ppg": 33.666666666666664,
       "off_share": 0.21311113563624326,
@@ -3345,26 +3377,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "ARI",
             "proj": 11.5,
             "act": 12,
-            "diff": 0.5
+            "diff": 0.5,
+            "opp": "ARI"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "LA",
             "proj": 10.0,
             "act": 1,
-            "diff": -9.0
+            "diff": -9.0,
+            "opp": "LA"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "NYG",
             "proj": 11.5,
             "act": 12,
-            "diff": 0.5
+            "diff": 0.5,
+            "opp": "NYG"
           }
         ]
       }
@@ -3394,12 +3426,13 @@
       "dome_pct": 37.0,
       "fpts": 38,
       "avg_pts": 7.6,
+      "join_name_x": "G.Gano",
       "off_stall_rate_ytd": 52.7,
       "def_stall_rate_ytd": 42.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wp5wochy7uuqcgyjcrrd",
       "match_name": "G.Gano",
       "own_pct": 0.7,
-      "join_name": "G.Gano",
+      "join_name_y": "G.Gano",
       "report_status": "IR. Injured Reserve",
       "practice_status": "Neck",
       "roster_status": "RES",
@@ -3452,26 +3485,26 @@
           {
             "week": 11,
             "status": "DNS",
-            "opp": "GB",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "GB"
           },
           {
             "week": 10,
             "status": "DNS",
-            "opp": "CHI",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "CHI"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "SF",
             "proj": 7.6,
             "act": 5,
-            "diff": -2.6
+            "diff": -2.6,
+            "opp": "SF"
           }
         ]
       }
@@ -3501,12 +3534,13 @@
       "dome_pct": 0.0,
       "fpts": 32,
       "avg_pts": 10.7,
+      "join_name_x": "J.Moody",
       "off_stall_rate_ytd": 54.5,
       "def_stall_rate_ytd": 38.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wkqqi3zfucoti8g5ncob",
       "match_name": "J.Moody",
       "own_pct": 5.8,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": "DEV",
@@ -3553,31 +3587,31 @@
       "details_vegas_spread": "-3.0",
       "history": {
         "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_proj": 0,
         "l3_games": [
           {
             "week": 11,
             "status": "DNS",
-            "opp": "MIN",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "MIN"
           },
           {
             "week": 10,
             "status": "DNS",
-            "opp": "NYG",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "NYG"
           },
           {
             "week": 9,
             "status": "DNS",
-            "opp": "CIN",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "CIN"
           }
         ]
       }
@@ -3607,12 +3641,13 @@
       "dome_pct": 70.0,
       "fpts": 44,
       "avg_pts": 6.3,
+      "join_name_x": "J.Romo",
       "off_stall_rate_ytd": 47.5,
       "def_stall_rate_ytd": 51.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pgbqca2tf4hcq4vxv13m",
       "match_name": 0,
       "own_pct": 0.0,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": "CUT",
@@ -3665,26 +3700,26 @@
           {
             "week": 11,
             "status": "DNS",
-            "opp": "CAR",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "CAR"
           },
           {
             "week": 10,
             "status": "DNS",
-            "opp": "IND",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "IND"
           },
           {
             "week": 9,
             "status": "ACTIVE",
-            "opp": "NE",
             "proj": 6.3,
             "act": 4,
-            "diff": -2.3
+            "diff": -2.3,
+            "opp": "NE"
           }
         ]
       }
@@ -3714,12 +3749,13 @@
       "dome_pct": 71.0,
       "fpts": 56,
       "avg_pts": 11.2,
+      "join_name_x": "S.Shrader",
       "off_stall_rate_ytd": 39.7,
       "def_stall_rate_ytd": 40.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/i63zrj1idnss37cpe1yo",
       "match_name": "S.Shrader",
       "own_pct": 1.7,
-      "join_name": "S.Shrader",
+      "join_name_y": "S.Shrader",
       "report_status": "IR. Injured Reserve",
       "practice_status": "Knee - ACL + MCL",
       "roster_status": "RES",
@@ -3765,31 +3801,31 @@
       "details_vegas_spread": "+3.5",
       "history": {
         "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_proj": 0,
         "l3_games": [
           {
             "week": 11,
             "status": "BYE",
-            "opp": "BYE",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "BYE"
           },
           {
             "week": 10,
             "status": "DNS",
-            "opp": "ATL",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "ATL"
           },
           {
             "week": 9,
             "status": "DNS",
-            "opp": "PIT",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "PIT"
           }
         ]
       }
@@ -3819,12 +3855,13 @@
       "dome_pct": 44.0,
       "fpts": 22,
       "avg_pts": 5.5,
+      "join_name_x": "M.Wright",
       "off_stall_rate_ytd": 63.3,
       "def_stall_rate_ytd": 45.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/htrs1hrrfok88fllrtex",
       "match_name": "M.Wright",
       "own_pct": 0.6,
-      "join_name": 0,
+      "join_name_y": 0,
       "report_status": 0,
       "practice_status": 0,
       "roster_status": "CUT",
@@ -3875,26 +3912,26 @@
           {
             "week": 11,
             "status": "ACTIVE",
-            "opp": "TEN",
             "proj": 5.5,
             "act": 12,
-            "diff": 6.5
+            "diff": 6.5,
+            "opp": "TEN"
           },
           {
             "week": 10,
             "status": "ACTIVE",
-            "opp": "JAX",
             "proj": 5.5,
             "act": 4,
-            "diff": -1.5
+            "diff": -1.5,
+            "opp": "JAX"
           },
           {
             "week": 9,
             "status": "DNS",
-            "opp": "DEN",
             "proj": 0,
             "act": 0,
-            "diff": 0
+            "diff": 0,
+            "opp": "DEN"
           }
         ]
       }
@@ -3926,12 +3963,13 @@
       "dome_pct": 18.0,
       "fpts": 120,
       "avg_pts": 10.9,
+      "join_name_x": "J.Myers",
       "off_stall_rate_ytd": 43.1,
       "def_stall_rate_ytd": 45.2,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/rnw5znsm0hrekqvztiog",
       "match_name": "J.Myers",
       "own_pct": 77.5,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -3964,12 +4002,13 @@
       "dome_pct": 68.0,
       "fpts": 110,
       "avg_pts": 10.0,
+      "join_name_x": "C.Dicker",
       "off_stall_rate_ytd": 56.9,
       "def_stall_rate_ytd": 51.2,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vd4nd1hoax82j7fi2bx0",
       "match_name": "C.Dicker",
       "own_pct": 84.5,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4002,12 +4041,13 @@
       "dome_pct": 63.0,
       "fpts": 106,
       "avg_pts": 9.6,
+      "join_name_x": "B.Aubrey",
       "off_stall_rate_ytd": 42.9,
       "def_stall_rate_ytd": 41.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/ynyyootbeabm5sx4ejgt",
       "match_name": "B.Aubrey",
       "own_pct": 98.5,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4040,12 +4080,13 @@
       "dome_pct": 6.0,
       "fpts": 105,
       "avg_pts": 9.5,
+      "join_name_x": "C.Boswell",
       "off_stall_rate_ytd": 39.5,
       "def_stall_rate_ytd": 45.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/rxbnhvnfjmheuryvdmuf",
       "match_name": "C.Boswell",
       "own_pct": 90.7,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4078,12 +4119,13 @@
       "dome_pct": 67.0,
       "fpts": 104,
       "avg_pts": 11.6,
+      "join_name_x": "K.Fairbairn",
       "off_stall_rate_ytd": 63.3,
       "def_stall_rate_ytd": 45.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/nbrs7doetqydf2rzhjjl",
       "match_name": "K.Fairbairn",
       "own_pct": 46.1,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4116,12 +4158,13 @@
       "dome_pct": 43.0,
       "fpts": 100,
       "avg_pts": 10.0,
+      "join_name_x": "E.Pineiro",
       "off_stall_rate_ytd": 43.8,
       "def_stall_rate_ytd": 43.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/l4rrfcuczjau7q02h2iz",
       "match_name": "E.Pineiro",
       "own_pct": 19.0,
-      "join_name": "E.Pineiro",
+      "join_name_y": "E.Pineiro",
       "report_status": "Out for Week 12 vs. Carolina. Expected Return - Week 13",
       "practice_status": "Hamstring",
       "roster_status": null,
@@ -4154,12 +4197,13 @@
       "dome_pct": 12.0,
       "fpts": 99,
       "avg_pts": 9.0,
+      "join_name_x": "T.Loop",
       "off_stall_rate_ytd": 57.4,
       "def_stall_rate_ytd": 50.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vp3vows5aq3sgnadgtjf",
       "match_name": "T.Loop",
       "own_pct": 83.2,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4192,12 +4236,13 @@
       "dome_pct": 71.0,
       "fpts": 99,
       "avg_pts": 9.0,
+      "join_name_x": "W.Reichard",
       "off_stall_rate_ytd": 48.6,
       "def_stall_rate_ytd": 66.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/r1g0mqxqc23tmqmgdbwm",
       "match_name": "W.Reichard",
       "own_pct": 30.4,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4230,12 +4275,13 @@
       "dome_pct": 5.0,
       "fpts": 97,
       "avg_pts": 8.1,
+      "join_name_x": "A.Borregales",
       "off_stall_rate_ytd": 50.0,
       "def_stall_rate_ytd": 37.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/jgxnjxhysqwqk4fgf1ke",
       "match_name": "A.Borregales",
       "own_pct": 39.6,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4268,12 +4314,13 @@
       "dome_pct": 33.0,
       "fpts": 95,
       "avg_pts": 8.6,
+      "join_name_x": "C.McLaughlin",
       "off_stall_rate_ytd": 51.1,
       "def_stall_rate_ytd": 51.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vwefhtevyn2qxauchan5",
       "match_name": "C.McLaughlin",
       "own_pct": 81.1,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4306,12 +4353,13 @@
       "dome_pct": 0.0,
       "fpts": 91,
       "avg_pts": 8.3,
+      "join_name_x": "N.Folk",
       "off_stall_rate_ytd": 53.8,
       "def_stall_rate_ytd": 49.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qcfiv2cc7ky37yq9iklp",
       "match_name": "N.Folk",
       "own_pct": 5.4,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4344,12 +4392,13 @@
       "dome_pct": 32.0,
       "fpts": 90,
       "avg_pts": 8.2,
+      "join_name_x": "C.Little",
       "off_stall_rate_ytd": 40.8,
       "def_stall_rate_ytd": 46.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pfdod5cds77uznkotipk",
       "match_name": "C.Little",
       "own_pct": 56.7,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4382,12 +4431,13 @@
       "dome_pct": 8.0,
       "fpts": 89,
       "avg_pts": 8.1,
+      "join_name_x": "H.Butker",
       "off_stall_rate_ytd": 37.7,
       "def_stall_rate_ytd": 37.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/ove4pmnrtqtuyta6rrlc",
       "match_name": "H.Butker",
       "own_pct": 74.2,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4420,12 +4470,13 @@
       "dome_pct": 53.0,
       "fpts": 88,
       "avg_pts": 8.0,
+      "join_name_x": "J.Bates",
       "off_stall_rate_ytd": 42.6,
       "def_stall_rate_ytd": 46.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/heh3zqyv3tqapnpnzgoj",
       "match_name": "J.Bates",
       "own_pct": 94.0,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4458,12 +4509,13 @@
       "dome_pct": 26.0,
       "fpts": 87,
       "avg_pts": 8.7,
+      "join_name_x": "J.Slye",
       "off_stall_rate_ytd": 57.1,
       "def_stall_rate_ytd": 45.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/xokfs27mtqrbb0y47ahn",
       "match_name": "J.Slye",
       "own_pct": 1.9,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4496,12 +4548,13 @@
       "dome_pct": 4.0,
       "fpts": 86,
       "avg_pts": 7.8,
+      "join_name_x": "E.McPherson",
       "off_stall_rate_ytd": 50.0,
       "def_stall_rate_ytd": 37.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/cpvujaqwscupzvbbx7oe",
       "match_name": "E.McPherson",
       "own_pct": 25.0,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4534,12 +4587,13 @@
       "dome_pct": 30.0,
       "fpts": 84,
       "avg_pts": 9.3,
+      "join_name_x": "C.Santos",
       "off_stall_rate_ytd": 54.5,
       "def_stall_rate_ytd": 38.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/w5mfvjfuflbitwuji1yx",
       "match_name": "C.Santos",
       "own_pct": 32.1,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4572,12 +4626,13 @@
       "dome_pct": 87.0,
       "fpts": 82,
       "avg_pts": 7.5,
+      "join_name_x": "C.Ryland",
       "off_stall_rate_ytd": 42.0,
       "def_stall_rate_ytd": 42.6,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hqbrncv4ktphfcmkf23g",
       "match_name": "C.Ryland",
       "own_pct": 4.0,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4610,12 +4665,13 @@
       "dome_pct": 12.0,
       "fpts": 81,
       "avg_pts": 7.4,
+      "join_name_x": "M.Prater",
       "off_stall_rate_ytd": 43.9,
       "def_stall_rate_ytd": 51.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pj981bi535y4jwy6skr1",
       "match_name": "M.Prater",
       "own_pct": 54.2,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4648,12 +4704,13 @@
       "dome_pct": 27.0,
       "fpts": 80,
       "avg_pts": 7.3,
+      "join_name_x": "W.Lutz",
       "off_stall_rate_ytd": 44.7,
       "def_stall_rate_ytd": 68.2,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/lcfurzhyjudmrwjxkgfs",
       "match_name": "W.Lutz",
       "own_pct": 22.7,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4686,12 +4743,13 @@
       "dome_pct": 14.0,
       "fpts": 80,
       "avg_pts": 8.0,
+      "join_name_x": "R.Patterson",
       "off_stall_rate_ytd": 56.8,
       "def_stall_rate_ytd": 48.0,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/gzvyb1u3dueikfy3otlq",
       "match_name": "R.Patterson",
       "own_pct": 1.1,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4724,12 +4782,13 @@
       "dome_pct": 18.0,
       "fpts": 71,
       "avg_pts": 6.5,
+      "join_name_x": "A.Szmyt",
       "off_stall_rate_ytd": 52.9,
       "def_stall_rate_ytd": 56.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tkah6glpysuyq2a54gts",
       "match_name": "A.Szmyt",
       "own_pct": 0.8,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4762,12 +4821,13 @@
       "dome_pct": 15.0,
       "fpts": 70,
       "avg_pts": 6.4,
+      "join_name_x": "R.Fitzgerald",
       "off_stall_rate_ytd": 46.3,
       "def_stall_rate_ytd": 52.3,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/abfug5vjak5ixdcqca7x",
       "match_name": "R.Fitzgerald",
       "own_pct": 3.8,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4800,12 +4860,13 @@
       "dome_pct": 20.0,
       "fpts": 69,
       "avg_pts": 6.3,
+      "join_name_x": "J.Elliott",
       "off_stall_rate_ytd": 42.5,
       "def_stall_rate_ytd": 48.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/v35j7b3tofdn0kfskdhj",
       "match_name": "J.Elliott",
       "own_pct": 64.5,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4838,12 +4899,13 @@
       "dome_pct": 68.0,
       "fpts": 69,
       "avg_pts": 6.3,
+      "join_name_x": "B.Grupe",
       "off_stall_rate_ytd": 65.8,
       "def_stall_rate_ytd": 47.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/de3vz6xjjo9paba6encd",
       "match_name": "B.Grupe",
       "own_pct": 0.9,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4876,12 +4938,13 @@
       "dome_pct": 29.0,
       "fpts": 68,
       "avg_pts": 6.8,
+      "join_name_x": "M.Gay",
       "off_stall_rate_ytd": 36.6,
       "def_stall_rate_ytd": 47.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qeca8ofwxhytcioy29wc",
       "match_name": "M.Gay",
       "own_pct": 21.8,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": "DEV",
@@ -4914,12 +4977,13 @@
       "dome_pct": 74.0,
       "fpts": 65,
       "avg_pts": 6.5,
+      "join_name_x": "D.Carlson",
       "off_stall_rate_ytd": 55.6,
       "def_stall_rate_ytd": 47.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/gsvj7rtvqwbwdeho8whf",
       "match_name": "D.Carlson",
       "own_pct": 12.8,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4952,12 +5016,13 @@
       "dome_pct": 18.0,
       "fpts": 59,
       "avg_pts": 7.4,
+      "join_name_x": "B.McManus",
       "off_stall_rate_ytd": 36.0,
       "def_stall_rate_ytd": 39.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qvwi9b1vfkn0wlmdl7ej",
       "match_name": "B.McManus",
       "own_pct": 11.5,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -4990,12 +5055,13 @@
       "dome_pct": 71.0,
       "fpts": 56,
       "avg_pts": 11.2,
+      "join_name_x": "S.Shrader",
       "off_stall_rate_ytd": 39.7,
       "def_stall_rate_ytd": 40.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/i63zrj1idnss37cpe1yo",
       "match_name": "S.Shrader",
       "own_pct": 1.7,
-      "join_name": "S.Shrader",
+      "join_name_y": "S.Shrader",
       "report_status": "IR. Injured Reserve",
       "practice_status": "Knee - ACL + MCL",
       "roster_status": "RES",
@@ -5028,12 +5094,13 @@
       "dome_pct": 44.0,
       "fpts": 50,
       "avg_pts": 6.2,
+      "join_name_x": "J.Karty",
       "off_stall_rate_ytd": 36.8,
       "def_stall_rate_ytd": 57.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/j51z79en8vs3qdgkvnn5",
       "match_name": "J.Karty",
       "own_pct": 6.2,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -5066,12 +5133,13 @@
       "dome_pct": 72.0,
       "fpts": 48,
       "avg_pts": 8.0,
+      "join_name_x": "M.Badgley",
       "off_stall_rate_ytd": 39.7,
       "def_stall_rate_ytd": 40.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vws2nawkkxxb8s82ny1s",
       "match_name": "M.Badgley",
       "own_pct": 20.8,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -5104,12 +5172,13 @@
       "dome_pct": 70.0,
       "fpts": 44,
       "avg_pts": 6.3,
+      "join_name_x": "J.Romo",
       "off_stall_rate_ytd": 47.5,
       "def_stall_rate_ytd": 51.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pgbqca2tf4hcq4vxv13m",
       "match_name": null,
       "own_pct": 0.0,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": "CUT",
@@ -5142,12 +5211,13 @@
       "dome_pct": 37.0,
       "fpts": 38,
       "avg_pts": 7.6,
+      "join_name_x": "G.Gano",
       "off_stall_rate_ytd": 52.7,
       "def_stall_rate_ytd": 42.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wp5wochy7uuqcgyjcrrd",
       "match_name": "G.Gano",
       "own_pct": 0.7,
-      "join_name": "G.Gano",
+      "join_name_y": "G.Gano",
       "report_status": "IR. Injured Reserve",
       "practice_status": "Neck",
       "roster_status": "RES",
@@ -5180,12 +5250,13 @@
       "dome_pct": 100.0,
       "fpts": 33,
       "avg_pts": 11.0,
+      "join_name_x": "Z.Gonzalez",
       "off_stall_rate_ytd": 47.5,
       "def_stall_rate_ytd": 51.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tytaxive5qhdumjqy2o2",
       "match_name": "Z.Gonzalez",
       "own_pct": 4.2,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -5218,12 +5289,13 @@
       "dome_pct": 0.0,
       "fpts": 32,
       "avg_pts": 10.7,
+      "join_name_x": "J.Moody",
       "off_stall_rate_ytd": 54.5,
       "def_stall_rate_ytd": 38.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wkqqi3zfucoti8g5ncob",
       "match_name": "J.Moody",
       "own_pct": 5.8,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": "DEV",
@@ -5256,12 +5328,13 @@
       "dome_pct": 59.0,
       "fpts": 27,
       "avg_pts": 6.8,
+      "join_name_x": "Y.Koo",
       "off_stall_rate_ytd": 52.7,
       "def_stall_rate_ytd": 42.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/j70hqvbaerk5ft50appk",
       "match_name": "Y.Koo",
       "own_pct": 20.3,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -5294,12 +5367,13 @@
       "dome_pct": 60.0,
       "fpts": 22,
       "avg_pts": 7.3,
+      "join_name_x": "H.Mevis",
       "off_stall_rate_ytd": 36.8,
       "def_stall_rate_ytd": 57.5,
       "headshot_url": "https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png",
       "match_name": "H.Mevis",
       "own_pct": 9.0,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -5332,12 +5406,13 @@
       "dome_pct": 44.0,
       "fpts": 22,
       "avg_pts": 5.5,
+      "join_name_x": "M.Wright",
       "off_stall_rate_ytd": 63.3,
       "def_stall_rate_ytd": 45.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/htrs1hrrfok88fllrtex",
       "match_name": "M.Wright",
       "own_pct": 0.6,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": "CUT",
@@ -5370,12 +5445,13 @@
       "dome_pct": 38.0,
       "fpts": 20,
       "avg_pts": 6.7,
+      "join_name_x": "L.Havrisik",
       "off_stall_rate_ytd": 36.0,
       "def_stall_rate_ytd": 39.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
       "match_name": "L.Havrisik",
       "own_pct": 1.3,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -5408,12 +5484,13 @@
       "dome_pct": 14.0,
       "fpts": 12,
       "avg_pts": 3.0,
+      "join_name_x": "J.McAtamney",
       "off_stall_rate_ytd": 52.7,
       "def_stall_rate_ytd": 42.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/k4klhpsp9mlcrpd8kcst",
       "match_name": "J.McAtamney",
       "own_pct": 0.6,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": "DEV",
@@ -5446,12 +5523,13 @@
       "dome_pct": 0.0,
       "fpts": -1,
       "avg_pts": -1.0,
+      "join_name_x": "J.Gillan",
       "off_stall_rate_ytd": 52.7,
       "def_stall_rate_ytd": 42.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/kxwddoiqqghc1kxaajco",
       "match_name": null,
       "own_pct": 0.0,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": null,
@@ -5486,12 +5564,13 @@
       "dome_pct": 43.0,
       "fpts": 100,
       "avg_pts": 10.0,
+      "join_name_x": "E.Pineiro",
       "off_stall_rate_ytd": 43.8,
       "def_stall_rate_ytd": 43.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/l4rrfcuczjau7q02h2iz",
       "match_name": "E.Pineiro",
       "own_pct": 19.0,
-      "join_name": "E.Pineiro",
+      "join_name_y": "E.Pineiro",
       "report_status": "Out for Week 12 vs. Carolina. Expected Return - Week 13",
       "practice_status": "Hamstring",
       "roster_status": null,
@@ -5524,12 +5603,13 @@
       "dome_pct": 29.0,
       "fpts": 68,
       "avg_pts": 6.8,
+      "join_name_x": "M.Gay",
       "off_stall_rate_ytd": 36.6,
       "def_stall_rate_ytd": 47.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/qeca8ofwxhytcioy29wc",
       "match_name": "M.Gay",
       "own_pct": 21.8,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": "DEV",
@@ -5562,12 +5642,13 @@
       "dome_pct": 71.0,
       "fpts": 56,
       "avg_pts": 11.2,
+      "join_name_x": "S.Shrader",
       "off_stall_rate_ytd": 39.7,
       "def_stall_rate_ytd": 40.8,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/i63zrj1idnss37cpe1yo",
       "match_name": "S.Shrader",
       "own_pct": 1.7,
-      "join_name": "S.Shrader",
+      "join_name_y": "S.Shrader",
       "report_status": "IR. Injured Reserve",
       "practice_status": "Knee - ACL + MCL",
       "roster_status": "RES",
@@ -5600,12 +5681,13 @@
       "dome_pct": 70.0,
       "fpts": 44,
       "avg_pts": 6.3,
+      "join_name_x": "J.Romo",
       "off_stall_rate_ytd": 47.5,
       "def_stall_rate_ytd": 51.1,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pgbqca2tf4hcq4vxv13m",
       "match_name": null,
       "own_pct": 0.0,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": "CUT",
@@ -5638,12 +5720,13 @@
       "dome_pct": 37.0,
       "fpts": 38,
       "avg_pts": 7.6,
+      "join_name_x": "G.Gano",
       "off_stall_rate_ytd": 52.7,
       "def_stall_rate_ytd": 42.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wp5wochy7uuqcgyjcrrd",
       "match_name": "G.Gano",
       "own_pct": 0.7,
-      "join_name": "G.Gano",
+      "join_name_y": "G.Gano",
       "report_status": "IR. Injured Reserve",
       "practice_status": "Neck",
       "roster_status": "RES",
@@ -5676,12 +5759,13 @@
       "dome_pct": 0.0,
       "fpts": 32,
       "avg_pts": 10.7,
+      "join_name_x": "J.Moody",
       "off_stall_rate_ytd": 54.5,
       "def_stall_rate_ytd": 38.5,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wkqqi3zfucoti8g5ncob",
       "match_name": "J.Moody",
       "own_pct": 5.8,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": "DEV",
@@ -5714,12 +5798,13 @@
       "dome_pct": 44.0,
       "fpts": 22,
       "avg_pts": 5.5,
+      "join_name_x": "M.Wright",
       "off_stall_rate_ytd": 63.3,
       "def_stall_rate_ytd": 45.7,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/htrs1hrrfok88fllrtex",
       "match_name": "M.Wright",
       "own_pct": 0.6,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": "CUT",
@@ -5752,12 +5837,13 @@
       "dome_pct": 14.0,
       "fpts": 12,
       "avg_pts": 3.0,
+      "join_name_x": "J.McAtamney",
       "off_stall_rate_ytd": 52.7,
       "def_stall_rate_ytd": 42.9,
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/k4klhpsp9mlcrpd8kcst",
       "match_name": "J.McAtamney",
       "own_pct": 0.6,
-      "join_name": null,
+      "join_name_y": null,
       "report_status": null,
       "practice_status": null,
       "roster_status": "DEV",
