@@ -25,12 +25,22 @@ const DEFAULT_SCORING = {
   fg_miss: -1, xp_made: 1, xp_miss: -1
 };
 
+const SETTING_LABELS = {
+  fg0_19: "FG (0-19 yds)",
+  fg20_29: "FG (20-29 yds)",
+  fg30_39: "FG (30-39 yds)",
+  fg40_49: "FG (40-49 yds)",
+  fg50_59: "FG (50-59 yds)",
+  fg60_plus: "FG (60+ yds)",
+  fg_miss: "Missed FG",
+  xp_made: "PAT Made",
+  xp_miss: "PAT Missed"
+};
+
 const HeaderCell = ({ label, description, avg }) => (
-  // REMOVED: whitespace-nowrap
-  // ADDED: leading-tight, min-w class to encourage wrapping
-  <th className="px-3 py-3 text-center group relative cursor-help leading-tight min-w-[80px] align-bottom">
-    <div className="flex items-center justify-center gap-1 h-full">
-      <span>{label}</span>
+  <th className="px-2 py-3 text-center align-middle group relative cursor-help leading-tight min-w-[90px]">
+    <div className="flex flex-col items-center justify-center h-full gap-1">
+      <span className="block">{label}</span>
       <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
     </div>
     <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal">
@@ -224,6 +234,14 @@ const MathCard = ({ player }) => {
   );
 };
 
+const DeepDiveRow = ({ player }) => (
+  <tr className="bg-slate-900/50 border-b border-slate-800">
+    <td colSpan="11" className="p-4">
+      <MathCard player={player} />
+    </td>
+  </tr>
+);
+
 const App = () => {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState('potential');
@@ -352,7 +370,6 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -362,7 +379,7 @@ const App = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {Object.entries(scoring).map(([key, val]) => (
                 <div key={key}>
-                  <label className="block text-xs uppercase text-slate-500 font-bold mb-1">{key.replace(/_/g, ' ')}</label>
+                  <label className="block text-xs uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS[key] || key}</label>
                   <input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white focus:border-blue-500 focus:outline-none" />
                 </div>
               ))}
@@ -373,7 +390,6 @@ const App = () => {
           </div>
         )}
 
-        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
@@ -393,8 +409,8 @@ const App = () => {
                   <tr>
                     <th className="px-6 py-3">Rank</th>
                     <th className="px-6 py-3">Player</th>
-                    <HeaderCell label="Proj" description="Projected Points (Custom Scoring)" />
-                    <HeaderCell label="Grade" description="Matchup Grade (0-100)" />
+                    <HeaderCell label="Projection" description="Projected Points (Custom Scoring)" />
+                    <HeaderCell label="Matchup Grade" description="Matchup Grade (0-100)" />
                     <th className="px-6 py-3 text-center">Weather</th>
                     <HeaderCell label="Offensive Stall % (L4)" description="Offense Stall Rate (L4)" avg={leagueAvgs.off_stall} />
                     <HeaderCell label="Opponent Stall % (L4)" description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
@@ -452,11 +468,11 @@ const App = () => {
                     <HeaderCell label="FPts" description="Total Fantasy Points (Custom Scoring)" avg={leagueAvgs.fpts} />
                     <HeaderCell label="Avg FPts" description="Average Fantasy Points per Game" />
                     <th className="px-6 py-3 text-center">FG (M/A)</th>
-                    <HeaderCell label="50+ Yds" description="Long Distance Makes" />
-                    <HeaderCell label="Dome %" description="Dome Games Played" />
-                    <HeaderCell label="FG RZ Trips" description="Drives reaching FG Range" />
-                    <HeaderCell label="Off Stall (YTD)" description="Season-Long Offensive Stall Rate" />
-                    <HeaderCell label="Def Stall (YTD)" description="Season-Long Defensive Stall Rate (Team's own defense)" />
+                    <HeaderCell label="Long Distance (50+ Yards)" description="Long Distance Makes" />
+                    <HeaderCell label="Dome Games (%)" description="Dome Games Played" />
+                    <HeaderCell label="Red Zone Trips (Resulting in FG)" description="Drives reaching FG Range" />
+                    <HeaderCell label="Offense Stall % (Season)" description="Season-Long Offensive Stall Rate" />
+                    <HeaderCell label="Defense Stall % (Season)" description="Season-Long Defensive Stall Rate (Team's own defense)" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
@@ -480,8 +496,6 @@ const App = () => {
                       <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded ${row.longs >= 4 ? 'bg-amber-500/20 text-amber-400' : 'text-slate-500'}`}>{row.longs}</span></td>
                       <td className="px-6 py-4 text-center text-blue-300">{row.dome_pct}%</td>
                       <td className="px-6 py-4 text-center text-slate-300">{row.rz_trips}</td>
-                      
-                      {/* STALL RATES (WITH NULL SAFETY) */}
                       <td className="px-6 py-4 text-center font-mono text-blue-300">{row.off_stall_rate_ytd ?? 0}%</td>
                       <td className="px-6 py-4 text-center font-mono text-slate-400">{row.def_stall_rate_ytd ?? 0}%</td>
                     </tr>
