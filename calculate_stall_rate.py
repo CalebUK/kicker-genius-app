@@ -35,7 +35,7 @@ STADIUM_COORDS = {
 
 def get_current_nfl_week():
     try:
-        schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
+        schedule = nfl.load_schedules(seasons=[CURRENT_SEASON])
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         today = datetime.now().strftime('%Y-%m-%d')
         upcoming = schedule[schedule['gameday'] >= today]
@@ -51,15 +51,7 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     lat, lon = coords
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-        # Retry logic for weather API
-        for i in range(3):
-            try:
-                data = requests.get(url, timeout=5).json()
-                break
-            except:
-                time.sleep(2)
-        else: return 0, "API Error"
-
+        data = requests.get(url, timeout=5).json()
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
         idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
@@ -149,7 +141,7 @@ def load_injury_data_safe(season, target_week):
     if not scraped.empty: return scraped
     
     try:
-        injuries = load_data_with_retry(lambda: nfl.load_injuries(seasons=[season]), "Injuries")
+        injuries = nfl.load_injuries(seasons=[season])
         if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
         df = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
         df.rename(columns={'practice_status': 'practice_status'}, inplace=True) 
@@ -357,8 +349,10 @@ def run_analysis():
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
+        # Merge into stats (Left Join to keep all kickers)
         stats = pd.merge(stats, off_stall_seas, left_on='team', right_on='posteam', how='left')
         stats = pd.merge(stats, def_stall_seas, left_on='team', right_on='defteam', how='left')
+        
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
 
