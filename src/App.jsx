@@ -51,7 +51,7 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
       <div className="flex flex-col items-center justify-center h-full gap-0.5">
         {/* LEAGUE AVERAGE DISPLAY (ABOVE HEADER) */}
         {avg !== undefined && (
-           <div className="text-[10px] font-mono text-slate-500 bg-slate-900/50 px-1.5 rounded border border-slate-800">
+           <div className="text-[10px] font-mono text-slate-500 bg-slate-900/50 px-1.5 rounded border border-slate-800 mb-0.5">
              Avg: {Number(avg).toFixed(1)}
            </div>
         )}
@@ -66,8 +66,6 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
             )
           )}
         </div>
-        {/* Info Icon (Moved below text for cleaner stack or keep inline if prefered) */}
-        {/* keeping inline above in flex-row inside name if needed, but description is tooltip */}
       </div>
       
       {/* TOOLTIP */}
@@ -436,19 +434,7 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-
-     // NEW LOGIC: Recalculate L3 sums based on rounded weekly values
-     const l3_games = p.history?.l3_games || [];
-     const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(g.proj), 0);
-     const l3_act_sum = l3_games.reduce((acc, g) => acc + g.act, 0); // Actuals are ints
-
-     return { 
-        ...pWithYtd, 
-        proj: parseFloat(proj), 
-        l3_proj_sum,
-        l3_act_sum,
-        acc_diff: l3_act_sum - l3_proj_sum
-     };
+     return { ...pWithYtd, proj: parseFloat(proj), acc_diff: (p.history?.l3_actual||0) - (p.history?.l3_proj||0) };
   })
   .filter(p => p.proj > 0); 
 
@@ -486,14 +472,15 @@ const App = () => {
 
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
-      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
+      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
+      
       return {
           ...p, 
           fpts: pts, 
-          avg_fpts: (p.games > 0 ? (pts/p.games) : 0), 
+          avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), 
           pct_val: pct, 
-          pct: pct.toFixed(1), 
+          pct: pct, 
           longs: longMakes 
       };
   }).sort((a, b) => {
