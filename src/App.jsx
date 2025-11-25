@@ -122,11 +122,15 @@ const HistoryBars = ({ games }) => {
                 {g.act >= projRounded ? "+" : ""}{diff}
               </span>
             </div>
+            
+            {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span>
                </div>
             </div>
+
+            {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -142,6 +146,7 @@ const HistoryBars = ({ games }) => {
 const PlayerCell = ({ player, subtext }) => {
   const injuryColor = player.injury_color || 'slate-600'; 
   const statusText = player.injury_status || '';
+  
   let borderColor = 'border-slate-600';
   if (injuryColor.includes('green')) borderColor = 'border-green-500';
   if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
@@ -164,11 +169,21 @@ const PlayerCell = ({ player, subtext }) => {
     ? '/assets/aubrey_custom.png' 
     : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
 
+  // --- PARSE INJURY DETAILS FOR 3-FOLD DISPLAY ---
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
-  let displayInjury = '', displayStatus = '';
-  if (match) { const reportStatus = match[1]; const injuryType = match[2]; displayInjury = `${player.injury_status}: ${injuryType}`; displayStatus = reportStatus; } 
-  else { displayInjury = details; }
+  
+  let displayInjury = '';
+  let displayStatus = '';
+  
+  if (match) {
+      const reportStatus = match[1];
+      const injuryType = match[2];
+      displayInjury = `${player.injury_status}: ${injuryType}`;
+      displayStatus = reportStatus;
+  } else {
+      displayInjury = details; 
+  }
 
   return (
     <td className="px-3 py-4 font-medium text-white">
@@ -184,7 +199,7 @@ const PlayerCell = ({ player, subtext }) => {
                     alt={player.kicker_player_name}
                     className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} 
                     onError={(e) => { 
-                        e.target.onerror = null; // Prevent infinite loop
+                        e.target.onerror = null;
                         if (e.target.src.includes('aubrey_custom.png')) {
                             e.target.src = player.headshot_url;
                         } else {
@@ -220,6 +235,7 @@ const PlayerCell = ({ player, subtext }) => {
 const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
 
+  // --- ROUNDED TREND LOGIC ---
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
   const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
   const l3_diff = l3_act - l3_proj;
@@ -227,8 +243,10 @@ const MathCard = ({ player, leagueAvgs, week }) => {
   let trendSign = "";
   if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
   else if (l3_diff < -2.5) { trendColor = "text-red-400"; }
+
   const lgOffStall = leagueAvgs?.off_stall || 40;
   const lgDefStall = leagueAvgs?.def_stall || 40;
+
   const baseRaw = (player.avg_pts * (player.grade / 90));
   const baseMult = (player.grade / 90).toFixed(2);
   const offRaw = player.off_cap_val; 
@@ -241,6 +259,7 @@ const MathCard = ({ player, leagueAvgs, week }) => {
           <Calculator className="w-4 h-4 text-emerald-400" />
           <h3 className="font-bold text-white text-sm">Math Worksheet: {player.kicker_player_name}</h3>
         </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
@@ -303,7 +322,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
   };
 
   const displayPlayers = players.filter(p => {
-      if (p.proj < 0) return false; // Allow 0, but not negative if that ever happens
+      if (p.proj <= 0) return false;
       const status = getGameStatus(p.game_dt);
       if (filter === 'ALL') return true;
       return filter === status;
@@ -507,6 +526,7 @@ const App = () => {
      let valA = a[sortConfig.key];
      let valB = b[sortConfig.key];
      if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
+     
      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
      return 0;
@@ -515,11 +535,18 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
+  // YTD Processing with League Averages
   const calculateLeagueAvg = (arr, key) => {
       if (!arr || arr.length === 0) return 0;
       const sum = arr.reduce((acc, curr) => acc + (parseFloat(curr[key]) || 0), 0);
       return sum / arr.length;
   };
+
+  // Identify Top 5 Scorers for Fire Emoji
+  const top5Ytd = ytd.map(p => ({ ...p, fpts_calc: calcFPts(p) })).sort((a, b) => b.fpts_calc - a.fpts_calc).slice(0, 5).map(p => p.kicker_player_name);
+
+  // Re-map processed to include isTop5 flag
+  processed = processed.map(p => ({ ...p, isTop5: top5Ytd.includes(p.kicker_player_name) }));
 
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
@@ -555,11 +582,49 @@ const App = () => {
       def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd'),
   };
 
+  // --- INJURY BUCKETS ---
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
   const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful' || k.injury_status === 'Inactive');
   const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
 
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
+
+  // Helper to render injury card with logic
+  const renderInjuryCard = (k, i, borderColor, textColor) => {
+      const details = k.injury_details || '';
+      const match = details.match(/^(.+?)\s\((.+)\)$/);
+      let displayInjury = k.injury_details;
+      let displayStatus = '';
+      
+      if (match) {
+          const reportStatus = match[1];
+          const injuryType = match[2];
+          displayInjury = `${k.injury_status}: ${injuryType}`;
+          displayStatus = reportStatus;
+      }
+
+      return (
+         <div key={i} className={`flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border ${borderColor}`}>
+            <img 
+                src={k.headshot_url} 
+                className={`w-12 h-12 rounded-full border-2 object-cover ${borderColor.replace('border', 'border-')}`} 
+                onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}
+            />
+            <div>
+               <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+               {match ? (
+                   <>
+                       <div className={`text-xs font-bold ${textColor}`}>{displayInjury}</div>
+                       <div className="text-xs text-slate-400 italic">{displayStatus}</div>
+                   </>
+               ) : (
+                   <div className={`text-xs ${textColor}`}>{displayInjury}</div>
+               )}
+               <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+            </div>
+         </div>
+      );
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
@@ -586,7 +651,6 @@ const App = () => {
           </div>
         </div>
 
-        {/* Navigation */}
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
