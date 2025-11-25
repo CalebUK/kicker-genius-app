@@ -218,6 +218,20 @@ const MathCard = ({ player, leagueAvgs, week }) => {
   const lgOffStall = leagueAvgs?.off_stall || 40;
   const lgDefStall = leagueAvgs?.def_stall || 40;
 
+  // --- Calculation Variables for Display ---
+  // Base
+  const baseRaw = (player.avg_pts * (player.grade / 90));
+  
+  // Offense
+  const offRaw = player.off_cap_val; // JSON value is actually pre-weight? No, JSON is post-weight usually.
+  // Wait, logic in python: off_cap = w_team_score * s_off * 1.2. 
+  // And weighted_proj = ... + (off_cap * 0.30)
+  // In React calcProj: const off_cap_scaled = (p.off_cap_val || 0) * scaleFactor;
+  // So player.off_cap_val IS the value before the 0.3 multiplier.
+  
+  // Defense
+  const defRaw = player.def_cap_val; 
+
   return (
     <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-3">
@@ -228,7 +242,7 @@ const MathCard = ({ player, leagueAvgs, week }) => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
           {/* 1. GRADE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
-            <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">1. MATCHUP GRADE</div>
+            <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
             
             {/* Offense Breakdown */}
             <div>
@@ -275,18 +289,19 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             </div>
           </div>
 
-          {/* 2. WEIGHTED PROJECTION */}
+          {/* 2. WEIGHTED PROJECTION (UPDATED) */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
-            <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">2. WEIGHTED PROJ</div>
+            <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">WEIGHTED PROJECTION</div>
             
             {/* Base */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Base (50%)</span>
-                    <span className="font-mono text-white">{(player.avg_pts * (player.grade / 90)).toFixed(1)}</span>
+                    <span className="font-mono text-white">{(baseRaw * 0.5).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500">
-                    Avg {player.avg_pts} × {(player.grade/90).toFixed(2)} (Mult)
+                <div className="text-[9px] text-slate-500 flex justify-between">
+                    <span>Raw: {baseRaw.toFixed(1)}</span>
+                    <span>× 0.50</span>
                 </div>
             </div>
 
@@ -294,10 +309,11 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Offense (30%)</span>
-                    <span className="font-mono text-white">{player.off_cap_val}</span>
+                    <span className="font-mono text-white">{(offRaw * 0.3).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500">
-                    Exp Score {player.w_team_score} × {((player.off_share || 0.35)*100).toFixed(0)}% × 1.2 (Boom)
+                <div className="text-[9px] text-slate-500 flex justify-between">
+                    <span>Raw: {offRaw}</span>
+                    <span>× 0.30</span>
                 </div>
             </div>
 
@@ -305,11 +321,21 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Defense (20%)</span>
-                    <span className="font-mono text-white">{player.def_cap_val}</span>
+                    <span className="font-mono text-white">{(defRaw * 0.2).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500">
-                    Opp Allow {player.w_def_allowed} × 35% × 1.2 (Boom)
+                <div className="text-[9px] text-slate-500 flex justify-between">
+                    <span>Raw: {defRaw}</span>
+                    <span>× 0.20</span>
                 </div>
+            </div>
+
+            {/* Final Summary Line */}
+            <div className="mt-auto pt-2 border-t border-slate-700">
+                 <div className="flex justify-between font-bold text-white text-[11px]">
+                    <span>Week {week} Projection</span>
+                    <span className="text-emerald-400 text-lg">{player.proj}</span>
+                 </div>
+                 <div className="text-[9px] text-right text-slate-500">(Rounded)</div>
             </div>
           </div>
           
@@ -458,7 +484,6 @@ const App = () => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
-      
       return {
           ...p, 
           fpts: pts, 
