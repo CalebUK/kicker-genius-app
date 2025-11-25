@@ -49,8 +49,12 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
       className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}
     >
       <div className="flex flex-col items-center justify-center h-full gap-0.5">
-        
-        {/* REMOVED VISIBLE AVERAGE FROM HERE - NOW ONLY IN TOOLTIP */}
+        {/* LEAGUE AVERAGE DISPLAY (ABOVE HEADER) */}
+        {avg !== undefined && (
+           <div className="text-[10px] font-mono text-slate-500 bg-slate-900/50 px-1.5 rounded border border-slate-800 mb-0.5">
+             Avg: {Number(avg).toFixed(1)}
+           </div>
+        )}
         
         <div className="flex items-center gap-1 mt-0.5">
           <span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>
@@ -62,7 +66,6 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
             )
           )}
         </div>
-        <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
       </div>
       
       {/* TOOLTIP */}
@@ -98,14 +101,13 @@ const HistoryBars = ({ games }) => {
         const maxVal = Math.max(20, projRounded, g.act); 
         const projPct = (projRounded / maxVal) * 100;
         const actPct = (g.act / maxVal) * 100;
-        const isBeat = g.act >= projRounded;
         
         return (
           <div key={i} className="text-[10px]">
             <div className="flex justify-between text-slate-400 mb-0.5 font-bold">
               <span>Wk {g.week} vs {g.opp}</span>
-              <span className={isBeat ? "text-green-400" : "text-red-400"}>
-                {isBeat ? "+" : ""}{diff}
+              <span className={g.act >= projRounded ? "text-green-400" : "text-red-400"}>
+                {g.act >= projRounded ? "+" : ""}{diff}
               </span>
             </div>
             
@@ -118,7 +120,7 @@ const HistoryBars = ({ games }) => {
 
             {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
-               <div className={`${isBeat ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
+               <div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
                </div>
             </div>
@@ -173,46 +175,52 @@ const PlayerCell = ({ player, subtext }) => {
 
   return (
     <td className="px-3 py-4 font-medium text-white">
-      <div className="flex items-center gap-3">
-        <div className="relative group flex-shrink-0">
-          <img 
-            src={imageUrl} 
-            alt={player.kicker_player_name}
-            className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`}
-            onError={(e) => {
-                if (e.target.src.includes('aubrey_custom.png') && player.headshot_url) {
-                    e.target.src = player.headshot_url;
-                } else {
-                    e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
-                }
-            }} 
-          />
-          {statusText !== '' && (
-             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-auto whitespace-nowrap p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
-                {/* 3-FOLD DISPLAY */}
-                {match ? (
-                    <>
-                        <div className={`font-bold ${textColor} mb-0.5`}>{displayInjury}</div>
-                        <div className="text-slate-400 italic">{displayStatus}</div>
-                    </>
-                ) : (
-                    <div className={`font-bold ${textColor} mb-1`}>{player.injury_status} <span className="text-slate-400 font-normal">({details})</span></div>
-                )}
-             </div>
-          )}
-        </div>
-        <div className="min-w-0 flex-1">
-          {/* NAME FIX: Smaller text on mobile, wrap enabled, removed truncate */}
-          <div className="text-xs md:text-sm font-bold text-white whitespace-normal break-words leading-tight">
+      <div className="flex flex-col justify-center">
+          {/* TOP: NAME */}
+          <div className="text-sm font-bold text-white leading-tight mb-2 break-words">
             {player.kicker_player_name}
           </div>
-          <div className="text-[10px] text-slate-500 truncate">{subtext}</div>
-          {player.own_pct > 0 && (
-             <div className={`text-[9px] mt-0.5 font-bold ${ownColor}`}>
-               Own: {player.own_pct.toFixed(1)}%
-             </div>
-          )}
-        </div>
+          
+          {/* BOTTOM: IMAGE + DETAILS SIDE-BY-SIDE */}
+          <div className="flex items-center gap-3">
+              {/* Left: Image with Tooltip */}
+              <div className="relative group flex-shrink-0">
+                <img 
+                  src={imageUrl} 
+                  alt={player.kicker_player_name}
+                  className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`}
+                  onError={(e) => {
+                      if (e.target.src.includes('aubrey_custom.png') && player.headshot_url) {
+                          e.target.src = player.headshot_url;
+                      } else {
+                          e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
+                      }
+                  }} 
+                />
+                {statusText !== '' && (
+                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-auto whitespace-nowrap p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
+                      {match ? (
+                          <>
+                              <div className={`font-bold ${textColor} mb-0.5`}>{displayInjury}</div>
+                              <div className="text-slate-400 italic">{displayStatus}</div>
+                          </>
+                      ) : (
+                          <div className={`font-bold ${textColor} mb-1`}>{player.injury_status} <span className="text-slate-400 font-normal">({details})</span></div>
+                      )}
+                   </div>
+                )}
+              </div>
+
+              {/* Right: Matchup & Ownership */}
+              <div className="min-w-0">
+                <div className="text-xs text-slate-400 truncate">{subtext}</div>
+                {player.own_pct > 0 && (
+                   <div className={`text-[10px] mt-0.5 font-bold ${ownColor}`}>
+                     Own: {player.own_pct.toFixed(1)}%
+                   </div>
+                )}
+              </div>
+          </div>
       </div>
     </td>
   );
@@ -458,19 +466,7 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-
-     // NEW LOGIC: Recalculate L3 sums based on rounded weekly values
-     const l3_games = p.history?.l3_games || [];
-     const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(g.proj), 0);
-     const l3_act_sum = l3_games.reduce((acc, g) => acc + g.act, 0); // Actuals are ints
-
-     return { 
-        ...pWithYtd, 
-        proj: parseFloat(proj), 
-        l3_proj_sum,
-        l3_act_sum,
-        acc_diff: l3_act_sum - l3_proj_sum
-     };
+     return { ...pWithYtd, proj: parseFloat(proj), acc_diff: (p.history?.l3_actual||0) - (p.history?.l3_proj||0) };
   })
   .filter(p => p.proj > 0); 
 
@@ -499,18 +495,10 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
-  // YTD Processing with League Averages
-  const calculateLeagueAvg = (arr, key) => {
-      if (!arr || arr.length === 0) return 0;
-      const sum = arr.reduce((acc, curr) => acc + (parseFloat(curr[key]) || 0), 0);
-      return sum / arr.length;
-  };
-
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
-      
       return {
           ...p, 
           fpts: pts, 
@@ -529,17 +517,6 @@ const App = () => {
       if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
   });
-
-  const ytdAvgs = {
-      fpts: calculateLeagueAvg(ytdSorted, 'fpts'),
-      avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'),
-      pct: calculateLeagueAvg(ytdSorted, 'pct_val'),
-      longs: calculateLeagueAvg(ytdSorted, 'longs'),
-      dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'),
-      rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'),
-      off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'),
-      def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd'),
-  };
 
   // --- INJURY BUCKETS ---
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
@@ -671,9 +648,9 @@ const App = () => {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
+                    <th className="w-8 px-2 py-3 align-middle text-center">Rank</th>
                     <th 
-                      className="px-2 py-3 align-middle text-left cursor-pointer group"
+                      className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
                       onClick={() => handleSort('own_pct')}
                     >
                       <div className="flex items-center gap-1">
@@ -688,8 +665,8 @@ const App = () => {
                     <HeaderCell label="Opponent Stall % (L4)" sortKey="def_stall_rate" currentSort={sortConfig} onSort={handleSort} description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
                     <HeaderCell label="Projection Accuracy (L3)" sortKey="proj_acc" currentSort={sortConfig} onSort={handleSort} description="Total Actual vs Projected Points (Last 3 Games)" />
                     <HeaderCell label="Implied Vegas Score Line" sortKey="vegas" currentSort={sortConfig} onSort={handleSort} description="Implied Team Total (Vegas Line & Spread)/2" />
-                    <HeaderCell label="Offensive PF (L4)" sortKey="off_ppg" currentSort={sortConfig} onSort={handleSort} description="Team Points For (L4)" />
-                    <HeaderCell label="Opponent PA (L4)" sortKey="def_pa" currentSort={sortConfig} onSort={handleSort} description="Opp Points Allowed (L4)" />
+                    <HeaderCell label="Offensive PF (L4)" sortKey="off_ppg" currentSort={sortConfig} onSort={handleSort} description="Team Points For (L4)" avg={leagueAvgs.l4_off_ppg} />
+                    <HeaderCell label="Opponent PA (L4)" sortKey="def_pa" currentSort={sortConfig} onSort={handleSort} description="Opp Points Allowed (L4)" avg={leagueAvgs.l4_def_pa} />
                     <th className="px-6 py-3"></th>
                   </tr>
                 </thead>
@@ -697,7 +674,7 @@ const App = () => {
                   {processed.map((row, idx) => (
                     <React.Fragment key={idx}>
                       <tr onClick={() => toggleRow(idx)} className="hover:bg-slate-800/50 cursor-pointer transition-colors">
-                        <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                        <td className="w-8 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                         <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} />
                         <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
                         <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
