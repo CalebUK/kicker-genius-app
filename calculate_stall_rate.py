@@ -107,6 +107,7 @@ def scrape_cbs_injuries():
         if not dfs: return pd.DataFrame()
         combined = pd.concat(dfs, ignore_index=True)
         combined.columns = [c.lower().strip() for c in combined.columns]
+        
         col_map = {}
         for col in combined.columns:
             if 'player' in col: col_map[col] = 'full_name'
@@ -212,7 +213,6 @@ def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
     for _, kicker in current_stats.iterrows():
         pid = kicker['kicker_player_id']
         team = kicker['team']
-        # FIX: Ensure variable is team_schedule to match usage in loop
         team_schedule = schedule[(schedule['week'].isin(weeks_to_analyze)) & 
                                  ((schedule['home_team'] == team) | (schedule['away_team'] == team))].copy()
         games_list = []
@@ -524,7 +524,6 @@ def run_analysis():
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
-        
         final = final.fillna(0)
 
         def process_row(row):
@@ -587,7 +586,6 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
-                # LIVE STATS PASSTHROUGH
                 'wk_fg_0_19': row['wk_fg_0_19'], 'wk_fg_20_29': row['wk_fg_20_29'],
                 'wk_fg_30_39': row['wk_fg_30_39'], 'wk_fg_40_49': row['wk_fg_40_49'],
                 'wk_fg_50_59': row['wk_fg_50_59'], 'wk_fg_60_plus': row['wk_fg_60_plus'],
