@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit } from 'lucide-react';
+// import { Analytics } from '@vercel/analytics/react'; // UNCOMMENT THIS AFTER INSTALLING PACKAGE
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -86,29 +87,24 @@ const HistoryBars = ({ games }) => {
            );
         }
 
-        // ROUND PROJECTION FOR DISPLAY AND CALCULATION
-        const projRounded = Math.round(g.proj);
-        const diff = g.act - projRounded; // Recalculate diff based on rounded proj
-        const diffDisplay = diff > 0 ? `+${diff}` : diff;
-
-        const maxVal = Math.max(20, projRounded, g.act); 
-        const projPct = (projRounded / maxVal) * 100;
+        const maxVal = Math.max(20, g.proj, g.act); 
+        const projPct = (g.proj / maxVal) * 100;
         const actPct = (g.act / maxVal) * 100;
-        const isBeat = g.act >= projRounded;
+        const isBeat = g.act >= g.proj;
         
         return (
           <div key={i} className="text-[10px]">
             <div className="flex justify-between text-slate-400 mb-0.5 font-bold">
               <span>Wk {g.week} vs {g.opp}</span>
               <span className={isBeat ? "text-green-400" : "text-red-400"}>
-                {isBeat ? "+" : ""}{diff}
+                {isBeat ? "+" : ""}{g.diff}
               </span>
             </div>
             
             {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
-                  <span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span>
+                  <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
                </div>
             </div>
 
@@ -214,12 +210,7 @@ const PlayerCell = ({ player, subtext }) => {
 const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
 
-  // Recalculate diff based on rounded projection (same logic as HistoryBars)
-  const l3_act = player.history?.l3_actual || 0;
-  // Note: l3_proj in history is sum of raw projections. We might want to sum rounded projections for consistency,
-  // but here we just use what we have.
-  const l3_diff = l3_act - (player.history?.l3_proj || 0);
-  
+  const l3_diff = (player.history?.l3_actual || 0) - (player.history?.l3_proj || 0);
   let trendColor = "text-slate-500";
   let trendSign = "";
   if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
@@ -827,6 +818,7 @@ const App = () => {
           </div>
         )}
       </div>
+      {/* <Analytics /> */}
     </div>
   );
 };
