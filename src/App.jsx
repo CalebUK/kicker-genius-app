@@ -40,205 +40,9 @@ const SETTING_LABELS = {
   xp_miss: "PAT Missed"
 };
 
-// --- ACCURACY TAB COMPONENT ---
-const AccuracyTab = ({ players, scoring, week }) => {
-  const [filter, setFilter] = useState('ALL'); // ALL, LIVE, FINISHED, UPCOMING
-
-  const calculateLiveScore = (p) => {
-      return (
-          ((p.wk_fg_0_19 || 0) * scoring.fg0_19) +
-          ((p.wk_fg_20_29 || 0) * scoring.fg20_29) +
-          ((p.wk_fg_30_39 || 0) * scoring.fg30_39) +
-          ((p.wk_fg_40_49 || 0) * scoring.fg40_49) +
-          ((p.wk_fg_50_59 || 0) * scoring.fg50_59) +
-          ((p.wk_fg_60_plus || 0) * scoring.fg60_plus) +
-          ((p.wk_fg_miss || 0) * scoring.fg_miss) +
-          ((p.wk_xp_made || 0) * scoring.xp_made) +
-          ((p.wk_xp_miss || 0) * scoring.xp_miss)
-      );
-  };
-
-  const getGameStatus = (gameDtStr) => {
-      if (!gameDtStr) return 'UPCOMING';
-      // Parsing "2025-11-24 13:00"
-      try {
-          const gameTime = new Date(gameDtStr.replace(' ', 'T'));
-          const now = new Date();
-          // Adjust for timezone if needed, usually data is ET. 
-          // Simple logic: If game time is in future -> UPCOMING
-          // If game time was < 4 hours ago -> LIVE
-          // If game time was > 4 hours ago -> FINISHED
-          const diffHours = (now - gameTime) / (1000 * 60 * 60);
-          
-          if (diffHours < 0) return 'UPCOMING';
-          if (diffHours >= 0 && diffHours < 4) return 'LIVE';
-          return 'FINISHED';
-      } catch (e) {
-          return 'UPCOMING';
-      }
-  };
-
-  // Filter Players
-  const displayPlayers = players.filter(p => {
-      if (p.proj <= 0) return false; // Only show playable kickers
-      const status = getGameStatus(p.game_dt); // You need to ensure game_dt is passed in p
-      if (filter === 'ALL') return true;
-      return filter === status;
-  }).sort((a, b) => {
-      // Sort by points if Live/Finished, else by Projection
-      const scoreA = calculateLiveScore(a);
-      const scoreB = calculateLiveScore(b);
-      if (filter === 'UPCOMING') return b.proj - a.proj;
-      return scoreB - scoreA; 
-  });
-
-  return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-        
-        {/* Filter Bar */}
-        <div className="flex gap-2 p-1 bg-slate-900/50 rounded-lg border border-slate-800 w-fit mx-auto">
-            {['ALL', 'LIVE', 'FINISHED', 'UPCOMING'].map((f) => (
-                <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
-                        filter === f 
-                        ? 'bg-blue-600 text-white shadow-lg' 
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                    }`}
-                >
-                    {f}
-                </button>
-            ))}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {displayPlayers.map((p, i) => {
-                const liveScore = calculateLiveScore(p);
-                const proj = p.proj; // Already rounded
-                
-                // Math for Progress Bar
-                const pct = Math.min(100, Math.max(5, (liveScore / proj) * 100)); // Min 5% so football shows
-                const isBeat = liveScore >= proj;
-                const isSmashed = liveScore >= proj + 3;
-                const status = getGameStatus(p.game_dt);
-                
-                // Status Badge Colors
-                let statusColor = "bg-slate-800 text-slate-400";
-                let StatusIcon = Calendar;
-                if (status === 'LIVE') { statusColor = "bg-red-900/50 text-red-400 animate-pulse"; StatusIcon = PlayCircle; }
-                if (status === 'FINISHED') { statusColor = "bg-emerald-900/30 text-emerald-400"; StatusIcon = CheckCircle2; }
-                if (status === 'UPCOMING') { statusColor = "bg-blue-900/30 text-blue-400"; StatusIcon = Clock; }
-
-                // Highlight Cowboys/Aubrey
-                const isSpecial = p.kicker_player_name.includes('Aubrey') || p.team === 'DAL';
-                const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
-                const glowClass = isSmashed ? "shadow-[0_0_15px_rgba(59,130,246,0.5)] border-blue-400" : "";
-
-                return (
-                    <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass} ${glowClass}`}>
-                        {/* Header */}
-                        <div className="flex items-center gap-3 mb-4 relative z-10">
-                            <img src={p.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-700 object-cover bg-slate-950"/>
-                            <div className="min-w-0 flex-1">
-                                <div className="font-bold text-white text-sm truncate">{p.kicker_player_name}</div>
-                                <div className="text-xs text-slate-500">{p.team} vs {p.opponent}</div>
-                            </div>
-                            <div className={`px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1 ${statusColor}`}>
-                                <StatusIcon className="w-3 h-3" /> {status}
-                            </div>
-                        </div>
-
-                        {/* Scoreboard */}
-                        <div className="flex justify-between items-end mb-2 relative z-10">
-                            <div className="text-xs text-slate-400 font-bold">PROJECTED: {proj}</div>
-                            <div className="text-right">
-                                <span className={`text-3xl font-black ${isSmashed ? 'text-blue-400' : isBeat ? 'text-emerald-400' : 'text-white'}`}>
-                                    {liveScore}
-                                </span>
-                                <span className="text-xs text-slate-500 ml-1">pts</span>
-                            </div>
-                        </div>
-
-                        {/* Gamified Progress Bar */}
-                        <div className="h-4 w-full bg-slate-950 rounded-full relative mb-4 border border-slate-800">
-                             {/* Fill */}
-                             <div 
-                                className={`h-full rounded-full transition-all duration-1000 ease-out ${isSmashed ? 'bg-blue-500' : isBeat ? 'bg-emerald-500' : 'bg-yellow-500'}`}
-                                style={{ width: `${pct}%` }}
-                             ></div>
-                             
-                             {/* Football Icon Marker */}
-                             <div 
-                                className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out flex items-center justify-center"
-                                style={{ left: `calc(${pct}% - 16px)` }}
-                             >
-                                 {/* Uses image if exists, else emoji fallback */}
-                                 <img 
-                                    src={isSmashed ? "/assets/football-fire.png" : "/assets/football.png"} 
-                                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
-                                    className="w-full h-full object-contain drop-shadow-lg"
-                                    alt="ball"
-                                 />
-                                 <span className="hidden text-xl" role="img" aria-label="ball">
-                                     {isSmashed ? "🔥" : "🏈"}
-                                 </span>
-                             </div>
-                        </div>
-
-                        {/* Live Kick Log Badges */}
-                        <div className="flex flex-wrap gap-1.5 relative z-10">
-                            {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && (
-                                <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">
-                                    {p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+
-                                </span>
-                            )}
-                            {(p.wk_fg_40_49 > 0) && (
-                                <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">
-                                    {p.wk_fg_40_49}x 40-49
-                                </span>
-                            )}
-                            {(p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39 > 0) && (
-                                <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">
-                                    {p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39}x Short FG
-                                </span>
-                            )}
-                            {(p.wk_xp_made > 0) && (
-                                <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">
-                                    {p.wk_xp_made}x XP
-                                </span>
-                            )}
-                            {(p.wk_fg_miss > 0 || p.wk_xp_miss > 0) && (
-                                <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">
-                                    {p.wk_fg_miss + p.wk_xp_miss} Miss
-                                </span>
-                            )}
-                            {liveScore === 0 && status !== 'UPCOMING' && (
-                                <span className="text-[10px] text-slate-600 italic">No points yet</span>
-                            )}
-                        </div>
-                        
-                        {/* Background Glow for Smashed */}
-                        {isSmashed && <div className="absolute inset-0 bg-blue-500/5 z-0 animate-pulse pointer-events-none"></div>}
-                    </div>
-                );
-            })}
-        </div>
-        {displayPlayers.length === 0 && (
-            <div className="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-slate-900">
-                No games found for this filter.
-            </div>
-        )}
-    </div>
-  );
-};
-
-// --- MAIN COMPONENT ---
-// (HeaderCell, HistoryBars, PlayerCell, MathCard, DeepDiveRow, App follow below)
-// Re-pasting full App component for completeness
-
 const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) => {
   const isActive = currentSort?.key === sortKey;
+  
   return (
     <th 
       onClick={() => onSort && onSort(sortKey)}
@@ -257,6 +61,7 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
         </div>
         <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
       </div>
+      
       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto">
         <div className="text-white font-semibold mb-1">{description}</div>
         {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
@@ -297,11 +102,13 @@ const HistoryBars = ({ games }) => {
                 {g.act >= projRounded ? "+" : ""}{diff}
               </span>
             </div>
+            
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span>
                </div>
             </div>
+
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -317,24 +124,29 @@ const HistoryBars = ({ games }) => {
 const PlayerCell = ({ player, subtext }) => {
   const injuryColor = player.injury_color || 'slate-600'; 
   const statusText = player.injury_status || '';
+  
   let borderColor = 'border-slate-600';
   if (injuryColor.includes('green')) borderColor = 'border-green-500';
   if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
   if (injuryColor.includes('red-500')) borderColor = 'border-red-500';
   if (injuryColor.includes('yellow')) borderColor = 'border-yellow-500';
+
   let textColor = 'text-slate-400';
   if (injuryColor.includes('green')) textColor = 'text-green-400';
   if (injuryColor.includes('red-700')) textColor = 'text-red-500';
   if (injuryColor.includes('red-500')) textColor = 'text-red-400';
   if (injuryColor.includes('yellow')) textColor = 'text-yellow-400';
+
   const ownPct = player.own_pct || 0;
   let ownColor = 'text-slate-500';
   if (ownPct < 10) ownColor = 'text-blue-400 font-bold'; 
   else if (ownPct > 80) ownColor = 'text-amber-500'; 
+
   const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
   const imageUrl = isAubrey 
     ? '/assets/aubrey_custom.png' 
     : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
+
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
   let displayInjury = '', displayStatus = '';
@@ -377,6 +189,7 @@ const PlayerCell = ({ player, subtext }) => {
 
 const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
+
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
   const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
   const l3_diff = l3_act - l3_proj;
@@ -428,6 +241,126 @@ const DeepDiveRow = ({ player, leagueAvgs, week }) => (
     </td>
   </tr>
 );
+
+// --- ACCURACY TAB COMPONENT ---
+const AccuracyTab = ({ players, scoring, week }) => {
+  const [filter, setFilter] = useState('ALL');
+
+  const calculateLiveScore = (p) => {
+      return (
+          ((p.wk_fg_0_19 || 0) * scoring.fg0_19) +
+          ((p.wk_fg_20_29 || 0) * scoring.fg20_29) +
+          ((p.wk_fg_30_39 || 0) * scoring.fg30_39) +
+          ((p.wk_fg_40_49 || 0) * scoring.fg40_49) +
+          ((p.wk_fg_50_59 || 0) * scoring.fg50_59) +
+          ((p.wk_fg_60_plus || 0) * scoring.fg60_plus) +
+          ((p.wk_fg_miss || 0) * scoring.fg_miss) +
+          ((p.wk_xp_made || 0) * scoring.xp_made) +
+          ((p.wk_xp_miss || 0) * scoring.xp_miss)
+      );
+  };
+
+  const getGameStatus = (gameDtStr) => {
+      if (!gameDtStr) return 'UPCOMING';
+      try {
+          const gameTime = new Date(gameDtStr.replace(' ', 'T'));
+          const now = new Date();
+          const diffHours = (now - gameTime) / (1000 * 60 * 60);
+          if (diffHours < 0) return 'UPCOMING';
+          if (diffHours >= 0 && diffHours < 4) return 'LIVE';
+          return 'FINISHED';
+      } catch (e) { return 'UPCOMING'; }
+  };
+
+  const displayPlayers = players.filter(p => {
+      if (p.proj <= 0) return false;
+      const status = getGameStatus(p.game_dt);
+      if (filter === 'ALL') return true;
+      return filter === status;
+  }).sort((a, b) => {
+      const scoreA = calculateLiveScore(a);
+      const scoreB = calculateLiveScore(b);
+      if (filter === 'UPCOMING') return b.proj - a.proj;
+      return scoreB - scoreA; 
+  });
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="flex gap-2 p-1 bg-slate-900/50 rounded-lg border border-slate-800 w-fit mx-auto">
+            {['ALL', 'LIVE', 'FINISHED', 'UPCOMING'].map((f) => (
+                <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${filter === f ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}>{f}</button>
+            ))}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {displayPlayers.map((p, i) => {
+                const liveScore = calculateLiveScore(p);
+                const proj = p.proj;
+                const pct = Math.min(100, Math.max(5, (liveScore / proj) * 100));
+                const isBeat = liveScore >= proj;
+                const isSmashed = liveScore >= proj + 3;
+                const status = getGameStatus(p.game_dt);
+                
+                let statusColor = "bg-slate-800 text-slate-400";
+                let StatusIcon = Calendar;
+                if (status === 'LIVE') { statusColor = "bg-red-900/50 text-red-400 animate-pulse"; StatusIcon = PlayCircle; }
+                if (status === 'FINISHED') { statusColor = "bg-emerald-900/30 text-emerald-400"; StatusIcon = CheckCircle2; }
+                if (status === 'UPCOMING') { statusColor = "bg-blue-900/30 text-blue-400"; StatusIcon = Clock; }
+
+                const isSpecial = p.kicker_player_name.includes('Aubrey') || p.team === 'DAL';
+                const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
+                const glowClass = isSmashed ? "shadow-[0_0_15px_rgba(59,130,246,0.5)] border-blue-400" : "";
+
+                return (
+                    <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass} ${glowClass}`}>
+                        <div className="flex items-center gap-3 mb-4 relative z-10">
+                            <img src={p.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-700 object-cover bg-slate-950"/>
+                            <div className="min-w-0 flex-1">
+                                <div className="font-bold text-white text-sm truncate">{p.kicker_player_name}</div>
+                                <div className="text-xs text-slate-500">{p.team} vs {p.opponent}</div>
+                            </div>
+                            <div className={`px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1 ${statusColor}`}><StatusIcon className="w-3 h-3" /> {status}</div>
+                        </div>
+
+                        <div className="flex justify-between items-end mb-2 relative z-10">
+                            <div className="text-xs text-slate-400 font-bold">PROJECTED: {proj}</div>
+                            <div className="text-right"><span className={`text-3xl font-black ${isSmashed ? 'text-blue-400' : isBeat ? 'text-emerald-400' : 'text-white'}`}>{liveScore}</span><span className="text-xs text-slate-500 ml-1">pts</span></div>
+                        </div>
+
+                        {/* FOOTBALL FIELD PROGRESS BAR */}
+                        <div className="h-6 w-full bg-emerald-900/40 rounded-full relative mb-4 border border-emerald-900/50 overflow-visible mt-2">
+                             {/* Hash Marks */}
+                             <div className="absolute inset-0 flex justify-between px-2 items-center pointer-events-none opacity-30">
+                                 {[...Array(9)].map((_, idx) => <div key={idx} className="h-full w-0.5 bg-white/50"></div>)}
+                             </div>
+
+                             {/* Fill */}
+                             <div className={`h-full rounded-l-full transition-all duration-1000 ease-out ${isSmashed ? 'bg-blue-500/50' : isBeat ? 'bg-emerald-500/50' : 'bg-yellow-500/40'}`} style={{ width: `${pct}%` }}></div>
+                             
+                             {/* Ball Icon */}
+                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-20 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 14px)` }}>
+                                 <img src={isSmashed ? "/assets/football-fire.png" : "/assets/football.png"} className="w-full h-full object-contain transform -rotate-12 hover:rotate-0 transition-transform" alt="ball"/>
+                             </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-1.5 relative z-10">
+                            {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
+                            {(p.wk_fg_40_49 > 0) && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{p.wk_fg_40_49}x 40-49</span>}
+                            {(p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39 > 0) && <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39}x Short FG</span>}
+                            {(p.wk_xp_made > 0) && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_xp_made}x XP</span>}
+                            {(p.wk_fg_miss > 0 || p.wk_xp_miss > 0) && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{p.wk_fg_miss + p.wk_xp_miss} Miss</span>}
+                            {liveScore === 0 && status !== 'UPCOMING' && <span className="text-[10px] text-slate-600 italic px-1">No points yet</span>}
+                        </div>
+                        
+                        {isSmashed && <div className="absolute inset-0 bg-blue-500/5 z-0 animate-pulse pointer-events-none"></div>}
+                    </div>
+                );
+            })}
+        </div>
+        {displayPlayers.length === 0 && <div className="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-slate-900">No games found for this filter.</div>}
+    </div>
+  );
+};
 
 const App = () => {
   const [data, setData] = useState(null);
@@ -503,10 +436,11 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-     
+
+     // NEW LOGIC: Recalculate L3 sums based on rounded weekly values
      const l3_games = p.history?.l3_games || [];
-     const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0);
-     const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
+     const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(g.proj), 0);
+     const l3_act_sum = l3_games.reduce((acc, g) => acc + g.act, 0); 
 
      return { 
         ...pWithYtd, 
@@ -518,6 +452,7 @@ const App = () => {
   })
   .filter(p => p.proj > 0); 
 
+  // Search Logic
   if (search) {
       const q = search.toLowerCase();
       processed = processed.filter(p => 
@@ -528,10 +463,12 @@ const App = () => {
       );
   }
 
+  // Sort Logic for Potential
   processed.sort((a, b) => {
      let valA = a[sortConfig.key];
      let valB = b[sortConfig.key];
      if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
+     
      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
      return 0;
@@ -583,6 +520,7 @@ const App = () => {
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
   const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful' || k.injury_status === 'Inactive');
   const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
+
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
   return (
@@ -610,7 +548,6 @@ const App = () => {
           </div>
         </div>
 
-        {/* Navigation */}
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
@@ -673,7 +610,7 @@ const App = () => {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="w-8 px-2 py-3 align-middle text-center">Rank</th>
+                    <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
                     <th 
                       className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
                       onClick={() => handleSort('own_pct')}
@@ -699,7 +636,7 @@ const App = () => {
                   {processed.map((row, idx) => (
                     <React.Fragment key={idx}>
                       <tr onClick={() => toggleRow(idx)} className="hover:bg-slate-800/50 cursor-pointer transition-colors">
-                        <td className="w-8 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                        <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                         <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} />
                         <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
                         <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
