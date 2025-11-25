@@ -71,6 +71,7 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
       {/* TOOLTIP */}
       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto">
         <div className="text-white font-semibold mb-1">{description}</div>
+        {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
         <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 border-l border-t border-slate-700 rotate-45"></div>
       </div>
     </th>
@@ -204,13 +205,13 @@ const PlayerCell = ({ player, subtext }) => {
           )}
         </div>
         <div className="min-w-0 flex-1">
-          {/* NAME FIX: removed truncate, allowed wrap */}
-          <div className="text-sm md:text-base leading-tight font-semibold text-white whitespace-normal break-words">
+          {/* NAME FIX: Smaller text on mobile, truncate to 1 line to prevent stacking */}
+          <div className="text-xs md:text-sm font-bold text-white truncate leading-tight">
             {player.kicker_player_name}
           </div>
-          <div className="text-xs text-slate-500 truncate">{subtext}</div>
+          <div className="text-[10px] text-slate-500 truncate">{subtext}</div>
           {player.own_pct > 0 && (
-             <div className={`text-[10px] mt-1 font-bold ${ownColor}`}>
+             <div className={`text-[9px] mt-0.5 font-bold ${ownColor}`}>
                Own: {player.own_pct.toFixed(1)}%
              </div>
           )}
@@ -255,20 +256,30 @@ const MathCard = ({ player, leagueAvgs, week }) => {
           {/* 1. GRADE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
+            
+            {/* Offense Breakdown */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Offense Score</span>
                     <span className="font-mono text-white">{player.off_score_val}</span>
                 </div>
-                <div className="text-[9px] text-slate-500">({player.off_stall_rate}% / {lgOffStall}%) × 40</div>
+                <div className="text-[9px] text-slate-500">
+                    ({player.off_stall_rate}% / {lgOffStall}%) × 40
+                </div>
             </div>
+
+            {/* Defense Breakdown */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Defense Score</span>
                     <span className="font-mono text-white">{player.def_score_val}</span>
                 </div>
-                <div className="text-[9px] text-slate-500">({player.def_stall_rate}% / {lgDefStall}%) × 40</div>
+                <div className="text-[9px] text-slate-500">
+                    ({player.def_stall_rate}% / {lgDefStall}%) × 40
+                </div>
             </div>
+
+            {/* Bonuses */}
             <div className="border-t border-slate-800 pt-1">
                 <div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div>
                 <div className="text-emerald-400 text-[10px] space-y-0.5">
@@ -277,6 +288,8 @@ const MathCard = ({ player, leagueAvgs, week }) => {
                         : <div className="text-slate-600 italic">None</div>}
                 </div>
             </div>
+
+            {/* Total & Multiplier */}
             <div className="mt-auto pt-2 border-t border-slate-700">
                 <div className="flex justify-between font-bold text-white">
                     <span>Total Grade</span>
@@ -292,27 +305,41 @@ const MathCard = ({ player, leagueAvgs, week }) => {
           {/* 2. WEIGHTED PROJECTION */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">WEIGHTED PROJECTION</div>
+            
+            {/* Base */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Base (50%)</span>
                     <span className="font-mono text-white">{(baseRaw * 0.5).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 leading-tight">{player.avg_pts} (Avg) × {baseMult} (Grd) = {baseRaw.toFixed(1)}</div>
+                <div className="text-[9px] text-slate-500 leading-tight">
+                    {player.avg_pts} (Avg) × {baseMult} (Grd) = {baseRaw.toFixed(1)}
+                </div>
             </div>
+
+            {/* Offense */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Offense (30%)</span>
                     <span className="font-mono text-white">{(offRaw * 0.3).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 leading-tight">{player.w_team_score} (Exp) × {offShare}% (Share) × 1.2 = {offRaw}</div>
+                <div className="text-[9px] text-slate-500 leading-tight">
+                    {player.w_team_score} (Exp) × {offShare}% (Share) × 1.2 = {offRaw}
+                </div>
             </div>
+
+            {/* Defense */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Defense (20%)</span>
                     <span className="font-mono text-white">{(defRaw * 0.2).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 leading-tight">{player.w_def_allowed} (Allow) × 35% (Share) × 1.2 = {defRaw}</div>
+                <div className="text-[9px] text-slate-500 leading-tight">
+                    {player.w_def_allowed} (Allow) × 35% (Share) × 1.2 = {defRaw}
+                </div>
             </div>
+
+            {/* Final Summary Line */}
             <div className="mt-auto pt-2 border-t border-slate-700">
                  <div className="flex justify-between font-bold text-white text-[11px]">
                     <span>Week {week} Projection</span>
@@ -434,7 +461,19 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-     return { ...pWithYtd, proj: parseFloat(proj), acc_diff: (p.history?.l3_actual||0) - (p.history?.l3_proj||0) };
+
+     // NEW LOGIC: Recalculate L3 sums based on rounded weekly values
+     const l3_games = p.history?.l3_games || [];
+     const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(g.proj), 0);
+     const l3_act_sum = l3_games.reduce((acc, g) => acc + g.act, 0); // Actuals are ints
+
+     return { 
+        ...pWithYtd, 
+        proj: parseFloat(proj), 
+        l3_proj_sum,
+        l3_act_sum,
+        acc_diff: l3_act_sum - l3_proj_sum
+     };
   })
   .filter(p => p.proj > 0); 
 
@@ -671,9 +710,9 @@ const App = () => {
                         
                         <td className="px-6 py-4 text-center">
                            <div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.l3_act_sum >= row.l3_proj_sum ? 'text-green-400' : 'text-red-400'}`}>
-                             <span>{row.l3_act_sum}</span>
+                             <span>{row.l3_act_sum ?? 0}</span>
                              <span className="mx-1 text-slate-600">/</span>
-                             <span className="text-slate-500">{row.l3_proj_sum}</span>
+                             <span className="text-slate-500">{row.l3_proj_sum ?? 0}</span>
                            </div>
                            <div className="text-[9px] text-slate-500 uppercase">Act / Proj</div>
                         </td>
