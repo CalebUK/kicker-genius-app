@@ -49,6 +49,7 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
       className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}
     >
       <div className="flex flex-col items-center justify-center h-full gap-0.5">
+        
         <div className="flex items-center gap-1 mt-0.5">
           <span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>
           {onSort && (
@@ -59,9 +60,9 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
             )
           )}
         </div>
+        <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
       </div>
       
-      {/* TOOLTIP */}
       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto">
         <div className="text-white font-semibold mb-1">{description}</div>
         {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
@@ -88,7 +89,6 @@ const HistoryBars = ({ games }) => {
            );
         }
 
-        // --- ROUNDING LOGIC ---
         const projRounded = Math.round(g.proj);
         const diff = g.act - projRounded;
         const maxVal = Math.max(20, projRounded, g.act); 
@@ -148,14 +148,22 @@ const PlayerCell = ({ player, subtext }) => {
 
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
-  let displayInjury = '', displayStatus = '';
-  if (match) { const reportStatus = match[1]; const injuryType = match[2]; displayInjury = `${player.injury_status}: ${injuryType}`; displayStatus = reportStatus; } 
-  else { displayInjury = details; }
+  
+  let displayInjury = '';
+  let displayStatus = '';
+  
+  if (match) {
+      const reportStatus = match[1];
+      const injuryType = match[2];
+      displayInjury = `${player.injury_status}: ${injuryType}`;
+      displayStatus = reportStatus;
+  } else {
+      displayInjury = details; 
+  }
 
   return (
     <td className="px-3 py-4 font-medium text-white">
       <div className="flex flex-col justify-center">
-          {/* TOP: NAME with Fire Emoji if Top 5 */}
           <div className="text-xs md:text-sm font-bold text-white leading-tight mb-2 whitespace-normal break-words flex items-center gap-1">
             {player.kicker_player_name}
             {player.isTop5 && <span title="Top 5 Scorer (Season)" className="text-sm">🔥</span>}
@@ -163,7 +171,18 @@ const PlayerCell = ({ player, subtext }) => {
           
           <div className="flex items-center gap-3">
               <div className="relative group flex-shrink-0">
-                <img src={imageUrl} className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} onError={(e) => { if (e.target.src.includes('aubrey_custom.png')) { e.target.src = player.headshot_url; } else { e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }}} />
+                <img 
+                  src={imageUrl} 
+                  alt={player.kicker_player_name}
+                  className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`}
+                  onError={(e) => {
+                      if (e.target.src.includes('aubrey_custom.png') && player.headshot_url) {
+                          e.target.src = player.headshot_url;
+                      } else {
+                          e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
+                      }
+                  }} 
+                />
                 {statusText !== '' && (
                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-auto whitespace-nowrap p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
                       {match ? (
@@ -177,10 +196,13 @@ const PlayerCell = ({ player, subtext }) => {
                    </div>
                 )}
               </div>
+
               <div className="min-w-0">
                 <div className="text-xs text-slate-400 truncate">{subtext}</div>
                 {player.own_pct > 0 && (
-                   <div className={`text-[9px] mt-0.5 font-bold ${ownColor}`}>Own: {player.own_pct.toFixed(1)}%</div>
+                   <div className={`text-[9px] mt-0.5 font-bold ${ownColor}`}>
+                     Own: {player.own_pct.toFixed(1)}%
+                   </div>
                 )}
               </div>
           </div>
@@ -192,7 +214,6 @@ const PlayerCell = ({ player, subtext }) => {
 const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
 
-  // --- ROUNDED TREND LOGIC ---
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
   const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
   
@@ -206,7 +227,6 @@ const MathCard = ({ player, leagueAvgs, week }) => {
   const lgOffStall = leagueAvgs?.off_stall || 40;
   const lgDefStall = leagueAvgs?.def_stall || 40;
 
-  // --- Calculation Variables for Display ---
   const baseRaw = (player.avg_pts * (player.grade / 90));
   const baseMult = (player.grade / 90).toFixed(2);
   const offRaw = player.off_cap_val; 
@@ -229,6 +249,8 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             <div className="border-t border-slate-800 pt-1"><div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div><div className="text-emerald-400 text-[10px] space-y-0.5">{player.grade_details && player.grade_details.length > 0 ? player.grade_details.map((d, i) => <div key={i} className="flex justify-between"><span>{d}</span></div>) : <div className="text-slate-600 italic">None</div>}</div></div>
             <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white"><span>Total Grade</span><span>{player.grade}</span></div><div className="flex justify-between text-[10px] text-blue-400 mt-1"><span>Week {week} Multiplier (÷90)</span><span className="font-mono font-bold">{(player.grade / 90).toFixed(2)}x</span></div></div>
           </div>
+
+          {/* 2. WEIGHTED PROJECTION */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">WEIGHTED PROJECTION</div>
             <div><div className="flex justify-between text-xs text-slate-300"><span>Base (50%)</span><span className="font-mono text-white">{(baseRaw * 0.5).toFixed(1)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{player.avg_pts} (Avg) × {baseMult} (Grd) = {baseRaw.toFixed(1)}</div></div>
@@ -236,7 +258,8 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             <div><div className="flex justify-between text-xs text-slate-300"><span>Defense (20%)</span><span className="font-mono text-white">{(defRaw * 0.2).toFixed(1)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{player.w_def_allowed} (Allow) × 35% (Share) × 1.2 = {defRaw}</div></div>
             <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white text-[11px]"><span>Week {week} Projection</span><span className="text-emerald-400 text-lg">{player.proj}</span></div><div className="text-[9px] text-right text-slate-500">(Rounded)</div></div>
           </div>
-          {/* RENAMED TO "Last 3 Trend" */}
+          
+          {/* 3. HISTORY */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50"><div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between"><div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> Last 3 Trend</div><span className={`text-[10px] font-mono ${trendColor}`}>{trendSign}{l3_diff.toFixed(1)}</span></div><HistoryBars games={player.history?.l3_games} /></div>
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col"><div className="text-emerald-400 font-bold mb-2 pb-1 border-b border-slate-800 flex items-center gap-2"><BrainCircuit className="w-3 h-3" /> KICKERGENIUS INSIGHT</div><div className="text-xs text-slate-300 leading-relaxed h-full flex items-center">{player.narrative || "No specific analysis available for this player yet."}</div></div>
         </div>
@@ -339,24 +362,48 @@ const AccuracyTab = ({ players, scoring, week }) => {
                         </div>
 
                         {/* FOOTBALL FIELD PROGRESS BAR */}
-                        <div className="h-6 w-full bg-emerald-900/40 rounded-md relative mb-4 border border-emerald-800 overflow-visible mt-2">
-                             <div className="absolute inset-0 flex justify-between px-2 items-center pointer-events-none opacity-40">
-                                 {[...Array(11)].map((_, idx) => (
-                                     <div key={idx} className={`h-full w-0.5 ${idx === 5 ? 'bg-white w-1' : 'bg-white/50'}`}></div>
-                                 ))}
+                        <div className="h-8 w-full bg-emerald-800 rounded-md relative mb-4 border-2 border-white overflow-hidden mt-2 shadow-inner">
+                             {/* Endzones (Left and Right) - WHITE */}
+                             <div className="absolute left-0 top-0 bottom-0 w-4 bg-white z-10"></div>
+                             <div className="absolute right-0 top-0 bottom-0 w-4 bg-white z-10"></div>
+
+                             {/* Field Markings */}
+                             <div className="absolute inset-0 flex justify-between px-4 items-center pointer-events-none z-0">
+                                 {/* Hash Marks 10-90% (3/5 height), Midfield (Full height) */}
+                                 {[...Array(9)].map((_, idx) => {
+                                     const isMidfield = idx === 4; // 50 yard line
+                                     return (
+                                         <div 
+                                            key={idx} 
+                                            className={`${isMidfield ? 'h-full w-1' : 'h-[60%] w-0.5'} bg-white opacity-80`}
+                                         ></div>
+                                     );
+                                 })}
                              </div>
-                             <img src="/assets/logo.png" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 opacity-20 pointer-events-none" alt="logo"/>
-                             <div className="absolute left-0 top-0 bottom-0 w-2 bg-white/10 border-r border-white/20"></div>
-                             <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/10 border-l border-white/20"></div>
-                             <div className={`h-full rounded-l-md transition-all duration-1000 ease-out ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/60'}`} style={{ width: `${pct}%` }}></div>
-                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-20 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 14px)` }}>
+                             
+                             {/* Center Field Logo (Fully Visible) */}
+                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                                 <img src="/assets/logo.png" className="w-8 h-8 object-contain drop-shadow-md" alt="logo"/>
+                             </div>
+
+                             {/* Progress Fill (Semi-Transparent to show field lines) */}
+                             <div 
+                                className={`h-full transition-all duration-1000 ease-out z-20 ${isSmashed ? 'bg-blue-500/80' : isBeat ? 'bg-emerald-500/80' : 'bg-yellow-500/70'}`} 
+                                style={{ width: `${pct}%` }}
+                             ></div>
+                             
+                             {/* Ball Icon */}
+                             <div 
+                                className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" 
+                                style={{ left: `calc(${pct}% - 16px)` }}
+                             >
                                  <img 
                                     src={isSmashed ? "/assets/football-fire.png" : "/assets/football.png"} 
                                     className="w-full h-full object-contain transform -rotate-12 hover:rotate-0 transition-transform" 
                                     alt="ball"
                                     onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
                                  />
-                                 <span className="hidden text-xl" role="img" aria-label="ball">{isSmashed ? "🔥" : "🏈"}</span>
+                                 <span className="hidden text-2xl" role="img" aria-label="ball">{isSmashed ? "🔥" : "🏈"}</span>
                              </div>
                         </div>
 
@@ -453,8 +500,6 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-
-     // NEW LOGIC: Recalculate L3 sums based on rounded weekly values
      const l3_games = p.history?.l3_games || [];
      const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0);
      const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
@@ -469,7 +514,6 @@ const App = () => {
   })
   .filter(p => p.proj > 0); 
 
-  // Search Logic
   if (search) {
       const q = search.toLowerCase();
       processed = processed.filter(p => 
@@ -485,7 +529,6 @@ const App = () => {
      let valA = a[sortConfig.key];
      let valB = b[sortConfig.key];
      if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
-     
      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
      return 0;
@@ -548,43 +591,6 @@ const App = () => {
 
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
-  // Helper to render injury card with logic
-  const renderInjuryCard = (k, i, borderColor, textColor) => {
-      const details = k.injury_details || '';
-      const match = details.match(/^(.+?)\s\((.+)\)$/);
-      let displayInjury = k.injury_details;
-      let displayStatus = '';
-      
-      if (match) {
-          const reportStatus = match[1];
-          const injuryType = match[2];
-          displayInjury = `${k.injury_status}: ${injuryType}`;
-          displayStatus = reportStatus;
-      }
-
-      return (
-         <div key={i} className={`flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border ${borderColor}`}>
-            <img 
-                src={k.headshot_url} 
-                className={`w-12 h-12 rounded-full border-2 object-cover ${borderColor.replace('border', 'border-')}`} 
-                onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}
-            />
-            <div>
-               <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-               {match ? (
-                   <>
-                       <div className={`text-xs font-bold ${textColor}`}>{displayInjury}</div>
-                       <div className="text-xs text-slate-400 italic">{displayStatus}</div>
-                   </>
-               ) : (
-                   <div className={`text-xs ${textColor}`}>{displayInjury}</div>
-               )}
-               <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
-            </div>
-         </div>
-      );
-  };
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -610,6 +616,7 @@ const App = () => {
           </div>
         </div>
 
+        {/* Navigation */}
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
@@ -867,7 +874,6 @@ const App = () => {
           </div>
         )}
       </div>
-      {/* <Analytics /> */}
     </div>
   );
 };
