@@ -145,6 +145,26 @@ const PlayerCell = ({ player, subtext }) => {
     ? '/assets/aubrey_custom.png' 
     : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
 
+  // --- PARSE INJURY DETAILS FOR 3-FOLD DISPLAY ---
+  // Format from Python: "ReportStatus (InjuryType)" e.g. "Inactive (Hamstring)"
+  const details = player.injury_details || '';
+  const match = details.match(/^(.+?)\s\((.+)\)$/);
+  
+  let displayInjury = '';
+  let displayStatus = '';
+  
+  if (match) {
+      // Matches "Inactive (Hamstring)" -> Status: Inactive, Injury: Hamstring
+      // We want: "OUT: Hamstring" / "Inactive"
+      const reportStatus = match[1];
+      const injuryType = match[2];
+      displayInjury = `${player.injury_status}: ${injuryType}`;
+      displayStatus = reportStatus;
+  } else {
+      // Fallback for "Roster: IR" or plain strings
+      displayInjury = details; 
+  }
+
   return (
     <td className="px-3 py-4 font-medium text-white">
       <div className="flex items-center gap-3">
@@ -163,8 +183,15 @@ const PlayerCell = ({ player, subtext }) => {
           />
           {statusText !== 'Healthy' && statusText !== '' && (
              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
-                <div className={`font-bold ${textColor} mb-1`}>{player.injury_status}</div>
-                <div className="text-slate-300">{player.injury_details || 'No details'}</div>
+                {/* 3-FOLD DISPLAY */}
+                {match ? (
+                    <>
+                        <div className={`font-bold ${textColor} mb-0.5`}>{displayInjury}</div>
+                        <div className="text-slate-400 italic">{displayStatus}</div>
+                    </>
+                ) : (
+                    <div className={`font-bold ${textColor} mb-1`}>{player.injury_status} <span className="text-slate-400 font-normal">({details})</span></div>
+                )}
              </div>
           )}
         </div>
@@ -325,7 +352,7 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
@@ -397,7 +424,6 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -603,7 +629,21 @@ const App = () => {
                           <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
                              <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-                             <div className="text-xs text-yellow-300">{k.injury_details}</div>
+                             
+                             {/* 3-FOLD DISPLAY LOGIC */}
+                             {(() => {
+                                const match = (k.injury_details || '').match(/^(.+?)\s\((.+)\)$/);
+                                if (match) {
+                                    return (
+                                        <>
+                                            <div className="text-xs text-yellow-300 font-bold">{k.injury_status}: {match[2]}</div>
+                                            <div className="text-xs text-slate-400 italic">{match[1]}</div>
+                                        </>
+                                    );
+                                }
+                                return <div className="text-xs text-yellow-300">{k.injury_details}</div>;
+                             })()}
+
                              <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
                           </div>
                        </div>
@@ -625,7 +665,21 @@ const App = () => {
                           <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-red-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
                           <div>
                              <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-                             <div className="text-xs text-red-300">{k.injury_details}</div>
+                             
+                             {/* 3-FOLD DISPLAY LOGIC */}
+                             {(() => {
+                                const match = (k.injury_details || '').match(/^(.+?)\s\((.+)\)$/);
+                                if (match) {
+                                    return (
+                                        <>
+                                            <div className="text-xs text-red-300 font-bold">{k.injury_status}: {match[2]}</div>
+                                            <div className="text-xs text-slate-400 italic">{match[1]}</div>
+                                        </>
+                                    );
+                                }
+                                return <div className="text-xs text-red-300">{k.injury_details}</div>;
+                             })()}
+
                              <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
                           </div>
                        </div>
