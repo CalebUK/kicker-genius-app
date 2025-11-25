@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, BrainCircuit, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search } from 'lucide-react';
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -146,7 +146,7 @@ const PlayerCell = ({ player, subtext }) => {
     : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
 
   return (
-    <td className="px-6 py-4 font-medium text-white">
+    <td className="px-3 py-4 font-medium text-white">
       <div className="flex items-center gap-3">
         <div className="relative group flex-shrink-0">
           <img 
@@ -232,7 +232,7 @@ const MathCard = ({ player }) => {
              <HistoryBars games={player.history?.l3_games} />
           </div>
 
-          {/* 4. NARRATIVE (REPLACES FINAL SCORE) */}
+          {/* 4. NARRATIVE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col">
              <div className="text-emerald-400 font-bold mb-2 pb-1 border-b border-slate-800 flex items-center gap-2">
                <BrainCircuit className="w-3 h-3" /> KICKERGENIUS INSIGHT
@@ -268,9 +268,10 @@ const App = () => {
   const [scoring, setScoring] = useState(DEFAULT_SCORING);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+  const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
   const [hideHighOwn, setHideHighOwn] = useState(false);
   const [hideMedOwn, setHideMedOwn] = useState(false);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const savedScoring = localStorage.getItem('kicker_scoring');
@@ -278,7 +279,6 @@ const App = () => {
       try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
       catch (e) { console.error(e); }
     }
-
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
@@ -302,7 +302,6 @@ const App = () => {
     if (sortConfig.key === key && sortConfig.direction === 'desc') direction = 'asc';
     setSortConfig({ key, direction });
   };
-  const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
 
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
 
@@ -326,7 +325,7 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
@@ -338,11 +337,29 @@ const App = () => {
      const proj = calcProj(pWithYtd, p.grade);
      return { ...pWithYtd, proj: parseFloat(proj), acc_diff: (p.history?.l3_actual||0) - (p.history?.l3_proj||0) };
   })
-  .filter(p => p.proj > 0) 
-  .sort((a, b) => {
+  .filter(p => p.proj > 0); // Removed explicit OUT filtering so Search can find them if needed? Or keep strictly playable? Assuming keep STRICT filter for "Potential Model" tab unless searched. 
+  // Actually, user request: "Can we make sure ... if a kicker didn't play ... change actual and projection to 0 ... and put DNS".
+  // The previous request was: "If a player is Doubtful, Out, Inactive, IR ... can we not have them show up on the prediction page."
+  // So I will keep the filter.
+
+  // Search Logic
+  if (search) {
+      const q = search.toLowerCase();
+      processed = processed.filter(p => 
+          p.kicker_player_name.toLowerCase().includes(q) || 
+          (p.team && p.team.toLowerCase().includes(q)) ||
+          (q === 'dome' && p.is_dome) ||
+          (q === 'cowboys' && p.team === 'DAL') // Alias for Cowboys if team code is DAL
+          // Add other team aliases if needed, but fuzzy matching name/team usually works
+      );
+  }
+
+  // Sort Logic for Potential
+  processed.sort((a, b) => {
      let valA = a[sortConfig.key];
      let valB = b[sortConfig.key];
      if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
+     
      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
      return 0;
@@ -355,7 +372,6 @@ const App = () => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
-      
       return {
           ...p, 
           fpts: pts, 
@@ -368,18 +384,17 @@ const App = () => {
       let key = sortConfig.key;
       if (key === 'pct') key = 'pct_val';
       if (key === 'avg_fpts') key = 'avg_fpts';
-      
       let valA = a[key];
       let valB = b[key];
-      
       if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
       if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
   });
-
-  const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
-  const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful' || k.injury_status === 'Inactive');
-  const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
+  
+  const outKickers = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT' || k.injury_status === 'IR');
+  const doubtfulKickers = injuries.filter(k => k.injury_status === 'Doubtful');
+  const questionableKickers = injuries.filter(k => k.injury_status === 'Questionable');
+  const otherKickers = injuries.filter(k => !['OUT', 'CUT', 'Doubtful', 'Questionable', 'Healthy', 'IR'].includes(k.injury_status));
 
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
@@ -438,23 +453,46 @@ const App = () => {
         {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+             {/* SEARCH BAR */}
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
-                <div className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1"><Filter className="w-3 h-3" /> Filters:</div>
-                <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white">
-                   <input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" />
-                   Hide {'>'} 80% Owned
-                </label>
-                <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white">
-                   <input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" />
-                   Hide {'>'} 60% Owned
-                </label>
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <input 
+                    type="text" 
+                    placeholder="(e.g. Aubrey, Cowboys, Dome)" 
+                    className="w-full bg-slate-900 border border-slate-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-blue-500 focus:outline-none placeholder:text-slate-600"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+                
+                <div className="flex items-center gap-4">
+                    <div className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1"><Filter className="w-3 h-3" /> Filters:</div>
+                    <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white">
+                    <input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" />
+                    Hide {'>'} 80% Owned
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white">
+                    <input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" />
+                    Hide {'>'} 60% Owned
+                    </label>
+                </div>
              </div>
+             
              <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="px-6 py-3 align-middle text-center">Rank</th>
-                    <th className="px-6 py-3 align-middle text-left">Player</th>
+                    <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
+                    <th 
+                      className="px-2 py-3 align-middle text-left cursor-pointer group"
+                      onClick={() => handleSort('own_pct')}
+                    >
+                      <div className="flex items-center gap-1">
+                        <span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </th>
                     <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description="Matchup Grade (Baseline 90)" />
                     <th className="px-6 py-3 text-center align-middle">Weather</th>
@@ -471,7 +509,7 @@ const App = () => {
                   {processed.map((row, idx) => (
                     <React.Fragment key={idx}>
                       <tr onClick={() => toggleRow(idx)} className="hover:bg-slate-800/50 cursor-pointer transition-colors">
-                        <td className="px-6 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                        <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                         <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} />
                         <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
                         <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
