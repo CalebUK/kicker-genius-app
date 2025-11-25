@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit, PlayCircle, CheckCircle2, Clock, Flame } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit, PlayCircle, CheckCircle2, Clock, Flame, Mail } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react'; // UNCOMMENT THIS AFTER INSTALLING PACKAGE
 
 // --- GLOSSARY DATA ---
@@ -49,12 +49,9 @@ const FootballIcon = ({ isFire }) => (
       </div>
     )}
     <svg viewBox="0 0 100 60" className={`w-full h-full drop-shadow-md transform transition-transform hover:scale-110 ${isFire ? 'rotate-12' : '-rotate-12'}`}>
-      {/* Ball Body */}
       <ellipse cx="50" cy="30" rx="48" ry="28" fill="#8B4513" stroke="#3E2723" strokeWidth="2" />
-      {/* Stripes */}
       <path d="M 25 10 Q 35 30 25 50" stroke="white" strokeWidth="3" fill="none" opacity="0.9" />
       <path d="M 75 10 Q 65 30 75 50" stroke="white" strokeWidth="3" fill="none" opacity="0.9" />
-      {/* Laces */}
       <path d="M 35 30 L 65 30" stroke="white" strokeWidth="3" strokeLinecap="round" />
       <path d="M 40 25 L 40 35" stroke="white" strokeWidth="3" strokeLinecap="round" />
       <path d="M 50 25 L 50 35" stroke="white" strokeWidth="3" strokeLinecap="round" />
@@ -126,11 +123,13 @@ const HistoryBars = ({ games }) => {
                 {g.act >= projRounded ? "+" : ""}{diff}
               </span>
             </div>
+            
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span>
                </div>
             </div>
+
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -146,7 +145,6 @@ const HistoryBars = ({ games }) => {
 const PlayerCell = ({ player, subtext }) => {
   const injuryColor = player.injury_color || 'slate-600'; 
   const statusText = player.injury_status || '';
-  
   let borderColor = 'border-slate-600';
   if (injuryColor.includes('green')) borderColor = 'border-green-500';
   if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
@@ -171,18 +169,9 @@ const PlayerCell = ({ player, subtext }) => {
 
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
-  
-  let displayInjury = '';
-  let displayStatus = '';
-  
-  if (match) {
-      const reportStatus = match[1];
-      const injuryType = match[2];
-      displayInjury = `${player.injury_status}: ${injuryType}`;
-      displayStatus = reportStatus;
-  } else {
-      displayInjury = details; 
-  }
+  let displayInjury = '', displayStatus = '';
+  if (match) { const reportStatus = match[1]; const injuryType = match[2]; displayInjury = `${player.injury_status}: ${injuryType}`; displayStatus = reportStatus; } 
+  else { displayInjury = details; }
 
   return (
     <td className="px-3 py-4 font-medium text-white">
@@ -194,18 +183,7 @@ const PlayerCell = ({ player, subtext }) => {
           
           <div className="flex items-center gap-3">
               <div className="relative group flex-shrink-0">
-                <img 
-                  src={imageUrl} 
-                  alt={player.kicker_player_name}
-                  className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`}
-                  onError={(e) => {
-                      if (e.target.src.includes('aubrey_custom.png') && player.headshot_url) {
-                          e.target.src = player.headshot_url;
-                      } else {
-                          e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
-                      }
-                  }} 
-                />
+                <img src={imageUrl} className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} onError={(e) => { if (e.target.src.includes('aubrey_custom.png')) { e.target.src = player.headshot_url; } else { e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }}} />
                 {statusText !== '' && (
                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-auto whitespace-nowrap p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
                       {match ? (
@@ -219,13 +197,10 @@ const PlayerCell = ({ player, subtext }) => {
                    </div>
                 )}
               </div>
-
               <div className="min-w-0">
                 <div className="text-xs text-slate-400 truncate">{subtext}</div>
                 {player.own_pct > 0 && (
-                   <div className={`text-[9px] mt-0.5 font-bold ${ownColor}`}>
-                     Own: {player.own_pct.toFixed(1)}%
-                   </div>
+                   <div className={`text-[9px] mt-0.5 font-bold ${ownColor}`}>Own: {player.own_pct.toFixed(1)}%</div>
                 )}
               </div>
           </div>
@@ -239,17 +214,13 @@ const MathCard = ({ player, leagueAvgs, week }) => {
 
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
   const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
-  
   const l3_diff = l3_act - l3_proj;
-  
   let trendColor = "text-slate-500";
   let trendSign = "";
   if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
   else if (l3_diff < -2.5) { trendColor = "text-red-400"; }
-
   const lgOffStall = leagueAvgs?.off_stall || 40;
   const lgDefStall = leagueAvgs?.def_stall || 40;
-
   const baseRaw = (player.avg_pts * (player.grade / 90));
   const baseMult = (player.grade / 90).toFixed(2);
   const offRaw = player.off_cap_val; 
@@ -262,7 +233,6 @@ const MathCard = ({ player, leagueAvgs, week }) => {
           <Calculator className="w-4 h-4 text-emerald-400" />
           <h3 className="font-bold text-white text-sm">Math Worksheet: {player.kicker_player_name}</h3>
         </div>
-        
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
@@ -528,6 +498,7 @@ const App = () => {
   })
   .filter(p => p.proj > 0); 
 
+  // Search Logic
   if (search) {
       const q = search.toLowerCase();
       processed = processed.filter(p => 
@@ -538,6 +509,7 @@ const App = () => {
       );
   }
 
+  // Sort Logic for Potential
   processed.sort((a, b) => {
      let valA = a[sortConfig.key];
      let valB = b[sortConfig.key];
@@ -550,6 +522,7 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
+  // YTD Processing with League Averages
   const calculateLeagueAvg = (arr, key) => {
       if (!arr || arr.length === 0) return 0;
       const sum = arr.reduce((acc, curr) => acc + (parseFloat(curr[key]) || 0), 0);
@@ -658,6 +631,7 @@ const App = () => {
           </div>
         </div>
 
+        {/* Navigation */}
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
@@ -722,7 +696,7 @@ const App = () => {
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
                     <th 
-                      className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
+                      className="px-2 py-3 align-middle text-left cursor-pointer group"
                       onClick={() => handleSort('own_pct')}
                     >
                       <div className="flex items-center gap-1">
@@ -775,11 +749,6 @@ const App = () => {
               </table>
             </div>
           </div>
-        )}
-        
-        {/* NEW ACCURACY TAB */}
-        {activeTab === 'accuracy' && (
-            <AccuracyTab players={processed} scoring={scoring} week={meta.week} />
         )}
 
         {/* YTD TABLE */}
@@ -893,6 +862,10 @@ const App = () => {
                   <MathCard player={aubreyExample} leagueAvgs={leagueAvgs} week={meta.week} />
                </div>
              )}
+
+             <div className="p-4 border-b border-slate-800 bg-slate-900/30 text-center text-xs text-slate-500">
+              This website was created by Caleb Hill. If you have any suggestions please <a href="mailto:calebthill@gmail.com" className="text-blue-400 hover:underline">email me</a>.
+            </div>
 
              {/* GLOSSARY GRID LAYOUT */}
              <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
