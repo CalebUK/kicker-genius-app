@@ -147,7 +147,6 @@ const PlayerCell = ({ player, subtext }) => {
     : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
 
   // --- PARSE INJURY DETAILS FOR 3-FOLD DISPLAY ---
-  // Format from Python: "ReportStatus (InjuryType)" e.g. "Inactive (Hamstring)"
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
   
@@ -155,14 +154,11 @@ const PlayerCell = ({ player, subtext }) => {
   let displayStatus = '';
   
   if (match) {
-      // Matches "Inactive (Hamstring)" -> Status: Inactive, Injury: Hamstring
-      // We want: "OUT: Hamstring" / "Inactive"
       const reportStatus = match[1];
       const injuryType = match[2];
       displayInjury = `${player.injury_status}: ${injuryType}`;
       displayStatus = reportStatus;
   } else {
-      // Fallback for "Roster: IR" or plain strings
       displayInjury = details; 
   }
 
@@ -210,7 +206,7 @@ const PlayerCell = ({ player, subtext }) => {
   );
 };
 
-const MathCard = ({ player }) => {
+const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
 
   const l3_diff = (player.history?.l3_actual || 0) - (player.history?.l3_proj || 0);
@@ -218,6 +214,9 @@ const MathCard = ({ player }) => {
   let trendSign = "";
   if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
   else if (l3_diff < -2.5) { trendColor = "text-red-400"; }
+
+  const lgOffStall = leagueAvgs?.off_stall || 40;
+  const lgDefStall = leagueAvgs?.def_stall || 40;
 
   return (
     <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
@@ -228,17 +227,51 @@ const MathCard = ({ player }) => {
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
           {/* 1. GRADE */}
-          <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
-            <div className="text-blue-300 font-bold mb-2 pb-1 border-b border-slate-800">1. MATCHUP</div>
-            <div className="flex justify-between mb-1"><span>Off Score:</span> <span className="text-white">{player.off_score_val}</span></div>
-            <div className="flex justify-between mb-1"><span>Def Score:</span> <span className="text-white">{player.def_score_val}</span></div>
-            <div className="mt-2 pt-1 border-t border-slate-800">
-              <div className="text-[10px] text-slate-400 mb-1">Bonuses:</div>
-              <div className="text-emerald-400 text-right">
-                  {player.grade_details && player.grade_details.length > 0 
-                    ? player.grade_details.map((d, i) => <div key={i}>{d}</div>) 
-                    : 'None'}
-              </div>
+          <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
+            <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">1. MATCHUP GRADE</div>
+            
+            {/* Offense Breakdown */}
+            <div>
+                <div className="flex justify-between text-xs text-slate-300">
+                    <span>Offense Score</span>
+                    <span className="font-mono text-white">{player.off_score_val}</span>
+                </div>
+                <div className="text-[9px] text-slate-500">
+                    ({player.off_stall_rate}% / {lgOffStall}%) × 40
+                </div>
+            </div>
+
+            {/* Defense Breakdown */}
+            <div>
+                <div className="flex justify-between text-xs text-slate-300">
+                    <span>Defense Score</span>
+                    <span className="font-mono text-white">{player.def_score_val}</span>
+                </div>
+                <div className="text-[9px] text-slate-500">
+                    ({player.def_stall_rate}% / {lgDefStall}%) × 40
+                </div>
+            </div>
+
+            {/* Bonuses */}
+            <div className="border-t border-slate-800 pt-1">
+                <div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div>
+                <div className="text-emerald-400 text-[10px] space-y-0.5">
+                    {player.grade_details && player.grade_details.length > 0 
+                        ? player.grade_details.map((d, i) => <div key={i} className="flex justify-between"><span>{d}</span></div>) 
+                        : <div className="text-slate-600 italic">None</div>}
+                </div>
+            </div>
+
+            {/* Total & Multiplier */}
+            <div className="mt-auto pt-2 border-t border-slate-700">
+                <div className="flex justify-between font-bold text-white">
+                    <span>Total Grade</span>
+                    <span>{player.grade}</span>
+                </div>
+                <div className="flex justify-between text-[10px] text-blue-400 mt-1">
+                     <span>Week {week} Multiplier (÷90)</span>
+                     <span className="font-mono font-bold">{(player.grade / 90).toFixed(2)}x</span>
+                </div>
             </div>
           </div>
 
@@ -281,10 +314,10 @@ const MathCard = ({ player }) => {
   );
 };
 
-const DeepDiveRow = ({ player }) => (
+const DeepDiveRow = ({ player, leagueAvgs, week }) => (
   <tr className="bg-slate-900/50 border-b border-slate-800">
     <td colSpan="11" className="p-4">
-      <MathCard player={player} />
+      <MathCard player={player} leagueAvgs={leagueAvgs} week={week} />
     </td>
   </tr>
 );
@@ -353,7 +386,7 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
@@ -396,7 +429,6 @@ const App = () => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
-      
       return {
           ...p, 
           fpts: pts, 
@@ -416,7 +448,7 @@ const App = () => {
       return 0;
   });
 
-  // --- INJURY BUCKETS (APPLYING 3-FOLD LOGIC TO ALL) ---
+  // --- INJURY BUCKETS ---
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
   const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful' || k.injury_status === 'Inactive');
   const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
@@ -425,14 +457,12 @@ const App = () => {
 
   // Helper to render injury card with logic
   const renderInjuryCard = (k, i, borderColor, textColor) => {
-      // Parse details for 3-fold display
       const details = k.injury_details || '';
       const match = details.match(/^(.+?)\s\((.+)\)$/);
       let displayInjury = k.injury_details;
       let displayStatus = '';
       
       if (match) {
-          // e.g. "Inactive (Hamstring)" -> Status: Inactive, Injury: Hamstring
           const reportStatus = match[1];
           const injuryType = match[2];
           displayInjury = `${k.injury_status}: ${injuryType}`;
@@ -465,7 +495,6 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -596,7 +625,7 @@ const App = () => {
                         <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && "🛡️"}</td>
                         <td className="px-6 py-4 text-slate-600">{expandedRow === idx ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</td>
                       </tr>
-                      {expandedRow === idx && <DeepDiveRow player={row} />}
+                      {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} />}
                     </React.Fragment>
                   ))}
                 </tbody>
@@ -713,7 +742,7 @@ const App = () => {
                   <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
                     <Calculator className="w-4 h-4 text-emerald-400" /> How It Works: Live Example
                   </h3>
-                  <MathCard player={aubreyExample} />
+                  <MathCard player={aubreyExample} leagueAvgs={leagueAvgs} week={meta.week} />
                </div>
              )}
 
