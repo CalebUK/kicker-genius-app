@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit } from 'lucide-react';
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -337,10 +337,7 @@ const App = () => {
      const proj = calcProj(pWithYtd, p.grade);
      return { ...pWithYtd, proj: parseFloat(proj), acc_diff: (p.history?.l3_actual||0) - (p.history?.l3_proj||0) };
   })
-  .filter(p => p.proj > 0); // Removed explicit OUT filtering so Search can find them if needed? Or keep strictly playable? Assuming keep STRICT filter for "Potential Model" tab unless searched. 
-  // Actually, user request: "Can we make sure ... if a kicker didn't play ... change actual and projection to 0 ... and put DNS".
-  // The previous request was: "If a player is Doubtful, Out, Inactive, IR ... can we not have them show up on the prediction page."
-  // So I will keep the filter.
+  .filter(p => p.proj > 0); 
 
   // Search Logic
   if (search) {
@@ -349,8 +346,7 @@ const App = () => {
           p.kicker_player_name.toLowerCase().includes(q) || 
           (p.team && p.team.toLowerCase().includes(q)) ||
           (q === 'dome' && p.is_dome) ||
-          (q === 'cowboys' && p.team === 'DAL') // Alias for Cowboys if team code is DAL
-          // Add other team aliases if needed, but fuzzy matching name/team usually works
+          (q === 'cowboys' && p.team === 'DAL') 
       );
   }
 
@@ -390,17 +386,18 @@ const App = () => {
       if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
   });
-  
-  const outKickers = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'CUT' || k.injury_status === 'IR');
-  const doubtfulKickers = injuries.filter(k => k.injury_status === 'Doubtful');
-  const questionableKickers = injuries.filter(k => k.injury_status === 'Questionable');
-  const otherKickers = injuries.filter(k => !['OUT', 'CUT', 'Doubtful', 'Questionable', 'Healthy', 'IR'].includes(k.injury_status));
+
+  // --- INJURY BUCKETS ---
+  const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
+  const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful' || k.injury_status === 'Inactive');
+  const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
 
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
