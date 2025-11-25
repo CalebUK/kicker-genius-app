@@ -585,12 +585,7 @@ def run_analysis():
                 'def_cap_val': round(def_cap, 1),
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
-                'history': history_obj,
-                'wk_fg_0_19': row['wk_fg_0_19'], 'wk_fg_20_29': row['wk_fg_20_29'],
-                'wk_fg_30_39': row['wk_fg_30_39'], 'wk_fg_40_49': row['wk_fg_40_49'],
-                'wk_fg_50_59': row['wk_fg_50_59'], 'wk_fg_60_plus': row['wk_fg_60_plus'],
-                'wk_fg_miss': row['wk_fg_miss'], 'wk_xp_made': row['wk_xp_made'],
-                'wk_xp_miss': row['wk_xp_miss']
+                'history': history_obj
             })
 
         final = final.join(final.apply(process_row, axis=1))
