@@ -182,7 +182,7 @@ const PlayerCell = ({ player, subtext }) => {
                 }
             }} 
           />
-          {statusText !== 'Healthy' && statusText !== '' && (
+          {statusText !== '' && (
              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
                 {/* 3-FOLD DISPLAY */}
                 {match ? (
@@ -214,8 +214,11 @@ const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
 
   // --- ROUNDED TREND LOGIC ---
-  const l3_proj = Math.round(player.history?.l3_proj || 0);
-  const l3_diff = (player.history?.l3_actual || 0) - l3_proj;
+  // Use the pre-calculated rounded sums if available, otherwise fallback
+  const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
+  const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
+  
+  const l3_diff = l3_act - l3_proj;
   
   let trendColor = "text-slate-500";
   let trendSign = "";
@@ -443,7 +446,7 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
@@ -453,7 +456,19 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-     return { ...pWithYtd, proj: parseFloat(proj), acc_diff: (p.history?.l3_actual||0) - (p.history?.l3_proj||0) };
+
+     // NEW LOGIC: Recalculate L3 sums based on rounded weekly values
+     const l3_games = p.history?.l3_games || [];
+     const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(g.proj), 0);
+     const l3_act_sum = l3_games.reduce((acc, g) => acc + g.act, 0); // Actuals are ints
+
+     return { 
+        ...pWithYtd, 
+        proj: parseFloat(proj), 
+        l3_proj_sum,
+        l3_act_sum,
+        acc_diff: l3_act_sum - l3_proj_sum
+     };
   })
   .filter(p => p.proj > 0); 
 
@@ -486,6 +501,7 @@ const App = () => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
+      
       return {
           ...p, 
           fpts: pts, 
@@ -552,6 +568,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -669,10 +686,10 @@ const App = () => {
                         <td className="px-6 py-4 text-center text-slate-400">{row.def_stall_rate}%</td>
                         
                         <td className="px-6 py-4 text-center">
-                           <div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.history?.l3_actual >= row.history?.l3_proj ? 'text-green-400' : 'text-red-400'}`}>
-                             <span>{row.history?.l3_actual || 0}</span>
+                           <div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.l3_act_sum >= row.l3_proj_sum ? 'text-green-400' : 'text-red-400'}`}>
+                             <span>{row.l3_act_sum}</span>
                              <span className="mx-1 text-slate-600">/</span>
-                             <span className="text-slate-500">{row.history?.l3_proj || 0}</span>
+                             <span className="text-slate-500">{row.l3_proj_sum}</span>
                            </div>
                            <div className="text-[9px] text-slate-500 uppercase">Act / Proj</div>
                         </td>
@@ -824,6 +841,7 @@ const App = () => {
           </div>
         )}
       </div>
+      {/* <Analytics /> */}
     </div>
   );
 };
