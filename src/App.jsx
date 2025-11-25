@@ -86,24 +86,29 @@ const HistoryBars = ({ games }) => {
            );
         }
 
-        const maxVal = Math.max(20, g.proj, g.act); 
-        const projPct = (g.proj / maxVal) * 100;
+        // ROUND PROJECTION FOR DISPLAY AND CALCULATION
+        const projRounded = Math.round(g.proj);
+        const diff = g.act - projRounded; // Recalculate diff based on rounded proj
+        const diffDisplay = diff > 0 ? `+${diff}` : diff;
+
+        const maxVal = Math.max(20, projRounded, g.act); 
+        const projPct = (projRounded / maxVal) * 100;
         const actPct = (g.act / maxVal) * 100;
-        const isBeat = g.act >= g.proj;
+        const isBeat = g.act >= projRounded;
         
         return (
           <div key={i} className="text-[10px]">
             <div className="flex justify-between text-slate-400 mb-0.5 font-bold">
               <span>Wk {g.week} vs {g.opp}</span>
               <span className={isBeat ? "text-green-400" : "text-red-400"}>
-                {isBeat ? "+" : ""}{g.diff}
+                {isBeat ? "+" : ""}{diff}
               </span>
             </div>
             
             {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
-                  <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
+                  <span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span>
                </div>
             </div>
 
@@ -209,7 +214,12 @@ const PlayerCell = ({ player, subtext }) => {
 const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
 
-  const l3_diff = (player.history?.l3_actual || 0) - (player.history?.l3_proj || 0);
+  // Recalculate diff based on rounded projection (same logic as HistoryBars)
+  const l3_act = player.history?.l3_actual || 0;
+  // Note: l3_proj in history is sum of raw projections. We might want to sum rounded projections for consistency,
+  // but here we just use what we have.
+  const l3_diff = l3_act - (player.history?.l3_proj || 0);
+  
   let trendColor = "text-slate-500";
   let trendSign = "";
   if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
@@ -221,13 +231,11 @@ const MathCard = ({ player, leagueAvgs, week }) => {
   // --- Calculation Variables for Display ---
   // Base
   const baseRaw = (player.avg_pts * (player.grade / 90));
+  const baseMult = (player.grade / 90).toFixed(2);
   
   // Offense
-  const offRaw = player.off_cap_val; // JSON value is actually pre-weight? No, JSON is post-weight usually.
-  // Wait, logic in python: off_cap = w_team_score * s_off * 1.2. 
-  // And weighted_proj = ... + (off_cap * 0.30)
-  // In React calcProj: const off_cap_scaled = (p.off_cap_val || 0) * scaleFactor;
-  // So player.off_cap_val IS the value before the 0.3 multiplier.
+  const offRaw = player.off_cap_val; 
+  const offShare = ((player.off_share || 0.35)*100).toFixed(0);
   
   // Defense
   const defRaw = player.def_cap_val; 
@@ -289,7 +297,7 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             </div>
           </div>
 
-          {/* 2. WEIGHTED PROJECTION (UPDATED) */}
+          {/* 2. WEIGHTED PROJECTION (UPDATED WITH FULL MATH) */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">WEIGHTED PROJECTION</div>
             
@@ -299,9 +307,8 @@ const MathCard = ({ player, leagueAvgs, week }) => {
                     <span>Base (50%)</span>
                     <span className="font-mono text-white">{(baseRaw * 0.5).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 flex justify-between">
-                    <span>Raw: {baseRaw.toFixed(1)}</span>
-                    <span>× 0.50</span>
+                <div className="text-[9px] text-slate-500 leading-tight">
+                    {player.avg_pts} (Avg) × {baseMult} (Grd) = {baseRaw.toFixed(1)}
                 </div>
             </div>
 
@@ -311,9 +318,8 @@ const MathCard = ({ player, leagueAvgs, week }) => {
                     <span>Offense (30%)</span>
                     <span className="font-mono text-white">{(offRaw * 0.3).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 flex justify-between">
-                    <span>Raw: {offRaw}</span>
-                    <span>× 0.30</span>
+                <div className="text-[9px] text-slate-500 leading-tight">
+                    {player.w_team_score} (Exp) × {offShare}% (Share) × 1.2 = {offRaw}
                 </div>
             </div>
 
@@ -323,9 +329,8 @@ const MathCard = ({ player, leagueAvgs, week }) => {
                     <span>Defense (20%)</span>
                     <span className="font-mono text-white">{(defRaw * 0.2).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 flex justify-between">
-                    <span>Raw: {defRaw}</span>
-                    <span>× 0.20</span>
+                <div className="text-[9px] text-slate-500 leading-tight">
+                    {player.w_def_allowed} (Allow) × 35% (Share) × 1.2 = {defRaw}
                 </div>
             </div>
 
@@ -797,7 +802,7 @@ const App = () => {
                   <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
                     <Calculator className="w-4 h-4 text-emerald-400" /> How It Works: Live Example
                   </h3>
-                  <MathCard player={aubreyExample} />
+                  <MathCard player={aubreyExample} leagueAvgs={leagueAvgs} week={meta.week} />
                </div>
              )}
 
