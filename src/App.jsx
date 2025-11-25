@@ -49,12 +49,8 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
       className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}
     >
       <div className="flex flex-col items-center justify-center h-full gap-0.5">
-        {/* LEAGUE AVERAGE DISPLAY (ABOVE HEADER) */}
-        {avg !== undefined && (
-           <div className="text-[10px] font-mono text-slate-500 bg-slate-900/50 px-1.5 rounded border border-slate-800 mb-0.5">
-             Avg: {Number(avg).toFixed(1)}
-           </div>
-        )}
+        
+        {/* REMOVED VISIBLE AVERAGE FROM HERE - NOW ONLY IN TOOLTIP */}
         
         <div className="flex items-center gap-1 mt-0.5">
           <span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>
@@ -66,6 +62,7 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
             )
           )}
         </div>
+        <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
       </div>
       
       {/* TOOLTIP */}
@@ -205,8 +202,8 @@ const PlayerCell = ({ player, subtext }) => {
           )}
         </div>
         <div className="min-w-0 flex-1">
-          {/* NAME FIX: Smaller text on mobile, truncate to 1 line to prevent stacking */}
-          <div className="text-xs md:text-sm font-bold text-white truncate leading-tight">
+          {/* NAME FIX: Smaller text on mobile, wrap enabled, removed truncate */}
+          <div className="text-xs md:text-sm font-bold text-white whitespace-normal break-words leading-tight">
             {player.kicker_player_name}
           </div>
           <div className="text-[10px] text-slate-500 truncate">{subtext}</div>
