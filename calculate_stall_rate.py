@@ -107,7 +107,6 @@ def scrape_cbs_injuries():
         if not dfs: return pd.DataFrame()
         combined = pd.concat(dfs, ignore_index=True)
         combined.columns = [c.lower().strip() for c in combined.columns]
-        
         col_map = {}
         for col in combined.columns:
             if 'player' in col: col_map[col] = 'full_name'
@@ -213,7 +212,8 @@ def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
     for _, kicker in current_stats.iterrows():
         pid = kicker['kicker_player_id']
         team = kicker['team']
-        team_sched = schedule[(schedule['week'].isin(weeks_to_analyze)) & 
+        # FIX: Ensure variable is team_schedule to match usage in loop
+        team_schedule = schedule[(schedule['week'].isin(weeks_to_analyze)) & 
                                  ((schedule['home_team'] == team) | (schedule['away_team'] == team))].copy()
         games_list = []
         total_act = 0
@@ -243,9 +243,8 @@ def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
             mult = 1.15 if vegas_implied > 24 else (0.85 if vegas_implied < 18 else 1.0)
             proj = round(base * mult, 1)
             act = int(actuals_map.get((wk, pid), 0))
-            total_act += act
-            total_proj += proj
-            games_list.append({'week': int(wk), 'status': 'ACTIVE', 'proj': proj, 'act': act, 'diff': round(act - proj, 1)})
+            
+            games_list.append({'week': int(wk), 'status': 'ACTIVE', 'proj': proj, 'act': act, 'diff': round(act - proj, 1), 'opp': opp})
             
         history_data[pid] = {'l3_actual': int(total_act), 'l3_proj': round(float(total_proj), 1), 'l3_games': games_list}
     return history_data
@@ -389,7 +388,6 @@ def run_analysis():
                 wk_xp_miss=('xp_miss', 'sum')
             ).reset_index()
         else:
-            # Create empty DataFrame with required columns to prevent merge errors
             live_stats = pd.DataFrame(columns=[
                 'kicker_player_id', 
                 'wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 
@@ -515,6 +513,10 @@ def run_analysis():
         if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         
         final = pd.merge(stats, model, on='team', how='inner')
+        
+        # MERGE LIVE STATS
+        final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
+        
         final = pd.merge(final, off_stall_l4, on='team', how='left')
         final = pd.merge(final, off_ppg, on='team', how='left')
         final = pd.merge(final, off_share, on='team', how='left')
@@ -522,9 +524,6 @@ def run_analysis():
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
-        
-        # MERGE LIVE STATS
-        final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
         final = final.fillna(0)
 
