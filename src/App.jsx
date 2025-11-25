@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit } from 'lucide-react';
-import { Analytics } from '@vercel/analytics/react';
+// import { Analytics } from '@vercel/analytics/react'; // UNCOMMENT THIS AFTER INSTALLING PACKAGE
 
 // --- GLOSSARY DATA ---
 const GLOSSARY_DATA = [
@@ -48,8 +48,15 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
       onClick={() => onSort && onSort(sortKey)}
       className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}
     >
-      <div className="flex flex-col items-center justify-center h-full gap-1">
-        <div className="flex items-center gap-1">
+      <div className="flex flex-col items-center justify-center h-full gap-0.5">
+        {/* LEAGUE AVERAGE DISPLAY (ABOVE HEADER) */}
+        {avg !== undefined && (
+           <div className="text-[10px] font-mono text-slate-500 bg-slate-900/50 px-1.5 rounded border border-slate-800">
+             Avg: {Number(avg).toFixed(1)}
+           </div>
+        )}
+        
+        <div className="flex items-center gap-1 mt-0.5">
           <span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>
           {onSort && (
             isActive ? (
@@ -59,11 +66,13 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
             )
           )}
         </div>
-        <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
+        {/* Info Icon (Moved below text for cleaner stack or keep inline if prefered) */}
+        {/* keeping inline above in flex-row inside name if needed, but description is tooltip */}
       </div>
+      
+      {/* TOOLTIP */}
       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto">
         <div className="text-white font-semibold mb-1">{description}</div>
-        {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
         <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 border-l border-t border-slate-700 rotate-45"></div>
       </div>
     </th>
@@ -196,8 +205,11 @@ const PlayerCell = ({ player, subtext }) => {
              </div>
           )}
         </div>
-        <div className="min-w-0">
-          <div className="text-base leading-tight truncate">{player.kicker_player_name}</div>
+        <div className="min-w-0 flex-1">
+          {/* NAME FIX: removed truncate, allowed wrap */}
+          <div className="text-sm md:text-base leading-tight font-semibold text-white whitespace-normal break-words">
+            {player.kicker_player_name}
+          </div>
           <div className="text-xs text-slate-500 truncate">{subtext}</div>
           {player.own_pct > 0 && (
              <div className={`text-[10px] mt-1 font-bold ${ownColor}`}>
@@ -214,7 +226,6 @@ const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
 
   // --- ROUNDED TREND LOGIC ---
-  // Use the pre-calculated rounded sums if available, otherwise fallback
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
   const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
   
@@ -229,15 +240,10 @@ const MathCard = ({ player, leagueAvgs, week }) => {
   const lgDefStall = leagueAvgs?.def_stall || 40;
 
   // --- Calculation Variables for Display ---
-  // Base
   const baseRaw = (player.avg_pts * (player.grade / 90));
   const baseMult = (player.grade / 90).toFixed(2);
-  
-  // Offense
   const offRaw = player.off_cap_val; 
   const offShare = ((player.off_share || 0.35)*100).toFixed(0);
-  
-  // Defense
   const defRaw = player.def_cap_val; 
 
   return (
@@ -251,30 +257,20 @@ const MathCard = ({ player, leagueAvgs, week }) => {
           {/* 1. GRADE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
-            
-            {/* Offense Breakdown */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Offense Score</span>
                     <span className="font-mono text-white">{player.off_score_val}</span>
                 </div>
-                <div className="text-[9px] text-slate-500">
-                    ({player.off_stall_rate}% / {lgOffStall}%) × 40
-                </div>
+                <div className="text-[9px] text-slate-500">({player.off_stall_rate}% / {lgOffStall}%) × 40</div>
             </div>
-
-            {/* Defense Breakdown */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Defense Score</span>
                     <span className="font-mono text-white">{player.def_score_val}</span>
                 </div>
-                <div className="text-[9px] text-slate-500">
-                    ({player.def_stall_rate}% / {lgDefStall}%) × 40
-                </div>
+                <div className="text-[9px] text-slate-500">({player.def_stall_rate}% / {lgDefStall}%) × 40</div>
             </div>
-
-            {/* Bonuses */}
             <div className="border-t border-slate-800 pt-1">
                 <div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div>
                 <div className="text-emerald-400 text-[10px] space-y-0.5">
@@ -283,8 +279,6 @@ const MathCard = ({ player, leagueAvgs, week }) => {
                         : <div className="text-slate-600 italic">None</div>}
                 </div>
             </div>
-
-            {/* Total & Multiplier */}
             <div className="mt-auto pt-2 border-t border-slate-700">
                 <div className="flex justify-between font-bold text-white">
                     <span>Total Grade</span>
@@ -297,44 +291,30 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             </div>
           </div>
 
-          {/* 2. WEIGHTED PROJECTION (UPDATED WITH FULL MATH) */}
+          {/* 2. WEIGHTED PROJECTION */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">WEIGHTED PROJECTION</div>
-            
-            {/* Base */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Base (50%)</span>
                     <span className="font-mono text-white">{(baseRaw * 0.5).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 leading-tight">
-                    {player.avg_pts} (Avg) × {baseMult} (Grd) = {baseRaw.toFixed(1)}
-                </div>
+                <div className="text-[9px] text-slate-500 leading-tight">{player.avg_pts} (Avg) × {baseMult} (Grd) = {baseRaw.toFixed(1)}</div>
             </div>
-
-            {/* Offense */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Offense (30%)</span>
                     <span className="font-mono text-white">{(offRaw * 0.3).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 leading-tight">
-                    {player.w_team_score} (Exp) × {offShare}% (Share) × 1.2 = {offRaw}
-                </div>
+                <div className="text-[9px] text-slate-500 leading-tight">{player.w_team_score} (Exp) × {offShare}% (Share) × 1.2 = {offRaw}</div>
             </div>
-
-            {/* Defense */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Defense (20%)</span>
                     <span className="font-mono text-white">{(defRaw * 0.2).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 leading-tight">
-                    {player.w_def_allowed} (Allow) × 35% (Share) × 1.2 = {defRaw}
-                </div>
+                <div className="text-[9px] text-slate-500 leading-tight">{player.w_def_allowed} (Allow) × 35% (Share) × 1.2 = {defRaw}</div>
             </div>
-
-            {/* Final Summary Line */}
             <div className="mt-auto pt-2 border-t border-slate-700">
                  <div className="flex justify-between font-bold text-white text-[11px]">
                     <span>Week {week} Projection</span>
@@ -446,7 +426,7 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
@@ -497,16 +477,23 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
+  // YTD Processing with League Averages
+  const calculateLeagueAvg = (arr, key) => {
+      if (!arr || arr.length === 0) return 0;
+      const sum = arr.reduce((acc, curr) => acc + (parseFloat(curr[key]) || 0), 0);
+      return sum / arr.length;
+  };
+
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
-      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
+      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
       return {
           ...p, 
           fpts: pts, 
-          avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), 
+          avg_fpts: (p.games > 0 ? (pts/p.games) : 0), 
           pct_val: pct, 
-          pct: pct, 
+          pct: pct.toFixed(1), 
           longs: longMakes 
       };
   }).sort((a, b) => {
@@ -519,6 +506,17 @@ const App = () => {
       if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
   });
+
+  const ytdAvgs = {
+      fpts: calculateLeagueAvg(ytdSorted, 'fpts'),
+      avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'),
+      pct: calculateLeagueAvg(ytdSorted, 'pct_val'),
+      longs: calculateLeagueAvg(ytdSorted, 'longs'),
+      dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'),
+      rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'),
+      off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'),
+      def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd'),
+  };
 
   // --- INJURY BUCKETS ---
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
@@ -716,14 +714,14 @@ const App = () => {
                   <tr>
                     <th className="px-6 py-3 align-middle text-center">Rank</th>
                     <th className="px-6 py-3 align-middle text-left">Player</th>
-                    <HeaderCell label="Fantasy Points" sortKey="fpts" currentSort={sortConfig} onSort={handleSort} description="Total Fantasy Points (Custom Scoring)" avg={leagueAvgs.fpts} />
-                    <HeaderCell label="Average Fantasy Points" sortKey="avg_fpts" currentSort={sortConfig} onSort={handleSort} description="Average Fantasy Points per Game" />
-                    <HeaderCell label="FG (Made/Attempts)" sortKey="pct" currentSort={sortConfig} onSort={handleSort} description="Field Goal Accuracy" />
-                    <HeaderCell label="50+ FGs" sortKey="longs" currentSort={sortConfig} onSort={handleSort} description="Long Distance Makes" />
-                    <HeaderCell label="Dome Games (%)" sortKey="dome_pct" currentSort={sortConfig} onSort={handleSort} description="Dome Games Played" />
-                    <HeaderCell label="FG Red Zone Trips" sortKey="rz_trips" currentSort={sortConfig} onSort={handleSort} description="Drives reaching FG Range" />
-                    <HeaderCell label="Offense Stall % (Season)" sortKey="off_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Offensive Stall Rate" />
-                    <HeaderCell label="Opponent Stall % (Season)" sortKey="def_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Defensive Stall Rate (Team's own defense)" />
+                    <HeaderCell label="Fantasy Points" sortKey="fpts" currentSort={sortConfig} onSort={handleSort} description="Total Fantasy Points (Custom Scoring)" avg={ytdAvgs.fpts} />
+                    <HeaderCell label="Average Fantasy Points" sortKey="avg_fpts" currentSort={sortConfig} onSort={handleSort} description="Average Fantasy Points per Game" avg={ytdAvgs.avg_fpts} />
+                    <HeaderCell label="FG (Made/Attempts)" sortKey="pct" currentSort={sortConfig} onSort={handleSort} description="Field Goal Accuracy" avg={ytdAvgs.pct} />
+                    <HeaderCell label="50+ FGs" sortKey="longs" currentSort={sortConfig} onSort={handleSort} description="Long Distance Makes" avg={ytdAvgs.longs} />
+                    <HeaderCell label="Dome Games (%)" sortKey="dome_pct" currentSort={sortConfig} onSort={handleSort} description="Dome Games Played" avg={ytdAvgs.dome_pct} />
+                    <HeaderCell label="FG Red Zone Trips" sortKey="rz_trips" currentSort={sortConfig} onSort={handleSort} description="Drives reaching FG Range" avg={ytdAvgs.rz_trips} />
+                    <HeaderCell label="Offense Stall % (Season)" sortKey="off_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Offensive Stall Rate" avg={ytdAvgs.off_stall} />
+                    <HeaderCell label="Opponent Stall % (Season)" sortKey="def_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Defensive Stall Rate (Team's own defense)" avg={ytdAvgs.def_stall} />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
