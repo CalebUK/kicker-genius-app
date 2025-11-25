@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit, PlayCircle, CheckCircle2, Clock, Flame, Mail } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit, PlayCircle, CheckCircle2, Clock, Flame } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react'; // UNCOMMENT THIS AFTER INSTALLING PACKAGE
 
 // --- GLOSSARY DATA ---
@@ -44,11 +44,11 @@ const SETTING_LABELS = {
 const FootballIcon = ({ isFire }) => (
   <div className="relative w-full h-full flex items-center justify-center">
     {isFire && (
-      <div className="absolute -top-2 -right-1 text-orange-500 animate-pulse">
+      <div className="absolute -top-3 -right-1 text-orange-500 animate-pulse">
         <Flame className="w-6 h-6 fill-orange-500 text-yellow-400" />
       </div>
     )}
-    <svg viewBox="0 0 100 60" className={`w-full h-full drop-shadow-md transform transition-transform hover:scale-110 ${isFire ? 'rotate-12' : '-rotate-12'}`}>
+    <svg viewBox="0 0 100 60" className={`w-full h-full drop-shadow-md transform transition-transform ${isFire ? 'rotate-12' : '-rotate-12'}`}>
       <ellipse cx="50" cy="30" rx="48" ry="28" fill="#8B4513" stroke="#3E2723" strokeWidth="2" />
       <path d="M 25 10 Q 35 30 25 50" stroke="white" strokeWidth="3" fill="none" opacity="0.9" />
       <path d="M 75 10 Q 65 30 75 50" stroke="white" strokeWidth="3" fill="none" opacity="0.9" />
@@ -81,7 +81,6 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
         </div>
         <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
       </div>
-      
       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto">
         <div className="text-white font-semibold mb-1">{description}</div>
         {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
@@ -123,13 +122,11 @@ const HistoryBars = ({ games }) => {
                 {g.act >= projRounded ? "+" : ""}{diff}
               </span>
             </div>
-            
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span>
                </div>
             </div>
-
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -180,10 +177,21 @@ const PlayerCell = ({ player, subtext }) => {
             {player.kicker_player_name}
             {player.isTop5 && <span title="Top 5 Scorer (Season)" className="text-sm">🔥</span>}
           </div>
-          
           <div className="flex items-center gap-3">
               <div className="relative group flex-shrink-0">
-                <img src={imageUrl} className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} onError={(e) => { if (e.target.src.includes('aubrey_custom.png')) { e.target.src = player.headshot_url; } else { e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }}} />
+                <img 
+                    src={imageUrl} 
+                    alt={player.kicker_player_name}
+                    className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} 
+                    onError={(e) => { 
+                        e.target.onerror = null; // Prevent infinite loop
+                        if (e.target.src.includes('aubrey_custom.png')) {
+                            e.target.src = player.headshot_url;
+                        } else {
+                            e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
+                        }
+                    }} 
+                />
                 {statusText !== '' && (
                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-auto whitespace-nowrap p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
                       {match ? (
@@ -295,7 +303,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
   };
 
   const displayPlayers = players.filter(p => {
-      if (p.proj <= 0) return false;
+      if (p.proj < 0) return false; // Allow 0, but not negative if that ever happens
       const status = getGameStatus(p.game_dt);
       if (filter === 'ALL') return true;
       return filter === status;
@@ -350,41 +358,26 @@ const AccuracyTab = ({ players, scoring, week }) => {
                         </div>
 
                         {/* FOOTBALL FIELD PROGRESS BAR */}
-                        <div className="h-8 w-full bg-emerald-800 rounded-md relative mb-4 border-2 border-white overflow-hidden mt-2 shadow-inner">
-                             {/* Endzones (Left and Right) - WHITE */}
-                             <div className="absolute left-0 top-0 bottom-0 w-4 bg-white z-10"></div>
-                             <div className="absolute right-0 top-0 bottom-0 w-4 bg-white z-10"></div>
-
-                             {/* Field Markings */}
+                        <div className="h-8 w-full bg-emerald-900 rounded-md relative mb-4 border-2 border-emerald-800 overflow-hidden mt-2 shadow-inner group">
+                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-800 to-emerald-950 opacity-80"></div>
+                             <div className="absolute left-0 top-0 bottom-0 w-4 bg-white/90 z-0"></div>
+                             <div className="absolute right-0 top-0 bottom-0 w-4 bg-white/90 z-0"></div>
                              <div className="absolute inset-0 flex justify-between px-4 items-center pointer-events-none z-0">
-                                 {/* Hash Marks 10-90% (3/5 height), Midfield (Full height) */}
                                  {[...Array(9)].map((_, idx) => {
-                                     const isMidfield = idx === 4; // 50 yard line
+                                     const isMidfield = idx === 4;
                                      return (
                                          <div 
                                             key={idx} 
-                                            className={`${isMidfield ? 'h-full w-1' : 'h-[60%] w-0.5'} bg-white opacity-80`}
+                                            className={`${isMidfield ? 'h-full w-0.5 bg-white/80' : 'h-[60%] w-px bg-white/40'}`}
                                          ></div>
                                      );
                                  })}
                              </div>
-                             
-                             {/* Center Field Logo (Fully Visible) */}
-                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                                 <img src="/assets/logo.png" className="w-8 h-8 object-contain drop-shadow-md" alt="logo"/>
-                             </div>
+                             <img src="/assets/logo.png" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 object-contain opacity-40 pointer-events-none" alt="logo"/>
 
-                             {/* Progress Fill (Semi-Transparent to show field lines) */}
-                             <div 
-                                className={`h-full transition-all duration-1000 ease-out z-20 ${isSmashed ? 'bg-blue-500/80' : isBeat ? 'bg-emerald-500/80' : 'bg-yellow-500/70'}`} 
-                                style={{ width: `${pct}%` }}
-                             ></div>
+                             <div className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${pct}%` }}></div>
                              
-                             {/* Ball Icon */}
-                             <div 
-                                className="absolute top-1/2 -translate-y-1/2 w-10 h-10 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" 
-                                style={{ left: `calc(${pct}% - 20px)` }}
-                             >
+                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 16px)` }}>
                                  <FootballIcon isFire={isSmashed} />
                              </div>
                         </div>
@@ -522,7 +515,6 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
-  // YTD Processing with League Averages
   const calculateLeagueAvg = (arr, key) => {
       if (!arr || arr.length === 0) return 0;
       const sum = arr.reduce((acc, curr) => acc + (parseFloat(curr[key]) || 0), 0);
@@ -568,43 +560,6 @@ const App = () => {
   const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
 
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
-
-  // Helper to render injury card with logic
-  const renderInjuryCard = (k, i, borderColor, textColor) => {
-      const details = k.injury_details || '';
-      const match = details.match(/^(.+?)\s\((.+)\)$/);
-      let displayInjury = k.injury_details;
-      let displayStatus = '';
-      
-      if (match) {
-          const reportStatus = match[1];
-          const injuryType = match[2];
-          displayInjury = `${k.injury_status}: ${injuryType}`;
-          displayStatus = reportStatus;
-      }
-
-      return (
-         <div key={i} className={`flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border ${borderColor}`}>
-            <img 
-                src={k.headshot_url} 
-                className={`w-12 h-12 rounded-full border-2 object-cover ${borderColor.replace('border', 'border-')}`} 
-                onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}
-            />
-            <div>
-               <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-               {match ? (
-                   <>
-                       <div className={`text-xs font-bold ${textColor}`}>{displayInjury}</div>
-                       <div className="text-xs text-slate-400 italic">{displayStatus}</div>
-                   </>
-               ) : (
-                   <div className={`text-xs ${textColor}`}>{displayInjury}</div>
-               )}
-               <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
-            </div>
-         </div>
-      );
-  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
@@ -696,7 +651,7 @@ const App = () => {
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
                     <th 
-                      className="px-2 py-3 align-middle text-left cursor-pointer group"
+                      className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
                       onClick={() => handleSort('own_pct')}
                     >
                       <div className="flex items-center gap-1">
@@ -749,6 +704,11 @@ const App = () => {
               </table>
             </div>
           </div>
+        )}
+        
+        {/* NEW ACCURACY TAB */}
+        {activeTab === 'accuracy' && (
+            <AccuracyTab players={processed} scoring={scoring} week={meta.week} />
         )}
 
         {/* YTD TABLE */}
