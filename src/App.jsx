@@ -49,12 +49,6 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
       className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}
     >
       <div className="flex flex-col items-center justify-center h-full gap-0.5">
-        {/* LEAGUE AVERAGE DISPLAY (ABOVE HEADER) */}
-        {avg !== undefined && (
-           <div className="text-[10px] font-mono text-slate-500 bg-slate-900/50 px-1.5 rounded border border-slate-800 mb-0.5">
-             Avg: {Number(avg).toFixed(1)}
-           </div>
-        )}
         
         <div className="flex items-center gap-1 mt-0.5">
           <span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>
@@ -66,6 +60,7 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
             )
           )}
         </div>
+        <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
       </div>
       
       {/* TOOLTIP */}
@@ -101,6 +96,7 @@ const HistoryBars = ({ games }) => {
         const maxVal = Math.max(20, projRounded, g.act); 
         const projPct = (projRounded / maxVal) * 100;
         const actPct = (g.act / maxVal) * 100;
+        const isBeat = g.act >= projRounded;
         
         return (
           <div key={i} className="text-[10px]">
@@ -230,6 +226,7 @@ const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
 
   // --- ROUNDED TREND LOGIC ---
+  // Ensure history exists before accessing
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
   const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
   
@@ -466,7 +463,20 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-     return { ...pWithYtd, proj: parseFloat(proj), acc_diff: (p.history?.l3_actual||0) - (p.history?.l3_proj||0) };
+
+     // NEW LOGIC: Recalculate L3 sums based on rounded weekly values
+     // SAFETY CHECK: Ensure history and games exist
+     const l3_games = p.history?.l3_games || [];
+     const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0); // Ensure number
+     const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
+
+     return { 
+        ...pWithYtd, 
+        proj: parseFloat(proj), 
+        l3_proj_sum,
+        l3_act_sum,
+        acc_diff: l3_act_sum - l3_proj_sum
+     };
   })
   .filter(p => p.proj > 0); 
 
@@ -495,16 +505,23 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
+  // YTD Processing with League Averages
+  const calculateLeagueAvg = (arr, key) => {
+      if (!arr || arr.length === 0) return 0;
+      const sum = arr.reduce((acc, curr) => acc + (parseFloat(curr[key]) || 0), 0);
+      return sum / arr.length;
+  };
+
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
-      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
+      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
       return {
           ...p, 
           fpts: pts, 
-          avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), 
+          avg_fpts: (p.games > 0 ? (pts/p.games) : 0), 
           pct_val: pct, 
-          pct: pct, 
+          pct: pct.toFixed(1), 
           longs: longMakes 
       };
   }).sort((a, b) => {
@@ -517,6 +534,17 @@ const App = () => {
       if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
   });
+
+  const ytdAvgs = {
+      fpts: calculateLeagueAvg(ytdSorted, 'fpts'),
+      avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'),
+      pct: calculateLeagueAvg(ytdSorted, 'pct_val'),
+      longs: calculateLeagueAvg(ytdSorted, 'longs'),
+      dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'),
+      rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'),
+      off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'),
+      def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd'),
+  };
 
   // --- INJURY BUCKETS ---
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
@@ -648,7 +676,7 @@ const App = () => {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="w-8 px-2 py-3 align-middle text-center">Rank</th>
+                    <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
                     <th 
                       className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
                       onClick={() => handleSort('own_pct')}
@@ -674,7 +702,7 @@ const App = () => {
                   {processed.map((row, idx) => (
                     <React.Fragment key={idx}>
                       <tr onClick={() => toggleRow(idx)} className="hover:bg-slate-800/50 cursor-pointer transition-colors">
-                        <td className="w-8 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                        <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                         <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} />
                         <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
                         <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
