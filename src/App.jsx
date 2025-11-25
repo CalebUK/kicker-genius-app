@@ -59,9 +59,9 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
             )
           )}
         </div>
-        <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
       </div>
       
+      {/* TOOLTIP */}
       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto">
         <div className="text-white font-semibold mb-1">{description}</div>
         {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
@@ -88,12 +88,12 @@ const HistoryBars = ({ games }) => {
            );
         }
 
+        // --- ROUNDING LOGIC ---
         const projRounded = Math.round(g.proj);
         const diff = g.act - projRounded;
         const maxVal = Math.max(20, projRounded, g.act); 
         const projPct = (projRounded / maxVal) * 100;
         const actPct = (g.act / maxVal) * 100;
-        const isBeat = g.act >= projRounded;
         
         return (
           <div key={i} className="text-[10px]">
@@ -123,6 +123,7 @@ const HistoryBars = ({ games }) => {
 const PlayerCell = ({ player, subtext }) => {
   const injuryColor = player.injury_color || 'slate-600'; 
   const statusText = player.injury_status || '';
+  
   let borderColor = 'border-slate-600';
   if (injuryColor.includes('green')) borderColor = 'border-green-500';
   if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
@@ -154,9 +155,12 @@ const PlayerCell = ({ player, subtext }) => {
   return (
     <td className="px-3 py-4 font-medium text-white">
       <div className="flex flex-col justify-center">
-          <div className="text-xs md:text-sm font-bold text-white leading-tight mb-2 whitespace-normal break-words">
+          {/* TOP: NAME with Fire Emoji if Top 5 */}
+          <div className="text-xs md:text-sm font-bold text-white leading-tight mb-2 whitespace-normal break-words flex items-center gap-1">
             {player.kicker_player_name}
+            {player.isTop5 && <span title="Top 5 Scorer (Season)" className="text-sm">🔥</span>}
           </div>
+          
           <div className="flex items-center gap-3">
               <div className="relative group flex-shrink-0">
                 <img src={imageUrl} className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} onError={(e) => { if (e.target.src.includes('aubrey_custom.png')) { e.target.src = player.headshot_url; } else { e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }}} />
@@ -187,15 +191,22 @@ const PlayerCell = ({ player, subtext }) => {
 
 const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
+
+  // --- ROUNDED TREND LOGIC ---
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
   const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
+  
   const l3_diff = l3_act - l3_proj;
+  
   let trendColor = "text-slate-500";
   let trendSign = "";
   if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
   else if (l3_diff < -2.5) { trendColor = "text-red-400"; }
+
   const lgOffStall = leagueAvgs?.off_stall || 40;
   const lgDefStall = leagueAvgs?.def_stall || 40;
+
+  // --- Calculation Variables for Display ---
   const baseRaw = (player.avg_pts * (player.grade / 90));
   const baseMult = (player.grade / 90).toFixed(2);
   const offRaw = player.off_cap_val; 
@@ -208,7 +219,9 @@ const MathCard = ({ player, leagueAvgs, week }) => {
           <Calculator className="w-4 h-4 text-emerald-400" />
           <h3 className="font-bold text-white text-sm">Math Worksheet: {player.kicker_player_name}</h3>
         </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+          {/* 1. GRADE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
             <div><div className="flex justify-between text-xs text-slate-300"><span>Offense Score</span><span className="font-mono text-white">{player.off_score_val}</span></div><div className="text-[9px] text-slate-500">({player.off_stall_rate}% / {lgOffStall}%) × 40</div></div>
@@ -223,7 +236,8 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             <div><div className="flex justify-between text-xs text-slate-300"><span>Defense (20%)</span><span className="font-mono text-white">{(defRaw * 0.2).toFixed(1)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{player.w_def_allowed} (Allow) × 35% (Share) × 1.2 = {defRaw}</div></div>
             <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white text-[11px]"><span>Week {week} Projection</span><span className="text-emerald-400 text-lg">{player.proj}</span></div><div className="text-[9px] text-right text-slate-500">(Rounded)</div></div>
           </div>
-          <div className="bg-slate-900 p-3 rounded border border-slate-800/50"><div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between"><div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> TREND (L3)</div><span className={`text-[10px] font-mono ${trendColor}`}>{trendSign}{l3_diff.toFixed(1)}</span></div><HistoryBars games={player.history?.l3_games} /></div>
+          {/* RENAMED TO "Last 3 Trend" */}
+          <div className="bg-slate-900 p-3 rounded border border-slate-800/50"><div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between"><div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> Last 3 Trend</div><span className={`text-[10px] font-mono ${trendColor}`}>{trendSign}{l3_diff.toFixed(1)}</span></div><HistoryBars games={player.history?.l3_games} /></div>
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col"><div className="text-emerald-400 font-bold mb-2 pb-1 border-b border-slate-800 flex items-center gap-2"><BrainCircuit className="w-3 h-3" /> KICKERGENIUS INSIGHT</div><div className="text-xs text-slate-300 leading-relaxed h-full flex items-center">{player.narrative || "No specific analysis available for this player yet."}</div></div>
         </div>
         <div className="mt-3 bg-slate-800/40 p-2 rounded border border-slate-800 text-[10px] text-slate-400 flex gap-6 justify-center"><span><strong className="text-slate-200">Vegas:</strong> {player.details_vegas_spread} / {player.details_vegas_total} Total</span><span><strong className="text-slate-200">Implied Score:</strong> {player.vegas ? Number(player.vegas).toFixed(1) : '--'} pts</span><span><strong className="text-slate-200">L4 Team PF:</strong> {player.off_ppg ? Number(player.off_ppg).toFixed(1) : '--'} pts</span><span><strong className="text-slate-200">L4 Opp PA:</strong> {player.def_pa ? Number(player.def_pa).toFixed(1) : '--'} pts</span></div>
@@ -293,9 +307,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
             {displayPlayers.map((p, i) => {
                 const liveScore = calculateLiveScore(p);
                 const proj = p.proj;
-                
-                // Math for Progress Bar
-                const pct = Math.min(100, Math.max(5, (liveScore / proj) * 100)); 
+                const pct = Math.min(100, Math.max(5, (liveScore / proj) * 100));
                 const isBeat = liveScore >= proj;
                 const isSmashed = liveScore >= proj + 3;
                 const status = getGameStatus(p.game_dt);
@@ -327,26 +339,16 @@ const AccuracyTab = ({ players, scoring, week }) => {
                         </div>
 
                         {/* FOOTBALL FIELD PROGRESS BAR */}
-                        <div className="h-6 w-full bg-emerald-900 rounded-md relative mb-4 border border-emerald-800 overflow-visible mt-2">
-                             {/* Field Markings */}
+                        <div className="h-6 w-full bg-emerald-900/40 rounded-md relative mb-4 border border-emerald-800 overflow-visible mt-2">
                              <div className="absolute inset-0 flex justify-between px-2 items-center pointer-events-none opacity-40">
-                                 {/* Yard Lines (0, 10, 20, 30, 40, 50, 40, 30, 20, 10, 0) */}
                                  {[...Array(11)].map((_, idx) => (
                                      <div key={idx} className={`h-full w-0.5 ${idx === 5 ? 'bg-white w-1' : 'bg-white/50'}`}></div>
                                  ))}
                              </div>
-                             
-                             {/* Faint Logo at 50yd line */}
                              <img src="/assets/logo.png" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 opacity-20 pointer-events-none" alt="logo"/>
-
-                             {/* Endzones (Visual Only) */}
                              <div className="absolute left-0 top-0 bottom-0 w-2 bg-white/10 border-r border-white/20"></div>
                              <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/10 border-l border-white/20"></div>
-
-                             {/* Fill Bar */}
                              <div className={`h-full rounded-l-md transition-all duration-1000 ease-out ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/60'}`} style={{ width: `${pct}%` }}></div>
-                             
-                             {/* Ball Icon */}
                              <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-20 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 14px)` }}>
                                  <img 
                                     src={isSmashed ? "/assets/football-fire.png" : "/assets/football.png"} 
@@ -451,13 +453,23 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
+
+     // NEW LOGIC: Recalculate L3 sums based on rounded weekly values
      const l3_games = p.history?.l3_games || [];
      const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0);
      const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
-     return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum };
+
+     return { 
+        ...pWithYtd, 
+        proj: parseFloat(proj), 
+        l3_proj_sum,
+        l3_act_sum,
+        acc_diff: l3_act_sum - l3_proj_sum
+     };
   })
   .filter(p => p.proj > 0); 
 
+  // Search Logic
   if (search) {
       const q = search.toLowerCase();
       processed = processed.filter(p => 
@@ -468,10 +480,12 @@ const App = () => {
       );
   }
 
+  // Sort Logic for Potential
   processed.sort((a, b) => {
      let valA = a[sortConfig.key];
      let valB = b[sortConfig.key];
      if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
+     
      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
      return 0;
@@ -480,17 +494,31 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
+  // YTD Processing with League Averages
   const calculateLeagueAvg = (arr, key) => {
       if (!arr || arr.length === 0) return 0;
       const sum = arr.reduce((acc, curr) => acc + (parseFloat(curr[key]) || 0), 0);
       return sum / arr.length;
   };
 
+  // Identify Top 5 Scorers for Fire Emoji
+  const top5Ytd = ytd.map(p => ({ ...p, fpts_calc: calcFPts(p) })).sort((a, b) => b.fpts_calc - a.fpts_calc).slice(0, 5).map(p => p.kicker_player_name);
+
+  // Re-map processed to include isTop5 flag
+  processed = processed.map(p => ({ ...p, isTop5: top5Ytd.includes(p.kicker_player_name) }));
+
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
-      return { ...p, fpts: pts, avg_fpts: (p.games > 0 ? (pts/p.games) : 0), pct_val: pct, pct: pct.toFixed(1), longs: longMakes };
+      return {
+          ...p, 
+          fpts: pts, 
+          avg_fpts: (p.games > 0 ? (pts/p.games) : 0), 
+          pct_val: pct, 
+          pct: pct.toFixed(1), 
+          longs: longMakes 
+      };
   }).sort((a, b) => {
       let key = sortConfig.key;
       if (key === 'pct') key = 'pct_val';
@@ -513,6 +541,7 @@ const App = () => {
       def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd'),
   };
 
+  // --- INJURY BUCKETS ---
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
   const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful' || k.injury_status === 'Inactive');
   const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
@@ -525,11 +554,21 @@ const App = () => {
       const match = details.match(/^(.+?)\s\((.+)\)$/);
       let displayInjury = k.injury_details;
       let displayStatus = '';
-      if (match) { const reportStatus = match[1]; const injuryType = match[2]; displayInjury = `${k.injury_status}: ${injuryType}`; displayStatus = reportStatus; }
+      
+      if (match) {
+          const reportStatus = match[1];
+          const injuryType = match[2];
+          displayInjury = `${k.injury_status}: ${injuryType}`;
+          displayStatus = reportStatus;
+      }
 
       return (
          <div key={i} className={`flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border ${borderColor}`}>
-            <img src={k.headshot_url} className={`w-12 h-12 rounded-full border-2 object-cover ${borderColor.replace('border', 'border-')}`} onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
+            <img 
+                src={k.headshot_url} 
+                className={`w-12 h-12 rounded-full border-2 object-cover ${borderColor.replace('border', 'border-')}`} 
+                onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}
+            />
             <div>
                <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
                {match ? (
@@ -571,7 +610,6 @@ const App = () => {
           </div>
         </div>
 
-        {/* Navigation */}
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
@@ -634,7 +672,7 @@ const App = () => {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="w-8 px-2 py-3 align-middle text-center">Rank</th>
+                    <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
                     <th 
                       className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
                       onClick={() => handleSort('own_pct')}
@@ -660,7 +698,7 @@ const App = () => {
                   {processed.map((row, idx) => (
                     <React.Fragment key={idx}>
                       <tr onClick={() => toggleRow(idx)} className="hover:bg-slate-800/50 cursor-pointer transition-colors">
-                        <td className="w-8 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                        <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                         <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} />
                         <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
                         <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
