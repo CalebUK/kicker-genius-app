@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit, CheckCircle2, XCircle } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react'; // UNCOMMENT THIS AFTER INSTALLING PACKAGE
 
 // --- GLOSSARY DATA ---
@@ -49,6 +49,7 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
       className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}
     >
       <div className="flex flex-col items-center justify-center h-full gap-0.5">
+        
         <div className="flex items-center gap-1 mt-0.5">
           <span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>
           {onSort && (
@@ -89,11 +90,13 @@ const HistoryBars = ({ games }) => {
            );
         }
 
+        // --- ROUNDING LOGIC ---
         const projRounded = Math.round(g.proj);
         const diff = g.act - projRounded;
         const maxVal = Math.max(20, projRounded, g.act); 
         const projPct = (projRounded / maxVal) * 100;
         const actPct = (g.act / maxVal) * 100;
+        const isBeat = g.act >= projRounded;
         
         return (
           <div key={i} className="text-[10px]">
@@ -103,11 +106,15 @@ const HistoryBars = ({ games }) => {
                 {g.act >= projRounded ? "+" : ""}{diff}
               </span>
             </div>
+            
+            {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span>
                </div>
             </div>
+
+            {/* Actual Bar (Color) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
                <div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
                   <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
@@ -146,6 +153,7 @@ const PlayerCell = ({ player, subtext }) => {
     ? '/assets/aubrey_custom.png' 
     : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
 
+  // --- PARSE INJURY DETAILS FOR 3-FOLD DISPLAY ---
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
   
@@ -171,6 +179,7 @@ const PlayerCell = ({ player, subtext }) => {
           
           {/* BOTTOM: IMAGE + DETAILS SIDE-BY-SIDE */}
           <div className="flex items-center gap-3">
+              {/* Left: Image with Tooltip */}
               <div className="relative group flex-shrink-0">
                 <img 
                   src={imageUrl} 
@@ -198,10 +207,11 @@ const PlayerCell = ({ player, subtext }) => {
                 )}
               </div>
 
+              {/* Right: Matchup & Ownership */}
               <div className="min-w-0">
                 <div className="text-xs text-slate-400 truncate">{subtext}</div>
                 {player.own_pct > 0 && (
-                   <div className={`text-[9px] mt-0.5 font-bold ${ownColor}`}>
+                   <div className={`text-[10px] mt-0.5 font-bold ${ownColor}`}>
                      Own: {player.own_pct.toFixed(1)}%
                    </div>
                 )}
@@ -215,6 +225,8 @@ const PlayerCell = ({ player, subtext }) => {
 const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
 
+  // --- ROUNDED TREND LOGIC ---
+  // Ensure history exists before accessing
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
   const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
   
@@ -228,6 +240,7 @@ const MathCard = ({ player, leagueAvgs, week }) => {
   const lgOffStall = leagueAvgs?.off_stall || 40;
   const lgDefStall = leagueAvgs?.def_stall || 40;
 
+  // --- Calculation Variables for Display ---
   const baseRaw = (player.avg_pts * (player.grade / 90));
   const baseMult = (player.grade / 90).toFixed(2);
   const offRaw = player.off_cap_val; 
@@ -242,22 +255,33 @@ const MathCard = ({ player, leagueAvgs, week }) => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+          {/* 1. GRADE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
+            
+            {/* Offense Breakdown */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Offense Score</span>
                     <span className="font-mono text-white">{player.off_score_val}</span>
                 </div>
-                <div className="text-[9px] text-slate-500">({player.off_stall_rate}% / {lgOffStall}%) × 40</div>
+                <div className="text-[9px] text-slate-500">
+                    ({player.off_stall_rate}% / {lgOffStall}%) × 40
+                </div>
             </div>
+
+            {/* Defense Breakdown */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Defense Score</span>
                     <span className="font-mono text-white">{player.def_score_val}</span>
                 </div>
-                <div className="text-[9px] text-slate-500">({player.def_stall_rate}% / {lgDefStall}%) × 40</div>
+                <div className="text-[9px] text-slate-500">
+                    ({player.def_stall_rate}% / {lgDefStall}%) × 40
+                </div>
             </div>
+
+            {/* Bonuses */}
             <div className="border-t border-slate-800 pt-1">
                 <div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div>
                 <div className="text-emerald-400 text-[10px] space-y-0.5">
@@ -266,6 +290,8 @@ const MathCard = ({ player, leagueAvgs, week }) => {
                         : <div className="text-slate-600 italic">None</div>}
                 </div>
             </div>
+
+            {/* Total & Multiplier */}
             <div className="mt-auto pt-2 border-t border-slate-700">
                 <div className="flex justify-between font-bold text-white">
                     <span>Total Grade</span>
@@ -278,29 +304,44 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             </div>
           </div>
 
+          {/* 2. WEIGHTED PROJECTION */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">WEIGHTED PROJECTION</div>
+            
+            {/* Base */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Base (50%)</span>
                     <span className="font-mono text-white">{(baseRaw * 0.5).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 leading-tight">{player.avg_pts} (Avg) × {baseMult} (Grd) = {baseRaw.toFixed(1)}</div>
+                <div className="text-[9px] text-slate-500 leading-tight">
+                    {player.avg_pts} (Avg) × {baseMult} (Grd) = {baseRaw.toFixed(1)}
+                </div>
             </div>
+
+            {/* Offense */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Offense (30%)</span>
                     <span className="font-mono text-white">{(offRaw * 0.3).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 leading-tight">{player.w_team_score} (Exp) × {offShare}% (Share) × 1.2 = {offRaw}</div>
+                <div className="text-[9px] text-slate-500 leading-tight">
+                    {player.w_team_score} (Exp) × {offShare}% (Share) × 1.2 = {offRaw}
+                </div>
             </div>
+
+            {/* Defense */}
             <div>
                 <div className="flex justify-between text-xs text-slate-300">
                     <span>Defense (20%)</span>
                     <span className="font-mono text-white">{(defRaw * 0.2).toFixed(1)}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 leading-tight">{player.w_def_allowed} (Allow) × 35% (Share) × 1.2 = {defRaw}</div>
+                <div className="text-[9px] text-slate-500 leading-tight">
+                    {player.w_def_allowed} (Allow) × 35% (Share) × 1.2 = {defRaw}
+                </div>
             </div>
+
+            {/* Final Summary Line */}
             <div className="mt-auto pt-2 border-t border-slate-700">
                  <div className="flex justify-between font-bold text-white text-[11px]">
                     <span>Week {week} Projection</span>
@@ -310,6 +351,7 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             </div>
           </div>
           
+          {/* 3. HISTORY */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
              <div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> TREND (L3)</div>
@@ -318,6 +360,7 @@ const MathCard = ({ player, leagueAvgs, week }) => {
              <HistoryBars games={player.history?.l3_games} />
           </div>
 
+          {/* 4. NARRATIVE */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col">
              <div className="text-emerald-400 font-bold mb-2 pb-1 border-b border-slate-800 flex items-center gap-2">
                <BrainCircuit className="w-3 h-3" /> KICKERGENIUS INSIGHT
@@ -345,108 +388,6 @@ const DeepDiveRow = ({ player, leagueAvgs, week }) => (
     </td>
   </tr>
 );
-
-// --- ACCURACY TAB COMPONENT ---
-const AccuracyTab = ({ players, scoring, week }) => {
-  // Calculate Live Score based on raw weekly data and user settings
-  const calculateLiveScore = (p) => {
-      return (
-          ((p.wk_fg_0_19 || 0) * scoring.fg0_19) +
-          ((p.wk_fg_20_29 || 0) * scoring.fg20_29) +
-          ((p.wk_fg_30_39 || 0) * scoring.fg30_39) +
-          ((p.wk_fg_40_49 || 0) * scoring.fg40_49) +
-          ((p.wk_fg_50_59 || 0) * scoring.fg50_59) +
-          ((p.wk_fg_60_plus || 0) * scoring.fg60_plus) +
-          ((p.wk_fg_miss || 0) * scoring.fg_miss) +
-          ((p.wk_xp_made || 0) * scoring.xp_made) +
-          ((p.wk_xp_miss || 0) * scoring.xp_miss)
-      );
-  };
-
-  // Filter for players who actually have a projection > 0
-  const displayPlayers = players.filter(p => p.proj > 0).sort((a, b) => b.proj - a.proj);
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in duration-500">
-        {displayPlayers.map((p, i) => {
-            const liveScore = calculateLiveScore(p);
-            const proj = p.proj; // Already rounded in processed data
-            const pct = Math.min(100, Math.max(0, (liveScore / proj) * 100));
-            const isBeat = liveScore >= proj;
-            const isSmashed = liveScore >= proj + 3;
-            const diff = liveScore - proj;
-            
-            // Highlight Cowboys/Aubrey
-            const isSpecial = p.kicker_player_name.includes('Aubrey') || p.team === 'DAL';
-            const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
-
-            return (
-                <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass}`}>
-                    {/* Header */}
-                    <div className="flex items-center gap-3 mb-3 relative z-10">
-                        <img src={p.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-700 object-cover bg-slate-950"/>
-                        <div className="min-w-0">
-                            <div className="font-bold text-white text-sm truncate">{p.kicker_player_name}</div>
-                            <div className="text-xs text-slate-500">{p.team} vs {p.opponent}</div>
-                        </div>
-                        <div className="ml-auto text-right">
-                             <div className={`text-2xl font-bold ${isSmashed ? 'text-blue-400' : isBeat ? 'text-emerald-400' : 'text-white'}`}>
-                                {liveScore}
-                             </div>
-                             <div className="text-[10px] text-slate-500 uppercase font-bold">
-                                Proj: {proj}
-                             </div>
-                        </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="w-full h-3 bg-slate-950 rounded-full overflow-hidden mb-3 relative z-10 border border-slate-800">
-                        <div 
-                            className={`h-full transition-all duration-1000 ease-out ${isSmashed ? 'bg-blue-500' : isBeat ? 'bg-emerald-500' : 'bg-yellow-500'}`}
-                            style={{ width: `${pct}%` }}
-                        ></div>
-                    </div>
-
-                    {/* Stat Badges */}
-                    <div className="flex flex-wrap gap-1.5 relative z-10">
-                        {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && (
-                            <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">
-                                {p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+
-                            </span>
-                        )}
-                        {(p.wk_fg_40_49 > 0) && (
-                            <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">
-                                {p.wk_fg_40_49}x 40-49
-                            </span>
-                        )}
-                        {(p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39 > 0) && (
-                             <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">
-                                {p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39}x FG
-                            </span>
-                        )}
-                        {(p.wk_xp_made > 0) && (
-                            <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">
-                                {p.wk_xp_made}x XP
-                            </span>
-                        )}
-                        {(p.wk_fg_miss > 0 || p.wk_xp_miss > 0) && (
-                             <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">
-                                {p.wk_fg_miss + p.wk_xp_miss} Miss
-                            </span>
-                        )}
-                        {liveScore === 0 && (
-                            <span className="text-[10px] text-slate-600 italic px-1">No stats yet</span>
-                        )}
-                    </div>
-                    
-                    {/* Background Glow for Smashed */}
-                    {isSmashed && <div className="absolute inset-0 bg-blue-500/5 z-0 animate-pulse"></div>}
-                </div>
-            );
-        })}
-    </div>
-  );
-};
 
 const App = () => {
   const [data, setData] = useState(null);
@@ -512,7 +453,7 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
@@ -524,9 +465,10 @@ const App = () => {
      const proj = calcProj(pWithYtd, p.grade);
 
      // NEW LOGIC: Recalculate L3 sums based on rounded weekly values
+     // SAFETY CHECK: Ensure history and games exist
      const l3_games = p.history?.l3_games || [];
-     const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(g.proj), 0);
-     const l3_act_sum = l3_games.reduce((acc, g) => acc + g.act, 0); // Actuals are ints
+     const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0); // Ensure number
+     const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
 
      return { 
         ...pWithYtd, 
@@ -563,17 +505,23 @@ const App = () => {
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
+  // YTD Processing with League Averages
+  const calculateLeagueAvg = (arr, key) => {
+      if (!arr || arr.length === 0) return 0;
+      const sum = arr.reduce((acc, curr) => acc + (parseFloat(curr[key]) || 0), 0);
+      return sum / arr.length;
+  };
+
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
-      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
+      const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
-      
       return {
           ...p, 
           fpts: pts, 
-          avg_fpts: (p.games > 0 ? (pts/p.games).toFixed(1) : '0.0'), 
+          avg_fpts: (p.games > 0 ? (pts/p.games) : 0), 
           pct_val: pct, 
-          pct: pct, 
+          pct: pct.toFixed(1), 
           longs: longMakes 
       };
   }).sort((a, b) => {
@@ -586,6 +534,17 @@ const App = () => {
       if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
   });
+
+  const ytdAvgs = {
+      fpts: calculateLeagueAvg(ytdSorted, 'fpts'),
+      avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'),
+      pct: calculateLeagueAvg(ytdSorted, 'pct_val'),
+      longs: calculateLeagueAvg(ytdSorted, 'longs'),
+      dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'),
+      rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'),
+      off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'),
+      def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd'),
+  };
 
   // --- INJURY BUCKETS ---
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
@@ -634,6 +593,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -657,14 +617,12 @@ const App = () => {
 
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
           <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
-          {/* NEW WEEK ACCURACY TAB */}
-          <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
           <button onClick={() => { setActiveTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
           <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* ... (Settings Tab Omitted for brevity, same as before) ... */}
+        {/* SETTINGS */}
         {activeTab === 'settings' && (
           <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
@@ -685,7 +643,7 @@ const App = () => {
           </div>
         )}
 
-        {/* POTENTIAL MODEL (Omitted for brevity, same as before) */}
+        {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              {/* SEARCH BAR */}
@@ -774,13 +732,8 @@ const App = () => {
             </div>
           </div>
         )}
-        
-        {/* NEW ACCURACY TAB */}
-        {activeTab === 'accuracy' && (
-            <AccuracyTab players={processed} scoring={scoring} week={meta.week} />
-        )}
 
-        {/* YTD TABLE (Omitted, same as before) */}
+        {/* YTD TABLE */}
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="overflow-x-auto">
