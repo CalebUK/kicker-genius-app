@@ -5,6 +5,7 @@ import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert
 const GLOSSARY_DATA = [
   { header: "Grade", title: "Matchup Grade", desc: "Composite score (Baseline 90) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
+  { header: "Rounding", title: "No Fractional Points", desc: "At Kicker Genius we don't believe in fractional points for Kickers. If a kicker can't get 9.4 points we shouldn't project it. .4 and below will be rounded down and .5 and above will be rounded up.", why: "Realism", source: "Kicker Genius Model" },
   { header: "Proj Acc", title: "Projection Accuracy (L3)", desc: "Total Actual Points vs Total Projected Points over the last 3 weeks.", why: "Model Trust Check", source: "Historical Backtest" },
   { header: "Injury", title: "Injury Status", desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.", why: "Availability Risk", source: "NFL Official + CBS Scraper" },
   { header: "Avg FPts", title: "Average Fantasy Points", desc: "Average points scored per game played this season.", why: "Consistency Metric", source: "nflreadpy (Play-by-Play)" },
@@ -395,6 +396,7 @@ const App = () => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
+      
       return {
           ...p, 
           fpts: pts, 
@@ -414,16 +416,56 @@ const App = () => {
       return 0;
   });
 
-  // --- INJURY BUCKETS ---
+  // --- INJURY BUCKETS (APPLYING 3-FOLD LOGIC TO ALL) ---
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
   const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful' || k.injury_status === 'Inactive');
   const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
 
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
+  // Helper to render injury card with logic
+  const renderInjuryCard = (k, i, borderColor, textColor) => {
+      // Parse details for 3-fold display
+      const details = k.injury_details || '';
+      const match = details.match(/^(.+?)\s\((.+)\)$/);
+      let displayInjury = k.injury_details;
+      let displayStatus = '';
+      
+      if (match) {
+          // e.g. "Inactive (Hamstring)" -> Status: Inactive, Injury: Hamstring
+          const reportStatus = match[1];
+          const injuryType = match[2];
+          displayInjury = `${k.injury_status}: ${injuryType}`;
+          displayStatus = reportStatus;
+      }
+
+      return (
+         <div key={i} className={`flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border ${borderColor}`}>
+            <img 
+                src={k.headshot_url} 
+                className={`w-12 h-12 rounded-full border-2 object-cover ${borderColor.replace('border', 'border-')}`} 
+                onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}
+            />
+            <div>
+               <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
+               {match ? (
+                   <>
+                       <div className={`text-xs font-bold ${textColor}`}>{displayInjury}</div>
+                       <div className="text-xs text-slate-400 italic">{displayStatus}</div>
+                   </>
+               ) : (
+                   <div className={`text-xs ${textColor}`}>{displayInjury}</div>
+               )}
+               <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
+            </div>
+         </div>
+      );
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -624,30 +666,7 @@ const App = () => {
                     <h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {bucketQuestionable.map((k, i) => (
-                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
-                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
-                          <div>
-                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-                             
-                             {/* 3-FOLD DISPLAY LOGIC */}
-                             {(() => {
-                                const match = (k.injury_details || '').match(/^(.+?)\s\((.+)\)$/);
-                                if (match) {
-                                    return (
-                                        <>
-                                            <div className="text-xs text-yellow-300 font-bold">{k.injury_status}: {match[2]}</div>
-                                            <div className="text-xs text-slate-400 italic">{match[1]}</div>
-                                        </>
-                                    );
-                                }
-                                return <div className="text-xs text-yellow-300">{k.injury_details}</div>;
-                             })()}
-
-                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
-                          </div>
-                       </div>
-                    ))}
+                    {bucketQuestionable.map((k, i) => renderInjuryCard(k, i, "border-yellow-500", "text-yellow-300"))}
                  </div>
                </div>
              )}
@@ -660,30 +679,7 @@ const App = () => {
                     <h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {bucketOutDoubtful.map((k, i) => (
-                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
-                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-red-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
-                          <div>
-                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-                             
-                             {/* 3-FOLD DISPLAY LOGIC */}
-                             {(() => {
-                                const match = (k.injury_details || '').match(/^(.+?)\s\((.+)\)$/);
-                                if (match) {
-                                    return (
-                                        <>
-                                            <div className="text-xs text-red-300 font-bold">{k.injury_status}: {match[2]}</div>
-                                            <div className="text-xs text-slate-400 italic">{match[1]}</div>
-                                        </>
-                                    );
-                                }
-                                return <div className="text-xs text-red-300">{k.injury_details}</div>;
-                             })()}
-
-                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
-                          </div>
-                       </div>
-                    ))}
+                    {bucketOutDoubtful.map((k, i) => renderInjuryCard(k, i, "border-red-600", "text-red-300"))}
                  </div>
                </div>
              )}
@@ -696,16 +692,7 @@ const App = () => {
                     <h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD / RELEASED</h3>
                  </div>
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {bucketRest.map((k, i) => (
-                       <div key={i} className="flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border border-slate-800">
-                          <img src={k.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}/>
-                          <div>
-                             <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-                             <div className="text-xs text-slate-300">{k.injury_details}</div>
-                             <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
-                          </div>
-                       </div>
-                    ))}
+                    {bucketRest.map((k, i) => renderInjuryCard(k, i, "border-slate-600", "text-slate-300"))}
                  </div>
                </div>
              )}
