@@ -275,13 +275,42 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             </div>
           </div>
 
-          {/* 2. CAPS */}
-          <div className="bg-slate-900 p-3 rounded border border-slate-800/50">
-            <div className="text-amber-400 font-bold mb-2 pb-1 border-b border-slate-800">2. CAPS</div>
-            <div className="flex justify-between mb-1"><span>Off Cap:</span> <span className="text-white">{player.off_cap_val}</span></div>
-            <div className="text-[10px] text-slate-500 mb-2">Tm Score {player.w_team_score} x Share</div>
-            <div className="flex justify-between mb-1"><span>Def Cap:</span> <span className="text-white">{player.def_cap_val}</span></div>
-            <div className="text-[10px] text-slate-500">Opp Allow {player.w_def_allowed} x Share</div>
+          {/* 2. WEIGHTED PROJECTION */}
+          <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
+            <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">2. WEIGHTED PROJ</div>
+            
+            {/* Base */}
+            <div>
+                <div className="flex justify-between text-xs text-slate-300">
+                    <span>Base (50%)</span>
+                    <span className="font-mono text-white">{(player.avg_pts * (player.grade / 90)).toFixed(1)}</span>
+                </div>
+                <div className="text-[9px] text-slate-500">
+                    Avg {player.avg_pts} × {(player.grade/90).toFixed(2)} (Mult)
+                </div>
+            </div>
+
+            {/* Offense */}
+            <div>
+                <div className="flex justify-between text-xs text-slate-300">
+                    <span>Offense (30%)</span>
+                    <span className="font-mono text-white">{player.off_cap_val}</span>
+                </div>
+                <div className="text-[9px] text-slate-500">
+                    Exp Score {player.w_team_score} × {((player.off_share || 0.35)*100).toFixed(0)}% × 1.2 (Boom)
+                </div>
+            </div>
+
+            {/* Defense */}
+            <div>
+                <div className="flex justify-between text-xs text-slate-300">
+                    <span>Defense (20%)</span>
+                    <span className="font-mono text-white">{player.def_cap_val}</span>
+                </div>
+                <div className="text-[9px] text-slate-500">
+                    Opp Allow {player.w_def_allowed} × 35% × 1.2 (Boom)
+                </div>
+            </div>
           </div>
           
           {/* 3. HISTORY */}
@@ -429,6 +458,7 @@ const App = () => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100).toFixed(1) : '0.0');
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
+      
       return {
           ...p, 
           fpts: pts, 
@@ -742,7 +772,7 @@ const App = () => {
                   <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
                     <Calculator className="w-4 h-4 text-emerald-400" /> How It Works: Live Example
                   </h3>
-                  <MathCard player={aubreyExample} leagueAvgs={leagueAvgs} week={meta.week} />
+                  <MathCard player={aubreyExample} />
                </div>
              )}
 
