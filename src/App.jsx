@@ -348,7 +348,7 @@ const App = () => {
     const def_cap_scaled = (p.def_cap_val || 0) * scaleFactor;
     const weighted_proj = (base * 0.50) + (off_cap_scaled * 0.30) + (def_cap_scaled * 0.20);
     const proj = weighted_proj > 1.0 ? weighted_proj : base;
-    return proj.toFixed(1);
+    return Math.round(proj); // ROUNDED
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
