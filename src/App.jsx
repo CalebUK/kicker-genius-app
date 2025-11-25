@@ -87,24 +87,27 @@ const HistoryBars = ({ games }) => {
            );
         }
 
-        const maxVal = Math.max(20, g.proj, g.act); 
-        const projPct = (g.proj / maxVal) * 100;
+        // --- ROUNDING LOGIC ---
+        const projRounded = Math.round(g.proj);
+        const diff = g.act - projRounded;
+        const maxVal = Math.max(20, projRounded, g.act); 
+        const projPct = (projRounded / maxVal) * 100;
         const actPct = (g.act / maxVal) * 100;
-        const isBeat = g.act >= g.proj;
+        const isBeat = g.act >= projRounded;
         
         return (
           <div key={i} className="text-[10px]">
             <div className="flex justify-between text-slate-400 mb-0.5 font-bold">
               <span>Wk {g.week} vs {g.opp}</span>
               <span className={isBeat ? "text-green-400" : "text-red-400"}>
-                {isBeat ? "+" : ""}{g.diff}
+                {isBeat ? "+" : ""}{diff}
               </span>
             </div>
             
             {/* Projection Bar (Gray) */}
             <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
                <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
-                  <span className="text-[9px] text-white font-bold leading-none">Projection {g.proj}</span>
+                  <span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span>
                </div>
             </div>
 
@@ -210,7 +213,10 @@ const PlayerCell = ({ player, subtext }) => {
 const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
 
-  const l3_diff = (player.history?.l3_actual || 0) - (player.history?.l3_proj || 0);
+  // --- ROUNDED TREND LOGIC ---
+  const l3_proj = Math.round(player.history?.l3_proj || 0);
+  const l3_diff = (player.history?.l3_actual || 0) - l3_proj;
+  
   let trendColor = "text-slate-500";
   let trendSign = "";
   if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
@@ -288,7 +294,7 @@ const MathCard = ({ player, leagueAvgs, week }) => {
             </div>
           </div>
 
-          {/* 2. WEIGHTED PROJECTION (UPDATED WITH FULL MATH) */}
+          {/* 2. WEIGHTED PROJECTION */}
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">WEIGHTED PROJECTION</div>
             
@@ -818,7 +824,6 @@ const App = () => {
           </div>
         )}
       </div>
-      {/* <Analytics /> */}
     </div>
   );
 };
