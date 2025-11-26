@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock } from 'lucide-react';
+import { TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
-import { GLOSSARY_DATA, DEFAULT_SCORING, SETTING_LABELS } from './data/constants';
+import { GLOSSARY_DATA, DEFAULT_SCORING } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
@@ -37,10 +37,14 @@ const App = () => {
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
     const savedUser = localStorage.getItem('sleeper_username');
     
+    // Load saved rosters
     const savedMyKickers = localStorage.getItem('sleeper_my_kickers');
     const savedTakenKickers = localStorage.getItem('sleeper_taken_kickers');
     
-    if (savedScoring) { try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } catch (e) { console.error(e); } }
+    if (savedScoring) {
+      try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
+      catch (e) { console.error(e); }
+    }
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
     if (savedUser) setSleeperUser(savedUser);
 
@@ -74,20 +78,23 @@ const App = () => {
           if (!leagueRes.ok) throw new Error("League Not Found");
           const leagueData = await leagueRes.json();
           
-          // FIXED: Sleeper Scoring Import Logic
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
+             
+             // SMART SCORING MAPPING
              const newScoring = {
                 fg0_19: s.fgm_0_19 || 3,
                 fg20_29: s.fgm_20_29 || 3,
                 fg30_39: s.fgm_30_39 || 3,
                 fg40_49: s.fgm_40_49 || 4,
-                fg50_59: s.fgm_50_plus || 5, // Map 50+ to 50-59
-                fg60_plus: s.fgm_50_plus || 5, // Map 50+ to 60+ as well
+                // Check specific distance keys first, fall back to generic 50_plus
+                fg50_59: s.fgm_50_59 !== undefined ? s.fgm_50_59 : (s.fgm_50_plus || 5),
+                fg60_plus: s.fgm_60_plus !== undefined ? s.fgm_60_plus : (s.fgm_50_plus || 5),
                 fg_miss: s.fgmiss || 0,
                 xp_made: s.xpm || 1,
                 xp_miss: s.xpmiss || 0
              };
+             
              setScoring(newScoring);
              localStorage.setItem('kicker_scoring', JSON.stringify(newScoring));
              setSleeperScoringUpdated(true);
@@ -126,6 +133,7 @@ const App = () => {
           setSleeperMyKickers(mySet);
           setSleeperTakenKickers(takenSet);
           
+          // Save rosters to local storage
           localStorage.setItem('sleeper_league_id', sleeperLeagueId);
           localStorage.setItem('sleeper_username', sleeperUser);
           localStorage.setItem('sleeper_my_kickers', JSON.stringify(Array.from(mySet)));
@@ -168,6 +176,7 @@ const App = () => {
      if (sleeperMyKickers.has(joinName)) sleeperStatus = 'MY_TEAM';
      else if (sleeperTakenKickers.has(joinName)) sleeperStatus = 'TAKEN';
      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
+
 
      return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum, sleeperStatus };
   }).filter(p => p.proj > 0); 
@@ -256,10 +265,11 @@ const App = () => {
           <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
           <button onClick={() => { setActiveTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
-          <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
+          <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report</button>
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
+        {/* TABS */}
         {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers}/> )}
 
         {activeTab === 'potential' && (
@@ -278,15 +288,7 @@ const App = () => {
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
-                    <th 
-                      className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
-                      onClick={() => handleSort('own_pct')}
-                    >
-                      <div className="flex items-center gap-1">
-                        <span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span>
-                        <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </th>
+                    <th className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]" onClick={() => handleSort('own_pct')}><div className="flex items-center gap-1"><span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span><ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" /></div></th>
                     <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description="Matchup Grade (Baseline 90)" />
                     <th className="px-6 py-3 text-center align-middle">Weather</th>
@@ -331,9 +333,9 @@ const App = () => {
             </div>
           </div>
         )}
-
+        
         {activeTab === 'accuracy' && <AccuracyTab players={processed} scoring={scoring} week={meta.week} />}
-
+        
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="overflow-x-auto">
@@ -374,6 +376,7 @@ const App = () => {
         )}
 
         {activeTab === 'injuries' && <InjuryReportTab injuries={injuries} scoring={scoring} />}
+
         {activeTab === 'glossary' && <GlossaryTab processed={processed} leagueAvgs={leagueAvgs} meta={meta} />}
       </div>
     </div>
