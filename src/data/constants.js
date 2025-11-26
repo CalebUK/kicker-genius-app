@@ -5,7 +5,7 @@ export const GLOSSARY_DATA = [
   { header: "Proj Acc", title: "Projection Accuracy (L3)", desc: "Total Actual Points vs Total Projected Points over the last 3 weeks.", why: "Model Trust Check", source: "Historical Backtest" },
   { header: "Injury", title: "Injury Status", desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.", why: "Availability Risk", source: "NFL Official + CBS Scraper" },
   { header: "Avg FPts", title: "Average Fantasy Points", desc: "Average points scored per game played this season.", why: "Consistency Metric", source: "nflreadpy (Play-by-Play)" },
-  { header: "L4 Off %", title: "Offensive Stall Rate (L4)", desc: "% of drives inside the 25 that fail to score a TD over the last 4 weeks.", why: "Recent Trend Volume", source: "nflreadpy (Play-by-play)" },
+  { header: "L4 Off %", title: "Offensive Stall Rate (L4)", desc: "% of drives inside the 25 that fail to score a TD over the last 4 weeks.", why: "Recent Trend Volume", source: "nflreadpy (Play-by-Play)" },
   { header: "L4 Def %", title: "Opponent Force Rate (L4)", desc: "% of opponent drives allowed inside the 25 that resulted in FGs (Last 4 weeks).", why: "Matchup Difficulty", source: "nflreadpy (Play-by-Play)" },
   { header: "Off Stall (YTD)", title: "Season Offense Stall Rate", desc: "Percentage of the kicker's team drives inside the 25 that ended in a FG attempt (Full Season).", why: "Long Term Efficiency", source: "nflreadpy (Season)" },
   { header: "Def Stall (YTD)", title: "Season Defense Stall Rate", desc: "Percentage of the kicker's team defense forcing FG attempts inside the 25 (Full Season).", why: "Game Script Indicator", source: "nflreadpy (Season)" },
@@ -19,18 +19,30 @@ export const GLOSSARY_DATA = [
 ];
 
 export const DEFAULT_SCORING = {
+  // Makes
   fg0_19: 3, fg20_29: 3, fg30_39: 3, fg40_49: 4, fg50_59: 5, fg60_plus: 5,
-  fg_miss: -1, xp_made: 1, xp_miss: -1
+  xp_made: 1,
+  // Misses (New Granularity)
+  fg_miss: -1, // General fallback
+  fg_miss_0_19: -1, fg_miss_20_29: -1, fg_miss_30_39: -1, 
+  fg_miss_40_49: -1, fg_miss_50_59: -1, fg_miss_60_plus: -1,
+  xp_miss: -1
 };
 
 export const SETTING_LABELS = {
-  fg0_19: "FG (0-19 yds)",
-  fg20_29: "FG (20-29 yds)",
-  fg30_39: "FG (30-39 yds)",
-  fg40_49: "FG (40-49 yds)",
-  fg50_59: "FG (50-59 yds)",
-  fg60_plus: "FG (60+ yds)",
-  fg_miss: "Missed FG",
-  xp_made: "PAT Made",
-  xp_miss: "PAT Missed"
+  fg0_19: "FG Made (0-19)",
+  fg20_29: "FG Made (20-29)",
+  fg30_39: "FG Made (30-39)",
+  fg40_49: "FG Made (40-49)",
+  fg50_59: "FG Made (50-59)",
+  fg60_plus: "FG Made (60+)",
+  xp_made: "XP Made",
+  fg_miss: "FG Miss (General)",
+  fg_miss_0_19: "FG Miss (0-19)",
+  fg_miss_20_29: "FG Miss (20-29)",
+  fg_miss_30_39: "FG Miss (30-39)",
+  fg_miss_40_49: "FG Miss (40-49)",
+  fg_miss_50_59: "FG Miss (50-59)",
+  fg_miss_60_plus: "FG Miss (60+)",
+  xp_miss: "XP Miss"
 };

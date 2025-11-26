@@ -16,13 +16,35 @@ const SettingsTab = ({
                 <h2 className="text-xl font-bold text-white flex items-center gap-2"><Settings className="w-5 h-5"/> Scoring Settings</h2>
                 <button onClick={resetScoring} className="text-xs bg-red-900/30 text-red-400 px-3 py-1 rounded border border-red-800/50 hover:bg-red-900/50 flex items-center gap-1"><RotateCcw className="w-3 h-3" /> Reset to Default</button>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                {Object.entries(scoring).map(([key, val]) => (
-                    <div key={key}>
-                        <label className="block text-xs uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS[key] || key}</label>
-                        <input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none" placeholder={val === 0 ? "0" : ""} />
+            
+            {/* MAKES GRID */}
+            <div className="mb-6">
+                <h3 className="text-xs font-bold text-emerald-400 uppercase mb-3 border-b border-slate-800 pb-1">Field Goals Made</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {Object.entries(scoring).filter(([k]) => !k.includes('miss') && k !== 'xp_made').map(([key, val]) => (
+                        <div key={key}>
+                            <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS[key] || key}</label>
+                            <input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* MISSES GRID */}
+            <div>
+                <h3 className="text-xs font-bold text-red-400 uppercase mb-3 border-b border-slate-800 pb-1">Misses & XP</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div key="xp_made">
+                         <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS['xp_made']}</label>
+                         <input type="number" value={scoring.xp_made} onChange={(e) => updateScoring('xp_made', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none" />
                     </div>
-                ))}
+                    {Object.entries(scoring).filter(([k]) => k.includes('miss')).map(([key, val]) => (
+                        <div key={key}>
+                            <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS[key] || key}</label>
+                            <input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none" />
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
         

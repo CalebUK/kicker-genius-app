@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
 import { GLOSSARY_DATA, DEFAULT_SCORING } from './data/constants';
@@ -36,18 +36,12 @@ const App = () => {
     const savedScoring = localStorage.getItem('kicker_scoring');
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
     const savedUser = localStorage.getItem('sleeper_username');
-    
-    // Load saved rosters
     const savedMyKickers = localStorage.getItem('sleeper_my_kickers');
     const savedTakenKickers = localStorage.getItem('sleeper_taken_kickers');
     
-    if (savedScoring) {
-      try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
-      catch (e) { console.error(e); }
-    }
+    if (savedScoring) { try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } catch (e) { console.error(e); } }
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
     if (savedUser) setSleeperUser(savedUser);
-
     if (savedMyKickers) { try { setSleeperMyKickers(new Set(JSON.parse(savedMyKickers))); } catch (e) { console.error(e); } }
     if (savedTakenKickers) { try { setSleeperTakenKickers(new Set(JSON.parse(savedTakenKickers))); } catch (e) { console.error(e); } }
 
@@ -81,18 +75,31 @@ const App = () => {
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
              
-             // SMART SCORING MAPPING
+             // 1. General Miss Fallback
+             const genMiss = s.fgmiss || 0;
+             
+             // 2. Map Sleeper Settings (Priority: Specific -> 50+ Group -> General)
              const newScoring = {
                 fg0_19: s.fgm_0_19 || 3,
                 fg20_29: s.fgm_20_29 || 3,
                 fg30_39: s.fgm_30_39 || 3,
                 fg40_49: s.fgm_40_49 || 4,
-                // Check specific distance keys first, fall back to generic 50_plus
+                
+                // Split 50+ logic
                 fg50_59: s.fgm_50_59 !== undefined ? s.fgm_50_59 : (s.fgm_50_plus || 5),
                 fg60_plus: s.fgm_60_plus !== undefined ? s.fgm_60_plus : (s.fgm_50_plus || 5),
-                fg_miss: s.fgmiss || 0,
+                
                 xp_made: s.xpm || 1,
-                xp_miss: s.xpmiss || 0
+                xp_miss: s.xpmiss || 0,
+                
+                // Granular Miss Logic (Use specific if avail, else general miss)
+                fg_miss: genMiss, // Keep general for legacy
+                fg_miss_0_19: s.fgmiss_0_19 !== undefined ? s.fgmiss_0_19 : genMiss,
+                fg_miss_20_29: s.fgmiss_20_29 !== undefined ? s.fgmiss_20_29 : genMiss,
+                fg_miss_30_39: s.fgmiss_30_39 !== undefined ? s.fgmiss_30_39 : genMiss,
+                fg_miss_40_49: s.fgmiss_40_49 !== undefined ? s.fgmiss_40_49 : genMiss,
+                fg_miss_50_59: s.fgmiss_50_59 !== undefined ? s.fgmiss_50_59 : (s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss),
+                fg_miss_60_plus: s.fgmiss_60_plus !== undefined ? s.fgmiss_60_plus : (s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss)
              };
              
              setScoring(newScoring);
@@ -132,13 +139,11 @@ const App = () => {
 
           setSleeperMyKickers(mySet);
           setSleeperTakenKickers(takenSet);
-          
-          // Save rosters to local storage
           localStorage.setItem('sleeper_league_id', sleeperLeagueId);
           localStorage.setItem('sleeper_username', sleeperUser);
           localStorage.setItem('sleeper_my_kickers', JSON.stringify(Array.from(mySet)));
           localStorage.setItem('sleeper_taken_kickers', JSON.stringify(Array.from(takenSet)));
-
+          
           setSleeperLoading(false);
       } catch (err) {
           console.error("Sleeper Sync Failed", err);
@@ -176,7 +181,6 @@ const App = () => {
      if (sleeperMyKickers.has(joinName)) sleeperStatus = 'MY_TEAM';
      else if (sleeperTakenKickers.has(joinName)) sleeperStatus = 'TAKEN';
      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
-
 
      return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum, sleeperStatus };
   }).filter(p => p.proj > 0); 
@@ -269,7 +273,6 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* TABS */}
         {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers}/> )}
 
         {activeTab === 'potential' && (
