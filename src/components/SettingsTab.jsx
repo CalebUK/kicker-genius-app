@@ -20,7 +20,7 @@ const SettingsTab = ({
                 {Object.entries(scoring).map(([key, val]) => (
                     <div key={key}>
                         <label className="block text-xs uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS[key] || key}</label>
-                        <input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white focus:border-blue-500 focus:outline-none" />
+                        <input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none" placeholder={val === 0 ? "0" : ""} />
                     </div>
                 ))}
             </div>

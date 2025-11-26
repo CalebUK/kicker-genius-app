@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Filter, Calendar, PlayCircle, CheckCircle2, Clock } from 'lucide-react';
+import { PlayCircle, CheckCircle2, Clock, Calendar } from 'lucide-react';
 import { calculateLiveScore, getGameStatus } from '../utils/scoring';
-import { FootballIcon, PlayerAvatar } from './KickerComponents'; // Import Avatar
+import { FootballIcon } from './KickerComponents'; // Assuming this is where the new icon is
 
 const AccuracyTab = ({ players, scoring, week }) => {
   const [filter, setFilter] = useState('ALL');
@@ -30,7 +30,9 @@ const AccuracyTab = ({ players, scoring, week }) => {
             {displayPlayers.map((p, i) => {
                 const liveScore = calculateLiveScore(p, scoring);
                 const proj = p.proj;
-                const pct = Math.min(100, Math.max(5, (liveScore / proj) * 100));
+                
+                // Math for Progress Bar
+                const pct = Math.min(100, Math.max(5, (liveScore / proj) * 100)); 
                 const isBeat = liveScore >= proj;
                 const isSmashed = liveScore >= proj + 3;
                 const status = getGameStatus(p.game_dt);
@@ -48,8 +50,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
                 return (
                     <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass} ${glowClass}`}>
                         <div className="flex items-center gap-3 mb-4 relative z-10">
-                            {/* Use new Avatar */}
-                            <PlayerAvatar src={p.headshot_url} alt={p.kicker_player_name} borderColor="border-slate-700" size="w-12 h-12" />
+                            <img src={p.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-700 object-cover bg-slate-950"/>
                             <div className="min-w-0 flex-1">
                                 <div className="font-bold text-white text-sm truncate">{p.kicker_player_name}</div>
                                 <div className="text-xs text-slate-500">{p.team} vs {p.opponent}</div>
@@ -64,22 +65,22 @@ const AccuracyTab = ({ players, scoring, week }) => {
 
                         {/* FOOTBALL FIELD PROGRESS BAR */}
                         <div className="h-8 w-full bg-emerald-900 rounded-md relative mb-4 border-2 border-emerald-800 overflow-hidden mt-2 shadow-inner group">
+                             {/* Field Markings */}
                              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-800 to-emerald-950 opacity-80"></div>
-                             <div className="absolute left-0 top-0 bottom-0 w-4 bg-white/90 z-0"></div>
-                             <div className="absolute right-0 top-0 bottom-0 w-4 bg-white/90 z-0"></div>
+                             <div className="absolute left-0 top-0 bottom-0 w-2 bg-white/90 z-0"></div>
+                             <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/90 z-0"></div>
                              <div className="absolute inset-0 flex justify-between px-4 items-center pointer-events-none z-0">
-                                 {[...Array(9)].map((_, idx) => {
-                                     const isMidfield = idx === 4;
-                                     return (
-                                         <div key={idx} className={`${isMidfield ? 'h-full w-0.5 bg-white/80' : 'h-[60%] w-px bg-white/40'}`}></div>
-                                     );
-                                 })}
+                                 {[...Array(9)].map((_, idx) => (
+                                     <div key={idx} className={`h-full w-0.5 ${idx === 4 ? 'bg-white w-1' : 'bg-white/40'}`}></div>
+                                 ))}
                              </div>
                              <img src="/assets/logo.png" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 object-contain opacity-40 pointer-events-none" alt="logo"/>
 
-                             <div className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${pct}%` }}></div>
+                             {/* Fill Bar */}
+                             <div className={`h-full rounded-l-md transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${pct}%` }}></div>
                              
-                             <div className="absolute top-1/2 -translate-y-1/2 w-10 h-10 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 20px)` }}>
+                             {/* Ball Icon */}
+                             <div className className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 16px)` }}>
                                  <FootballIcon isFire={isSmashed} />
                              </div>
                         </div>

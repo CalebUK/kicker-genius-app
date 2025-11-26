@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp } from 'lucide-react';
-// import { Analytics } from '@vercel/analytics/react';
+import { Gamepad2, BrainCircuit, ShieldAlert, UserMinus, RotateCcw, AlertTriangle as AlertTriangleIcon } from 'lucide-react'; // Imports for use in functions/rendering
 
-import { GLOSSARY_DATA, DEFAULT_SCORING, SETTING_LABELS } from './data/constants';
+import { GLOSSARY_DATA, DEFAULT_SCORING } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
 import SettingsTab from './components/SettingsTab';
 
+
+// --- MAIN APP COMPONENT ---
 const App = () => {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState('potential');
@@ -31,17 +33,16 @@ const App = () => {
   const [sleeperScoringUpdated, setSleeperScoringUpdated] = useState(false);
 
   useEffect(() => {
+    // Load local storage items
     const savedScoring = localStorage.getItem('kicker_scoring');
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
     const savedUser = localStorage.getItem('sleeper_username');
     
-    if (savedScoring) {
-      try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
-      catch (e) { console.error(e); }
-    }
+    if (savedScoring) { try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } catch (e) { console.error(e); } }
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
     if (savedUser) setSleeperUser(savedUser);
 
+    // Fetch live data
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
@@ -60,7 +61,6 @@ const App = () => {
     localStorage.setItem('kicker_scoring', JSON.stringify(DEFAULT_SCORING));
   };
 
-  // --- SLEEPER SYNC LOGIC ---
   const syncSleeper = async () => {
       if (!sleeperLeagueId) return;
       setSleeperLoading(true);
@@ -72,11 +72,7 @@ const App = () => {
           
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
-             const newScoring = {
-                fg0_19: s.fgm_0_19 || 3, fg20_29: s.fgm_20_29 || 3, fg30_39: s.fgm_30_39 || 3,
-                fg40_49: s.fgm_40_49 || 4, fg50_59: s.fgm_50_plus || 5, fg60_plus: s.fgm_50_plus || 5,
-                fg_miss: s.fgmiss || 0, xp_made: s.xpm || 1, xp_miss: s.xpmiss || 0
-             };
+             const newScoring = { fg0_19: s.fgm_0_19 || 3, fg20_29: s.fgm_20_29 || 3, fg30_39: s.fgm_30_39 || 3, fg40_49: s.fgm_40_49 || 4, fg50_59: s.fgm_50_plus || 5, fg60_plus: s.fgm_50_plus || 5, fg_miss: s.fgmiss || 0, xp_made: s.xpm || 1, xp_miss: s.xpmiss || 0 };
              setScoring(newScoring);
              localStorage.setItem('kicker_scoring', JSON.stringify(newScoring));
              setSleeperScoringUpdated(true);
@@ -124,6 +120,7 @@ const App = () => {
       }
   };
 
+
   const handleSort = (key) => {
     let direction = 'desc';
     if (sortConfig.key === key && sortConfig.direction === 'desc') direction = 'asc';
@@ -139,13 +136,23 @@ const App = () => {
   const leagueAvgs = meta?.league_avgs || {};
   
   let processed = rankings.map(p => {
-     const ytdPts = calcFPts(p, scoring);
-     const pWithYtd = { ...p, fpts_ytd: ytdPts };
+     const pWithVegas = { ...p, vegas: p.vegas_implied || 0 }; 
+     const ytdPts = calcFPts(pWithVegas, scoring);
+     const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
+     
      const l3_games = p.history?.l3_games || [];
      const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0);
      const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
-     return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum };
+
+     const teamCode = p.team || '';
+     let sleeperStatus = null;
+     if (sleeperMyKickers.has(p.join_name)) sleeperStatus = 'MY_TEAM';
+     else if (sleeperTakenKickers.has(p.join_name)) sleeperStatus = 'TAKEN';
+     else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
+
+
+     return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum, sleeperStatus };
   }).filter(p => p.proj > 0); 
 
   if (search) {
@@ -157,18 +164,14 @@ const App = () => {
           (q === 'cowboys' && p.team === 'DAL') 
       );
   }
-
+  
   if (sleeperFilter && sleeperLeagueId) {
-      processed = processed.sort((a, b) => {
-          const aMine = sleeperMyKickers.has(a.join_name);
-          const bMine = sleeperMyKickers.has(b.join_name);
+      processed = processed.filter(p => p.sleeperStatus === 'MY_TEAM' || p.sleeperStatus === 'FREE_AGENT').sort((a, b) => {
+          const aMine = a.sleeperStatus === 'MY_TEAM';
+          const bMine = b.sleeperStatus === 'MY_TEAM';
           if (aMine && !bMine) return -1;
           if (!aMine && bMine) return 1;
-          const aTaken = sleeperTakenKickers.has(a.join_name);
-          const bTaken = sleeperTakenKickers.has(b.join_name);
-          if (!aTaken && bTaken) return -1;
-          if (aTaken && !bTaken) return 1;
-          
+
           let valA = a[sortConfig.key];
           let valB = b[sortConfig.key];
           if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
@@ -196,7 +199,6 @@ const App = () => {
       return sum / arr.length;
   };
 
-  // Identify Top 5
   const top5Ytd = ytd.map(p => ({ ...p, fpts_calc: calcFPts(p, scoring) })).sort((a, b) => b.fpts_calc - a.fpts_calc).slice(0, 5).map(p => p.kicker_player_name);
   processed = processed.map(p => ({ ...p, isTop5: top5Ytd.includes(p.kicker_player_name) }));
 
@@ -221,6 +223,7 @@ const App = () => {
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
   const bucketOutDoubtful = injuries.filter(k => ['OUT', 'Doubtful', 'Inactive'].includes(k.injury_status));
   const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
+
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
   return (
@@ -246,6 +249,7 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
+        {/* TABS */}
         {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers}/> )}
 
         {activeTab === 'potential' && (
@@ -300,7 +304,7 @@ const App = () => {
                             <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && "🛡️"}</td>
                             <td className="px-6 py-4 text-slate-600">{expandedRow === idx ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</td>
                           </tr>
-                          {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} sleeperStatus={sleeperStatus}/>}
+                          {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} />}
                         </React.Fragment>
                      );
                   })}
@@ -309,7 +313,7 @@ const App = () => {
             </div>
           </div>
         )}
-        
+
         {activeTab === 'accuracy' && <AccuracyTab players={processed} scoring={scoring} week={meta.week} />}
         
         {activeTab === 'ytd' && (
@@ -353,10 +357,10 @@ const App = () => {
 
         {activeTab === 'injuries' && (
            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             {bucketQuestionable.length > 0 && <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden"><div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-yellow-500" /><h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketQuestionable.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-yellow-500" textColor="text-yellow-300" scoring={scoring} />)}</div></div>}
-             {bucketOutDoubtful.length > 0 && <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden"><div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2"><ShieldAlert className="w-5 h-5 text-red-500" /><h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketOutDoubtful.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-red-600" textColor="text-red-300" scoring={scoring} />)}</div></div>}
-             {bucketRest.length > 0 && <div className="bg-slate-800/30 rounded-xl border border-slate-700 overflow-hidden"><div className="p-4 bg-slate-800/50 border-b border-slate-700 flex items-center gap-2"><UserMinus className="w-5 h-5 text-slate-400" /><h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD / RELEASED</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketRest.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-slate-600" textColor="text-slate-300" scoring={scoring} />)}</div></div>}
-             {!bucketQuestionable.length && !bucketOutDoubtful.length && !bucketRest.length && <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">No kickers currently listed on the injury report!</div>}
+             {bucketQuestionable.length > 0 && ( <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden"><div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-yellow-500" /><h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketQuestionable.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-yellow-500" textColor="text-yellow-300" scoring={scoring} />)}</div></div>)}
+             {(bucketOutDoubtful.length > 0) && ( <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden"><div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2"><ShieldAlert className="w-5 h-5 text-red-500" /><h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketOutDoubtful.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-red-600" textColor="text-red-300" scoring={scoring} />)}</div></div>)}
+             {bucketRest.length > 0 && ( <div className="bg-slate-800/30 rounded-xl border border-slate-700 overflow-hidden"><div className="p-4 bg-slate-800/50 border-b border-slate-700 flex items-center gap-2"><UserMinus className="w-5 h-5 text-slate-400" /><h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD / RELEASED</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketRest.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-slate-600" textColor="text-slate-300" scoring={scoring} />)}</div></div> )}
+             {(!bucketQuestionable.length && !bucketOutDoubtful.length && !bucketRest.length) && ( <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">No kickers currently listed on the injury report!</div> )}
            </div>
         )}
 
