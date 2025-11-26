@@ -12,16 +12,13 @@ export const calcFPts = (p, scoring) => {
     // XP
     ((p.xp_made||0) * scoring.xp_made) + 
 
-    // Misses - Granular (Future Proofing) + General Fallback
+    // Misses (Using Granular Keys - fallback to general miss logic is handled in App.jsx sync)
     ((p.fg_miss_0_19||0) * scoring.fg_miss_0_19) +
     ((p.fg_miss_20_29||0) * scoring.fg_miss_20_29) +
     ((p.fg_miss_30_39||0) * scoring.fg_miss_30_39) +
     ((p.fg_miss_40_49||0) * scoring.fg_miss_40_49) +
     ((p.fg_miss_50_59||0) * scoring.fg_miss_50_59) +
     ((p.fg_miss_60_plus||0) * scoring.fg_miss_60_plus) +
-    
-    // Use General Miss if granular not available/applicable
-    ((p.fg_miss||0) * scoring.fg_miss) + 
     
     ((p.xp_miss||0) * scoring.xp_miss)
   );
@@ -36,11 +33,12 @@ export const calcProj = (p, grade) => {
   const def_cap_scaled = (p.def_cap_val || 0) * scaleFactor;
   const weighted_proj = (base * 0.50) + (off_cap_scaled * 0.30) + (def_cap_scaled * 0.20);
   const proj = weighted_proj > 1.0 ? weighted_proj : base;
-  return Math.round(proj); 
+  return Math.round(proj); // ROUNDED
 };
 
 export const calculateLiveScore = (p, scoring) => {
   return (
+      // Makes
       ((p.wk_fg_0_19 || 0) * scoring.fg0_19) +
       ((p.wk_fg_20_29 || 0) * scoring.fg20_29) +
       ((p.wk_fg_30_39 || 0) * scoring.fg30_39) +
@@ -49,16 +47,12 @@ export const calculateLiveScore = (p, scoring) => {
       ((p.wk_fg_60_plus || 0) * scoring.fg60_plus) +
       ((p.wk_xp_made || 0) * scoring.xp_made) +
       
-      // Granular Misses (Future Proof)
-      ((p.wk_fg_miss_0_19 || 0) * scoring.fg_miss_0_19) +
-      ((p.wk_fg_miss_20_29 || 0) * scoring.fg_miss_20_29) +
-      ((p.wk_fg_miss_30_39 || 0) * scoring.fg_miss_30_39) +
-      ((p.wk_fg_miss_40_49 || 0) * scoring.fg_miss_40_49) +
-      ((p.wk_fg_miss_50_59 || 0) * scoring.fg_miss_50_59) +
-      ((p.wk_fg_miss_60_plus || 0) * scoring.fg_miss_60_plus) +
-      
-      // General Miss Fallback
-      ((p.wk_fg_miss || 0) * scoring.fg_miss) +
+      // Granular Misses (Engine must provide these, or we fall back to general miss calc if data is missing)
+      // Note: Current Python engine provides specific wk_fg_miss but not broken down by distance yet. 
+      // For now, we assume wk_fg_miss is applied to a general penalty, or we map the 'general' miss setting if available.
+      // However, since we are moving to granular settings, we will use the 40-49 miss range as a 'standard' penalty for live tracking 
+      // until the engine is updated to split live misses by distance.
+      ((p.wk_fg_miss || 0) * scoring.fg_miss_40_49) + // Using 40-49 as the "Standard Miss" proxy for live view
       
       ((p.wk_xp_miss || 0) * scoring.xp_miss)
   );

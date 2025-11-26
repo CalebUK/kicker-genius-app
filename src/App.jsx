@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
-import { GLOSSARY_DATA, DEFAULT_SCORING, SETTING_LABELS } from './data/constants';
+import { GLOSSARY_DATA, DEFAULT_SCORING } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
@@ -37,7 +37,6 @@ const App = () => {
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
     const savedUser = localStorage.getItem('sleeper_username');
     
-    // Load saved rosters
     const savedMyKickers = localStorage.getItem('sleeper_my_kickers');
     const savedTakenKickers = localStorage.getItem('sleeper_taken_kickers');
     
@@ -80,26 +79,22 @@ const App = () => {
           
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
-             
-             // 1. General Miss Fallback
              const genMiss = s.fgmiss || 0;
-             
-             // 2. Map Sleeper Settings (Priority: Specific -> 50+ Group -> General)
+
              const newScoring = {
                 fg0_19: s.fgm_0_19 || 3,
                 fg20_29: s.fgm_20_29 || 3,
                 fg30_39: s.fgm_30_39 || 3,
                 fg40_49: s.fgm_40_49 || 4,
                 
-                // Split 50+ logic
+                // Split 50+ logic (Check specific first, then fallback to 50_plus)
                 fg50_59: s.fgm_50_59 !== undefined ? s.fgm_50_59 : (s.fgm_50_plus || 5),
                 fg60_plus: s.fgm_60_plus !== undefined ? s.fgm_60_plus : (s.fgm_50_plus || 5),
                 
                 xp_made: s.xpm || 1,
                 xp_miss: s.xpmiss || 0,
                 
-                // Granular Miss Logic (Use specific if avail, else general miss)
-                fg_miss: genMiss, // Keep general for legacy
+                // Granular Miss Logic (Map general miss to all buckets if granular unavailable)
                 fg_miss_0_19: s.fgmiss_0_19 !== undefined ? s.fgmiss_0_19 : genMiss,
                 fg_miss_20_29: s.fgmiss_20_29 !== undefined ? s.fgmiss_20_29 : genMiss,
                 fg_miss_30_39: s.fgmiss_30_39 !== undefined ? s.fgmiss_30_39 : genMiss,
@@ -145,6 +140,7 @@ const App = () => {
 
           setSleeperMyKickers(mySet);
           setSleeperTakenKickers(takenSet);
+          
           localStorage.setItem('sleeper_league_id', sleeperLeagueId);
           localStorage.setItem('sleeper_username', sleeperUser);
           localStorage.setItem('sleeper_my_kickers', JSON.stringify(Array.from(mySet)));
@@ -187,6 +183,7 @@ const App = () => {
      if (sleeperMyKickers.has(joinName)) sleeperStatus = 'MY_TEAM';
      else if (sleeperTakenKickers.has(joinName)) sleeperStatus = 'TAKEN';
      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
+
 
      return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum, sleeperStatus };
   }).filter(p => p.proj > 0); 
@@ -281,7 +278,7 @@ const App = () => {
           <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
           <button onClick={() => { setActiveTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
-          <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
+          <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report</button>
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
@@ -292,7 +289,7 @@ const App = () => {
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4 justify-between">
                 <div className="relative flex-1 min-w-[200px] max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" /><input type="text" placeholder="(e.g. Aubrey, Cowboys, Dome)" className="w-full bg-slate-900 border border-slate-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-blue-500 focus:outline-none placeholder:text-slate-600" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                 <div className="flex items-center gap-4 flex-wrap">
-                    {sleeperMyKickers.size > 0 && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><Gamepad2 className="w-3 h-3"/> Sleeper Avail</button> )}
+                    {sleeperMyKickers.size > 0 && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><div className="w-3 h-3"></div> Sleeper Avail</button> )}
                     <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
                     <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 80% Own</label>
                     <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 60% Own</label>
@@ -303,15 +300,7 @@ const App = () => {
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
-                    <th 
-                      className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
-                      onClick={() => handleSort('own_pct')}
-                    >
-                      <div className="flex items-center gap-1">
-                        <span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span>
-                        <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </th>
+                    <th className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]" onClick={() => handleSort('own_pct')}><div className="flex items-center gap-1"><span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span><ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" /></div></th>
                     <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description="Matchup Grade (Baseline 90)" />
                     <th className="px-6 py-3 text-center align-middle">Weather</th>

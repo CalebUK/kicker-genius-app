@@ -22,27 +22,24 @@ export const DEFAULT_SCORING = {
   // Makes
   fg0_19: 3, fg20_29: 3, fg30_39: 3, fg40_49: 4, fg50_59: 5, fg60_plus: 5,
   xp_made: 1,
-  // Misses (New Granularity)
-  fg_miss: -1, // General fallback
+  
+  // Misses (Default to 0 or -1 depending on preference, set to -1 for standard)
   fg_miss_0_19: -1, fg_miss_20_29: -1, fg_miss_30_39: -1, 
   fg_miss_40_49: -1, fg_miss_50_59: -1, fg_miss_60_plus: -1,
   xp_miss: -1
 };
 
+// Config for the UI Generator (Grouped for cleaner Settings Tab)
+export const SCORING_CONFIG = [
+  { label: "0-19 Yards", makeKey: "fg0_19", missKey: "fg_miss_0_19" },
+  { label: "20-29 Yards", makeKey: "fg20_29", missKey: "fg_miss_20_29" },
+  { label: "30-39 Yards", makeKey: "fg30_39", missKey: "fg_miss_30_39" },
+  { label: "40-49 Yards", makeKey: "fg40_49", missKey: "fg_miss_40_49" },
+  { label: "50-59 Yards", makeKey: "fg50_59", missKey: "fg_miss_50_59" },
+  { label: "60+ Yards", makeKey: "fg60_plus", missKey: "fg_miss_60_plus" },
+  { label: "PAT", makeKey: "xp_made", missKey: "xp_miss" }
+];
+
 export const SETTING_LABELS = {
-  fg0_19: "FG Made (0-19)",
-  fg20_29: "FG Made (20-29)",
-  fg30_39: "FG Made (30-39)",
-  fg40_49: "FG Made (40-49)",
-  fg50_59: "FG Made (50-59)",
-  fg60_plus: "FG Made (60+)",
-  xp_made: "XP Made",
-  fg_miss: "FG Miss (General)",
-  fg_miss_0_19: "FG Miss (0-19)",
-  fg_miss_20_29: "FG Miss (20-29)",
-  fg_miss_30_39: "FG Miss (30-39)",
-  fg_miss_40_49: "FG Miss (40-49)",
-  fg_miss_50_59: "FG Miss (50-59)",
-  fg_miss_60_plus: "FG Miss (60+)",
-  xp_miss: "XP Miss"
+  // Kept for legacy support if needed, but SCORING_CONFIG drives the UI now
 };

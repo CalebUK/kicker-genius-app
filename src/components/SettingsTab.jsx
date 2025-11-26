@@ -1,6 +1,6 @@
 import React from 'react';
 import { Settings, RotateCcw, Gamepad2, Loader2, RefreshCw, Check, Save } from 'lucide-react';
-import { SETTING_LABELS } from '../data/constants';
+import { SCORING_CONFIG } from '../data/constants';
 
 const SettingsTab = ({ 
     scoring, updateScoring, resetScoring, 
@@ -17,34 +17,33 @@ const SettingsTab = ({
                 <button onClick={resetScoring} className="text-xs bg-red-900/30 text-red-400 px-3 py-1 rounded border border-red-800/50 hover:bg-red-900/50 flex items-center gap-1"><RotateCcw className="w-3 h-3" /> Reset to Default</button>
             </div>
             
-            {/* MAKES GRID */}
-            <div className="mb-6">
-                <h3 className="text-xs font-bold text-emerald-400 uppercase mb-3 border-b border-slate-800 pb-1">Field Goals Made</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {Object.entries(scoring).filter(([k]) => !k.includes('miss') && k !== 'xp_made').map(([key, val]) => (
-                        <div key={key}>
-                            <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS[key] || key}</label>
-                            <input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none" />
+            {/* NEW GROUPED LAYOUT */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {SCORING_CONFIG.map((group, idx) => (
+                    <div key={idx} className="bg-slate-950/50 p-3 rounded border border-slate-800">
+                        <div className="text-xs font-bold text-blue-400 uppercase mb-3 border-b border-slate-800 pb-1">{group.label}</div>
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <label className="block text-[9px] uppercase text-slate-500 font-bold mb-1">Make</label>
+                                <input 
+                                    type="number" 
+                                    value={scoring[group.makeKey]} 
+                                    onChange={(e) => updateScoring(group.makeKey, e.target.value)} 
+                                    className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-emerald-500 focus:outline-none text-center" 
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label className="block text-[9px] uppercase text-slate-500 font-bold mb-1">Miss</label>
+                                <input 
+                                    type="number" 
+                                    value={scoring[group.missKey]} 
+                                    onChange={(e) => updateScoring(group.missKey, e.target.value)} 
+                                    className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-red-500 focus:outline-none text-center text-red-300" 
+                                />
+                            </div>
                         </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* MISSES GRID */}
-            <div>
-                <h3 className="text-xs font-bold text-red-400 uppercase mb-3 border-b border-slate-800 pb-1">Misses & XP</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div key="xp_made">
-                         <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS['xp_made']}</label>
-                         <input type="number" value={scoring.xp_made} onChange={(e) => updateScoring('xp_made', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none" />
                     </div>
-                    {Object.entries(scoring).filter(([k]) => k.includes('miss')).map(([key, val]) => (
-                        <div key={key}>
-                            <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS[key] || key}</label>
-                            <input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none" />
-                        </div>
-                    ))}
-                </div>
+                ))}
             </div>
         </div>
         
