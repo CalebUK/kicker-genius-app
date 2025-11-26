@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2 } from 'lucide-react';
-// import { Analytics } from '@vercel/analytics/react';
+import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, AlertTriangle as AlertTriangleIcon } from 'lucide-react';
 
 import { GLOSSARY_DATA, DEFAULT_SCORING } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
-import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
+import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } as Components from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
 import SettingsTab from './components/SettingsTab';
+import InjuryReportTab from './components/InjuryReportTab';
+import GlossaryTab from './components/GlossaryTab';
 
 const App = () => {
   const [data, setData] = useState(null);
@@ -31,19 +32,14 @@ const App = () => {
   const [sleeperScoringUpdated, setSleeperScoringUpdated] = useState(false);
 
   useEffect(() => {
-    // Load local storage items
     const savedScoring = localStorage.getItem('kicker_scoring');
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
     const savedUser = localStorage.getItem('sleeper_username');
     
-    if (savedScoring) {
-      try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
-      catch (e) { console.error(e); }
-    }
+    if (savedScoring) { try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } catch (e) { console.error(e); } }
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
     if (savedUser) setSleeperUser(savedUser);
 
-    // Fetch live data
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
@@ -129,6 +125,25 @@ const App = () => {
 
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
 
+  const calcFPts = (p, scoring) => {
+    if (!p) return 0;
+    return ((p.fg_0_19||0)*scoring.fg0_19) + ((p.fg_20_29||0)*scoring.fg20_29) + ((p.fg_30_39||0)*scoring.fg30_39) + 
+           ((p.fg_40_49||0)*scoring.fg40_49) + ((p.fg_50_59||0)*scoring.fg50_59) + ((p.fg_60_plus||0)*scoring.fg60_plus) + 
+           ((p.fg_miss||0)*scoring.fg_miss) + ((p.xp_made||0)*scoring.xp_made) + ((p.xp_miss||0)*scoring.xp_miss);
+  };
+
+  const calcProj = (p, grade) => {
+    if (grade === 0) return 0;
+    const avgPts = p.fpts_ytd / (p.games || 1);
+    const base = avgPts * (grade / 90);
+    const scaleFactor = (p.avg_pts && p.avg_pts > 0) ? (avgPts / p.avg_pts) : 1.0;
+    const off_cap_scaled = (p.off_cap_val || 0) * scaleFactor;
+    const def_cap_scaled = (p.def_cap_val || 0) * scaleFactor;
+    const weighted_proj = (base * 0.50) + (off_cap_scaled * 0.30) + (def_cap_scaled * 0.20);
+    const proj = weighted_proj > 1.0 ? weighted_proj : base;
+    return Math.round(proj); 
+  };
+
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
   if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
 
@@ -140,30 +155,22 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas, scoring);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-     
      const l3_games = p.history?.l3_games || [];
      const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0);
      const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
-
      const teamCode = p.team || '';
      let sleeperStatus = null;
      const joinName = p.join_name;
      if (sleeperMyKickers.has(joinName)) sleeperStatus = 'MY_TEAM';
      else if (sleeperTakenKickers.has(joinName)) sleeperStatus = 'TAKEN';
      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
-
-
-     return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum, sleeperStatus };
+     
+     return { ...pWithVegas, ...p, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum, sleeperStatus };
   }).filter(p => p.proj > 0); 
 
   if (search) {
       const q = search.toLowerCase();
-      processed = processed.filter(p => 
-          p.kicker_player_name.toLowerCase().includes(q) || 
-          (p.team && p.team.toLowerCase().includes(q)) ||
-          (q === 'dome' && p.is_dome) ||
-          (q === 'cowboys' && p.team === 'DAL') 
-      );
+      processed = processed.filter(p => p.kicker_player_name.toLowerCase().includes(q) || (p.team && p.team.toLowerCase().includes(q)) || (q === 'dome' && p.is_dome) || (q === 'cowboys' && p.team === 'DAL') );
   }
 
   if (sleeperFilter && sleeperLeagueId) {
@@ -200,9 +207,6 @@ const App = () => {
       return sum / arr.length;
   };
 
-  const top5Ytd = ytd.map(p => ({ ...p, fpts_calc: calcFPts(p, scoring) })).sort((a, b) => b.fpts_calc - a.fpts_calc).slice(0, 5).map(p => p.kicker_player_name);
-  processed = processed.map(p => ({ ...p, isTop5: top5Ytd.includes(p.kicker_player_name) }));
-
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p, scoring);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
@@ -221,9 +225,12 @@ const App = () => {
 
   const ytdAvgs = { fpts: calculateLeagueAvg(ytdSorted, 'fpts'), avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'), pct: calculateLeagueAvg(ytdSorted, 'pct_val'), longs: calculateLeagueAvg(ytdSorted, 'longs'), dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'), rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'), off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'), def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd') };
 
-  const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
-  const bucketOutDoubtful = injuries.filter(k => ['OUT', 'Doubtful', 'Inactive'].includes(k.injury_status));
-  const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
+  const injuryData = {
+    bucketQuestionable: injuries.filter(k => k.injury_status === 'Questionable'),
+    bucketOutDoubtful: injuries.filter(k => ['OUT', 'Doubtful', 'Inactive'].includes(k.injury_status)),
+    bucketRest: injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster')),
+    injuries: injuries // Pass all injuries for count
+  };
 
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
 
@@ -282,7 +289,7 @@ const App = () => {
                     <HeaderCell label="Opponent Stall % (L4)" sortKey="def_stall_rate" currentSort={sortConfig} onSort={handleSort} description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
                     <HeaderCell label="Projection Accuracy (L3)" sortKey="proj_acc" currentSort={sortConfig} onSort={handleSort} description="Total Actual vs Projected Points (Last 3 Games)" />
                     <HeaderCell label="Implied Vegas Score Line" sortKey="vegas" currentSort={sortConfig} onSort={handleSort} description="Implied Team Total (Vegas Line & Spread)/2" />
-                    <HeaderCell label="Offensive PF (L4)" sortKey="off_ppg" currentSort={sortConfig} onSort={handleSort} description="Team Points For (L4)" avg={leagueAvgs.l4_off_ppg} />
+                    <HeaderCell label="Offensive PF (L4)" sortKey="off_ppg" currentSort={sortConfig} onOnSort={handleSort} description="Team Points For (L4)" avg={leagueAvgs.l4_off_ppg} />
                     <HeaderCell label="Opponent PA (L4)" sortKey="def_pa" currentSort={sortConfig} onSort={handleSort} description="Opp Points Allowed (L4)" avg={leagueAvgs.l4_def_pa} />
                     <th className="px-6 py-3"></th>
                   </tr>
@@ -320,7 +327,7 @@ const App = () => {
           </div>
         )}
 
-        {activeTab === 'accuracy' && <AccuracyTab players={processed} scoring={scoring} week={meta.week} />}
+        {activeTab === 'accuracy' && ( <AccuracyTab players={processed} scoring={scoring} week={meta.week} /> )}
         
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
@@ -362,22 +369,11 @@ const App = () => {
         )}
 
         {activeTab === 'injuries' && (
-           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             {bucketQuestionable.length > 0 && ( <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden"><div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2"><AlertTriangleIcon className="w-5 h-5 text-yellow-500" /><h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketQuestionable.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-yellow-500" textColor="text-yellow-300" scoring={scoring} />)}</div></div>)}
-             {(bucketOutDoubtful.length > 0) && ( <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden"><div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2"><ShieldAlert className="w-5 h-5 text-red-500" /><h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketOutDoubtful.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-red-600" textColor="text-red-300" scoring={scoring} />)}</div></div> )}
-             {bucketRest.length > 0 && ( <div className="bg-slate-800/30 rounded-xl border border-slate-700 overflow-hidden"><div className="p-4 bg-slate-800/50 border-b border-slate-700 flex items-center gap-2"><UserMinus className="w-5 h-5 text-slate-400" /><h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD / RELEASED</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketRest.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-slate-600" textColor="text-slate-300" scoring={scoring} />)}</div></div> )}
-             {(!bucketQuestionable.length && !bucketOutDoubtful.length && !bucketRest.length) && ( <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">No kickers currently listed on the injury report!</div> )}
-           </div>
+           <InjuryReportTab injuries={injuries} scoring={scoring} />
         )}
 
         {activeTab === 'glossary' && (
-          <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
-             {aubreyExample && ( <div className="p-4 border-b border-slate-800 bg-slate-900/50"><h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2"><Calculator className="w-4 h-4 text-emerald-400" /> How It Works: Live Example</h3><MathCard player={aubreyExample} leagueAvgs={leagueAvgs} week={meta.week} /></div> )}
-             <div className="p-4 border-b border-slate-800 bg-slate-900/30 text-center text-xs text-slate-500">This website was created by Caleb Hill. If you have any suggestions please <a href="mailto:calebthill@gmail.com" className="text-blue-400 hover:underline">email me</a>.</div>
-             <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {GLOSSARY_DATA.map((item, idx) => ( <div key={idx} className="bg-slate-800/50 p-4 rounded border border-slate-700"><div className="flex justify-between items-start mb-2"><span className="font-mono font-bold text-blue-300">{item.header}</span><span className="text-[10px] text-emerald-400 flex items-center gap-1 bg-emerald-900/20 px-2 py-1 rounded border border-emerald-900/50"><Database className="w-3 h-3"/> {item.source}</span></div><div className="text-sm font-semibold text-white mb-1">{item.title}</div><div className="text-xs text-slate-400">{item.desc}</div><div className="mt-2 text-[10px] text-slate-500 italic border-t border-slate-700 pt-1">Why: {item.why}</div></div> ))}
-             </div>
-          </div>
+           <GlossaryTab processed={processed} leagueAvgs={leagueAvgs} meta={meta} />
         )}
       </div>
       {/* <Analytics /> */}
