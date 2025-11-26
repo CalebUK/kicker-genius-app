@@ -61,7 +61,7 @@ def get_current_nfl_week():
         return 1
 
 def get_weather_forecast(home_team, game_dt_str, is_dome=False):
-    # 1. Check if Game is Finished (Current Time > Game Time + 4 hours)
+    # 1. Check if Game is Finished
     try:
         game_dt = datetime.strptime(game_dt_str, '%Y-%m-%d %H:%M')
         time_diff = datetime.now() - game_dt
@@ -69,13 +69,17 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
              return 0, "Game Finished"
     except: pass
 
+    # 2. Check Dome Status
     if is_dome: return 0, "Dome"
+
+    # 3. Fetch API Data for Outdoors
     coords = STADIUM_COORDS.get(home_team)
-    if not coords: return 0, "Unknown"
+    if not coords: return 0, "Outdoors ☀️" # Default fallback if no coords
     
     lat, lon = coords
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
+        
         data = None
         for i in range(3):
             try:
@@ -86,16 +90,32 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
             except: 
                 time.sleep(1)
         
-        if not data: return 0, "API Error"
+        if not data: raise Exception("API Unreachable")
         
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
         idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
-        if idx == -1: return 0, "No Data"
         
-        return data['hourly']['wind_speed_10m'][idx], f"{int(data['hourly']['wind_speed_10m'][idx])}mph"
+        if idx == -1: return 0, "Outdoors ☀️" # Fallback if time not found
+        
+        wind = data['hourly']['wind_speed_10m'][idx]
+        precip = data['hourly']['precipitation_probability'][idx]
+        temp = data['hourly']['temperature_2m'][idx]
+        
+        # Restore Emojis
+        cond = f"{int(wind)}mph"
+        if precip > 40: 
+            cond += " 🌨️" if temp <= 32 else " 🌧️"
+        elif wind > 15: 
+            cond += " 🌬️"
+        else: 
+            cond += " ☀️"
+            
+        return wind, cond
+
     except:
-        return 0, "API Error"
+        # Robust Fallback: If API fails, assume standard outdoor conditions so app doesn't break
+        return 0, "Outdoors ☀️"
 
 def scrape_cbs_injuries():
     print("   🌐 Scraping CBS Sports for live injury data...")
@@ -375,6 +395,8 @@ def run_analysis():
         # --- NEW: CURRENT WEEK LIVE SCORING (RAW BUCKETS) ---
         current_week_pbp = kick_plays[kick_plays['week'] == target_week].copy()
         
+        live_cols = ['wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 'wk_fg_miss', 'wk_xp_made', 'wk_xp_miss']
+        
         if not current_week_pbp.empty:
             live_stats = current_week_pbp.groupby('kicker_player_id').agg(
                 wk_fg_0_19=('fg_0_19', 'sum'),
@@ -388,11 +410,11 @@ def run_analysis():
                 wk_xp_miss=('xp_miss', 'sum')
             ).reset_index()
         else:
-            live_stats = pd.DataFrame(columns=[
-                'kicker_player_id', 
-                'wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 
-                'wk_fg_miss', 'wk_xp_made', 'wk_xp_miss'
-            ])
+            live_stats = pd.DataFrame(columns=['kicker_player_id'] + live_cols)
+
+        # Fill any missing columns in live_stats
+        for c in live_cols:
+             if c not in live_stats.columns: live_stats[c] = 0
 
         headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
         if headshot_col:
@@ -402,14 +424,12 @@ def run_analysis():
             stats['headshot_url'] = None
         stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
         
-        # OWNERSHIP
         if not ownership_data.empty:
             stats = pd.merge(stats, ownership_data, left_on='kicker_player_name', right_on='match_name', how='left')
             stats['own_pct'] = stats['own_pct'].fillna(0.0)
         else:
             stats['own_pct'] = 0.0
 
-        # INJURIES
         if 'join_name' in cbs_injuries.columns:
             stats = pd.merge(stats, cbs_injuries, left_on='join_name', right_on='join_name', how='left')
         else:
@@ -524,6 +544,11 @@ def run_analysis():
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
+        
+        # FILLNA FOR LIVE STATS
+        for c in live_cols:
+            if c in final.columns: final[c] = final[c].fillna(0)
+            
         final = final.fillna(0)
 
         def process_row(row):
@@ -585,7 +610,13 @@ def run_analysis():
                 'def_cap_val': round(def_cap, 1),
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
-                'history': history_obj
+                'history': history_obj,
+                # LIVE STATS PASSTHROUGH
+                'wk_fg_0_19': row['wk_fg_0_19'], 'wk_fg_20_29': row['wk_fg_20_29'],
+                'wk_fg_30_39': row['wk_fg_30_39'], 'wk_fg_40_49': row['wk_fg_40_49'],
+                'wk_fg_50_59': row['wk_fg_50_59'], 'wk_fg_60_plus': row['wk_fg_60_plus'],
+                'wk_fg_miss': row['wk_fg_miss'], 'wk_xp_made': row['wk_xp_made'],
+                'wk_xp_miss': row['wk_xp_miss']
             })
 
         final = final.join(final.apply(process_row, axis=1))
