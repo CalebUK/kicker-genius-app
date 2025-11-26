@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit, PlayCircle, CheckCircle2, Clock, Flame, Gamepad2, UserCheck, Users, CloudRain } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit, PlayCircle, CheckCircle2, Clock, Flame, Gamepad2, Check } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react'; // UNCOMMENT THIS AFTER INSTALLING PACKAGE
 
 // --- GLOSSARY DATA ---
@@ -40,6 +40,7 @@ const SETTING_LABELS = {
   xp_miss: "PAT Missed"
 };
 
+// --- CUSTOM ICONS ---
 const FootballIcon = ({ isFire }) => (
   <div className="relative w-full h-full flex items-center justify-center">
     {isFire && (
@@ -61,6 +62,7 @@ const FootballIcon = ({ isFire }) => (
 
 const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) => {
   const isActive = currentSort?.key === sortKey;
+  
   return (
     <th 
       onClick={() => onSort && onSort(sortKey)}
@@ -79,6 +81,8 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
         </div>
         <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
       </div>
+      
+      {/* TOOLTIP */}
       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto">
         <div className="text-white font-semibold mb-1">{description}</div>
         {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
@@ -90,16 +94,47 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
 
 const HistoryBars = ({ games }) => {
   if (!games || games.length === 0) return <div className="text-xs text-slate-500">No recent data</div>;
+
   return (
     <div className="space-y-3">
       {games.map((g, i) => {
-        if (g.status === 'BYE' || g.status === 'DNS') return ( <div key={i} className="text-[10px]"><div className="text-slate-500 mb-0.5">Wk {g.week}: {g.status}</div><div className="w-full bg-slate-800/50 h-4 rounded-full relative"><div className="bg-slate-700 h-full rounded-full" style={{width: '100%'}}></div></div></div> );
-        const projRounded = Math.round(g.proj); const diff = g.act - projRounded; const maxVal = Math.max(20, projRounded, g.act); const projPct = (projRounded / maxVal) * 100; const actPct = (g.act / maxVal) * 100;
+        if (g.status === 'BYE' || g.status === 'DNS') {
+           return (
+             <div key={i} className="text-[10px]">
+               <div className="text-slate-500 mb-0.5">Wk {g.week}: {g.status}</div>
+               <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
+                 <div className="bg-slate-700 h-full rounded-full" style={{width: '100%'}}></div>
+               </div>
+             </div>
+           );
+        }
+
+        // --- ROUNDING LOGIC ---
+        const projRounded = Math.round(g.proj);
+        const diff = g.act - projRounded;
+        const maxVal = Math.max(20, projRounded, g.act); 
+        const projPct = (projRounded / maxVal) * 100;
+        const actPct = (g.act / maxVal) * 100;
+        const isBeat = g.act >= projRounded;
+        
         return (
           <div key={i} className="text-[10px]">
-            <div className="flex justify-between text-slate-400 mb-0.5 font-bold"><span>Wk {g.week} vs {g.opp}</span><span className={g.act >= projRounded ? "text-green-400" : "text-red-400"}>{g.act >= projRounded ? "+" : ""}{diff}</span></div>
-            <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative"><div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}><span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span></div></div>
-            <div className="w-full bg-slate-800/50 h-4 rounded-full relative"><div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}><span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span></div></div>
+            <div className="flex justify-between text-slate-400 mb-0.5 font-bold">
+              <span>Wk {g.week} vs {g.opp}</span>
+              <span className={g.act >= projRounded ? "text-green-400" : "text-red-400"}>
+                {g.act >= projRounded ? "+" : ""}{diff}
+              </span>
+            </div>
+            <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
+               <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
+                  <span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span>
+               </div>
+            </div>
+            <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
+               <div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
+                  <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
+               </div>
+            </div>
           </div>
         );
       })}
@@ -128,7 +163,9 @@ const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   else if (ownPct > 80) ownColor = 'text-amber-500'; 
 
   const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
-  const imageUrl = isAubrey ? '/assets/aubrey_custom.png' : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
+  const imageUrl = isAubrey 
+    ? '/assets/aubrey_custom.png' 
+    : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
 
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
@@ -149,7 +186,6 @@ const PlayerCell = ({ player, subtext, sleeperStatus }) => {
               {sleeperStatus === 'TAKEN' && <span className="text-[9px] bg-slate-700/50 text-slate-400 border border-slate-600/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">TAKEN</span>}
               {sleeperStatus === 'FREE_AGENT' && <span className="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">FREE AGENT</span>}
           </div>
-          
           <div className="flex items-center gap-3">
               <div className="relative group flex-shrink-0">
                 <img src={imageUrl} className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} onError={(e) => { e.target.onerror = null; if (e.target.src.includes('aubrey_custom.png')) { e.target.src = player.headshot_url; } else { e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }}} />
@@ -242,6 +278,7 @@ const App = () => {
   const [sleeperTakenKickers, setSleeperTakenKickers] = useState(new Set());
   const [sleeperLoading, setSleeperLoading] = useState(false);
   const [sleeperFilter, setSleeperFilter] = useState(false);
+  const [sleeperScoringUpdated, setSleeperScoringUpdated] = useState(false); // Feedback msg
 
   useEffect(() => {
     const savedScoring = localStorage.getItem('kicker_scoring');
@@ -265,8 +302,33 @@ const App = () => {
   const syncSleeper = async () => {
       if (!sleeperLeagueId) return;
       setSleeperLoading(true);
+      setSleeperScoringUpdated(false);
       try {
-          // 1. Fetch Users to find My User ID
+          // 1. Get League Details (Scoring + Roster IDs)
+          const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
+          if (!leagueRes.ok) throw new Error("League Not Found");
+          const leagueData = await leagueRes.json();
+          
+          // 1b. Update Scoring from Sleeper Settings
+          if (leagueData.scoring_settings) {
+             const s = leagueData.scoring_settings;
+             const newScoring = {
+                fg0_19: s.fgm_0_19 || 3,
+                fg20_29: s.fgm_20_29 || 3,
+                fg30_39: s.fgm_30_39 || 3,
+                fg40_49: s.fgm_40_49 || 4,
+                fg50_59: s.fgm_50_plus || 5, // Sleeper usually groups 50+
+                fg60_plus: s.fgm_50_plus || 5,
+                fg_miss: s.fgmiss || 0,
+                xp_made: s.xpm || 1,
+                xp_miss: s.xpmiss || 0
+             };
+             setScoring(newScoring);
+             localStorage.setItem('kicker_scoring', JSON.stringify(newScoring));
+             setSleeperScoringUpdated(true);
+          }
+
+          // 2. Fetch Users to find My User ID
           let myUserId = null;
           if (sleeperUser) {
              const usersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/users`);
@@ -275,17 +337,15 @@ const App = () => {
              if (me) myUserId = me.user_id;
           }
 
-          // 2. Fetch Rosters
+          // 3. Fetch Rosters
           const rostersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/rosters`);
           const rosters = await rostersRes.json();
           
-          // 3. Fetch NFL Players DB (This is the heavy lift, do once)
-          // Optimized: Only fetch active players if possible, but Sleeper endpoint is all-or-nothing usually.
-          // We will use a public github mirror for speed if needed, but let's try direct first.
+          // 4. Fetch NFL Players DB (This is the heavy lift, do once)
           const playersRes = await fetch('https://api.sleeper.app/v1/players/nfl'); 
           const allPlayers = await playersRes.json();
 
-          // 4. Filter and Map Kickers
+          // 5. Filter and Map Kickers
           const mySet = new Set();
           const takenSet = new Set();
 
@@ -294,7 +354,6 @@ const App = () => {
               roster.players.forEach(playerId => {
                   const player = allPlayers[playerId];
                   if (player && player.position === 'K') {
-                      // Normalize Name: "Brandon Aubrey" -> "B.Aubrey" to match our data
                       const first = player.first_name.charAt(0);
                       const last = player.last_name;
                       const joinName = `${first}.${last}`;
@@ -512,6 +571,7 @@ const App = () => {
                     {sleeperLoading ? <Loader2 className="w-4 h-4 animate-spin"/> : <RefreshCw className="w-4 h-4"/>}
                     {sleeperLoading ? "Syncing League..." : "Sync with Sleeper"}
                 </button>
+                {sleeperScoringUpdated && <div className="mt-4 p-3 bg-green-900/20 border border-green-800/50 rounded text-xs text-green-300 flex items-center gap-2"><Check className="w-4 h-4"/> Scoring settings auto-updated from league!</div>}
                 {sleeperMyKickers.size > 0 && (
                     <div className="mt-4 p-3 bg-purple-900/20 border border-purple-800/50 rounded text-xs text-purple-300">
                         ✅ Found team! Your kickers: <strong>{Array.from(sleeperMyKickers).join(', ')}</strong>
@@ -524,6 +584,7 @@ const App = () => {
         {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+             {/* SEARCH BAR */}
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4 justify-between">
                 <div className="relative flex-1 min-w-[200px] max-w-md">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -552,7 +613,15 @@ const App = () => {
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
-                    <th className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]" onClick={() => handleSort('own_pct')}><div className="flex items-center gap-1"><span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span><ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" /></div></th>
+                    <th 
+                      className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
+                      onClick={() => handleSort('own_pct')}
+                    >
+                      <div className="flex items-center gap-1">
+                        <span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </th>
                     <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description="Matchup Grade (Baseline 90)" />
                     <th className="px-6 py-3 text-center align-middle">Weather</th>
