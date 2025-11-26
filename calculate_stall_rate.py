@@ -11,7 +11,6 @@ import io
 import math
 import sys
 import re 
-import random
 
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
@@ -70,9 +69,12 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
              return 0, "Game Finished"
     except: pass
 
+    # 2. Check Dome
     if is_dome: return 0, "Dome"
+
+    # 3. Fetch Forecast (With Fallback)
     coords = STADIUM_COORDS.get(home_team)
-    if not coords: return 0, "Unknown"
+    if not coords: return 0, "Outdoors ☀️" # Default fallback
     
     lat, lon = coords
     try:
@@ -88,17 +90,30 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
             except: 
                 time.sleep(1)
         
-        if not data: return 0, "API Error"
+        if not data: return 0, "Outdoors ☀️" # API Failed Fallback
         
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
         idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
-        if idx == -1: return 0, "No Data"
         
-        return data['hourly']['wind_speed_10m'][idx], f"{int(data['hourly']['wind_speed_10m'][idx])}mph"
+        if idx == -1: return 0, "Outdoors ☀️" # Time not found Fallback
+        
+        wind = data['hourly']['wind_speed_10m'][idx]
+        precip = data['hourly']['precipitation_probability'][idx]
+        temp = data['hourly']['temperature_2m'][idx]
+        
+        # 4. Emoji Logic (Restored)
+        cond = f"{int(wind)}mph"
+        if precip > 40: 
+            cond += " 🌨️" if temp <= 32 else " 🌧️"
+        elif wind > 15: 
+            cond += " 🌬️"
+        else: 
+            cond += " ☀️"
+        
+        return wind, cond
     except:
-        # Robust Fallback
-        return 0, "Outdoors ☀️"
+        return 0, "Outdoors ☀️" # Exception Fallback
 
 def scrape_cbs_injuries():
     print("   🌐 Scraping CBS Sports for live injury data...")
@@ -265,88 +280,19 @@ def generate_narrative(row):
     off_stall = row['off_stall_rate']
     
     s1 = ""
-    if grade >= 100:
-        s1_options = [
-            f"{name} is a locked-and-loaded RB1 of kickers this week with an elite Grade of {grade}.",
-            f"Fire up {name} with confidence; his Matchup Grade of {grade} is in the elite tier.",
-            f"Don't overthink it: {name} is a top-tier option boasting a massive Grade of {grade}.",
-            f"With a stellar Grade of {grade}, {name} offers one of the highest floors on the slate.",
-            f"{name} projects as a matchup-winner this week with a Grade of {grade}."
-        ]
-    elif grade >= 90:
-        s1_options = [
-            f"{name} is a strong play this week, sitting comfortably with a Grade of {grade}.",
-            f"You can trust {name} in your lineup given his solid Grade of {grade}.",
-            f"{name} offers a safe floor and good upside with a Grade of {grade}.",
-            f"The model sees value in {name}, assigning a strong Grade of {grade}.",
-            f"{name} is a quality starter this week with a Grade of {grade}."
-        ]
-    elif grade >= 80:
-        s1_options = [
-            f"{name} is a viable streaming option with a respectable Grade of {grade}.",
-            f"Consider {name} if you need a fill-in; his Grade is a decent {grade}.",
-            f"{name} is a middle-of-the-road play with a Grade of {grade}.",
-            f"With a Grade of {grade}, {name} is a reasonable floor play.",
-            f"{name} is playable in deeper leagues with a Grade of {grade}."
-        ]
-    else:
-        s1_options = [
-            f"{name} is a risky option this week with a below-average Grade of {grade}.",
-            f"Fade {name} if possible; his Grade of {grade} suggests low upside.",
-            f"The model is fading {name} this week (Grade: {grade}).",
-            f"Look elsewhere for kicker points; {name} only grades at {grade}.",
-            f"{name} faces significant headwinds, resulting in a Grade of {grade}."
-        ]
+    if grade >= 100: s1 = f"{name} is a must-start option this week with an elite Matchup Grade of {grade}."
+    elif grade >= 90: s1 = f"{name} is a strong play this week, boasting a solid Grade of {grade}."
+    elif grade >= 80: s1 = f"{name} is a viable streaming option with a respectable Grade of {grade}."
+    else: s1 = f"{name} is a risky option this week with a below-average Grade of {grade}."
     
-    s1 = random.choice(s1_options)
-
-    # --- SENTENCE 2: THE CONTEXT ---
-    s2_options = []
-    
-    if vegas > 27:
-        s2_options = [
-            f"The offense has a massive implied total of {vegas:.1f}, offering a high ceiling.",
-            f"Vegas projects a shootout ({vegas:.1f} team pts), which means plenty of XP and FG chances.",
-            f"Being attached to an offense projected for {vegas:.1f} points is a recipe for success."
-        ]
-    elif row['wind'] > 15 and not row['is_dome']:
-        s2_options = [
-            f"However, heavy winds ({row['wind']} mph) could severely limit kicking opportunities.",
-            f"Be careful: {row['wind']} mph winds usually downgrade kicking efficiency significantly.",
-            f"The weather is a major concern, with winds gusting over {row['wind']} mph."
-        ]
-    elif row['is_dome']:
-        s2_options = [
-            f"Playing in a dome guarantees perfect kicking conditions.",
-            f"The controlled dome environment boosts his accuracy floor.",
-            f"No weather concerns here; the dome keeps his floor safe."
-        ]
-    elif off_stall > 40:
-        s2_options = [
-            f"His offense has a high stall rate ({off_stall}%), which often leads to FG attempts.",
-            f"The team moves the ball but struggles to finish ({off_stall}% stall), perfect for kickers.",
-            f"A {off_stall}% offensive stall rate suggests plenty of drives ending in 3 points."
-        ]
-    elif row['def_stall_rate'] > 40:
-        s2_options = [
-            f"The matchup is favorable against a defense that forces FGs ({row['def_stall_rate']}%) in the red zone.",
-            f"His opponent has a 'bend don't break' defense (Stall: {row['def_stall_rate']}%), boosting his value.",
-            f"Facing a defense with a {row['def_stall_rate']}% stall rate usually means extra FG tries."
-        ]
-    elif vegas < 18:
-        s2_options = [
-            f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting chances.",
-            f"The low team total ({vegas:.1f}) suggests a lack of scoring opportunities.",
-            f"Upside is capped by a poor offensive projection ({vegas:.1f} pts)."
-        ]
-    else:
-        s2_options = [
-            f"They face a neutral matchup with standard scoring expectations.",
-            f"The metrics don't show any major red flags or massive boosts.",
-            f"He is a solid, middle-of-the-road play based on the data."
-        ]
-
-    s2 = random.choice(s2_options)
+    s2 = ""
+    if vegas > 27: s2 = f"The offense has a massive implied total of {vegas:.1f} points, offering a high ceiling."
+    elif row['wind'] > 15: s2 = f"However, heavy winds ({row['wind']} mph) could severely limit kicking opportunities."
+    elif off_stall > 40: s2 = f"The offense has a high stall rate ({off_stall}%), which often leads to field goal attempts."
+    elif row['def_stall_rate'] > 40: s2 = f"The matchup is favorable against a defense that frequently forces field goals in the red zone."
+    elif vegas < 18: s2 = f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting scoring chances."
+    else: s2 = f"They face a neutral matchup with standard scoring expectations."
+        
     return f"{s1} {s2}"
 
 def run_analysis():
@@ -584,7 +530,7 @@ def run_analysis():
         
         final = pd.merge(stats, model, on='team', how='inner')
         
-        # MERGE LIVE STATS
+        # MERGE LIVE STATS (LATE MERGE)
         final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
         final = pd.merge(final, off_stall_l4, on='team', how='left')
@@ -661,7 +607,6 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
-                # NO DUPLICATE LIVE COLS HERE
             })
 
         final = final.join(final.apply(process_row, axis=1))
