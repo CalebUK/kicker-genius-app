@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
-import { GLOSSARY_DATA, DEFAULT_SCORING } from './data/constants';
+import { GLOSSARY_DATA, DEFAULT_SCORING, SETTING_LABELS } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
@@ -36,12 +36,18 @@ const App = () => {
     const savedScoring = localStorage.getItem('kicker_scoring');
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
     const savedUser = localStorage.getItem('sleeper_username');
+    
+    // Load saved rosters
     const savedMyKickers = localStorage.getItem('sleeper_my_kickers');
     const savedTakenKickers = localStorage.getItem('sleeper_taken_kickers');
     
-    if (savedScoring) { try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } catch (e) { console.error(e); } }
+    if (savedScoring) {
+      try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
+      catch (e) { console.error(e); }
+    }
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
     if (savedUser) setSleeperUser(savedUser);
+
     if (savedMyKickers) { try { setSleeperMyKickers(new Set(JSON.parse(savedMyKickers))); } catch (e) { console.error(e); } }
     if (savedTakenKickers) { try { setSleeperTakenKickers(new Set(JSON.parse(savedTakenKickers))); } catch (e) { console.error(e); } }
 
@@ -250,6 +256,12 @@ const App = () => {
 
   const ytdAvgs = { fpts: calculateLeagueAvg(ytdSorted, 'fpts'), avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'), pct: calculateLeagueAvg(ytdSorted, 'pct_val'), longs: calculateLeagueAvg(ytdSorted, 'longs'), dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'), rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'), off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'), def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd') };
 
+  const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
+  const bucketOutDoubtful = injuries.filter(k => ['OUT', 'Doubtful', 'Inactive'].includes(k.injury_status));
+  const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
+
+  const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -269,7 +281,7 @@ const App = () => {
           <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
           <button onClick={() => { setActiveTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
-          <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report</button>
+          <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
@@ -291,7 +303,15 @@ const App = () => {
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
-                    <th className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]" onClick={() => handleSort('own_pct')}><div className="flex items-center gap-1"><span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span><ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" /></div></th>
+                    <th 
+                      className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
+                      onClick={() => handleSort('own_pct')}
+                    >
+                      <div className="flex items-center gap-1">
+                        <span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </th>
                     <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description="Matchup Grade (Baseline 90)" />
                     <th className="px-6 py-3 text-center align-middle">Weather</th>
