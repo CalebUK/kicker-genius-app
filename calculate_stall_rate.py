@@ -11,6 +11,7 @@ import io
 import math
 import sys
 import re 
+import random
 
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
@@ -95,7 +96,6 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
         idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
-        
         if idx == -1: return 0, "Outdoors ☀️" # Time not found Fallback
         
         wind = data['hourly']['wind_speed_10m'][idx]
@@ -110,7 +110,6 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
             cond += " 🌬️"
         else: 
             cond += " ☀️"
-        
         return wind, cond
     except:
         return 0, "Outdoors ☀️" # Exception Fallback
@@ -168,7 +167,7 @@ def scrape_fantasy_ownership():
             if not isinstance(val, str): return val
             name_part = val.split('(')[0].strip()
             parts = name_part.split(' ')
-            if len(parts) >= 2: return f"{parts[0][0]}.{parts[1]}"
+            if len(parts) >= 2: return f"{parts[0][0]}.{parts[-1]}"
             return name_part
         df['match_name'] = df['full_name'].apply(clean_name_to_match)
         def clean_pct(val):
@@ -180,7 +179,24 @@ def scrape_fantasy_ownership():
         return pd.DataFrame()
 
 def load_injury_data_safe(season, target_week):
-    # We rely on CBS Scraper + Roster Data now.
+    print("🏥 Fetching Injury Data...")
+    scraped = scrape_cbs_injuries()
+    if not scraped.empty: return scraped
+    
+    try:
+        injuries = nfl.load_injuries(seasons=[season])
+        if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
+        df = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
+        df.rename(columns={'practice_status': 'practice_status'}, inplace=True) 
+        return df
+    except Exception: pass
+    
+    try:
+        url = f"https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_{season}.csv"
+        injuries = pd.read_csv(url)
+        return injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
+    except Exception: pass
+    
     return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
 
 def clean_nan(val):
@@ -278,21 +294,93 @@ def generate_narrative(row):
     grade = row['grade']
     vegas = row['vegas_implied']
     off_stall = row['off_stall_rate']
+    def_stall = row['def_stall_rate']
+    wind = row['wind']
+    is_dome = row['is_dome']
     
     s1 = ""
-    if grade >= 100: s1 = f"{name} is a must-start option this week with an elite Matchup Grade of {grade}."
-    elif grade >= 90: s1 = f"{name} is a strong play this week, boasting a solid Grade of {grade}."
-    elif grade >= 80: s1 = f"{name} is a viable streaming option with a respectable Grade of {grade}."
-    else: s1 = f"{name} is a risky option this week with a below-average Grade of {grade}."
+    if grade >= 100:
+        s1_options = [
+            f"{name} is a locked-and-loaded RB1 of kickers this week with an elite Grade of {grade}.",
+            f"Fire up {name} with confidence; his Matchup Grade of {grade} is in the elite tier.",
+            f"Don't overthink it: {name} is a top-tier option boasting a massive Grade of {grade}.",
+            f"With a stellar Grade of {grade}, {name} offers one of the highest floors on the slate.",
+            f"{name} projects as a matchup-winner this week with a Grade of {grade}."
+        ]
+    elif grade >= 90:
+        s1_options = [
+            f"{name} is a strong play this week, sitting comfortably with a Grade of {grade}.",
+            f"You can trust {name} in your lineup given his solid Grade of {grade}.",
+            f"{name} offers a safe floor and good upside with a Grade of {grade}.",
+            f"The model sees value in {name}, assigning a strong Grade of {grade}.",
+            f"{name} is a quality starter this week with a Grade of {grade}."
+        ]
+    elif grade >= 80:
+        s1_options = [
+            f"{name} is a viable streaming option with a respectable Grade of {grade}.",
+            f"Consider {name} if you need a fill-in; his Grade is a decent {grade}.",
+            f"{name} is a middle-of-the-road play with a Grade of {grade}.",
+            f"With a Grade of {grade}, {name} is a reasonable floor play.",
+            f"{name} is playable in deeper leagues with a Grade of {grade}."
+        ]
+    else:
+        s1_options = [
+            f"{name} is a risky option this week with a below-average Grade of {grade}.",
+            f"Fade {name} if possible; his Grade of {grade} suggests low upside.",
+            f"The model is fading {name} this week (Grade: {grade}).",
+            f"Look elsewhere for kicker points; {name} only grades at {grade}.",
+            f"{name} faces significant headwinds, resulting in a Grade of {grade}."
+        ]
     
-    s2 = ""
-    if vegas > 27: s2 = f"The offense has a massive implied total of {vegas:.1f} points, offering a high ceiling."
-    elif row['wind'] > 15: s2 = f"However, heavy winds ({row['wind']} mph) could severely limit kicking opportunities."
-    elif off_stall > 40: s2 = f"The offense has a high stall rate ({off_stall}%), which often leads to field goal attempts."
-    elif row['def_stall_rate'] > 40: s2 = f"The matchup is favorable against a defense that frequently forces field goals in the red zone."
-    elif vegas < 18: s2 = f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting scoring chances."
-    else: s2 = f"They face a neutral matchup with standard scoring expectations."
-        
+    s1 = random.choice(s1_options)
+
+    # --- SENTENCE 2: THE CONTEXT ---
+    s2_options = []
+    
+    if vegas > 27:
+        s2_options = [
+            f"The offense has a massive implied total of {vegas:.1f}, offering a high ceiling.",
+            f"Vegas projects a shootout ({vegas:.1f} team pts), which means plenty of XP and FG chances.",
+            f"Being attached to an offense projected for {vegas:.1f} points is a recipe for success."
+        ]
+    elif row['wind'] > 15 and not row['is_dome']:
+        s2_options = [
+            f"However, heavy winds ({row['wind']} mph) could severely limit kicking opportunities.",
+            f"Be careful: {row['wind']} mph winds usually downgrade kicking efficiency significantly.",
+            f"The weather is a major concern, with winds gusting over {row['wind']} mph."
+        ]
+    elif row['is_dome']:
+        s2_options = [
+            f"Playing in a dome guarantees perfect kicking conditions.",
+            f"The controlled dome environment boosts his accuracy floor.",
+            f"No weather concerns here; the dome keeps his floor safe."
+        ]
+    elif off_stall > 40:
+        s2_options = [
+            f"His offense has a high stall rate ({off_stall}%), which often leads to FG attempts.",
+            f"The team moves the ball but struggles to finish ({off_stall}% stall), perfect for kickers.",
+            f"A {off_stall}% offensive stall rate suggests plenty of drives ending in 3 points."
+        ]
+    elif def_stall > 40:
+        s2_options = [
+            f"The matchup is favorable against a defense that forces FGs ({row['def_stall_rate']}%) in the red zone.",
+            f"His opponent has a 'bend don't break' defense (Stall: {row['def_stall_rate']}%), boosting his value.",
+            f"Facing a defense with a {row['def_stall_rate']}% stall rate usually means extra FG tries."
+        ]
+    elif vegas < 18:
+        s2_options = [
+            f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting chances.",
+            f"The low team total ({vegas:.1f}) suggests a lack of scoring opportunities.",
+            f"Upside is capped by a poor offensive projection ({vegas:.1f} pts)."
+        ]
+    else:
+        s2_options = [
+            f"They face a neutral matchup with standard scoring expectations.",
+            f"The metrics don't show any major red flags or massive boosts.",
+            f"He is a solid, middle-of-the-road play based on the data."
+        ]
+
+    s2 = random.choice(s2_options)
     return f"{s1} {s2}"
 
 def run_analysis():
@@ -338,7 +426,15 @@ def run_analysis():
         kick_plays['fg_50_59'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(50, 59))
         kick_plays['fg_60_plus'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'] >= 60)
         
-        kick_plays['fg_miss'] = (kick_plays['is_fg']) & (~kick_plays['made'])
+        # GRANULAR MISSES
+        kick_plays['fg_miss_0_19'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'] < 20)
+        kick_plays['fg_miss_20_29'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'].between(20, 29))
+        kick_plays['fg_miss_30_39'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'].between(30, 39))
+        kick_plays['fg_miss_40_49'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'].between(40, 49))
+        kick_plays['fg_miss_50_59'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'].between(50, 59))
+        kick_plays['fg_miss_60_plus'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'] >= 60)
+        
+        kick_plays['fg_miss'] = (kick_plays['is_fg']) & (~kick_plays['made']) # Total Miss Count (Fallback)
         kick_plays['xp_made'] = (kick_plays['is_xp']) & (kick_plays['made'])
         kick_plays['xp_miss'] = (kick_plays['is_xp']) & (~kick_plays['made'])
         kick_plays['real_pts'] = (kick_plays['is_fg'] & kick_plays['made']) * 3 + (kick_plays['is_xp'] & kick_plays['made']) * 1
@@ -354,7 +450,11 @@ def run_analysis():
             fg_att=('is_fg', 'sum'),
             fg_0_19=('fg_0_19', 'sum'), fg_20_29=('fg_20_29', 'sum'), fg_30_39=('fg_30_39', 'sum'),
             fg_40_49=('fg_40_49', 'sum'), fg_50_59=('fg_50_59', 'sum'), fg_60_plus=('fg_60_plus', 'sum'),
-            fg_miss=('fg_miss', 'sum'), xp_made=('xp_made', 'sum'), xp_miss=('xp_miss', 'sum'),
+            
+            fg_miss=('fg_miss', 'sum'), xp_made=('xp_made', 'sum'), xp_miss=('xp_miss', 'sum'), # Fallback values
+            fg_miss_0_19=('fg_miss_0_19', 'sum'), fg_miss_20_29=('fg_miss_20_29', 'sum'), fg_miss_30_39=('fg_miss_30_39', 'sum'),
+            fg_miss_40_49=('fg_miss_40_49', 'sum'), fg_miss_50_59=('fg_miss_50_59', 'sum'), fg_miss_60_plus=('fg_miss_60_plus', 'sum'),
+
             real_pts=('real_pts', 'sum'), dome_kicks=('is_dome', 'sum'),
             total_kicks=('play_id', 'count'), games=('game_id', 'nunique')
         ).reset_index()
@@ -392,7 +492,12 @@ def run_analysis():
 
         # --- NEW: CURRENT WEEK LIVE SCORING (RAW BUCKETS) ---
         current_week_pbp = kick_plays[kick_plays['week'] == target_week].copy()
-        live_cols = ['wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 'wk_fg_miss', 'wk_xp_made', 'wk_xp_miss']
+        live_cols = [
+            'wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 
+            'wk_fg_miss', 'wk_xp_made', 'wk_xp_miss',
+            'wk_fg_miss_0_19', 'wk_fg_miss_20_29', 'wk_fg_miss_30_39', 'wk_fg_miss_40_49',
+            'wk_fg_miss_50_59', 'wk_fg_miss_60_plus'
+        ]
         
         if not current_week_pbp.empty:
             live_stats = current_week_pbp.groupby('kicker_player_id').agg(
@@ -404,7 +509,13 @@ def run_analysis():
                 wk_fg_60_plus=('fg_60_plus', 'sum'),
                 wk_fg_miss=('fg_miss', 'sum'),
                 wk_xp_made=('xp_made', 'sum'),
-                wk_xp_miss=('xp_miss', 'sum')
+                wk_xp_miss=('xp_miss', 'sum'),
+                wk_fg_miss_0_19=('fg_miss_0_19', 'sum'),
+                wk_fg_miss_20_29=('fg_miss_20_29', 'sum'),
+                wk_fg_miss_30_39=('fg_miss_30_39', 'sum'),
+                wk_fg_miss_40_49=('fg_miss_40_49', 'sum'),
+                wk_fg_miss_50_59=('fg_miss_50_59', 'sum'),
+                wk_fg_miss_60_plus=('fg_miss_60_plus', 'sum')
             ).reset_index()
         else:
             live_stats = pd.DataFrame(columns=['kicker_player_id'] + live_cols)
@@ -529,8 +640,6 @@ def run_analysis():
         if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         
         final = pd.merge(stats, model, on='team', how='inner')
-        
-        # MERGE LIVE STATS (LATE MERGE)
         final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
         final = pd.merge(final, off_stall_l4, on='team', how='left')
@@ -541,7 +650,6 @@ def run_analysis():
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
         
-        # FILLNA FOR LIVE STATS
         for c in live_cols:
             if c in final.columns: final[c] = final[c].fillna(0)
             
