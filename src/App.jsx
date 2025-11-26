@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit, PlayCircle, CheckCircle2, Clock, Flame } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Wind, Calendar, Info, MapPin, ShieldAlert, BookOpen, ChevronDown, ChevronUp, Calculator, RefreshCw, AlertTriangle, Loader2, Stethoscope, Database, UserMinus, Settings, Save, RotateCcw, Filter, Target, ArrowUpDown, ArrowUp, ArrowDown, Search, BrainCircuit, PlayCircle, CheckCircle2, Clock, Flame, Gamepad2, UserCheck, Users, CloudRain } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react'; // UNCOMMENT THIS AFTER INSTALLING PACKAGE
 
 // --- GLOSSARY DATA ---
@@ -40,7 +40,6 @@ const SETTING_LABELS = {
   xp_miss: "PAT Missed"
 };
 
-// --- CUSTOM ICONS ---
 const FootballIcon = ({ isFire }) => (
   <div className="relative w-full h-full flex items-center justify-center">
     {isFire && (
@@ -62,7 +61,6 @@ const FootballIcon = ({ isFire }) => (
 
 const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) => {
   const isActive = currentSort?.key === sortKey;
-  
   return (
     <th 
       onClick={() => onSort && onSort(sortKey)}
@@ -92,50 +90,16 @@ const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) =
 
 const HistoryBars = ({ games }) => {
   if (!games || games.length === 0) return <div className="text-xs text-slate-500">No recent data</div>;
-
   return (
     <div className="space-y-3">
       {games.map((g, i) => {
-        if (g.status === 'BYE' || g.status === 'DNS') {
-           return (
-             <div key={i} className="text-[10px]">
-               <div className="text-slate-500 mb-0.5">Wk {g.week}: {g.status}</div>
-               <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
-                 <div className="bg-slate-700 h-full rounded-full" style={{width: '100%'}}></div>
-               </div>
-             </div>
-           );
-        }
-
-        const projRounded = Math.round(g.proj);
-        const diff = g.act - projRounded;
-        const maxVal = Math.max(20, projRounded, g.act); 
-        const projPct = (projRounded / maxVal) * 100;
-        const actPct = (g.act / maxVal) * 100;
-        const isBeat = g.act >= projRounded;
-        
+        if (g.status === 'BYE' || g.status === 'DNS') return ( <div key={i} className="text-[10px]"><div className="text-slate-500 mb-0.5">Wk {g.week}: {g.status}</div><div className="w-full bg-slate-800/50 h-4 rounded-full relative"><div className="bg-slate-700 h-full rounded-full" style={{width: '100%'}}></div></div></div> );
+        const projRounded = Math.round(g.proj); const diff = g.act - projRounded; const maxVal = Math.max(20, projRounded, g.act); const projPct = (projRounded / maxVal) * 100; const actPct = (g.act / maxVal) * 100;
         return (
           <div key={i} className="text-[10px]">
-            <div className="flex justify-between text-slate-400 mb-0.5 font-bold">
-              <span>Wk {g.week} vs {g.opp}</span>
-              <span className={g.act >= projRounded ? "text-green-400" : "text-red-400"}>
-                {g.act >= projRounded ? "+" : ""}{diff}
-              </span>
-            </div>
-            
-            {/* Projection Bar (Gray) */}
-            <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative">
-               <div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}>
-                  <span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span>
-               </div>
-            </div>
-
-            {/* Actual Bar (Color) */}
-            <div className="w-full bg-slate-800/50 h-4 rounded-full relative">
-               <div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}>
-                  <span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span>
-               </div>
-            </div>
+            <div className="flex justify-between text-slate-400 mb-0.5 font-bold"><span>Wk {g.week} vs {g.opp}</span><span className={g.act >= projRounded ? "text-green-400" : "text-red-400"}>{g.act >= projRounded ? "+" : ""}{diff}</span></div>
+            <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative"><div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}><span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span></div></div>
+            <div className="w-full bg-slate-800/50 h-4 rounded-full relative"><div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}><span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span></div></div>
           </div>
         );
       })}
@@ -143,10 +107,9 @@ const HistoryBars = ({ games }) => {
   );
 };
 
-const PlayerCell = ({ player, subtext }) => {
+const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   const injuryColor = player.injury_color || 'slate-600'; 
   const statusText = player.injury_status || '';
-  
   let borderColor = 'border-slate-600';
   if (injuryColor.includes('green')) borderColor = 'border-green-500';
   if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
@@ -165,48 +128,31 @@ const PlayerCell = ({ player, subtext }) => {
   else if (ownPct > 80) ownColor = 'text-amber-500'; 
 
   const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
-  const imageUrl = isAubrey 
-    ? '/assets/aubrey_custom.png' 
-    : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
+  const imageUrl = isAubrey ? '/assets/aubrey_custom.png' : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
 
-  // --- PARSE INJURY DETAILS FOR 3-FOLD DISPLAY ---
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
-  
-  let displayInjury = '';
-  let displayStatus = '';
-  
-  if (match) {
-      const reportStatus = match[1];
-      const injuryType = match[2];
-      displayInjury = `${player.injury_status}: ${injuryType}`;
-      displayStatus = reportStatus;
-  } else {
-      displayInjury = details; 
-  }
+  let displayInjury = '', displayStatus = '';
+  if (match) { const reportStatus = match[1]; const injuryType = match[2]; displayInjury = `${player.injury_status}: ${injuryType}`; displayStatus = reportStatus; } 
+  else { displayInjury = details; }
 
   return (
     <td className="px-3 py-4 font-medium text-white">
       <div className="flex flex-col justify-center">
-          <div className="text-xs md:text-sm font-bold text-white leading-tight mb-2 whitespace-normal break-words flex items-center gap-1">
-            {player.kicker_player_name}
-            {player.isTop5 && <span title="Top 5 Scorer (Season)" className="text-sm">🔥</span>}
+          <div className="flex items-center gap-2 mb-2">
+              <div className="text-xs md:text-sm font-bold text-white leading-tight whitespace-normal break-words flex items-center gap-1">
+                {player.kicker_player_name}
+                {player.isTop5 && <span title="Top 5 Scorer (Season)" className="text-sm">🔥</span>}
+              </div>
+              {/* SLEEPER BADGES */}
+              {sleeperStatus === 'MY_TEAM' && <span className="text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">MY TEAM</span>}
+              {sleeperStatus === 'TAKEN' && <span className="text-[9px] bg-slate-700/50 text-slate-400 border border-slate-600/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">TAKEN</span>}
+              {sleeperStatus === 'FREE_AGENT' && <span className="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">FREE AGENT</span>}
           </div>
+          
           <div className="flex items-center gap-3">
               <div className="relative group flex-shrink-0">
-                <img 
-                    src={imageUrl} 
-                    alt={player.kicker_player_name}
-                    className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} 
-                    onError={(e) => { 
-                        e.target.onerror = null;
-                        if (e.target.src.includes('aubrey_custom.png')) {
-                            e.target.src = player.headshot_url;
-                        } else {
-                            e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png';
-                        }
-                    }} 
-                />
+                <img src={imageUrl} className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} onError={(e) => { e.target.onerror = null; if (e.target.src.includes('aubrey_custom.png')) { e.target.src = player.headshot_url; } else { e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }}} />
                 {statusText !== '' && (
                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-auto whitespace-nowrap p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
                       {match ? (
@@ -234,32 +180,18 @@ const PlayerCell = ({ player, subtext }) => {
 
 const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
-
-  // --- ROUNDED TREND LOGIC ---
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
   const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
   const l3_diff = l3_act - l3_proj;
-  let trendColor = "text-slate-500";
-  let trendSign = "";
-  if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; }
-  else if (l3_diff < -2.5) { trendColor = "text-red-400"; }
-
-  const lgOffStall = leagueAvgs?.off_stall || 40;
-  const lgDefStall = leagueAvgs?.def_stall || 40;
-
-  const baseRaw = (player.avg_pts * (player.grade / 90));
-  const baseMult = (player.grade / 90).toFixed(2);
-  const offRaw = player.off_cap_val; 
-  const offShare = ((player.off_share || 0.35)*100).toFixed(0);
-  const defRaw = player.def_cap_val; 
+  let trendColor = "text-slate-500"; let trendSign = "";
+  if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; } else if (l3_diff < -2.5) { trendColor = "text-red-400"; }
+  const lgOffStall = leagueAvgs?.off_stall || 40; const lgDefStall = leagueAvgs?.def_stall || 40;
+  const baseRaw = (player.avg_pts * (player.grade / 90)); const baseMult = (player.grade / 90).toFixed(2);
+  const offRaw = player.off_cap_val; const offShare = ((player.off_share || 0.35)*100).toFixed(0); const defRaw = player.def_cap_val; 
 
   return (
     <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Calculator className="w-4 h-4 text-emerald-400" />
-          <h3 className="font-bold text-white text-sm">Math Worksheet: {player.kicker_player_name}</h3>
-        </div>
-        
+        <div className="flex items-center gap-2 mb-3"><Calculator className="w-4 h-4 text-emerald-400" /><h3 className="font-bold text-white text-sm">Math Worksheet: {player.kicker_player_name}</h3></div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
@@ -283,142 +215,13 @@ const MathCard = ({ player, leagueAvgs, week }) => {
   );
 };
 
-const DeepDiveRow = ({ player, leagueAvgs, week }) => (
+const DeepDiveRow = ({ player, leagueAvgs, week, sleeperStatus }) => (
   <tr className="bg-slate-900/50 border-b border-slate-800">
     <td colSpan="11" className="p-4">
       <MathCard player={player} leagueAvgs={leagueAvgs} week={week} />
     </td>
   </tr>
 );
-
-// --- ACCURACY TAB COMPONENT ---
-const AccuracyTab = ({ players, scoring, week }) => {
-  const [filter, setFilter] = useState('ALL');
-
-  const calculateLiveScore = (p) => {
-      return (
-          ((p.wk_fg_0_19 || 0) * scoring.fg0_19) +
-          ((p.wk_fg_20_29 || 0) * scoring.fg20_29) +
-          ((p.wk_fg_30_39 || 0) * scoring.fg30_39) +
-          ((p.wk_fg_40_49 || 0) * scoring.fg40_49) +
-          ((p.wk_fg_50_59 || 0) * scoring.fg50_59) +
-          ((p.wk_fg_60_plus || 0) * scoring.fg60_plus) +
-          ((p.wk_fg_miss || 0) * scoring.fg_miss) +
-          ((p.wk_xp_made || 0) * scoring.xp_made) +
-          ((p.wk_xp_miss || 0) * scoring.xp_miss)
-      );
-  };
-
-  const getGameStatus = (gameDtStr) => {
-      if (!gameDtStr) return 'UPCOMING';
-      try {
-          const gameTime = new Date(gameDtStr.replace(' ', 'T'));
-          const now = new Date();
-          const diffHours = (now - gameTime) / (1000 * 60 * 60);
-          if (diffHours < 0) return 'UPCOMING';
-          if (diffHours >= 0 && diffHours < 4) return 'LIVE';
-          return 'FINISHED';
-      } catch (e) { return 'UPCOMING'; }
-  };
-
-  const displayPlayers = players.filter(p => {
-      if (p.proj <= 0) return false;
-      const status = getGameStatus(p.game_dt);
-      if (filter === 'ALL') return true;
-      return filter === status;
-  }).sort((a, b) => {
-      const scoreA = calculateLiveScore(a);
-      const scoreB = calculateLiveScore(b);
-      if (filter === 'UPCOMING') return b.proj - a.proj;
-      return scoreB - scoreA; 
-  });
-
-  return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-        <div className="flex gap-2 p-1 bg-slate-900/50 rounded-lg border border-slate-800 w-fit mx-auto">
-            {['ALL', 'LIVE', 'FINISHED', 'UPCOMING'].map((f) => (
-                <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${filter === f ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}>{f}</button>
-            ))}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {displayPlayers.map((p, i) => {
-                const liveScore = calculateLiveScore(p);
-                const proj = p.proj;
-                const pct = Math.min(100, Math.max(5, (liveScore / proj) * 100));
-                const isBeat = liveScore >= proj;
-                const isSmashed = liveScore >= proj + 3;
-                const status = getGameStatus(p.game_dt);
-                
-                let statusColor = "bg-slate-800 text-slate-400";
-                let StatusIcon = Calendar;
-                if (status === 'LIVE') { statusColor = "bg-red-900/50 text-red-400 animate-pulse"; StatusIcon = PlayCircle; }
-                if (status === 'FINISHED') { statusColor = "bg-emerald-900/30 text-emerald-400"; StatusIcon = CheckCircle2; }
-                if (status === 'UPCOMING') { statusColor = "bg-blue-900/30 text-blue-400"; StatusIcon = Clock; }
-
-                const isSpecial = p.kicker_player_name.includes('Aubrey') || p.team === 'DAL';
-                const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
-                const glowClass = isSmashed ? "shadow-[0_0_15px_rgba(59,130,246,0.5)] border-blue-400" : "";
-
-                return (
-                    <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass} ${glowClass}`}>
-                        <div className="flex items-center gap-3 mb-4 relative z-10">
-                            <img src={p.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-700 object-cover bg-slate-950"/>
-                            <div className="min-w-0 flex-1">
-                                <div className="font-bold text-white text-sm truncate">{p.kicker_player_name}</div>
-                                <div className="text-xs text-slate-500">{p.team} vs {p.opponent}</div>
-                            </div>
-                            <div className={`px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1 ${statusColor}`}><StatusIcon className="w-3 h-3" /> {status}</div>
-                        </div>
-
-                        <div className="flex justify-between items-end mb-2 relative z-10">
-                            <div className="text-xs text-slate-400 font-bold">PROJECTED: {proj}</div>
-                            <div className="text-right"><span className={`text-3xl font-black ${isSmashed ? 'text-blue-400' : isBeat ? 'text-emerald-400' : 'text-white'}`}>{liveScore}</span><span className="text-xs text-slate-500 ml-1">pts</span></div>
-                        </div>
-
-                        {/* FOOTBALL FIELD PROGRESS BAR */}
-                        <div className="h-8 w-full bg-emerald-900 rounded-md relative mb-4 border-2 border-emerald-800 overflow-hidden mt-2 shadow-inner group">
-                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-800 to-emerald-950 opacity-80"></div>
-                             <div className="absolute left-0 top-0 bottom-0 w-4 bg-white/90 z-0"></div>
-                             <div className="absolute right-0 top-0 bottom-0 w-4 bg-white/90 z-0"></div>
-                             <div className="absolute inset-0 flex justify-between px-4 items-center pointer-events-none z-0">
-                                 {[...Array(9)].map((_, idx) => {
-                                     const isMidfield = idx === 4;
-                                     return (
-                                         <div 
-                                            key={idx} 
-                                            className={`${isMidfield ? 'h-full w-0.5 bg-white/80' : 'h-[60%] w-px bg-white/40'}`}
-                                         ></div>
-                                     );
-                                 })}
-                             </div>
-                             <img src="/assets/logo.png" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 object-contain opacity-40 pointer-events-none" alt="logo"/>
-
-                             <div className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${pct}%` }}></div>
-                             
-                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 16px)` }}>
-                                 <FootballIcon isFire={isSmashed} />
-                             </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-1.5 relative z-10">
-                            {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
-                            {(p.wk_fg_40_49 > 0) && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{p.wk_fg_40_49}x 40-49</span>}
-                            {(p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39 > 0) && <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39}x Short FG</span>}
-                            {(p.wk_xp_made > 0) && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_xp_made}x XP</span>}
-                            {(p.wk_fg_miss > 0 || p.wk_xp_miss > 0) && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{p.wk_fg_miss + p.wk_xp_miss} Miss</span>}
-                            {liveScore === 0 && status !== 'UPCOMING' && <span className="text-[10px] text-slate-600 italic px-1">No points yet</span>}
-                        </div>
-                        
-                        {isSmashed && <div className="absolute inset-0 bg-blue-500/5 z-0 animate-pulse pointer-events-none"></div>}
-                    </div>
-                );
-            })}
-        </div>
-        {displayPlayers.length === 0 && <div className="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-slate-900">No games found for this filter.</div>}
-    </div>
-  );
-};
 
 const App = () => {
   const [data, setData] = useState(null);
@@ -432,18 +235,93 @@ const App = () => {
   const [hideMedOwn, setHideMedOwn] = useState(false);
   const [search, setSearch] = useState('');
 
+  // Sleeper State
+  const [sleeperLeagueId, setSleeperLeagueId] = useState('');
+  const [sleeperUser, setSleeperUser] = useState('');
+  const [sleeperMyKickers, setSleeperMyKickers] = useState(new Set());
+  const [sleeperTakenKickers, setSleeperTakenKickers] = useState(new Set());
+  const [sleeperLoading, setSleeperLoading] = useState(false);
+  const [sleeperFilter, setSleeperFilter] = useState(false);
+
   useEffect(() => {
     const savedScoring = localStorage.getItem('kicker_scoring');
+    const savedLeagueId = localStorage.getItem('sleeper_league_id');
+    const savedUser = localStorage.getItem('sleeper_username');
+    
     if (savedScoring) {
       try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
       catch (e) { console.error(e); }
     }
+    if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
+    if (savedUser) setSleeperUser(savedUser);
+
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
   }, []);
 
+  // --- SLEEPER SYNC LOGIC ---
+  const syncSleeper = async () => {
+      if (!sleeperLeagueId) return;
+      setSleeperLoading(true);
+      try {
+          // 1. Fetch Users to find My User ID
+          let myUserId = null;
+          if (sleeperUser) {
+             const usersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/users`);
+             const users = await usersRes.json();
+             const me = users.find(u => u.display_name.toLowerCase() === sleeperUser.toLowerCase());
+             if (me) myUserId = me.user_id;
+          }
+
+          // 2. Fetch Rosters
+          const rostersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/rosters`);
+          const rosters = await rostersRes.json();
+          
+          // 3. Fetch NFL Players DB (This is the heavy lift, do once)
+          // Optimized: Only fetch active players if possible, but Sleeper endpoint is all-or-nothing usually.
+          // We will use a public github mirror for speed if needed, but let's try direct first.
+          const playersRes = await fetch('https://api.sleeper.app/v1/players/nfl'); 
+          const allPlayers = await playersRes.json();
+
+          // 4. Filter and Map Kickers
+          const mySet = new Set();
+          const takenSet = new Set();
+
+          rosters.forEach(roster => {
+              const isMine = roster.owner_id === myUserId;
+              roster.players.forEach(playerId => {
+                  const player = allPlayers[playerId];
+                  if (player && player.position === 'K') {
+                      // Normalize Name: "Brandon Aubrey" -> "B.Aubrey" to match our data
+                      const first = player.first_name.charAt(0);
+                      const last = player.last_name;
+                      const joinName = `${first}.${last}`;
+                      
+                      if (isMine) mySet.add(joinName);
+                      else takenSet.add(joinName);
+                  }
+              });
+          });
+
+          setSleeperMyKickers(mySet);
+          setSleeperTakenKickers(takenSet);
+          
+          // Save settings
+          localStorage.setItem('sleeper_league_id', sleeperLeagueId);
+          localStorage.setItem('sleeper_username', sleeperUser);
+          
+          setSleeperLoading(false);
+
+      } catch (err) {
+          console.error("Sleeper Sync Failed", err);
+          setSleeperLoading(false);
+          alert("Failed to sync Sleeper league. Check League ID.");
+      }
+  };
+
+  // ... (Standard Update Functions) ...
   const updateScoring = (key, val) => {
     const numVal = val === '' ? 0 : parseFloat(val);
     const newScoring = { ...scoring, [key]: numVal };
@@ -464,6 +342,7 @@ const App = () => {
 
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
 
+  // ... (Calc Functions) ...
   const calcFPts = (p) => {
     if (!p) return 0;
     return ((p.fg_0_19||0)*scoring.fg0_19) + ((p.fg_20_29||0)*scoring.fg20_29) + ((p.fg_30_39||0)*scoring.fg30_39) + 
@@ -480,11 +359,11 @@ const App = () => {
     const def_cap_scaled = (p.def_cap_val || 0) * scaleFactor;
     const weighted_proj = (base * 0.50) + (off_cap_scaled * 0.30) + (def_cap_scaled * 0.20);
     const proj = weighted_proj > 1.0 ? weighted_proj : base;
-    return Math.round(proj); // ROUNDED
+    return Math.round(proj); 
   };
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
@@ -494,23 +373,15 @@ const App = () => {
      const ytdPts = calcFPts(pWithVegas);
      const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-
-     // NEW LOGIC: Recalculate L3 sums based on rounded weekly values
+     
      const l3_games = p.history?.l3_games || [];
      const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0);
      const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
 
-     return { 
-        ...pWithYtd, 
-        proj: parseFloat(proj), 
-        l3_proj_sum,
-        l3_act_sum,
-        acc_diff: l3_act_sum - l3_proj_sum
-     };
-  })
-  .filter(p => p.proj > 0); 
+     return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum };
+  }).filter(p => p.proj > 0); 
 
-  // Search Logic
+  // --- SEARCH ---
   if (search) {
       const q = search.toLowerCase();
       processed = processed.filter(p => 
@@ -521,110 +392,63 @@ const App = () => {
       );
   }
 
-  // Sort Logic for Potential
-  processed.sort((a, b) => {
-     let valA = a[sortConfig.key];
-     let valB = b[sortConfig.key];
-     if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
-     
-     if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
-     if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
-     return 0;
-  });
+  // --- SLEEPER FILTER LOGIC ---
+  if (sleeperFilter && sleeperLeagueId) {
+      processed = processed.sort((a, b) => {
+          // 1. My Kickers
+          const aMine = sleeperMyKickers.has(a.join_name);
+          const bMine = sleeperMyKickers.has(b.join_name);
+          if (aMine && !bMine) return -1;
+          if (!aMine && bMine) return 1;
+          
+          // 2. Available (Not Taken)
+          const aTaken = sleeperTakenKickers.has(a.join_name);
+          const bTaken = sleeperTakenKickers.has(b.join_name);
+          if (!aTaken && bTaken) return -1;
+          if (aTaken && !bTaken) return 1;
+          
+          // 3. Fallback to standard sort
+          let valA = a[sortConfig.key];
+          let valB = b[sortConfig.key];
+          if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
+          if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+          if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+          return 0;
+      });
+  } else {
+     // Standard Sort
+     processed.sort((a, b) => {
+         let valA = a[sortConfig.key];
+         let valB = b[sortConfig.key];
+         if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
+         if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+         if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+         return 0;
+     });
+  }
 
   if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
   if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
-  // YTD Processing with League Averages
+  // YTD
   const calculateLeagueAvg = (arr, key) => {
       if (!arr || arr.length === 0) return 0;
       const sum = arr.reduce((acc, curr) => acc + (parseFloat(curr[key]) || 0), 0);
       return sum / arr.length;
   };
 
-  // Identify Top 5 Scorers for Fire Emoji
-  const top5Ytd = ytd.map(p => ({ ...p, fpts_calc: calcFPts(p) })).sort((a, b) => b.fpts_calc - a.fpts_calc).slice(0, 5).map(p => p.kicker_player_name);
-
-  // Re-map processed to include isTop5 flag
-  processed = processed.map(p => ({ ...p, isTop5: top5Ytd.includes(p.kicker_player_name) }));
-
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
-      return {
-          ...p, 
-          fpts: pts, 
-          avg_fpts: (p.games > 0 ? (pts/p.games) : 0), 
-          pct_val: pct, 
-          pct: pct.toFixed(1), 
-          longs: longMakes 
-      };
-  }).sort((a, b) => {
-      let key = sortConfig.key;
-      if (key === 'pct') key = 'pct_val';
-      if (key === 'avg_fpts') key = 'avg_fpts';
-      let valA = a[key];
-      let valB = b[key];
-      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
-  });
+      return { ...p, fpts: pts, avg_fpts: (p.games > 0 ? (pts/p.games) : 0), pct_val: pct, pct: pct.toFixed(1), longs: longMakes };
+  }).sort((a, b) => b.fpts - a.fpts); // Keep standard sort for YTD for now
 
-  const ytdAvgs = {
-      fpts: calculateLeagueAvg(ytdSorted, 'fpts'),
-      avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'),
-      pct: calculateLeagueAvg(ytdSorted, 'pct_val'),
-      longs: calculateLeagueAvg(ytdSorted, 'longs'),
-      dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'),
-      rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'),
-      off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'),
-      def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd'),
-  };
-
-  // --- INJURY BUCKETS ---
+  const ytdAvgs = { fpts: calculateLeagueAvg(ytdSorted, 'fpts'), avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'), pct: calculateLeagueAvg(ytdSorted, 'pct_val'), longs: calculateLeagueAvg(ytdSorted, 'longs'), dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'), rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'), off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'), def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd') };
   const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
   const bucketOutDoubtful = injuries.filter(k => k.injury_status === 'OUT' || k.injury_status === 'Doubtful' || k.injury_status === 'Inactive');
   const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
-
   const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
-
-  // Helper to render injury card with logic
-  const renderInjuryCard = (k, i, borderColor, textColor) => {
-      const details = k.injury_details || '';
-      const match = details.match(/^(.+?)\s\((.+)\)$/);
-      let displayInjury = k.injury_details;
-      let displayStatus = '';
-      
-      if (match) {
-          const reportStatus = match[1];
-          const injuryType = match[2];
-          displayInjury = `${k.injury_status}: ${injuryType}`;
-          displayStatus = reportStatus;
-      }
-
-      return (
-         <div key={i} className={`flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border ${borderColor}`}>
-            <img 
-                src={k.headshot_url} 
-                className={`w-12 h-12 rounded-full border-2 object-cover ${borderColor.replace('border', 'border-')}`} 
-                onError={(e) => {e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'}}
-            />
-            <div>
-               <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-               {match ? (
-                   <>
-                       <div className={`text-xs font-bold ${textColor}`}>{displayInjury}</div>
-                       <div className="text-xs text-slate-400 italic">{displayStatus}</div>
-                   </>
-               ) : (
-                   <div className={`text-xs ${textColor}`}>{displayInjury}</div>
-               )}
-               <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k)}</div>
-            </div>
-         </div>
-      );
-  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
@@ -634,19 +458,14 @@ const App = () => {
           <div>
             <div className="flex items-center gap-3 mb-2">
               <img src="/assets/logo.png" alt="KickerGenius" className="w-12 h-12 object-contain" />
-              <h1 className="text-3xl md:text-4xl font-bold text-white">
-                Kicker<span className="text-blue-500">Genius</span>
-              </h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1>
             </div>
             <p className="text-slate-400 ml-1">Advanced Stall Rate Analytics & Fantasy Projections</p>
           </div>
           <div className="flex gap-3">
              <button onClick={() => setActiveTab('settings')} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded flex items-center gap-2 border border-slate-700 transition-colors"><Settings className="w-4 h-4" /> League Settings</button>
              <div className="bg-slate-900 border border-slate-800 rounded-lg p-2 flex items-center gap-3 shadow-sm px-4">
-               <div className="text-right">
-                 <div className="text-[10px] text-slate-500 uppercase font-bold">Last Update</div>
-                 <div className="text-xs font-semibold text-white">{meta.updated} (Week {meta.week})</div>
-               </div>
+               <div className="text-right"><div className="text-[10px] text-slate-500 uppercase font-bold">Last Update</div><div className="text-xs font-semibold text-white">{meta.updated} (Week {meta.week})</div></div>
              </div>
           </div>
         </div>
@@ -659,23 +478,45 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* SETTINGS */}
+        {/* SETTINGS TAB */}
         {activeTab === 'settings' && (
-          <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2"><Settings className="w-5 h-5"/> Scoring Settings</h2>
-                <button onClick={resetScoring} className="text-xs bg-red-900/30 text-red-400 px-3 py-1 rounded border border-red-800/50 hover:bg-red-900/50 flex items-center gap-1"><RotateCcw className="w-3 h-3" /> Reset to Default</button>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {Object.entries(scoring).map(([key, val]) => (
-                <div key={key}>
-                  <label className="block text-xs uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS[key] || key}</label>
-                  <input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white focus:border-blue-500 focus:outline-none" />
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+            {/* SCORING */}
+            <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-white flex items-center gap-2"><Settings className="w-5 h-5"/> Scoring Settings</h2><button onClick={resetScoring} className="text-xs bg-red-900/30 text-red-400 px-3 py-1 rounded border border-red-800/50 hover:bg-red-900/50 flex items-center gap-1"><RotateCcw className="w-3 h-3" /> Reset to Default</button></div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    {Object.entries(scoring).map(([key, val]) => (
+                        <div key={key}><label className="block text-xs uppercase text-slate-500 font-bold mb-1">{SETTING_LABELS[key] || key}</label><input type="number" value={val} onChange={(e) => updateScoring(key, e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white focus:border-blue-500 focus:outline-none" /></div>
+                    ))}
                 </div>
-              ))}
             </div>
-            <div className="mt-6 p-4 bg-blue-900/20 border border-blue-800 rounded text-sm text-blue-300 flex items-center gap-2">
-              <Save className="w-4 h-4" /> Changes save automatically and update all projections instantly.
+            
+            {/* SLEEPER SYNC */}
+            <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <div className="flex items-center gap-2 mb-4 text-lg font-bold text-white"><Gamepad2 className="w-5 h-5 text-purple-400"/> Sleeper League Sync</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label className="block text-xs uppercase text-slate-500 font-bold mb-1">League ID</label>
+                        <input type="text" value={sleeperLeagueId} onChange={(e) => setSleeperLeagueId(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600" placeholder="e.g. 104837..." />
+                    </div>
+                    <div>
+                        <label className="block text-xs uppercase text-slate-500 font-bold mb-1">Your Username</label>
+                        <input type="text" value={sleeperUser} onChange={(e) => setSleeperUser(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600" placeholder="e.g. kickerfan123" />
+                    </div>
+                </div>
+                <button 
+                    onClick={syncSleeper} 
+                    disabled={sleeperLoading || !sleeperLeagueId}
+                    className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {sleeperLoading ? <Loader2 className="w-4 h-4 animate-spin"/> : <RefreshCw className="w-4 h-4"/>}
+                    {sleeperLoading ? "Syncing League..." : "Sync with Sleeper"}
+                </button>
+                {sleeperMyKickers.size > 0 && (
+                    <div className="mt-4 p-3 bg-purple-900/20 border border-purple-800/50 rounded text-xs text-purple-300">
+                        ✅ Found team! Your kickers: <strong>{Array.from(sleeperMyKickers).join(', ')}</strong>
+                    </div>
+                )}
             </div>
           </div>
         )}
@@ -683,29 +524,26 @@ const App = () => {
         {/* POTENTIAL MODEL */}
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
-             {/* SEARCH BAR */}
-             <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4">
-                <div className="relative flex-1 min-w-[200px]">
+             <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4 justify-between">
+                <div className="relative flex-1 min-w-[200px] max-w-md">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                  <input 
-                    type="text" 
-                    placeholder="(e.g. Aubrey, Cowboys, Dome)" 
-                    className="w-full bg-slate-900 border border-slate-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-blue-500 focus:outline-none placeholder:text-slate-600"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
+                  <input type="text" placeholder="(e.g. Aubrey, Cowboys, Dome)" className="w-full bg-slate-900 border border-slate-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-blue-500 focus:outline-none placeholder:text-slate-600" value={search} onChange={(e) => setSearch(e.target.value)} />
                 </div>
                 
-                <div className="flex items-center gap-4">
-                    <div className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1"><Filter className="w-3 h-3" /> Filters:</div>
-                    <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white">
-                    <input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" />
-                    Hide {'>'} 80% Owned
-                    </label>
-                    <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white">
-                    <input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" />
-                    Hide {'>'} 60% Owned
-                    </label>
+                <div className="flex items-center gap-4 flex-wrap">
+                    {/* SLEEPER TOGGLE */}
+                    {sleeperMyKickers.size > 0 && (
+                         <button 
+                            onClick={() => setSleeperFilter(!sleeperFilter)}
+                            className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}
+                         >
+                             <Gamepad2 className="w-3 h-3"/> Sleeper Avail
+                         </button>
+                    )}
+                    
+                    <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
+                    <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 80% Own</label>
+                    <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 60% Own</label>
                 </div>
              </div>
              
@@ -714,15 +552,7 @@ const App = () => {
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
-                    <th 
-                      className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
-                      onClick={() => handleSort('own_pct')}
-                    >
-                      <div className="flex items-center gap-1">
-                        <span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span>
-                        <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </th>
+                    <th className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]" onClick={() => handleSort('own_pct')}><div className="flex items-center gap-1"><span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span><ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" /></div></th>
                     <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description="Matchup Grade (Baseline 90)" />
                     <th className="px-6 py-3 text-center align-middle">Weather</th>
@@ -736,40 +566,42 @@ const App = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
-                  {processed.map((row, idx) => (
-                    <React.Fragment key={idx}>
-                      <tr onClick={() => toggleRow(idx)} className="hover:bg-slate-800/50 cursor-pointer transition-colors">
-                        <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
-                        <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} />
-                        <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
-                        <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
-                        <td className="px-6 py-4 text-center text-xs font-mono text-slate-400">{row.weather_desc}</td>
-                        <td className="px-6 py-4 text-center text-blue-300">{row.off_stall_rate}%</td>
-                        <td className="px-6 py-4 text-center text-slate-400">{row.def_stall_rate}%</td>
-                        
-                        <td className="px-6 py-4 text-center">
-                           <div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.l3_act_sum >= row.l3_proj_sum ? 'text-green-400' : 'text-red-400'}`}>
-                             <span>{row.l3_act_sum ?? 0}</span>
-                             <span className="mx-1 text-slate-600">/</span>
-                             <span className="text-slate-500">{row.l3_proj_sum ?? 0}</span>
-                           </div>
-                           <div className="text-[9px] text-slate-500 uppercase">Act / Proj</div>
-                        </td>
+                  {processed.map((row, idx) => {
+                     // Determine Sleeper Status for Display
+                     let sleeperStatus = null;
+                     if (sleeperMyKickers.has(row.join_name)) sleeperStatus = 'MY_TEAM';
+                     else if (sleeperTakenKickers.has(row.join_name)) sleeperStatus = 'TAKEN';
+                     else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT'; // If league loaded and not taken, assume FA
 
-                        <td className="px-6 py-4 text-center font-mono text-amber-400">{Number(row.vegas).toFixed(1)}</td>
-                        <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.off_ppg).toFixed(1)} {row.off_ppg < 15 && "❄️"}</td>
-                        <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && "🛡️"}</td>
-                        <td className="px-6 py-4 text-slate-600">{expandedRow === idx ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</td>
-                      </tr>
-                      {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} />}
-                    </React.Fragment>
-                  ))}
+                     // Apply opacity if Taken and Filter is ON
+                     const isDimmed = sleeperFilter && sleeperStatus === 'TAKEN';
+
+                     return (
+                        <React.Fragment key={idx}>
+                          <tr onClick={() => toggleRow(idx)} className={`hover:bg-slate-800/50 cursor-pointer transition-colors ${isDimmed ? 'opacity-40 grayscale' : ''} ${sleeperStatus === 'MY_TEAM' && sleeperFilter ? 'bg-purple-900/20' : ''}`}>
+                            <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                            <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} sleeperStatus={sleeperStatus} />
+                            <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
+                            <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
+                            <td className="px-6 py-4 text-center text-xs font-mono text-slate-400">{row.weather_desc}</td>
+                            <td className="px-6 py-4 text-center text-blue-300">{row.off_stall_rate}%</td>
+                            <td className="px-6 py-4 text-center text-slate-400">{row.def_stall_rate}%</td>
+                            <td className="px-6 py-4 text-center"><div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.l3_act_sum >= row.l3_proj_sum ? 'text-green-400' : 'text-red-400'}`}><span>{row.l3_act_sum ?? 0}</span><span className="mx-1 text-slate-600">/</span><span className="text-slate-500">{row.l3_proj_sum ?? 0}</span></div><div className="text-[9px] text-slate-500 uppercase">Act / Proj</div></td>
+                            <td className="px-6 py-4 text-center font-mono text-amber-400">{Number(row.vegas).toFixed(1)}</td>
+                            <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.off_ppg).toFixed(1)} {row.off_ppg < 15 && "❄️"}</td>
+                            <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && "🛡️"}</td>
+                            <td className="px-6 py-4 text-slate-600">{expandedRow === idx ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</td>
+                          </tr>
+                          {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} sleeperStatus={sleeperStatus}/>}
+                        </React.Fragment>
+                     );
+                  })}
                 </tbody>
               </table>
             </div>
           </div>
         )}
-        
+
         {/* NEW ACCURACY TAB */}
         {activeTab === 'accuracy' && (
             <AccuracyTab players={processed} scoring={scoring} week={meta.week} />
@@ -799,19 +631,9 @@ const App = () => {
                     <tr key={idx} className="hover:bg-slate-800/50 transition-colors">
                       <td className="px-6 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                       <PlayerCell player={row} subtext={row.team} />
-                      
                       <td className="px-6 py-4 text-center font-bold text-emerald-400 text-lg">{row.fpts}</td>
-
-                      <td className="px-6 py-4 text-center">
-                        <div className="font-bold text-white">{Number(row.avg_fpts).toFixed(1)}</div>
-                        <div className="text-[10px] text-slate-500 uppercase font-bold">Games: {row.games}</div>
-                      </td>
-
-                      <td className="px-6 py-4 text-center">
-                        <div className="text-slate-300">{row.fg_made}/{row.fg_att}</div>
-                        <div className="text-[10px] text-blue-400 font-mono">{row.pct}%</div>
-                      </td>
-
+                      <td className="px-6 py-4 text-center"><div className="font-bold text-white">{Number(row.avg_fpts).toFixed(1)}</div><div className="text-[10px] text-slate-500 uppercase font-bold">Games: {row.games}</div></td>
+                      <td className="px-6 py-4 text-center"><div className="text-slate-300">{row.fg_made}/{row.fg_att}</div><div className="text-[10px] text-blue-400 font-mono">{row.pct}%</div></td>
                       <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded ${row.longs >= 4 ? 'bg-amber-500/20 text-amber-400' : 'text-slate-500'}`}>{row.longs}</span></td>
                       <td className="px-6 py-4 text-center text-blue-300">{row.dome_pct}%</td>
                       <td className="px-6 py-4 text-center text-slate-300">{row.rz_trips}</td>
