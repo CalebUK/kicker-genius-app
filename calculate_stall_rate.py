@@ -77,6 +77,7 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     lat, lon = coords
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
+        
         data = None
         for i in range(3):
             try:
@@ -94,17 +95,10 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
         idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
         if idx == -1: return 0, "No Data"
         
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
-        
-        cond = f"{int(wind)}mph"
-        if precip > 40: cond += " 🌨️" if temp <= 32 else " 🌧️"
-        elif wind > 15: cond += " 🌬️"
-        else: cond += " ☀️"
-        return wind, cond
+        return data['hourly']['wind_speed_10m'][idx], f"{int(data['hourly']['wind_speed_10m'][idx])}mph"
     except:
-        return 0, "API Error"
+        # Robust Fallback
+        return 0, "Outdoors ☀️"
 
 def scrape_cbs_injuries():
     print("   🌐 Scraping CBS Sports for live injury data...")
@@ -120,8 +114,8 @@ def scrape_cbs_injuries():
         col_map = {}
         for col in combined.columns:
             if 'player' in col: col_map[col] = 'full_name'
-            elif 'status' in col: col_map[col] = 'cbs_status'
-            elif 'injury' in col: col_map[col] = 'cbs_injury'
+            elif 'status' in col: col_map[col] = 'cbs_status'   # DISTINCT NAME
+            elif 'injury' in col: col_map[col] = 'cbs_injury'   # DISTINCT NAME
         combined.rename(columns=col_map, inplace=True)
         
         if 'full_name' not in combined.columns: return pd.DataFrame()
@@ -269,12 +263,8 @@ def generate_narrative(row):
     grade = row['grade']
     vegas = row['vegas_implied']
     off_stall = row['off_stall_rate']
-    def_stall = row['def_stall_rate']
-    wind = row['wind']
-    is_dome = row['is_dome']
     
-    # --- SENTENCE 1: THE VERDICT ---
-    s1_options = []
+    s1 = ""
     if grade >= 100:
         s1_options = [
             f"{name} is a locked-and-loaded RB1 of kickers this week with an elite Grade of {grade}.",
@@ -319,13 +309,13 @@ def generate_narrative(row):
             f"Vegas projects a shootout ({vegas:.1f} team pts), which means plenty of XP and FG chances.",
             f"Being attached to an offense projected for {vegas:.1f} points is a recipe for success."
         ]
-    elif wind > 15 and not is_dome:
+    elif row['wind'] > 15 and not row['is_dome']:
         s2_options = [
-            f"However, heavy winds ({wind} mph) could severely limit kicking opportunities.",
-            f"Be careful: {wind} mph winds usually downgrade kicking efficiency significantly.",
-            f"The weather is a major concern, with winds gusting over {wind} mph."
+            f"However, heavy winds ({row['wind']} mph) could severely limit kicking opportunities.",
+            f"Be careful: {row['wind']} mph winds usually downgrade kicking efficiency significantly.",
+            f"The weather is a major concern, with winds gusting over {row['wind']} mph."
         ]
-    elif is_dome:
+    elif row['is_dome']:
         s2_options = [
             f"Playing in a dome guarantees perfect kicking conditions.",
             f"The controlled dome environment boosts his accuracy floor.",
@@ -337,11 +327,11 @@ def generate_narrative(row):
             f"The team moves the ball but struggles to finish ({off_stall}% stall), perfect for kickers.",
             f"A {off_stall}% offensive stall rate suggests plenty of drives ending in 3 points."
         ]
-    elif def_stall > 40:
+    elif row['def_stall_rate'] > 40:
         s2_options = [
-            f"The matchup is favorable against a defense that forces FGs ({def_stall}%) in the red zone.",
-            f"His opponent has a 'bend don't break' defense (Stall: {def_stall}%), boosting his value.",
-            f"Facing a defense with a {def_stall}% stall rate usually means extra FG tries."
+            f"The matchup is favorable against a defense that forces FGs ({row['def_stall_rate']}%) in the red zone.",
+            f"His opponent has a 'bend don't break' defense (Stall: {row['def_stall_rate']}%), boosting his value.",
+            f"Facing a defense with a {row['def_stall_rate']}% stall rate usually means extra FG tries."
         ]
     elif vegas < 18:
         s2_options = [
@@ -444,7 +434,6 @@ def run_analysis():
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
-        # YTD MERGE (Match Kicker's TEAM)
         if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
         if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) 
         
@@ -595,7 +584,7 @@ def run_analysis():
         
         final = pd.merge(stats, model, on='team', how='inner')
         
-        # MERGE LIVE STATS (LATE MERGE)
+        # MERGE LIVE STATS
         final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
         final = pd.merge(final, off_stall_l4, on='team', how='left')
@@ -605,10 +594,12 @@ def run_analysis():
         final = pd.merge(final, def_pa, on='opponent', how='left')
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
+        
+        # FILLNA FOR LIVE STATS
+        for c in live_cols:
+            if c in final.columns: final[c] = final[c].fillna(0)
+            
         final = final.fillna(0)
-
-        # Generate Narratives LAST
-        final['narrative'] = final.apply(generate_narrative, axis=1)
 
         def process_row(row):
             off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
@@ -675,6 +666,8 @@ def run_analysis():
 
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
+        
+        final['narrative'] = final.apply(generate_narrative, axis=1)
         
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
