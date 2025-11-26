@@ -1,10 +1,45 @@
-import React from 'react';
-import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, BrainCircuit, AlertTriangle, ShieldAlert, UserMinus } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, BrainCircuit, Shield, User } from 'lucide-react';
 import { calcFPts } from '../utils/scoring';
 
-// ... (FootballIcon, HeaderCell, HistoryBars, PlayerCell remain the same as before) ...
-// Re-exporting them for completeness of this file block
+// --- SAFE IMAGE COMPONENT ---
+export const PlayerAvatar = ({ src, alt, borderColor = "border-slate-600", size = "w-12 h-12" }) => {
+  const [error, setError] = useState(false);
 
+  // 1. Handle Aubrey Custom Image
+  let finalSrc = src;
+  if (alt && (alt.includes('Aubrey') || alt === 'B.Aubrey') && !error) {
+     // Try custom first, fallback to src if it fails (handled by onError)
+     finalSrc = '/assets/aubrey_custom.png';
+  }
+
+  if (error) {
+    // Fallback UI: A simple shield/helmet icon
+    return (
+      <div className={`${size} rounded-full border-2 ${borderColor} bg-slate-800 flex items-center justify-center shrink-0`}>
+         <Shield className="w-1/2 h-1/2 text-slate-500" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={finalSrc}
+      alt={alt}
+      className={`${size} rounded-full border-2 object-cover shrink-0 ${borderColor} bg-slate-950`}
+      onError={(e) => {
+          // If custom aubrey fails, try the real src. If that fails (or if we were already using real src), show icon.
+          if (finalSrc.includes('aubrey_custom.png') && src) {
+              e.target.src = src; // Try original URL
+          } else {
+              setError(true); // Switch to Icon
+          }
+      }}
+    />
+  );
+};
+
+// --- FOOTBALL ICON ---
 export const FootballIcon = ({ isFire }) => (
   <div className="relative w-full h-full flex items-center justify-center">
     {isFire && (
@@ -76,16 +111,18 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   if (injuryColor.includes('red-700')) textColor = 'text-red-500';
   if (injuryColor.includes('red-500')) textColor = 'text-red-400';
   if (injuryColor.includes('yellow')) textColor = 'text-yellow-400';
+
   const ownPct = player.own_pct || 0;
   let ownColor = 'text-slate-500';
   if (ownPct < 10) ownColor = 'text-blue-400 font-bold'; 
   else if (ownPct > 80) ownColor = 'text-amber-500'; 
-  const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
-  const imageUrl = isAubrey ? '/assets/aubrey_custom.png' : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
+
+  // Parse Injury
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
   let displayInjury = '', displayStatus = '';
-  if (match) { const reportStatus = match[1]; const injuryType = match[2]; displayInjury = `${player.injury_status}: ${injuryType}`; displayStatus = reportStatus; } else { displayInjury = details; }
+  if (match) { const reportStatus = match[1]; const injuryType = match[2]; displayInjury = `${player.injury_status}: ${injuryType}`; displayStatus = reportStatus; } 
+  else { displayInjury = details; }
 
   return (
     <td className="px-3 py-4 font-medium text-white">
@@ -94,18 +131,37 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
             {player.kicker_player_name}
             {player.isTop5 && <span title="Top 5 Scorer (Season)" className="text-sm">🔥</span>}
           </div>
+          
           <div className="flex items-center gap-3">
               <div className="relative group flex-shrink-0">
-                <img src={imageUrl} className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} onError={(e) => { e.target.onerror = null; if (e.target.src.includes('aubrey_custom.png')) { e.target.src = player.headshot_url; } else { e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }}} />
+                {/* NEW AVATAR COMPONENT */}
+                <PlayerAvatar 
+                  src={player.headshot_url} 
+                  alt={player.kicker_player_name}
+                  borderColor={borderColor.replace('border', 'border-')} 
+                  size="w-10 h-10"
+                />
+                
                 {statusText !== '' && (
                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-auto whitespace-nowrap p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
-                      {match ? ( <> <div className={`font-bold ${textColor} mb-0.5`}>{displayInjury}</div> <div className="text-slate-400 italic">{displayStatus}</div> </> ) : ( <div className={`font-bold ${textColor} mb-1`}>{player.injury_status} <span className="text-slate-400 font-normal">({details})</span></div> )}
+                      {match ? (
+                          <>
+                              <div className={`font-bold ${textColor} mb-0.5`}>{displayInjury}</div>
+                              <div className="text-slate-400 italic">{displayStatus}</div>
+                          </>
+                      ) : (
+                          <div className={`font-bold ${textColor} mb-1`}>{player.injury_status} <span className="text-slate-400 font-normal">({details})</span></div>
+                      )}
                    </div>
                 )}
               </div>
               <div className="min-w-0">
                 <div className="text-xs text-slate-400 truncate">{subtext}</div>
                 {player.own_pct > 0 && ( <div className={`text-[9px] mt-0.5 font-bold ${ownColor}`}>Own: {player.own_pct.toFixed(1)}%</div> )}
+                {/* SLEEPER BADGES MOVED HERE FOR COMPACTNESS */}
+                {sleeperStatus === 'MY_TEAM' && <span className="text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/50 px-1 py-0.5 rounded mt-1 inline-block">My Team</span>}
+                {sleeperStatus === 'TAKEN' && <span className="text-[9px] bg-slate-700/50 text-slate-400 border border-slate-600/50 px-1 py-0.5 rounded mt-1 inline-block">Taken</span>}
+                {sleeperStatus === 'FREE_AGENT' && <span className="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 px-1 py-0.5 rounded mt-1 inline-block">Free Agent</span>}
               </div>
           </div>
       </div>
@@ -162,7 +218,8 @@ export const InjuryCard = ({ k, borderColor, textColor, scoring }) => {
      const match = (k.injury_details || '').match(/^(.+?)\s\((.+)\)$/);
      return (
          <div className={`flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border ${borderColor}`}>
-            <img src={k.headshot_url} className={`w-12 h-12 rounded-full border-2 object-cover ${borderColor.replace('border', 'border-')}`} onError={(e) => { e.target.onerror = null; e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }} />
+             {/* Use Avatar Here Too */}
+            <PlayerAvatar src={k.headshot_url} alt={k.kicker_player_name} borderColor={borderColor.replace('border', 'border-')} />
             <div>
                <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
                {match ? ( <> <div className={`text-xs font-bold ${textColor}`}>{k.injury_status}: {match[2]}</div> <div className="text-xs text-slate-400 italic">{match[1]}</div> </> ) : ( <div className={`text-xs ${textColor}`}>{k.injury_details}</div> )}

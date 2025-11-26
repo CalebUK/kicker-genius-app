@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Filter, Calendar, PlayCircle, CheckCircle2, Clock } from 'lucide-react';
 import { calculateLiveScore, getGameStatus } from '../utils/scoring';
-import { FootballIcon } from './KickerComponents';
+import { FootballIcon, PlayerAvatar } from './KickerComponents'; // Import Avatar
 
 const AccuracyTab = ({ players, scoring, week }) => {
   const [filter, setFilter] = useState('ALL');
@@ -48,7 +48,8 @@ const AccuracyTab = ({ players, scoring, week }) => {
                 return (
                     <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass} ${glowClass}`}>
                         <div className="flex items-center gap-3 mb-4 relative z-10">
-                            <img src={p.headshot_url} className="w-12 h-12 rounded-full border-2 border-slate-700 object-cover bg-slate-950"/>
+                            {/* Use new Avatar */}
+                            <PlayerAvatar src={p.headshot_url} alt={p.kicker_player_name} borderColor="border-slate-700" size="w-12 h-12" />
                             <div className="min-w-0 flex-1">
                                 <div className="font-bold text-white text-sm truncate">{p.kicker_player_name}</div>
                                 <div className="text-xs text-slate-500">{p.team} vs {p.opponent}</div>
@@ -78,7 +79,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
 
                              <div className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${pct}%` }}></div>
                              
-                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 16px)` }}>
+                             <div className="absolute top-1/2 -translate-y-1/2 w-10 h-10 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 20px)` }}>
                                  <FootballIcon isFire={isSmashed} />
                              </div>
                         </div>
