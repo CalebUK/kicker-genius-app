@@ -4,7 +4,7 @@ import { TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, L
 
 import { DEFAULT_SCORING } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
-import { HeaderCell, PlayerCell, DeepDiveRow } from './components/KickerComponents';
+import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
 import SettingsTab from './components/SettingsTab';
 import InjuryReportTab from './components/InjuryReportTab';
@@ -27,8 +27,8 @@ const App = () => {
   const [sleeperLeagueId, setSleeperLeagueId] = useState('');
   const [sleeperUser, setSleeperUser] = useState('');
   const [sleeperMyKickers, setSleeperMyKickers] = useState(new Set());
-  const [sleeperTakenKickers, setSleeperTakenKickers] = new Set();
-  const [sleeperLoading, setLoading] = useState(false);
+  const [sleeperTakenKickers, setSleeperTakenKickers] = useState(new Set());
+  const [sleeperLoading, setSleeperLoading] = useState(false); // FIXED: Renamed to setSleeperLoading
   const [sleeperFilter, setSleeperFilter] = useState(false);
   const [sleeperScoringUpdated, setSleeperScoringUpdated] = useState(false);
 
@@ -73,12 +73,10 @@ const App = () => {
       setSleeperLoading(true);
       setSleeperScoringUpdated(false);
       try {
-          // STEP 1: VERIFY ROSTERS (More reliable endpoint for ID validation)
           const rostersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/rosters`);
           if (!rostersRes.ok) throw new Error("League ID is invalid or not public.");
           const rosters = await rostersRes.json();
           
-          // STEP 2: FETCH LEAGUE AND SCORING
           const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
           const leagueData = await leagueRes.json();
 
@@ -86,31 +84,30 @@ const App = () => {
              const s = leagueData.scoring_settings;
              const genMiss = s.fgmiss || 0;
              
-             // MAPPING: Granular keys take precedence.
+             const generic50Plus = s.fgm_50p || 5; 
+             const genericMiss50Plus = s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss;
+
              const newScoring = {
                 fg0_19: s.fgm_0_19 || 3,
                 fg20_29: s.fgm_20_29 || 3,
                 fg30_39: s.fgm_30_39 || 3,
                 fg40_49: s.fgm_40_49 || 4,
                 
-                // 50-59 MAKE: Check specific, fallback to generic 50p
-                fg50_59: s.fgm_50_59 !== undefined ? s.fgm_50_59 : (s.fgm_50p || 5),
-                // 60+ MAKE: Check specific 60p, fallback to generic 50p
-                fg60_plus: s.fgm_60_plus !== undefined ? s.fgm_60_plus : (s.fgm_60p !== undefined ? s.fgm_60p : (s.fgm_50p || 5)),
+                fg50_59: s.fgm_50_59 !== undefined ? s.fgm_50_59 : generic50Plus,
+                fg60_plus: s.fgm_60_plus !== undefined ? s.fgm_60_plus : (s.fgm_60p !== undefined ? s.fgm_60p : generic50Plus),
                 
                 xp_made: s.xpm || 1,
                 xp_miss: s.xpmiss || 0,
                 
-                // Granular MISSES
                 fg_miss_0_19: s.fgmiss_0_19 !== undefined ? s.fgmiss_0_19 : genMiss,
                 fg_miss_20_29: s.fgmiss_20_29 !== undefined ? s.fgmiss_20_29 : genMiss,
                 fg_miss_30_39: s.fgmiss_30_39 !== undefined ? s.fgmiss_30_39 : genMiss,
                 fg_miss_40_49: s.fgmiss_40_49 !== undefined ? s.fgmiss_40_49 : genMiss,
                 
-                fg_miss_50_59: s.fgmiss_50_59 !== undefined ? s.fgmiss_50_59 : (s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss),
-                fg_miss_60_plus: s.fgmiss_60_plus !== undefined ? s.fgmiss_60_plus : (s.fgmiss_60p !== undefined ? s.fgmiss_60p : (s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss)),
+                fg_miss_50_59: s.fgmiss_50_59 !== undefined ? s.fgmiss_50_59 : genericMiss50Plus,
+                fg_miss_60_plus: s.fgmiss_60_plus !== undefined ? s.fgmiss_60_plus : (s.fgmiss_60p !== undefined ? s.fgmiss_60p : genericMiss50Plus),
                 
-                fg_miss: genMiss // Keep general miss value for safety
+                fg_miss: genMiss 
              };
              
              setScoring(newScoring);
@@ -118,7 +115,6 @@ const App = () => {
              setSleeperScoringUpdated(true);
           }
 
-          // STEP 3: ROSTER MAPPING
           let myUserId = null;
           if (sleeperUser) {
              const usersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/users`);
