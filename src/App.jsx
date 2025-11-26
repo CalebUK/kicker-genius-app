@@ -80,27 +80,38 @@ const App = () => {
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
              const genMiss = s.fgmiss || 0;
+             
+             // Check generic 50+ only if granular fields are UNDEFINED
+             const fg50_plus_generic = s.fgm_50_plus || 5; 
+             const fgmiss_50_plus_generic = s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss;
 
+             // MAPPING: Granular keys take precedence.
              const newScoring = {
                 fg0_19: s.fgm_0_19 || 3,
                 fg20_29: s.fgm_20_29 || 3,
                 fg30_39: s.fgm_30_39 || 3,
                 fg40_49: s.fgm_40_49 || 4,
                 
-                fg50_59: s.fgm_50_59 !== undefined ? s.fgm_50_59 : (s.fgm_50_plus || 5),
-                fg60_plus: s.fgm_60_plus !== undefined ? s.fgm_60_plus : (s.fgm_50_plus || 5),
+                // 50-59 MAKE: Check specific, fallback to generic 50p
+                fg50_59: s.fgm_50_59 !== undefined ? s.fgm_50_59 : (s.fgm_50p || fg50_plus_generic),
+                // 60+ MAKE: Check specific 60p, fallback to generic 50p
+                fg60_plus: s.fgm_60p !== undefined ? s.fgm_60p : (s.fgm_50_plus || fg50_plus_generic),
                 
                 xp_made: s.xpm || 1,
                 xp_miss: s.xpmiss || 0,
                 
+                // Granular MISSES (If specific miss is not found, apply general miss)
                 fg_miss_0_19: s.fgmiss_0_19 !== undefined ? s.fgmiss_0_19 : genMiss,
                 fg_miss_20_29: s.fgmiss_20_29 !== undefined ? s.fgmiss_20_29 : genMiss,
                 fg_miss_30_39: s.fgmiss_30_39 !== undefined ? s.fgmiss_30_39 : genMiss,
                 fg_miss_40_49: s.fgmiss_40_49 !== undefined ? s.fgmiss_40_49 : genMiss,
-                fg_miss_50_59: s.fgmiss_50_59 !== undefined ? s.fgmiss_50_59 : (s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss),
-                fg_miss_60_plus: s.fgmiss_60_plus !== undefined ? s.fgmiss_60_plus : (s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss),
                 
-                fg_miss: genMiss // General miss value
+                // 50-59 MISS: Check specific, fallback to generic 50p miss, then general miss
+                fg_miss_50_59: s.fgmiss_50_59 !== undefined ? s.fgmiss_50_59 : genericMiss50Plus,
+                // 60+ MISS: Check specific 60p miss, fallback to generic 50p miss, then general miss
+                fg_miss_60_plus: s.fgmiss_60p !== undefined ? s.fgmiss_60p : genericMiss50Plus,
+                
+                fg_miss: genMiss // Keep general miss value for safety
              };
              
              setScoring(newScoring);
