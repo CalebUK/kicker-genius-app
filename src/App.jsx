@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, AlertTriangle as AlertTriangleIcon } from 'lucide-react';
+import { TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown } from 'lucide-react';
+// import { Analytics } from '@vercel/analytics/react';
 
-import { GLOSSARY_DATA, DEFAULT_SCORING } from './data/constants';
+import { DEFAULT_SCORING } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
-import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } as Components from './components/KickerComponents';
+import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
 import SettingsTab from './components/SettingsTab';
 import InjuryReportTab from './components/InjuryReportTab';
@@ -125,25 +126,6 @@ const App = () => {
 
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
 
-  const calcFPts = (p, scoring) => {
-    if (!p) return 0;
-    return ((p.fg_0_19||0)*scoring.fg0_19) + ((p.fg_20_29||0)*scoring.fg20_29) + ((p.fg_30_39||0)*scoring.fg30_39) + 
-           ((p.fg_40_49||0)*scoring.fg40_49) + ((p.fg_50_59||0)*scoring.fg50_59) + ((p.fg_60_plus||0)*scoring.fg60_plus) + 
-           ((p.fg_miss||0)*scoring.fg_miss) + ((p.xp_made||0)*scoring.xp_made) + ((p.xp_miss||0)*scoring.xp_miss);
-  };
-
-  const calcProj = (p, grade) => {
-    if (grade === 0) return 0;
-    const avgPts = p.fpts_ytd / (p.games || 1);
-    const base = avgPts * (grade / 90);
-    const scaleFactor = (p.avg_pts && p.avg_pts > 0) ? (avgPts / p.avg_pts) : 1.0;
-    const off_cap_scaled = (p.off_cap_val || 0) * scaleFactor;
-    const def_cap_scaled = (p.def_cap_val || 0) * scaleFactor;
-    const weighted_proj = (base * 0.50) + (off_cap_scaled * 0.30) + (def_cap_scaled * 0.20);
-    const proj = weighted_proj > 1.0 ? weighted_proj : base;
-    return Math.round(proj); 
-  };
-
   if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
   if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
 
@@ -151,21 +133,23 @@ const App = () => {
   const leagueAvgs = meta?.league_avgs || {};
   
   let processed = rankings.map(p => {
-     const pWithVegas = { ...p, vegas: p.vegas_implied || 0 }; 
-     const ytdPts = calcFPts(pWithVegas, scoring);
-     const pWithYtd = { ...pWithVegas, fpts_ytd: ytdPts };
+     const ytdPts = calcFPts(p, scoring);
+     const pWithYtd = { ...p, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
+     
      const l3_games = p.history?.l3_games || [];
      const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0);
      const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
+
      const teamCode = p.team || '';
      let sleeperStatus = null;
      const joinName = p.join_name;
      if (sleeperMyKickers.has(joinName)) sleeperStatus = 'MY_TEAM';
      else if (sleeperTakenKickers.has(joinName)) sleeperStatus = 'TAKEN';
      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
-     
-     return { ...pWithVegas, ...p, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum, sleeperStatus };
+
+
+     return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum, sleeperStatus };
   }).filter(p => p.proj > 0); 
 
   if (search) {
@@ -207,6 +191,9 @@ const App = () => {
       return sum / arr.length;
   };
 
+  const top5Ytd = ytd.map(p => ({ ...p, fpts_calc: calcFPts(p, scoring) })).sort((a, b) => b.fpts_calc - a.fpts_calc).slice(0, 5).map(p => p.kicker_player_name);
+  processed = processed.map(p => ({ ...p, isTop5: top5Ytd.includes(p.kicker_player_name) }));
+
   const ytdSorted = ytd.map(p => {
       const pts = calcFPts(p, scoring);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
@@ -225,27 +212,13 @@ const App = () => {
 
   const ytdAvgs = { fpts: calculateLeagueAvg(ytdSorted, 'fpts'), avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'), pct: calculateLeagueAvg(ytdSorted, 'pct_val'), longs: calculateLeagueAvg(ytdSorted, 'longs'), dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'), rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'), off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'), def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd') };
 
-  const injuryData = {
-    bucketQuestionable: injuries.filter(k => k.injury_status === 'Questionable'),
-    bucketOutDoubtful: injuries.filter(k => ['OUT', 'Doubtful', 'Inactive'].includes(k.injury_status)),
-    bucketRest: injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster')),
-    injuries: injuries // Pass all injuries for count
-  };
-
-  const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <img src="/assets/logo.png" alt="KickerGenius" className="w-12 h-12 object-contain" />
-              <h1 className="text-3xl md:text-4xl font-bold text-white">
-                Kicker<span className="text-blue-500">Genius</span>
-              </h1>
-            </div>
+            <div className="flex items-center gap-3 mb-2"><img src="/assets/logo.png" alt="KickerGenius" className="w-12 h-12 object-contain" /><h1 className="text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
             <p className="text-slate-400 ml-1">Advanced Stall Rate Analytics & Fantasy Projections</p>
           </div>
           <div className="flex gap-3">
@@ -262,7 +235,6 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* TABS */}
         {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers}/> )}
 
         {activeTab === 'potential' && (
@@ -289,7 +261,7 @@ const App = () => {
                     <HeaderCell label="Opponent Stall % (L4)" sortKey="def_stall_rate" currentSort={sortConfig} onSort={handleSort} description="Opponent Force Rate (L4)" avg={leagueAvgs.def_stall} />
                     <HeaderCell label="Projection Accuracy (L3)" sortKey="proj_acc" currentSort={sortConfig} onSort={handleSort} description="Total Actual vs Projected Points (Last 3 Games)" />
                     <HeaderCell label="Implied Vegas Score Line" sortKey="vegas" currentSort={sortConfig} onSort={handleSort} description="Implied Team Total (Vegas Line & Spread)/2" />
-                    <HeaderCell label="Offensive PF (L4)" sortKey="off_ppg" currentSort={sortConfig} onOnSort={handleSort} description="Team Points For (L4)" avg={leagueAvgs.l4_off_ppg} />
+                    <HeaderCell label="Offensive PF (L4)" sortKey="off_ppg" currentSort={sortConfig} onSort={handleSort} description="Team Points For (L4)" avg={leagueAvgs.l4_off_ppg} />
                     <HeaderCell label="Opponent PA (L4)" sortKey="def_pa" currentSort={sortConfig} onSort={handleSort} description="Opp Points Allowed (L4)" avg={leagueAvgs.l4_def_pa} />
                     <th className="px-6 py-3"></th>
                   </tr>
@@ -317,7 +289,7 @@ const App = () => {
                             <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && "🛡️"}</td>
                             <td className="px-6 py-4 text-slate-600">{expandedRow === idx ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</td>
                           </tr>
-                          {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} />}
+                          {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} sleeperStatus={sleeperStatus}/>}
                         </React.Fragment>
                      );
                   })}
@@ -326,8 +298,8 @@ const App = () => {
             </div>
           </div>
         )}
-
-        {activeTab === 'accuracy' && ( <AccuracyTab players={processed} scoring={scoring} week={meta.week} /> )}
+        
+        {activeTab === 'accuracy' && <AccuracyTab players={processed} scoring={scoring} week={meta.week} />}
         
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
@@ -368,13 +340,9 @@ const App = () => {
           </div>
         )}
 
-        {activeTab === 'injuries' && (
-           <InjuryReportTab injuries={injuries} scoring={scoring} />
-        )}
+        {activeTab === 'injuries' && <InjuryReportTab injuries={injuries} scoring={scoring} />}
 
-        {activeTab === 'glossary' && (
-           <GlossaryTab processed={processed} leagueAvgs={leagueAvgs} meta={meta} />
-        )}
+        {activeTab === 'glossary' && <GlossaryTab processed={processed} leagueAvgs={leagueAvgs} meta={meta} />}
       </div>
       {/* <Analytics /> */}
     </div>
