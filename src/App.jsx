@@ -31,6 +31,7 @@ const App = () => {
   const [sleeperScoringUpdated, setSleeperScoringUpdated] = useState(false);
 
   useEffect(() => {
+    // Load local storage items
     const savedScoring = localStorage.getItem('kicker_scoring');
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
     const savedUser = localStorage.getItem('sleeper_username');
@@ -42,6 +43,7 @@ const App = () => {
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
     if (savedUser) setSleeperUser(savedUser);
 
+    // Fetch live data
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
@@ -156,7 +158,12 @@ const App = () => {
 
   if (search) {
       const q = search.toLowerCase();
-      processed = processed.filter(p => p.kicker_player_name.toLowerCase().includes(q) || (p.team && p.team.toLowerCase().includes(q)) || (q === 'dome' && p.is_dome) || (q === 'cowboys' && p.team === 'DAL') );
+      processed = processed.filter(p => 
+          p.kicker_player_name.toLowerCase().includes(q) || 
+          (p.team && p.team.toLowerCase().includes(q)) ||
+          (q === 'dome' && p.is_dome) ||
+          (q === 'cowboys' && p.team === 'DAL') 
+      );
   }
 
   if (sleeperFilter && sleeperLeagueId) {
@@ -226,7 +233,12 @@ const App = () => {
         {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-2"><img src="/assets/logo.png" alt="KickerGenius" className="w-12 h-12 object-contain" /><h1 className="text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
+            <div className="flex items-center gap-3 mb-2">
+              <img src="/assets/logo.png" alt="KickerGenius" className="w-12 h-12 object-contain" />
+              <h1 className="text-3xl md:text-4xl font-bold text-white">
+                Kicker<span className="text-blue-500">Genius</span>
+              </h1>
+            </div>
             <p className="text-slate-400 ml-1">Advanced Stall Rate Analytics & Fantasy Projections</p>
           </div>
           <div className="flex gap-3">
@@ -351,8 +363,8 @@ const App = () => {
 
         {activeTab === 'injuries' && (
            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             {bucketQuestionable.length > 0 && ( <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden"><div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-yellow-500" /><h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketQuestionable.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-yellow-500" textColor="text-yellow-300" scoring={scoring} />)}</div></div>)}
-             {(bucketOutDoubtful.length > 0) && ( <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden"><div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2"><ShieldAlert className="w-5 h-5 text-red-500" /><h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketOutDoubtful.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-red-600" textColor="text-red-300" scoring={scoring} />)}</div></div>)}
+             {bucketQuestionable.length > 0 && ( <div className="bg-yellow-900/20 rounded-xl border border-yellow-800/50 overflow-hidden"><div className="p-4 bg-yellow-900/40 border-b border-yellow-800/50 flex items-center gap-2"><AlertTriangleIcon className="w-5 h-5 text-yellow-500" /><h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketQuestionable.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-yellow-500" textColor="text-yellow-300" scoring={scoring} />)}</div></div>)}
+             {(bucketOutDoubtful.length > 0) && ( <div className="bg-red-900/20 rounded-xl border border-red-800/50 overflow-hidden"><div className="p-4 bg-red-900/40 border-b border-red-800/50 flex items-center gap-2"><ShieldAlert className="w-5 h-5 text-red-500" /><h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketOutDoubtful.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-red-600" textColor="text-red-300" scoring={scoring} />)}</div></div> )}
              {bucketRest.length > 0 && ( <div className="bg-slate-800/30 rounded-xl border border-slate-700 overflow-hidden"><div className="p-4 bg-slate-800/50 border-b border-slate-700 flex items-center gap-2"><UserMinus className="w-5 h-5 text-slate-400" /><h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD / RELEASED</h3></div><div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{bucketRest.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-slate-600" textColor="text-slate-300" scoring={scoring} />)}</div></div> )}
              {(!bucketQuestionable.length && !bucketOutDoubtful.length && !bucketRest.length) && ( <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">No kickers currently listed on the injury report!</div> )}
            </div>
@@ -368,6 +380,7 @@ const App = () => {
           </div>
         )}
       </div>
+      {/* <Analytics /> */}
     </div>
   );
 };
