@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, ShieldAlert, UserMinus } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
 import { GLOSSARY_DATA, DEFAULT_SCORING, SETTING_LABELS } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
-import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
+import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard, MathCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
 import SettingsTab from './components/SettingsTab';
 
@@ -60,6 +60,7 @@ const App = () => {
     localStorage.setItem('kicker_scoring', JSON.stringify(DEFAULT_SCORING));
   };
 
+  // --- SLEEPER SYNC LOGIC ---
   const syncSleeper = async () => {
       if (!sleeperLeagueId) return;
       setSleeperLoading(true);
@@ -141,22 +142,15 @@ const App = () => {
      const ytdPts = calcFPts(p, scoring);
      const pWithYtd = { ...p, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-     
      const l3_games = p.history?.l3_games || [];
      const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0);
      const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
-
      return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum };
   }).filter(p => p.proj > 0); 
 
   if (search) {
       const q = search.toLowerCase();
-      processed = processed.filter(p => 
-          p.kicker_player_name.toLowerCase().includes(q) || 
-          (p.team && p.team.toLowerCase().includes(q)) ||
-          (q === 'dome' && p.is_dome) ||
-          (q === 'cowboys' && p.team === 'DAL') 
-      );
+      processed = processed.filter(p => p.kicker_player_name.toLowerCase().includes(q) || (p.team && p.team.toLowerCase().includes(q)) || (q === 'dome' && p.is_dome) || (q === 'cowboys' && p.team === 'DAL'));
   }
 
   if (sleeperFilter && sleeperLeagueId) {
@@ -197,7 +191,6 @@ const App = () => {
       return sum / arr.length;
   };
 
-  // Identify Top 5
   const top5Ytd = ytd.map(p => ({ ...p, fpts_calc: calcFPts(p, scoring) })).sort((a, b) => b.fpts_calc - a.fpts_calc).slice(0, 5).map(p => p.kicker_player_name);
   processed = processed.map(p => ({ ...p, isTop5: top5Ytd.includes(p.kicker_player_name) }));
 
@@ -247,6 +240,7 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
+        {/* TABS */}
         {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers}/> )}
 
         {activeTab === 'potential' && (
@@ -264,7 +258,7 @@ const App = () => {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
+                    <th className="w-8 px-2 py-3 align-middle text-center">Rank</th>
                     <th className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]" onClick={() => handleSort('own_pct')}><div className="flex items-center gap-1"><span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span><ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" /></div></th>
                     <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description="Matchup Grade (Baseline 90)" />
@@ -285,10 +279,11 @@ const App = () => {
                      else if (sleeperTakenKickers.has(row.join_name)) sleeperStatus = 'TAKEN';
                      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
                      const isDimmed = sleeperFilter && sleeperStatus === 'TAKEN';
+
                      return (
                         <React.Fragment key={idx}>
                           <tr onClick={() => toggleRow(idx)} className={`hover:bg-slate-800/50 cursor-pointer transition-colors ${isDimmed ? 'opacity-40 grayscale' : ''} ${sleeperStatus === 'MY_TEAM' && sleeperFilter ? 'bg-purple-900/20' : ''}`}>
-                            <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                            <td className="w-8 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                             <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} sleeperStatus={sleeperStatus} />
                             <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
                             <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
