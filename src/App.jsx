@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown } from 'lucide-react';
+import { TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2 } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
 import { DEFAULT_SCORING } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
-import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
+import { HeaderCell, PlayerCell, DeepDiveRow } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
 import SettingsTab from './components/SettingsTab';
 import InjuryReportTab from './components/InjuryReportTab';
@@ -37,7 +37,10 @@ const App = () => {
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
     const savedUser = localStorage.getItem('sleeper_username');
     
-    if (savedScoring) { try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } catch (e) { console.error(e); } }
+    if (savedScoring) {
+      try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
+      catch (e) { console.error(e); }
+    }
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
     if (savedUser) setSleeperUser(savedUser);
 
@@ -148,7 +151,6 @@ const App = () => {
      else if (sleeperTakenKickers.has(joinName)) sleeperStatus = 'TAKEN';
      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
 
-
      return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum, sleeperStatus };
   }).filter(p => p.proj > 0); 
 
@@ -163,7 +165,7 @@ const App = () => {
           const bMine = b.sleeperStatus === 'MY_TEAM';
           if (aMine && !bMine) return -1;
           if (!aMine && bMine) return 1;
-
+          // ... rest of sort logic can be simplified or reuse existing
           let valA = a[sortConfig.key];
           let valB = b[sortConfig.key];
           if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
@@ -212,6 +214,11 @@ const App = () => {
 
   const ytdAvgs = { fpts: calculateLeagueAvg(ytdSorted, 'fpts'), avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'), pct: calculateLeagueAvg(ytdSorted, 'pct_val'), longs: calculateLeagueAvg(ytdSorted, 'longs'), dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'), rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'), off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'), def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd') };
 
+  const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
+  const bucketOutDoubtful = injuries.filter(k => ['OUT', 'Doubtful', 'Inactive'].includes(k.injury_status));
+  const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
+  const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -235,6 +242,7 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
+        {/* TABS */}
         {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers}/> )}
 
         {activeTab === 'potential' && (
@@ -242,7 +250,7 @@ const App = () => {
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4 justify-between">
                 <div className="relative flex-1 min-w-[200px] max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" /><input type="text" placeholder="(e.g. Aubrey, Cowboys, Dome)" className="w-full bg-slate-900 border border-slate-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-blue-500 focus:outline-none placeholder:text-slate-600" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                 <div className="flex items-center gap-4 flex-wrap">
-                    {sleeperMyKickers.size > 0 && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><Gamepad2 className="w-3 h-3"/> Sleeper Avail</button> )}
+                    {sleeperMyKickers.size > 0 && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><div className="w-3 h-3"></div> Sleeper Avail</button> )}
                     <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
                     <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 80% Own</label>
                     <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 60% Own</label>
@@ -298,7 +306,7 @@ const App = () => {
             </div>
           </div>
         )}
-        
+
         {activeTab === 'accuracy' && <AccuracyTab players={processed} scoring={scoring} week={meta.week} />}
         
         {activeTab === 'ytd' && (

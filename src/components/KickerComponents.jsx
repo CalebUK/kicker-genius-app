@@ -2,10 +2,14 @@ import React from 'react';
 import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, BrainCircuit, AlertTriangle, ShieldAlert, UserMinus } from 'lucide-react';
 import { calcFPts } from '../utils/scoring';
 
-// --- FOOTBALL ICON (SVG) ---
+// --- FOOTBALL ICON ---
 export const FootballIcon = ({ isFire }) => (
   <div className="relative w-full h-full flex items-center justify-center">
-    {isFire && (<div className="absolute -top-3 -right-1 text-orange-500 animate-pulse"><Flame className="w-6 h-6 fill-orange-500 text-yellow-400" /></div>)}
+    {isFire && (
+      <div className="absolute -top-3 -right-1 text-orange-500 animate-pulse">
+        <Flame className="w-6 h-6 fill-orange-500 text-yellow-400" />
+      </div>
+    )}
     <svg viewBox="0 0 100 60" className={`w-full h-full drop-shadow-md transform transition-transform ${isFire ? 'rotate-12' : '-rotate-12'}`}>
       <ellipse cx="50" cy="30" rx="48" ry="28" fill="#8B4513" stroke="#3E2723" strokeWidth="2" />
       <path d="M 25 10 Q 35 30 25 50" stroke="white" strokeWidth="3" fill="none" opacity="0.9" />
@@ -37,6 +41,7 @@ export const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSo
   );
 };
 
+// --- HISTORY BARS ---
 export const HistoryBars = ({ games }) => {
   if (!games || games.length === 0) return <div className="text-xs text-slate-500">No recent data</div>;
   return (
@@ -56,59 +61,41 @@ export const HistoryBars = ({ games }) => {
   );
 };
 
+// --- PLAYER CELL ---
 export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   const injuryColor = player.injury_color || 'slate-600'; 
   const statusText = player.injury_status || '';
-  
   let borderColor = 'border-slate-600';
   if (injuryColor.includes('green')) borderColor = 'border-green-500';
   if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
   if (injuryColor.includes('red-500')) borderColor = 'border-red-500';
   if (injuryColor.includes('yellow')) borderColor = 'border-yellow-500';
-
   let textColor = 'text-slate-400';
   if (injuryColor.includes('green')) textColor = 'text-green-400';
   if (injuryColor.includes('red-700')) textColor = 'text-red-500';
   if (injuryColor.includes('red-500')) textColor = 'text-red-400';
   if (injuryColor.includes('yellow')) textColor = 'text-yellow-400';
-
   const ownPct = player.own_pct || 0;
   let ownColor = 'text-slate-500';
   if (ownPct < 10) ownColor = 'text-blue-400 font-bold'; 
   else if (ownPct > 80) ownColor = 'text-amber-500'; 
-
   const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
-  const imageUrl = isAubrey 
-    ? '/assets/aubrey_custom.png' 
-    : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
-
+  const imageUrl = isAubrey ? '/assets/aubrey_custom.png' : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
-  
   let displayInjury = '', displayStatus = '';
   if (match) { const reportStatus = match[1]; const injuryType = match[2]; displayInjury = `${player.injury_status}: ${injuryType}`; displayStatus = reportStatus; } else { displayInjury = details; }
 
   return (
     <td className="px-3 py-4 font-medium text-white">
       <div className="flex flex-col justify-center">
-          <div className="flex items-center gap-2 mb-2">
-              <div className="text-xs md:text-sm font-bold text-white leading-tight mb-2 whitespace-normal break-words flex items-center gap-1">
-                {player.kicker_player_name}
-                {player.isTop5 && <span title="Top 5 Scorer (Season)" className="text-sm">🔥</span>}
-              </div>
-              {sleeperStatus === 'MY_TEAM' && <span className="text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">MY TEAM</span>}
-              {sleeperStatus === 'TAKEN' && <span className="text-[9px] bg-slate-700/50 text-slate-400 border border-slate-600/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">TAKEN</span>}
-              {sleeperStatus === 'FREE_AGENT' && <span className="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">FREE AGENT</span>}
+          <div className="text-xs md:text-sm font-bold text-white leading-tight mb-2 whitespace-normal break-words flex items-center gap-1">
+            {player.kicker_player_name}
+            {player.isTop5 && <span title="Top 5 Scorer (Season)" className="text-sm">🔥</span>}
           </div>
-          
           <div className="flex items-center gap-3">
               <div className="relative group flex-shrink-0">
-                <img 
-                    src={imageUrl} 
-                    alt={player.kicker_player_name}
-                    className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`}
-                    onError={(e) => { e.target.onerror = null; if (e.target.src.includes('aubrey_custom.png')) { e.target.src = player.headshot_url; } else { e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }}} 
-                />
+                <img src={imageUrl} className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`} onError={(e) => { e.target.onerror = null; if (e.target.src.includes('aubrey_custom.png')) { e.target.src = player.headshot_url; } else { e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }}} />
                 {statusText !== '' && (
                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-auto whitespace-nowrap p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
                       {match ? ( <> <div className={`font-bold ${textColor} mb-0.5`}>{displayInjury}</div> <div className="text-slate-400 italic">{displayStatus}</div> </> ) : ( <div className={`font-bold ${textColor} mb-1`}>{player.injury_status} <span className="text-slate-400 font-normal">({details})</span></div> )}
@@ -125,9 +112,9 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   );
 };
 
+// --- MATH CARD ---
 export const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
-
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
   const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
   const l3_diff = l3_act - l3_proj;
@@ -163,7 +150,8 @@ export const MathCard = ({ player, leagueAvgs, week }) => {
   );
 };
 
-export const DeepDiveRow = ({ player, leagueAvgs, week }) => (
+// --- DEEP DIVE ROW ---
+export const DeepDiveRow = ({ player, leagueAvgs, week, sleeperStatus }) => (
   <tr className="bg-slate-900/50 border-b border-slate-800">
     <td colSpan="11" className="p-4">
       <MathCard player={player} leagueAvgs={leagueAvgs} week={week} />
@@ -171,6 +159,7 @@ export const DeepDiveRow = ({ player, leagueAvgs, week }) => (
   </tr>
 );
 
+// --- INJURY CARD ---
 export const InjuryCard = ({ k, borderColor, textColor, scoring }) => {
      const match = (k.injury_details || '').match(/^(.+?)\s\((.+)\)$/);
      return (
