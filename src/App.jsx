@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, RotateCcw, Gamepad2, RefreshCw, Check } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
-// Import from our new folder structure
-import { DEFAULT_SCORING, SETTING_LABELS } from './data/constants';
+import { GLOSSARY_DATA, DEFAULT_SCORING, SETTING_LABELS } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
@@ -17,7 +16,6 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // UI State
   const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
   const [hideHighOwn, setHideHighOwn] = useState(false);
   const [hideMedOwn, setHideMedOwn] = useState(false);
@@ -62,7 +60,6 @@ const App = () => {
     localStorage.setItem('kicker_scoring', JSON.stringify(DEFAULT_SCORING));
   };
 
-  // --- SLEEPER SYNC LOGIC ---
   const syncSleeper = async () => {
       if (!sleeperLeagueId) return;
       setSleeperLoading(true);
@@ -144,9 +141,11 @@ const App = () => {
      const ytdPts = calcFPts(p, scoring);
      const pWithYtd = { ...p, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
+     
      const l3_games = p.history?.l3_games || [];
      const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0);
      const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
+
      return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum };
   }).filter(p => p.proj > 0); 
 
@@ -198,6 +197,7 @@ const App = () => {
       return sum / arr.length;
   };
 
+  // Identify Top 5
   const top5Ytd = ytd.map(p => ({ ...p, fpts_calc: calcFPts(p, scoring) })).sort((a, b) => b.fpts_calc - a.fpts_calc).slice(0, 5).map(p => p.kicker_player_name);
   processed = processed.map(p => ({ ...p, isTop5: top5Ytd.includes(p.kicker_player_name) }));
 
