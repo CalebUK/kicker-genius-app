@@ -25,6 +25,7 @@ const App = () => {
 
   // Sleeper State
   const [sleeperLeagueId, setSleeperLeagueId] = useState('');
+  const [sleeperLeagueName, setSleeperLeagueName] = useState(''); // NEW: Store League Name
   const [sleeperUser, setSleeperUser] = useState('');
   const [sleeperMyKickers, setSleeperMyKickers] = useState(new Set());
   const [sleeperTakenKickers, setSleeperTakenKickers] = useState(new Set());
@@ -35,6 +36,7 @@ const App = () => {
   useEffect(() => {
     const savedScoring = localStorage.getItem('kicker_scoring');
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
+    const savedLeagueName = localStorage.getItem('sleeper_league_name'); // NEW: Load name
     const savedUser = localStorage.getItem('sleeper_username');
     
     const savedMyKickers = localStorage.getItem('sleeper_my_kickers');
@@ -45,6 +47,7 @@ const App = () => {
       catch (e) { console.error(e); }
     }
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
+    if (savedLeagueName) setSleeperLeagueName(savedLeagueName);
     if (savedUser) setSleeperUser(savedUser);
 
     if (savedMyKickers) { try { setSleeperMyKickers(new Set(JSON.parse(savedMyKickers))); } catch (e) { console.error(e); } }
@@ -79,6 +82,11 @@ const App = () => {
           
           const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
           const leagueData = await leagueRes.json();
+          
+          // NEW: Save League Name
+          const leagueName = leagueData.name || "Unknown League";
+          setSleeperLeagueName(leagueName);
+          localStorage.setItem('sleeper_league_name', leagueName);
 
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
@@ -154,7 +162,7 @@ const App = () => {
       } catch (err) {
           console.error("Sleeper Sync Failed", err);
           setSleeperLoading(false);
-          alert(`Sync Failed: ${err.message}. Check League ID and Username.`);
+          alert("Failed to sync Sleeper league. Check League ID.");
       }
   };
 
@@ -173,18 +181,16 @@ const App = () => {
   const leagueAvgs = meta?.league_avgs || {};
   
   // --- RANKING CALCULATIONS ---
-  // 1. YTD Rank (Total Points)
   const ytdRankMap = new Map();
   [...rankings].sort((a, b) => calcFPts(b, scoring) - calcFPts(a, scoring)).forEach((p, i) => ytdRankMap.set(p.kicker_player_name, i + 1));
   
-  // 2. PPG Rank (Min 80% games)
+  // 2. PPG Rank (Min 50% games) - UPDATED from 0.8 to 0.5
   const ppgRankMap = new Map();
-  const gamesThreshold = (meta.week - 1) * 0.8; // 80% of played weeks
+  const gamesThreshold = (meta.week - 1) * 0.5; 
   [...rankings]
     .filter(p => p.games >= gamesThreshold)
     .sort((a, b) => (calcFPts(b, scoring) / b.games) - (calcFPts(a, scoring) / a.games))
     .forEach((p, i) => ppgRankMap.set(p.kicker_player_name, i + 1));
-
 
   let processed = rankings.map(p => {
      const ytdPts = calcFPts(p, scoring);
@@ -210,7 +216,6 @@ const App = () => {
          l3_act_sum, 
          acc_diff: l3_act_sum - l3_proj_sum, 
          sleeperStatus,
-         // INJECT RANKS
          ytdRank: ytdRankMap.get(p.kicker_player_name),
          ppgRank: ppgRankMap.get(p.kicker_player_name)
      };
@@ -310,14 +315,30 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers}/> )}
+        {/* TABS - Pass leagueName down to SettingsTab */}
+        {activeTab === 'settings' && ( 
+            <SettingsTab 
+                scoring={scoring} 
+                updateScoring={updateScoring} 
+                resetScoring={resetScoring} 
+                sleeperLeagueId={sleeperLeagueId} 
+                setSleeperLeagueId={setSleeperLeagueId} 
+                sleeperUser={sleeperUser} 
+                setSleeperUser={setSleeperUser} 
+                syncSleeper={syncSleeper} 
+                sleeperLoading={sleeperLoading} 
+                sleeperScoringUpdated={sleeperScoringUpdated} 
+                sleeperMyKickers={sleeperMyKickers}
+                sleeperLeagueName={sleeperLeagueName} // NEW PROP
+            /> 
+        )}
 
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4 justify-between">
                 <div className="relative flex-1 min-w-[200px] max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" /><input type="text" placeholder="(e.g. Aubrey, Cowboys, Dome)" className="w-full bg-slate-900 border border-slate-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-blue-500 focus:outline-none placeholder:text-slate-600" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                 <div className="flex items-center gap-4 flex-wrap">
-                    {sleeperMyKickers.size > 0 && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><Gamepad2 className="w-3 h-3"/> Sleeper Avail</button> )}
+                    {sleeperMyKickers.size > 0 && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><Bot className="w-3 h-3"/> Sleeper Status</button> )}
                     <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
                     <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 80% Own</label>
                     <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 60% Own</label>
