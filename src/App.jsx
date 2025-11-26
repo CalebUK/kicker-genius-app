@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp } from 'lucide-react';
-import { Gamepad2, BrainCircuit, ShieldAlert, UserMinus, RotateCcw, AlertTriangle as AlertTriangleIcon } from 'lucide-react'; // Imports for use in functions/rendering
+import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2 } from 'lucide-react';
+// import { Analytics } from '@vercel/analytics/react';
 
 import { GLOSSARY_DATA, DEFAULT_SCORING } from './data/constants';
 import { calcFPts, calcProj } from './utils/scoring';
@@ -8,8 +8,6 @@ import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/Ki
 import AccuracyTab from './components/AccuracyTab';
 import SettingsTab from './components/SettingsTab';
 
-
-// --- MAIN APP COMPONENT ---
 const App = () => {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState('potential');
@@ -33,16 +31,17 @@ const App = () => {
   const [sleeperScoringUpdated, setSleeperScoringUpdated] = useState(false);
 
   useEffect(() => {
-    // Load local storage items
     const savedScoring = localStorage.getItem('kicker_scoring');
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
     const savedUser = localStorage.getItem('sleeper_username');
     
-    if (savedScoring) { try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } catch (e) { console.error(e); } }
+    if (savedScoring) {
+      try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
+      catch (e) { console.error(e); }
+    }
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
     if (savedUser) setSleeperUser(savedUser);
 
-    // Fetch live data
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
@@ -120,7 +119,6 @@ const App = () => {
       }
   };
 
-
   const handleSort = (key) => {
     let direction = 'desc';
     if (sortConfig.key === key && sortConfig.direction === 'desc') direction = 'asc';
@@ -147,8 +145,9 @@ const App = () => {
 
      const teamCode = p.team || '';
      let sleeperStatus = null;
-     if (sleeperMyKickers.has(p.join_name)) sleeperStatus = 'MY_TEAM';
-     else if (sleeperTakenKickers.has(p.join_name)) sleeperStatus = 'TAKEN';
+     const joinName = p.join_name;
+     if (sleeperMyKickers.has(joinName)) sleeperStatus = 'MY_TEAM';
+     else if (sleeperTakenKickers.has(joinName)) sleeperStatus = 'TAKEN';
      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
 
 
@@ -157,14 +156,9 @@ const App = () => {
 
   if (search) {
       const q = search.toLowerCase();
-      processed = processed.filter(p => 
-          p.kicker_player_name.toLowerCase().includes(q) || 
-          (p.team && p.team.toLowerCase().includes(q)) ||
-          (q === 'dome' && p.is_dome) ||
-          (q === 'cowboys' && p.team === 'DAL') 
-      );
+      processed = processed.filter(p => p.kicker_player_name.toLowerCase().includes(q) || (p.team && p.team.toLowerCase().includes(q)) || (q === 'dome' && p.is_dome) || (q === 'cowboys' && p.team === 'DAL') );
   }
-  
+
   if (sleeperFilter && sleeperLeagueId) {
       processed = processed.filter(p => p.sleeperStatus === 'MY_TEAM' || p.sleeperStatus === 'FREE_AGENT').sort((a, b) => {
           const aMine = a.sleeperStatus === 'MY_TEAM';
@@ -374,7 +368,6 @@ const App = () => {
           </div>
         )}
       </div>
-      {/* <Analytics /> */}
     </div>
   );
 };

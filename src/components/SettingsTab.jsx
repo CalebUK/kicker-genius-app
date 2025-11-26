@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, RotateCcw, Gamepad2, Loader2, RefreshCw, Check } from 'lucide-react';
+import { Settings, RotateCcw, Gamepad2, Loader2, RefreshCw, Check, Save } from 'lucide-react';
 import { SETTING_LABELS } from '../data/constants';
 
 const SettingsTab = ({ 

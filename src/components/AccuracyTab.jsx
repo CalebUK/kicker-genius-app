@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { PlayCircle, CheckCircle2, Clock, Calendar } from 'lucide-react';
+import { Filter, Calendar, PlayCircle, CheckCircle2, Clock } from 'lucide-react';
 import { calculateLiveScore, getGameStatus } from '../utils/scoring';
-import { FootballIcon } from './KickerComponents'; // Assuming this is where the new icon is
+import { FootballIcon } from './KickerComponents';
 
 const AccuracyTab = ({ players, scoring, week }) => {
   const [filter, setFilter] = useState('ALL');
@@ -31,7 +31,6 @@ const AccuracyTab = ({ players, scoring, week }) => {
                 const liveScore = calculateLiveScore(p, scoring);
                 const proj = p.proj;
                 
-                // Math for Progress Bar
                 const pct = Math.min(100, Math.max(5, (liveScore / proj) * 100)); 
                 const isBeat = liveScore >= proj;
                 const isSmashed = liveScore >= proj + 3;
@@ -80,17 +79,17 @@ const AccuracyTab = ({ players, scoring, week }) => {
                              <div className={`h-full rounded-l-md transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${pct}%` }}></div>
                              
                              {/* Ball Icon */}
-                             <div className className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 16px)` }}>
+                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${pct}% - 16px)` }}>
                                  <FootballIcon isFire={isSmashed} />
                              </div>
                         </div>
 
                         <div className="flex flex-wrap gap-1.5 relative z-10">
-                            {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
-                            {(p.wk_fg_40_49 > 0) && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{p.wk_fg_40_49}x 40-49</span>}
-                            {(p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39 > 0) && <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39}x Short FG</span>}
-                            {(p.wk_xp_made > 0) && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_xp_made}x XP</span>}
-                            {(p.wk_fg_miss > 0 || p.wk_xp_miss > 0) && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{p.wk_fg_miss + p.wk_xp_miss} Miss</span>}
+                            {(p.wk_fg_50_59 || p.wk_fg_60_plus) > 0 && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{(p.wk_fg_50_59 || 0) + (p.wk_fg_60_plus || 0)}x 50+</span>}
+                            {(p.wk_fg_40_49 || 0) > 0 && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{(p.wk_fg_40_49 || 0)}x 40-49</span>}
+                            {(p.wk_fg_0_19 || p.wk_fg_20_29 || p.wk_fg_30_39) > 0 && <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{(p.wk_fg_0_19 || 0) + (p.wk_fg_20_29 || 0) + (p.wk_fg_30_39 || 0)}x Short FG</span>}
+                            {(p.wk_xp_made || 0) > 0 && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{(p.wk_xp_made || 0)}x XP</span>}
+                            {(p.wk_fg_miss || p.wk_xp_miss) > 0 && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{(p.wk_fg_miss || 0) + (p.wk_xp_miss || 0)} Miss</span>}
                             {liveScore === 0 && status !== 'UPCOMING' && <span className="text-[10px] text-slate-600 italic px-1">No points yet</span>}
                         </div>
                         
