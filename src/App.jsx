@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Bot, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock, Bot } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
 import { DEFAULT_SCORING } from './data/constants';
@@ -73,14 +73,18 @@ const App = () => {
       setSleeperLoading(true);
       setSleeperScoringUpdated(false);
       try {
-          const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
-          if (!leagueRes.ok) throw new Error("League Not Found");
-          const leagueData = await leagueRes.json();
+          const rostersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/rosters`);
+          if (!rostersRes.ok) throw new Error("League ID is invalid or not public.");
+          const rosters = await rostersRes.json();
           
+          const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
+          const leagueData = await leagueRes.json();
+
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
              const genMiss = s.fgmiss || 0;
              
+             // Check generic 50+ (Sleeper key is 'fgm_50p')
              const generic50Plus = s.fgm_50p || 5; 
              const genericMiss50Plus = s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss;
 
@@ -90,19 +94,22 @@ const App = () => {
                 fg30_39: s.fgm_30_39 || 3,
                 fg40_49: s.fgm_40_49 || 4,
                 
+                // 50-59 MAKE: Check specific, fallback to generic 50p
                 fg50_59: s.fgm_50_59 !== undefined ? s.fgm_50_59 : generic50Plus,
-                fg60_plus: s.fgm_60_plus !== undefined ? s.fgm_60_plus : (s.fgm_60p !== undefined ? s.fgm_60p : generic50Plus),
+                // 60+ MAKE: Check specific 60p, fallback to generic 50p
+                fg60_plus: s.fgm_60p !== undefined ? s.fgm_60p : generic50Plus,
                 
                 xp_made: s.xpm || 1,
                 xp_miss: s.xpmiss || 0,
                 
+                // Granular MISSES
                 fg_miss_0_19: s.fgmiss_0_19 !== undefined ? s.fgmiss_0_19 : genMiss,
                 fg_miss_20_29: s.fgmiss_20_29 !== undefined ? s.fgmiss_20_29 : genMiss,
                 fg_miss_30_39: s.fgmiss_30_39 !== undefined ? s.fgmiss_30_39 : genMiss,
                 fg_miss_40_49: s.fgmiss_40_49 !== undefined ? s.fgmiss_40_49 : genMiss,
                 
                 fg_miss_50_59: s.fgmiss_50_59 !== undefined ? s.fgmiss_50_59 : genericMiss50Plus,
-                fg_miss_60_plus: s.fgmiss_60_plus !== undefined ? s.fgmiss_60_plus : (s.fgmiss_60p !== undefined ? s.fgmiss_60p : genericMiss50Plus),
+                fg_miss_60_plus: s.fgmiss_60_plus !== undefined ? s.fgmiss_60_plus : genericMiss50Plus,
                 
                 fg_miss: genMiss 
              };
@@ -120,8 +127,6 @@ const App = () => {
              if (me) myUserId = me.user_id;
           }
 
-          const rostersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/rosters`);
-          const rosters = await rostersRes.json();
           const playersRes = await fetch('https://api.sleeper.app/v1/players/nfl'); 
           const allPlayers = await playersRes.json();
 
@@ -187,8 +192,16 @@ const App = () => {
      else if (sleeperTakenKickers.has(joinName)) sleeperStatus = 'TAKEN';
      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
 
-
-     return { ...pWithYtd, proj: parseFloat(proj), l3_proj_sum, l3_act_sum, acc_diff: l3_act_sum - l3_proj_sum, sleeperStatus };
+     // MAPPED VEGAS IMPLIED
+     return { 
+        ...pWithYtd, 
+        vegas: p.vegas_implied, // Explicit mapping fixes the display issue
+        proj: parseFloat(proj), 
+        l3_proj_sum, 
+        l3_act_sum, 
+        acc_diff: l3_act_sum - l3_proj_sum, 
+        sleeperStatus 
+     };
   }).filter(p => p.proj > 0); 
 
   if (search) {
@@ -285,7 +298,6 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* TABS */}
         {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers}/> )}
 
         {activeTab === 'potential' && (
@@ -293,7 +305,7 @@ const App = () => {
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4 justify-between">
                 <div className="relative flex-1 min-w-[200px] max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" /><input type="text" placeholder="(e.g. Aubrey, Cowboys, Dome)" className="w-full bg-slate-900 border border-slate-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-blue-500 focus:outline-none placeholder:text-slate-600" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                 <div className="flex items-center gap-4 flex-wrap">
-                    {sleeperMyKickers.size > 0 && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><Bot className="w-3 h-3"/> Sleeper Status</button> )}
+                    {sleeperMyKickers.size > 0 && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><Gamepad2 className="w-3 h-3"/> Sleeper Status</button> )}
                     <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
                     <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 80% Own</label>
                     <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 60% Own</label>
