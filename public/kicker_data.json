@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 13,
-    "updated": "2025-11-27 11:09",
+    "updated": "2025-11-27 12:29",
     "league_avgs": {
       "fpts": 69.7,
       "off_stall": 50.7,
@@ -66,10 +66,10 @@
       "spread_display": "-11.5",
       "is_dome": false,
       "weather_data": [
-        1.2,
+        1.1,
         "1mph \u2600\ufe0f"
       ],
-      "wind": 1.2,
+      "wind": 1.1,
       "weather_desc": "1mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -108,8 +108,8 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "-11.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 42,
+        "l3_proj": 35.9,
         "l3_games": [
           {
             "week": 12,
@@ -137,7 +137,7 @@
           }
         ]
       },
-      "narrative": "Myers is a locked-and-loaded RB1 of kickers this week with an elite Grade of 101.5. The team moves the ball but struggles to finish (60.0% stall), perfect for kickers."
+      "narrative": "Myers is a locked-and-loaded RB1 of kickers this week with an elite Grade of 101.5. His offense has a high stall rate (60.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -236,8 +236,8 @@
       "details_vegas_total": 44.5,
       "details_vegas_spread": "+4.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 12,
+        "l3_proj": 11.6,
         "l3_games": [
           {
             "week": 12,
@@ -265,7 +265,7 @@
           }
         ]
       },
-      "narrative": "Fairbairn is a locked-and-loaded RB1 of kickers this week with an elite Grade of 108.2. No weather concerns here; the dome keeps his floor safe."
+      "narrative": "Fire up Fairbairn with confidence; his Matchup Grade of 108.2 is in the elite tier. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "C.Dicker",
@@ -364,8 +364,8 @@
       "details_vegas_total": 40.5,
       "details_vegas_spread": "-9.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 21,
+        "l3_proj": 21.5,
         "l3_games": [
           {
             "week": 12,
@@ -393,7 +393,7 @@
           }
         ]
       },
-      "narrative": "Dicker is a quality starter this week with a Grade of 91.4. The controlled dome environment boosts his accuracy floor."
+      "narrative": "Dicker is a strong play this week, sitting comfortably with a Grade of 91.4. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -450,11 +450,11 @@
       "spread_display": "-7.0",
       "is_dome": false,
       "weather_data": [
-        7.2,
-        "7mph \u2600\ufe0f"
+        6.7,
+        "6mph \u2600\ufe0f"
       ],
-      "wind": 7.2,
-      "weather_desc": "7mph \u2600\ufe0f",
+      "wind": 6.7,
+      "weather_desc": "6mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -491,8 +491,8 @@
       "details_vegas_total": 51.5,
       "details_vegas_spread": "-7.0",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 36,
+        "l3_proj": 29.6,
         "l3_games": [
           {
             "week": 12,
@@ -520,7 +520,7 @@
           }
         ]
       },
-      "narrative": "Loop is a strong play this week, sitting comfortably with a Grade of 90.1. The offense has a massive implied total of 29.2, offering a high ceiling."
+      "narrative": "You can trust Loop in your lineup given his solid Grade of 90.1. The offense has a massive implied total of 29.2, offering a high ceiling."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -577,10 +577,10 @@
       "spread_display": "-5.5",
       "is_dome": false,
       "weather_data": [
-        7.1,
+        7.2,
         "7mph \ud83c\udf27\ufe0f"
       ],
-      "wind": 7.1,
+      "wind": 7.2,
       "weather_desc": "7mph \ud83c\udf27\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -618,8 +618,8 @@
       "details_vegas_total": 43.5,
       "details_vegas_spread": "-5.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 21,
+        "l3_proj": 15.7,
         "l3_games": [
           {
             "week": 12,
@@ -647,7 +647,7 @@
           }
         ]
       },
-      "narrative": "Don't overthink it: Lutz is a top-tier option boasting a massive Grade of 106.5. A 81.8% offensive stall rate suggests plenty of drives ending in 3 points."
+      "narrative": "Lutz is a locked-and-loaded RB1 of kickers this week with an elite Grade of 106.5. His offense has a high stall rate (81.8%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -704,11 +704,11 @@
       "spread_display": "+7.0",
       "is_dome": false,
       "weather_data": [
-        7.2,
-        "7mph \u2600\ufe0f"
+        6.7,
+        "6mph \u2600\ufe0f"
       ],
-      "wind": 7.2,
-      "weather_desc": "7mph \u2600\ufe0f",
+      "wind": 6.7,
+      "weather_desc": "6mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -745,8 +745,8 @@
       "details_vegas_total": 51.5,
       "details_vegas_spread": "+7.0",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 20,
+        "l3_proj": 15.6,
         "l3_games": [
           {
             "week": 12,
@@ -774,7 +774,7 @@
           }
         ]
       },
-      "narrative": "You can trust McPherson in your lineup given his solid Grade of 95.7. A 61.5% offensive stall rate suggests plenty of drives ending in 3 points."
+      "narrative": "You can trust McPherson in your lineup given his solid Grade of 95.7. His offense has a high stall rate (61.5%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -872,8 +872,8 @@
       "details_vegas_total": 52.5,
       "details_vegas_spread": "-3.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 22,
+        "l3_proj": 17.4,
         "l3_games": [
           {
             "week": 12,
@@ -901,7 +901,7 @@
           }
         ]
       },
-      "narrative": "The model is fading Butker this week (Grade: 79.0). Vegas projects a shootout (28.0 team pts), which means plenty of XP and FG chances."
+      "narrative": "Butker is a risky option this week with a below-average Grade of 79.0. The offense has a massive implied total of 28.0, offering a high ceiling."
     },
     {
       "kicker_player_name": "R.Patterson",
@@ -958,11 +958,11 @@
       "spread_display": "-5.5",
       "is_dome": false,
       "weather_data": [
-        12.6,
-        "12mph \u2600\ufe0f"
+        11.1,
+        "11mph \u2600\ufe0f"
       ],
-      "wind": 12.6,
-      "weather_desc": "12mph \u2600\ufe0f",
+      "wind": 11.1,
+      "weather_desc": "11mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -1000,8 +1000,8 @@
       "details_vegas_total": 42.5,
       "details_vegas_spread": "-5.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 17,
+        "l3_proj": 17.2,
         "l3_games": [
           {
             "week": 12,
@@ -1029,7 +1029,7 @@
           }
         ]
       },
-      "narrative": "With a Grade of 82.7, Patterson is a reasonable floor play. His offense has a high stall rate (80.0%), which often leads to FG attempts."
+      "narrative": "Patterson is a viable streaming option with a respectable Grade of 82.7. His offense has a high stall rate (80.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "M.Badgley",
@@ -1128,8 +1128,8 @@
       "details_vegas_total": 44.5,
       "details_vegas_spread": "-4.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 14,
+        "l3_proj": 17.2,
         "l3_games": [
           {
             "week": 12,
@@ -1157,7 +1157,7 @@
           }
         ]
       },
-      "narrative": "The model sees value in Badgley, assigning a strong Grade of 99.4. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "You can trust Badgley in your lineup given his solid Grade of 99.4. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -1257,8 +1257,8 @@
       "details_vegas_total": 52.5,
       "details_vegas_spread": "+3.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 15,
+        "l3_proj": 20.6,
         "l3_games": [
           {
             "week": 12,
@@ -1286,7 +1286,7 @@
           }
         ]
       },
-      "narrative": "Aubrey is playable in deeper leagues with a Grade of 84.4. No weather concerns here; the dome keeps his floor safe."
+      "narrative": "Consider Aubrey if you need a fill-in; his Grade is a decent 84.4. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -1386,8 +1386,8 @@
       "details_vegas_total": 48.5,
       "details_vegas_spread": "-2.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 28,
+        "l3_proj": 26.4,
         "l3_games": [
           {
             "week": 12,
@@ -1415,61 +1415,61 @@
           }
         ]
       },
-      "narrative": "Consider Bates if you need a fill-in; his Grade is a decent 82.7. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Bates is a viable streaming option with a respectable Grade of 82.7. Playing in a dome guarantees perfect kicking conditions."
     },
     {
-      "kicker_player_name": "J.Moody",
-      "kicker_player_id": "00-0038562",
-      "team": "WAS",
-      "fg_made": 9,
-      "fg_att": 12,
+      "kicker_player_name": "E.Pineiro",
+      "kicker_player_id": "00-0034173",
+      "team": "SF",
+      "fg_made": 22,
+      "fg_att": 22,
       "fg_0_19": 0,
-      "fg_20_29": 2,
+      "fg_20_29": 4,
       "fg_30_39": 4,
-      "fg_40_49": 3,
-      "fg_50_59": 0,
+      "fg_40_49": 8,
+      "fg_50_59": 6,
       "fg_60_plus": 0,
-      "fg_miss": 3,
+      "fg_miss": 0,
       "fg_miss_0_19": 0,
-      "fg_miss_20_29": 1,
-      "fg_miss_30_39": 1,
-      "fg_miss_40_49": 1,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 0,
+      "fg_miss_40_49": 0,
       "fg_miss_50_59": 0,
       "fg_miss_60_plus": 0,
-      "xp_made": 5,
-      "xp_miss": 0,
-      "real_pts": 32,
-      "dome_kicks": 0,
-      "total_kicks": 17,
-      "games": 3,
+      "xp_made": 18,
+      "xp_miss": 4,
+      "real_pts": 84,
+      "dome_kicks": 19,
+      "total_kicks": 44,
+      "games": 10,
       "status": "ACT",
-      "posteam": "WAS",
-      "rz_trips": 42,
-      "acc": 75.0,
-      "dome_pct": 0.0,
-      "fpts": 32,
-      "avg_pts": 10.7,
-      "join_name": "J.Moody",
-      "off_stall_rate_ytd": 36.6,
-      "def_stall_rate_ytd": 47.1,
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wkqqi3zfucoti8g5ncob",
-      "match_name": "J.Moody",
-      "own_pct": 5.8,
-      "cbs_status": 0,
-      "cbs_injury": 0,
+      "posteam": "SF",
+      "rz_trips": 51,
+      "acc": 100.0,
+      "dome_pct": 43.0,
+      "fpts": 100,
+      "avg_pts": 10.0,
+      "join_name": "E.Pineiro",
+      "off_stall_rate_ytd": 43.1,
+      "def_stall_rate_ytd": 44.4,
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/l4rrfcuczjau7q02h2iz",
+      "match_name": "E.Pineiro",
+      "own_pct": 15.8,
+      "cbs_status": "Did Not Practice on Wednesday. Questionable for Week 13 at Cleveland",
+      "cbs_injury": "Hamstring",
       "roster_status": 0,
-      "injury_status": "Healthy",
-      "injury_color": "green",
-      "injury_details": "Active",
-      "opponent": "DEN",
+      "injury_status": "Questionable",
+      "injury_color": "yellow-500",
+      "injury_details": "Did Not Practice On Wednesday. Questionable For Week 13 At Cleveland (Hamstring)",
+      "opponent": "CLE",
       "roof": "outdoors",
-      "game_dt": "2025-11-30 20:20",
-      "total_line": 43.5,
-      "spread_line": -5.5,
-      "home_field": "WAS",
-      "vegas_implied": 19.0,
-      "is_home": true,
-      "spread_display": "+5.5",
+      "game_dt": "2025-11-30 13:00",
+      "total_line": 35.5,
+      "spread_line": -4.5,
+      "home_field": "CLE",
+      "vegas_implied": 20.0,
+      "is_home": false,
+      "spread_display": "-4.5",
       "is_dome": false,
       "weather_data": [
         0,
@@ -1492,57 +1492,58 @@
       "wk_fg_miss_40_49": 0,
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
-      "off_stall_rate": 33.3,
-      "off_ppg": 16.333333333333332,
-      "off_share": 0.2877122877122877,
-      "def_stall_rate": 66.7,
-      "def_pa": 13.666666666666666,
-      "def_share": 0.5037593984962406,
-      "aggression_pct": 42.9,
-      "grade": 75.4,
-      "proj": 8.5,
+      "off_stall_rate": 26.3,
+      "off_ppg": 30.25,
+      "off_share": 0.25983335172718247,
+      "def_stall_rate": 76.9,
+      "def_pa": 20.0,
+      "def_share": 0.4038647342995169,
+      "aggression_pct": 28.6,
+      "grade": 83.2,
+      "proj": 8.7,
       "grade_details": [
+        "+5 Elite Talent",
         "-5 Aggressive Coach"
       ],
-      "off_score_val": 26.3,
-      "def_score_val": 54.2,
-      "w_team_score": 18.2,
-      "w_def_allowed": 17.4,
-      "off_cap_val": 6.3,
-      "def_cap_val": 10.5,
-      "details_vegas_total": 43.5,
-      "details_vegas_spread": "+5.5",
+      "off_score_val": 20.7,
+      "def_score_val": 62.5,
+      "w_team_score": 23.1,
+      "w_def_allowed": 20.0,
+      "off_cap_val": 7.2,
+      "def_cap_val": 9.7,
+      "details_vegas_total": 35.5,
+      "details_vegas_spread": "-4.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 13,
+        "l3_proj": 21.5,
         "l3_games": [
           {
             "week": 12,
-            "status": "BYE",
+            "status": "DNS",
             "proj": 0,
             "act": 0,
             "diff": 0,
-            "opp": "BYE"
+            "opp": "CAR"
           },
           {
             "week": 11,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "MIA"
+            "status": "ACTIVE",
+            "proj": 11.5,
+            "act": 12,
+            "diff": 0.5,
+            "opp": "ARI"
           },
           {
             "week": 10,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "DET"
+            "status": "ACTIVE",
+            "proj": 10.0,
+            "act": 1,
+            "diff": -9.0,
+            "opp": "LA"
           }
         ]
       },
-      "narrative": "Moody is a risky option this week with a below-average Grade of 75.4. Facing a defense with a 66.7% stall rate usually means extra FG tries."
+      "narrative": "Monitor status closely as they are currently listed as Questionable. This significantly impacts their viability for Week ."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -1599,10 +1600,10 @@
       "spread_display": "+3.5",
       "is_dome": false,
       "weather_data": [
-        11.2,
+        11.6,
         "11mph \ud83c\udf27\ufe0f"
       ],
-      "wind": 11.2,
+      "wind": 11.6,
       "weather_desc": "11mph \ud83c\udf27\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -1643,8 +1644,8 @@
       "details_vegas_total": 46.5,
       "details_vegas_spread": "+3.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 19,
+        "l3_proj": 29.9,
         "l3_games": [
           {
             "week": 12,
@@ -1672,7 +1673,263 @@
           }
         ]
       },
-      "narrative": "Boswell is a viable streaming option with a respectable Grade of 80.8. A 50.0% offensive stall rate suggests plenty of drives ending in 3 points."
+      "narrative": "Boswell is a viable streaming option with a respectable Grade of 80.8. His offense has a high stall rate (50.0%), which often leads to FG attempts."
+    },
+    {
+      "kicker_player_name": "Z.Gonzalez",
+      "kicker_player_id": "00-0033862",
+      "team": "ATL",
+      "fg_made": 6,
+      "fg_att": 6,
+      "fg_0_19": 0,
+      "fg_20_29": 0,
+      "fg_30_39": 0,
+      "fg_40_49": 3,
+      "fg_50_59": 3,
+      "fg_60_plus": 0,
+      "fg_miss": 0,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 0,
+      "fg_miss_40_49": 0,
+      "fg_miss_50_59": 0,
+      "fg_miss_60_plus": 0,
+      "xp_made": 6,
+      "xp_miss": 0,
+      "real_pts": 24,
+      "dome_kicks": 12,
+      "total_kicks": 12,
+      "games": 3,
+      "status": "ACT",
+      "posteam": "ATL",
+      "rz_trips": 40,
+      "acc": 100.0,
+      "dome_pct": 100.0,
+      "fpts": 33,
+      "avg_pts": 11.0,
+      "join_name": "Z.Gonzalez",
+      "off_stall_rate_ytd": 47.5,
+      "def_stall_rate_ytd": 51.1,
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tytaxive5qhdumjqy2o2",
+      "match_name": "Z.Gonzalez",
+      "own_pct": 4.3,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": 0,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active",
+      "opponent": "NYJ",
+      "roof": "outdoors",
+      "game_dt": "2025-11-30 13:00",
+      "total_line": 39.5,
+      "spread_line": -2.5,
+      "home_field": "NYJ",
+      "vegas_implied": 21.0,
+      "is_home": false,
+      "spread_display": "-2.5",
+      "is_dome": false,
+      "weather_data": [
+        0,
+        "Outdoors \u2600\ufe0f"
+      ],
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "off_stall_rate": 28.6,
+      "off_ppg": 24.75,
+      "off_share": 0.29184782608695653,
+      "def_stall_rate": 50.0,
+      "def_pa": 23.333333333333332,
+      "def_share": 0.4038647342995169,
+      "aggression_pct": 42.9,
+      "grade": 63.2,
+      "proj": 8.3,
+      "grade_details": [
+        "+5 Tight Game",
+        "-5 Aggressive Coach"
+      ],
+      "off_score_val": 22.6,
+      "def_score_val": 40.6,
+      "w_team_score": 22.1,
+      "w_def_allowed": 21.7,
+      "off_cap_val": 7.7,
+      "def_cap_val": 10.5,
+      "details_vegas_total": 39.5,
+      "details_vegas_spread": "-2.5",
+      "history": {
+        "l3_actual": 33,
+        "l3_proj": 33.0,
+        "l3_games": [
+          {
+            "week": 12,
+            "status": "ACTIVE",
+            "proj": 11.0,
+            "act": 15,
+            "diff": 4.0,
+            "opp": "NO"
+          },
+          {
+            "week": 11,
+            "status": "ACTIVE",
+            "proj": 11.0,
+            "act": 12,
+            "diff": 1.0,
+            "opp": "CAR"
+          },
+          {
+            "week": 10,
+            "status": "ACTIVE",
+            "proj": 11.0,
+            "act": 6,
+            "diff": -5.0,
+            "opp": "IND"
+          }
+        ]
+      },
+      "narrative": "Gonzalez is a risky option this week with a below-average Grade of 63.2. The matchup is favorable against a defense that forces FGs (50.0%) in the red zone."
+    },
+    {
+      "kicker_player_name": "J.Moody",
+      "kicker_player_id": "00-0038562",
+      "team": "WAS",
+      "fg_made": 9,
+      "fg_att": 12,
+      "fg_0_19": 0,
+      "fg_20_29": 2,
+      "fg_30_39": 4,
+      "fg_40_49": 3,
+      "fg_50_59": 0,
+      "fg_60_plus": 0,
+      "fg_miss": 3,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 1,
+      "fg_miss_30_39": 1,
+      "fg_miss_40_49": 1,
+      "fg_miss_50_59": 0,
+      "fg_miss_60_plus": 0,
+      "xp_made": 5,
+      "xp_miss": 0,
+      "real_pts": 32,
+      "dome_kicks": 0,
+      "total_kicks": 17,
+      "games": 3,
+      "status": "ACT",
+      "posteam": "WAS",
+      "rz_trips": 42,
+      "acc": 75.0,
+      "dome_pct": 0.0,
+      "fpts": 32,
+      "avg_pts": 10.7,
+      "join_name": "J.Moody",
+      "off_stall_rate_ytd": 36.6,
+      "def_stall_rate_ytd": 47.1,
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wkqqi3zfucoti8g5ncob",
+      "match_name": "J.Moody",
+      "own_pct": 5.8,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": 0,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active",
+      "opponent": "DEN",
+      "roof": "outdoors",
+      "game_dt": "2025-11-30 20:20",
+      "total_line": 43.5,
+      "spread_line": -5.5,
+      "home_field": "WAS",
+      "vegas_implied": 19.0,
+      "is_home": true,
+      "spread_display": "+5.5",
+      "is_dome": false,
+      "weather_data": [
+        7.2,
+        "7mph \ud83c\udf27\ufe0f"
+      ],
+      "wind": 7.2,
+      "weather_desc": "7mph \ud83c\udf27\ufe0f",
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "off_stall_rate": 33.3,
+      "off_ppg": 16.333333333333332,
+      "off_share": 0.2877122877122877,
+      "def_stall_rate": 66.7,
+      "def_pa": 13.666666666666666,
+      "def_share": 0.5037593984962406,
+      "aggression_pct": 42.9,
+      "grade": 70.4,
+      "proj": 8.2,
+      "grade_details": [
+        "-5 Rain",
+        "-5 Aggressive Coach"
+      ],
+      "off_score_val": 26.3,
+      "def_score_val": 54.2,
+      "w_team_score": 18.2,
+      "w_def_allowed": 17.4,
+      "off_cap_val": 6.3,
+      "def_cap_val": 10.5,
+      "details_vegas_total": 43.5,
+      "details_vegas_spread": "+5.5",
+      "history": {
+        "l3_actual": 0,
+        "l3_proj": 0.0,
+        "l3_games": [
+          {
+            "week": 12,
+            "status": "BYE",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "BYE"
+          },
+          {
+            "week": 11,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "MIA"
+          },
+          {
+            "week": 10,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "DET"
+          }
+        ]
+      },
+      "narrative": "Moody is a risky option this week with a below-average Grade of 70.4. The matchup is favorable against a defense that forces FGs (66.7%) in the red zone."
     },
     {
       "kicker_player_name": "C.Little",
@@ -1729,11 +1986,11 @@
       "spread_display": "-6.5",
       "is_dome": false,
       "weather_data": [
-        8.5,
-        "8mph \ud83c\udf27\ufe0f"
+        7.6,
+        "7mph \ud83c\udf27\ufe0f"
       ],
-      "wind": 8.5,
-      "weather_desc": "8mph \ud83c\udf27\ufe0f",
+      "wind": 7.6,
+      "weather_desc": "7mph \ud83c\udf27\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -1771,8 +2028,8 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "-6.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 31,
+        "l3_proj": 25.8,
         "l3_games": [
           {
             "week": 12,
@@ -1800,7 +2057,7 @@
           }
         ]
       },
-      "narrative": "Little is a risky option this week with a below-average Grade of 56.1. The matchup is favorable against a defense that forces FGs (57.1%) in the red zone."
+      "narrative": "Fade Little if possible; his Grade of 56.1 suggests low upside. The matchup is favorable against a defense that forces FGs (57.1%) in the red zone."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -1899,8 +2156,8 @@
       "details_vegas_total": 48.5,
       "details_vegas_spread": "+2.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 12,
+        "l3_proj": 14.8,
         "l3_games": [
           {
             "week": 12,
@@ -1928,136 +2185,7 @@
           }
         ]
       },
-      "narrative": "You can trust McManus in your lineup given his solid Grade of 90.2. Playing in a dome guarantees perfect kicking conditions."
-    },
-    {
-      "kicker_player_name": "Z.Gonzalez",
-      "kicker_player_id": "00-0033862",
-      "team": "ATL",
-      "fg_made": 6,
-      "fg_att": 6,
-      "fg_0_19": 0,
-      "fg_20_29": 0,
-      "fg_30_39": 0,
-      "fg_40_49": 3,
-      "fg_50_59": 3,
-      "fg_60_plus": 0,
-      "fg_miss": 0,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 0,
-      "fg_miss_50_59": 0,
-      "fg_miss_60_plus": 0,
-      "xp_made": 6,
-      "xp_miss": 0,
-      "real_pts": 24,
-      "dome_kicks": 12,
-      "total_kicks": 12,
-      "games": 3,
-      "status": "ACT",
-      "posteam": "ATL",
-      "rz_trips": 40,
-      "acc": 100.0,
-      "dome_pct": 100.0,
-      "fpts": 33,
-      "avg_pts": 11.0,
-      "join_name": "Z.Gonzalez",
-      "off_stall_rate_ytd": 47.5,
-      "def_stall_rate_ytd": 51.1,
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tytaxive5qhdumjqy2o2",
-      "match_name": "Z.Gonzalez",
-      "own_pct": 4.3,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": 0,
-      "injury_status": "Healthy",
-      "injury_color": "green",
-      "injury_details": "Active",
-      "opponent": "NYJ",
-      "roof": "outdoors",
-      "game_dt": "2025-11-30 13:00",
-      "total_line": 39.5,
-      "spread_line": -2.5,
-      "home_field": "NYJ",
-      "vegas_implied": 21.0,
-      "is_home": false,
-      "spread_display": "-2.5",
-      "is_dome": false,
-      "weather_data": [
-        13.1,
-        "13mph \u2600\ufe0f"
-      ],
-      "wind": 13.1,
-      "weather_desc": "13mph \u2600\ufe0f",
-      "wk_fg_0_19": 0,
-      "wk_fg_20_29": 0,
-      "wk_fg_30_39": 0,
-      "wk_fg_40_49": 0,
-      "wk_fg_50_59": 0,
-      "wk_fg_60_plus": 0,
-      "wk_fg_miss": 0,
-      "wk_xp_made": 0,
-      "wk_xp_miss": 0,
-      "wk_fg_miss_0_19": 0,
-      "wk_fg_miss_20_29": 0,
-      "wk_fg_miss_30_39": 0,
-      "wk_fg_miss_40_49": 0,
-      "wk_fg_miss_50_59": 0,
-      "wk_fg_miss_60_plus": 0,
-      "off_stall_rate": 28.6,
-      "off_ppg": 24.75,
-      "off_share": 0.29184782608695653,
-      "def_stall_rate": 50.0,
-      "def_pa": 23.333333333333332,
-      "def_share": 0.4038647342995169,
-      "aggression_pct": 42.9,
-      "grade": 58.2,
-      "proj": 8.0,
-      "grade_details": [
-        "-5 Wind",
-        "+5 Tight Game",
-        "-5 Aggressive Coach"
-      ],
-      "off_score_val": 22.6,
-      "def_score_val": 40.6,
-      "w_team_score": 22.1,
-      "w_def_allowed": 21.7,
-      "off_cap_val": 7.7,
-      "def_cap_val": 10.5,
-      "details_vegas_total": 39.5,
-      "details_vegas_spread": "-2.5",
-      "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
-        "l3_games": [
-          {
-            "week": 12,
-            "status": "ACTIVE",
-            "proj": 11.0,
-            "act": 15,
-            "diff": 4.0,
-            "opp": "NO"
-          },
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "proj": 11.0,
-            "act": 12,
-            "diff": 1.0,
-            "opp": "CAR"
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "proj": 11.0,
-            "act": 6,
-            "diff": -5.0,
-            "opp": "IND"
-          }
-        ]
-      },
-      "narrative": "Look elsewhere for kicker points; Gonzalez only grades at 58.2. Facing a defense with a 50.0% stall rate usually means extra FG tries."
+      "narrative": "McManus is a strong play this week, sitting comfortably with a Grade of 90.2. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -2114,11 +2242,11 @@
       "spread_display": "+6.5",
       "is_dome": false,
       "weather_data": [
-        8.5,
-        "8mph \ud83c\udf27\ufe0f"
+        7.6,
+        "7mph \ud83c\udf27\ufe0f"
       ],
-      "wind": 8.5,
-      "weather_desc": "8mph \ud83c\udf27\ufe0f",
+      "wind": 7.6,
+      "weather_desc": "7mph \ud83c\udf27\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -2156,8 +2284,8 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "+6.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 16,
+        "l3_proj": 14.8,
         "l3_games": [
           {
             "week": 12,
@@ -2185,7 +2313,7 @@
           }
         ]
       },
-      "narrative": "Fade Slye if possible; his Grade of 75.6 suggests low upside. A 57.1% offensive stall rate suggests plenty of drives ending in 3 points."
+      "narrative": "Fade Slye if possible; his Grade of 75.6 suggests low upside. His offense has a high stall rate (57.1%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "N.Folk",
@@ -2242,11 +2370,11 @@
       "spread_display": "+2.5",
       "is_dome": false,
       "weather_data": [
-        13.1,
-        "13mph \u2600\ufe0f"
+        11.5,
+        "11mph \u2600\ufe0f"
       ],
-      "wind": 13.1,
-      "weather_desc": "13mph \u2600\ufe0f",
+      "wind": 11.5,
+      "weather_desc": "11mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -2284,8 +2412,8 @@
       "details_vegas_total": 39.5,
       "details_vegas_spread": "+2.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 16,
+        "l3_proj": 22.5,
         "l3_games": [
           {
             "week": 12,
@@ -2314,136 +2442,6 @@
         ]
       },
       "narrative": "Folk is a strong play this week, sitting comfortably with a Grade of 97.6. His offense has a high stall rate (60.0%), which often leads to FG attempts."
-    },
-    {
-      "kicker_player_name": "E.Pineiro",
-      "kicker_player_id": "00-0034173",
-      "team": "SF",
-      "fg_made": 22,
-      "fg_att": 22,
-      "fg_0_19": 0,
-      "fg_20_29": 4,
-      "fg_30_39": 4,
-      "fg_40_49": 8,
-      "fg_50_59": 6,
-      "fg_60_plus": 0,
-      "fg_miss": 0,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 0,
-      "fg_miss_50_59": 0,
-      "fg_miss_60_plus": 0,
-      "xp_made": 18,
-      "xp_miss": 4,
-      "real_pts": 84,
-      "dome_kicks": 19,
-      "total_kicks": 44,
-      "games": 10,
-      "status": "ACT",
-      "posteam": "SF",
-      "rz_trips": 51,
-      "acc": 100.0,
-      "dome_pct": 43.0,
-      "fpts": 100,
-      "avg_pts": 10.0,
-      "join_name": "E.Pineiro",
-      "off_stall_rate_ytd": 43.1,
-      "def_stall_rate_ytd": 44.4,
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/l4rrfcuczjau7q02h2iz",
-      "match_name": "E.Pineiro",
-      "own_pct": 15.8,
-      "cbs_status": "Did Not Practice on Wednesday. Questionable for Week 13 at Cleveland",
-      "cbs_injury": "Hamstring",
-      "roster_status": 0,
-      "injury_status": "Questionable",
-      "injury_color": "yellow-500",
-      "injury_details": "Did Not Practice On Wednesday. Questionable For Week 13 At Cleveland (Hamstring)",
-      "opponent": "CLE",
-      "roof": "outdoors",
-      "game_dt": "2025-11-30 13:00",
-      "total_line": 35.5,
-      "spread_line": -4.5,
-      "home_field": "CLE",
-      "vegas_implied": 20.0,
-      "is_home": false,
-      "spread_display": "-4.5",
-      "is_dome": false,
-      "weather_data": [
-        23.1,
-        "23mph \ud83c\udf27\ufe0f"
-      ],
-      "wind": 23.1,
-      "weather_desc": "23mph \ud83c\udf27\ufe0f",
-      "wk_fg_0_19": 0,
-      "wk_fg_20_29": 0,
-      "wk_fg_30_39": 0,
-      "wk_fg_40_49": 0,
-      "wk_fg_50_59": 0,
-      "wk_fg_60_plus": 0,
-      "wk_fg_miss": 0,
-      "wk_xp_made": 0,
-      "wk_xp_miss": 0,
-      "wk_fg_miss_0_19": 0,
-      "wk_fg_miss_20_29": 0,
-      "wk_fg_miss_30_39": 0,
-      "wk_fg_miss_40_49": 0,
-      "wk_fg_miss_50_59": 0,
-      "wk_fg_miss_60_plus": 0,
-      "off_stall_rate": 26.3,
-      "off_ppg": 30.25,
-      "off_share": 0.25983335172718247,
-      "def_stall_rate": 76.9,
-      "def_pa": 20.0,
-      "def_share": 0.4038647342995169,
-      "aggression_pct": 28.6,
-      "grade": 68.2,
-      "proj": 7.9,
-      "grade_details": [
-        "-10 Heavy Wind",
-        "-5 Rain",
-        "+5 Elite Talent",
-        "-5 Aggressive Coach"
-      ],
-      "off_score_val": 20.7,
-      "def_score_val": 62.5,
-      "w_team_score": 23.1,
-      "w_def_allowed": 20.0,
-      "off_cap_val": 7.2,
-      "def_cap_val": 9.7,
-      "details_vegas_total": 35.5,
-      "details_vegas_spread": "-4.5",
-      "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
-        "l3_games": [
-          {
-            "week": 12,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "CAR"
-          },
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "proj": 11.5,
-            "act": 12,
-            "diff": 0.5,
-            "opp": "ARI"
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "proj": 10.0,
-            "act": 1,
-            "diff": -9.0,
-            "opp": "LA"
-          }
-        ]
-      },
-      "narrative": "Monitor status closely as they are currently listed as Questionable. This significantly impacts their viability for Week ."
     },
     {
       "kicker_player_name": "L.Havrisik",
@@ -2542,8 +2540,8 @@
       "details_vegas_total": 48.5,
       "details_vegas_spread": "+2.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": -1,
+        "l3_proj": 7.7,
         "l3_games": [
           {
             "week": 12,
@@ -2571,7 +2569,7 @@
           }
         ]
       },
-      "narrative": "The model sees value in Havrisik, assigning a strong Grade of 90.2. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Havrisik is a strong play this week, sitting comfortably with a Grade of 90.2. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "A.Borregales",
@@ -2628,11 +2626,11 @@
       "spread_display": "-7.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        3.5,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 3.5,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -2667,8 +2665,8 @@
       "details_vegas_total": 46.5,
       "details_vegas_spread": "-7.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 31,
+        "l3_proj": 26.7,
         "l3_games": [
           {
             "week": 12,
@@ -2696,7 +2694,7 @@
           }
         ]
       },
-      "narrative": "The model is fading Borregales this week (Grade: 65.2). A 55.6% offensive stall rate suggests plenty of drives ending in 3 points."
+      "narrative": "Borregales is a risky option this week with a below-average Grade of 65.2. His offense has a high stall rate (55.6%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -2753,10 +2751,10 @@
       "spread_display": "-2.5",
       "is_dome": false,
       "weather_data": [
-        7.1,
+        7.3,
         "7mph \u2600\ufe0f"
       ],
-      "wind": 7.1,
+      "wind": 7.3,
       "weather_desc": "7mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -2795,8 +2793,8 @@
       "details_vegas_total": 43.5,
       "details_vegas_spread": "-2.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 14,
+        "l3_proj": 27.1,
         "l3_games": [
           {
             "week": 12,
@@ -2824,7 +2822,7 @@
           }
         ]
       },
-      "narrative": "Look elsewhere for kicker points; McLaughlin only grades at 79.0. A 53.8% offensive stall rate suggests plenty of drives ending in 3 points."
+      "narrative": "Fade McLaughlin if possible; his Grade of 79.0 suggests low upside. His offense has a high stall rate (53.8%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "J.Elliott",
@@ -2922,8 +2920,8 @@
       "details_vegas_total": 44.5,
       "details_vegas_spread": "-7.0",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 17,
+        "l3_proj": 20.7,
         "l3_games": [
           {
             "week": 12,
@@ -2951,7 +2949,7 @@
           }
         ]
       },
-      "narrative": "Elliott is a risky option this week with a below-average Grade of 59.2. Be careful: 15.8 mph winds usually downgrade kicking efficiency significantly."
+      "narrative": "Elliott is a risky option this week with a below-average Grade of 59.2. However, heavy winds (15.8 mph) could severely limit kicking opportunities."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -3008,10 +3006,10 @@
       "spread_display": "-3.5",
       "is_dome": false,
       "weather_data": [
-        11.2,
+        11.6,
         "11mph \ud83c\udf27\ufe0f"
       ],
-      "wind": 11.2,
+      "wind": 11.6,
       "weather_desc": "11mph \ud83c\udf27\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -3051,8 +3049,8 @@
       "details_vegas_total": 46.5,
       "details_vegas_spread": "-3.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 16,
+        "l3_proj": 25.5,
         "l3_games": [
           {
             "week": 12,
@@ -3080,7 +3078,7 @@
           }
         ]
       },
-      "narrative": "Prater is a risky option this week with a below-average Grade of 62.4. The team moves the ball but struggles to finish (50.0% stall), perfect for kickers."
+      "narrative": "Prater is a risky option this week with a below-average Grade of 62.4. His offense has a high stall rate (50.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -3179,8 +3177,8 @@
       "details_vegas_total": 40.5,
       "details_vegas_spread": "+9.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 15,
+        "l3_proj": 18.5,
         "l3_games": [
           {
             "week": 12,
@@ -3265,10 +3263,10 @@
       "spread_display": "+11.5",
       "is_dome": false,
       "weather_data": [
-        1.2,
+        1.1,
         "1mph \u2600\ufe0f"
       ],
-      "wind": 1.2,
+      "wind": 1.1,
       "weather_desc": "1mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -3308,8 +3306,8 @@
       "details_vegas_total": 41.5,
       "details_vegas_spread": "+11.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 24,
+        "l3_proj": 26.9,
         "l3_games": [
           {
             "week": 12,
@@ -3337,7 +3335,7 @@
           }
         ]
       },
-      "narrative": "Reichard faces significant headwinds, resulting in a Grade of 61.9. A 46.2% offensive stall rate suggests plenty of drives ending in 3 points."
+      "narrative": "Fade Reichard if possible; his Grade of 61.9 suggests low upside. His offense has a high stall rate (46.2%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -3394,10 +3392,10 @@
       "spread_display": "-10.0",
       "is_dome": false,
       "weather_data": [
-        4.0,
+        4.7,
         "4mph \u2600\ufe0f"
       ],
-      "wind": 4.0,
+      "wind": 4.7,
       "weather_desc": "4mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -3436,8 +3434,8 @@
       "details_vegas_total": 44.5,
       "details_vegas_spread": "-10.0",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 22,
+        "l3_proj": 25.2,
         "l3_games": [
           {
             "week": 12,
@@ -3465,7 +3463,7 @@
           }
         ]
       },
-      "narrative": "Fade Mevis if possible; his Grade of 54.4 suggests low upside. Being attached to an offense projected for 27.2 points is a recipe for success."
+      "narrative": "Mevis is a risky option this week with a below-average Grade of 54.4. The offense has a massive implied total of 27.2, offering a high ceiling."
     },
     {
       "kicker_player_name": "J.Karty",
@@ -3522,10 +3520,10 @@
       "spread_display": "-10.0",
       "is_dome": false,
       "weather_data": [
-        4.0,
+        4.7,
         "4mph \u2600\ufe0f"
       ],
-      "wind": 4.0,
+      "wind": 4.7,
       "weather_desc": "4mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -3593,7 +3591,7 @@
           }
         ]
       },
-      "narrative": "Look elsewhere for kicker points; Karty only grades at 54.4. The offense has a massive implied total of 27.2, offering a high ceiling."
+      "narrative": "Fade Karty if possible; his Grade of 54.4 suggests low upside. The offense has a massive implied total of 27.2, offering a high ceiling."
     },
     {
       "kicker_player_name": "C.Santos",
@@ -3692,8 +3690,8 @@
       "details_vegas_total": 44.5,
       "details_vegas_spread": "+7.0",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 29,
+        "l3_proj": 30.7,
         "l3_games": [
           {
             "week": 12,
@@ -3721,7 +3719,7 @@
           }
         ]
       },
-      "narrative": "Look elsewhere for kicker points; Santos only grades at 40.4. Be careful: 15.8 mph winds usually downgrade kicking efficiency significantly."
+      "narrative": "Fade Santos if possible; his Grade of 40.4 suggests low upside. However, heavy winds (15.8 mph) could severely limit kicking opportunities."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -3778,10 +3776,10 @@
       "spread_display": "+2.5",
       "is_dome": false,
       "weather_data": [
-        7.1,
+        7.3,
         "7mph \u2600\ufe0f"
       ],
-      "wind": 7.1,
+      "wind": 7.3,
       "weather_desc": "7mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -3820,8 +3818,8 @@
       "details_vegas_total": 43.5,
       "details_vegas_spread": "+2.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 10,
+        "l3_proj": 22.5,
         "l3_games": [
           {
             "week": 12,
@@ -3849,7 +3847,7 @@
           }
         ]
       },
-      "narrative": "Ryland is a risky option this week with a below-average Grade of 71.1. The team moves the ball but struggles to finish (45.0% stall), perfect for kickers."
+      "narrative": "Fade Ryland if possible; his Grade of 71.1 suggests low upside. His offense has a high stall rate (45.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -3906,10 +3904,10 @@
       "spread_display": "+4.5",
       "is_dome": false,
       "weather_data": [
-        23.1,
+        23.4,
         "23mph \ud83c\udf27\ufe0f"
       ],
-      "wind": 23.1,
+      "wind": 23.4,
       "weather_desc": "23mph \ud83c\udf27\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -3948,8 +3946,8 @@
       "details_vegas_total": 35.5,
       "details_vegas_spread": "+4.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 28,
+        "l3_proj": 17.5,
         "l3_games": [
           {
             "week": 12,
@@ -3977,7 +3975,7 @@
           }
         ]
       },
-      "narrative": "Szmyt faces significant headwinds, resulting in a Grade of 59.5. Be careful: 23.1 mph winds usually downgrade kicking efficiency significantly."
+      "narrative": "Fade Szmyt if possible; his Grade of 59.5 suggests low upside. However, heavy winds (23.4 mph) could severely limit kicking opportunities."
     },
     {
       "kicker_player_name": "R.Fitzgerald",
@@ -4034,10 +4032,10 @@
       "spread_display": "+10.0",
       "is_dome": false,
       "weather_data": [
-        4.0,
+        4.7,
         "4mph \u2600\ufe0f"
       ],
-      "wind": 4.0,
+      "wind": 4.7,
       "weather_desc": "4mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
@@ -4076,8 +4074,8 @@
       "details_vegas_total": 44.5,
       "details_vegas_spread": "+10.0",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 12,
+        "l3_proj": 18.0,
         "l3_games": [
           {
             "week": 12,
@@ -4105,7 +4103,7 @@
           }
         ]
       },
-      "narrative": "Fitzgerald is a risky option this week with a below-average Grade of 67.4. The team moves the ball but struggles to finish (46.7% stall), perfect for kickers."
+      "narrative": "Fitzgerald is a risky option this week with a below-average Grade of 67.4. His offense has a high stall rate (46.7%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "Y.Koo",
@@ -4162,11 +4160,11 @@
       "spread_display": "+7.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        3.5,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 3.5,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -4203,8 +4201,8 @@
       "details_vegas_total": 46.5,
       "details_vegas_spread": "+7.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 19,
+        "l3_proj": 19.4,
         "l3_games": [
           {
             "week": 12,
@@ -4232,7 +4230,7 @@
           }
         ]
       },
-      "narrative": "The model is fading Koo this week (Grade: 52.7). His offense has a high stall rate (47.4%), which often leads to FG attempts."
+      "narrative": "Koo is a risky option this week with a below-average Grade of 52.7. His offense has a high stall rate (47.4%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "J.Gillan",
@@ -4289,11 +4287,11 @@
       "spread_display": "+7.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        3.5,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 3.5,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -4331,7 +4329,7 @@
       "details_vegas_spread": "+7.5",
       "history": {
         "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_proj": -1.0,
         "l3_games": [
           {
             "week": 12,
@@ -4359,7 +4357,7 @@
           }
         ]
       },
-      "narrative": "Gillan faces significant headwinds, resulting in a Grade of 52.7. The team moves the ball but struggles to finish (47.4% stall), perfect for kickers."
+      "narrative": "Fade Gillan if possible; his Grade of 52.7 suggests low upside. His offense has a high stall rate (47.4%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "B.Grupe",
@@ -4416,11 +4414,11 @@
       "spread_display": "+5.5",
       "is_dome": false,
       "weather_data": [
-        12.6,
-        "12mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 12.6,
-      "weather_desc": "12mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -4446,7 +4444,6 @@
       "grade": 0.0,
       "proj": 0.0,
       "grade_details": [
-        "-5 Wind",
         "-5 Aggressive Coach",
         "\u26d4 CUT"
       ],
@@ -4459,8 +4456,8 @@
       "details_vegas_total": 42.5,
       "details_vegas_spread": "+5.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 7,
+        "l3_proj": 11.7,
         "l3_games": [
           {
             "week": 12,
@@ -4545,11 +4542,11 @@
       "spread_display": "+7.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        3.5,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 3.5,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -4673,11 +4670,11 @@
       "spread_display": "+7.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        3.5,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 3.5,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -4801,11 +4798,11 @@
       "spread_display": "-2.5",
       "is_dome": false,
       "weather_data": [
-        13.1,
-        "13mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 13.1,
-      "weather_desc": "13mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -4831,7 +4828,6 @@
       "grade": 0.0,
       "proj": 0.0,
       "grade_details": [
-        "-5 Wind",
         "+5 Tight Game",
         "-5 Aggressive Coach",
         "\u26d4 CUT"
@@ -4931,11 +4927,11 @@
       "spread_display": "-4.5",
       "is_dome": false,
       "weather_data": [
-        23.1,
-        "23mph \ud83c\udf27\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 23.1,
-      "weather_desc": "23mph \ud83c\udf27\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -4961,8 +4957,6 @@
       "grade": 0.0,
       "proj": 0.0,
       "grade_details": [
-        "-10 Heavy Wind",
-        "-5 Rain",
         "-5 Aggressive Coach",
         "\u26d4 PRACTICE SQUAD"
       ],
@@ -4975,8 +4969,8 @@
       "details_vegas_total": 35.5,
       "details_vegas_spread": "-4.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 19,
+        "l3_proj": 23.0,
         "l3_games": [
           {
             "week": 12,
@@ -5103,8 +5097,8 @@
       "details_vegas_total": 44.5,
       "details_vegas_spread": "+4.5",
       "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
+        "l3_actual": 16,
+        "l3_proj": 11.0,
         "l3_games": [
           {
             "week": 12,
