@@ -59,7 +59,7 @@ def get_current_nfl_week():
         upcoming = schedule[schedule['gameday'] >= today]
         return int(upcoming['week'].min()) if not upcoming.empty else 18
     except:
-        return 12
+        return 1
 
 def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     # 1. Check if Game is Finished (Current Time > Game Time + 4 hours)
