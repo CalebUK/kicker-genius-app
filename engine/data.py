@@ -4,6 +4,7 @@ import requests
 import io
 import time
 import numpy as np
+import re  # <--- Added missing import
 from datetime import datetime
 from engine.config import CURRENT_SEASON, SEASON_START_DATE, FORCE_WEEK
 
@@ -50,8 +51,15 @@ def scrape_cbs_injuries():
         combined.rename(columns=col_map, inplace=True)
         
         if 'full_name' not in combined.columns: return pd.DataFrame()
-        
-        combined['full_name'] = combined['full_name'].apply(lambda x: x.split(' (')[0].strip() if isinstance(x, str) else x)
+
+        # Use regex to clean name if needed, or simpler split
+        def clean_name(val):
+            if not isinstance(val, str): return val
+            # Remove suffix like Jr., Sr., III using regex
+            clean = re.sub(r'\s+(Jr\.?|Sr\.?|III|II|IV)$', '', val, flags=re.IGNORECASE)
+            return clean.split(' (')[0].strip()
+            
+        combined['full_name'] = combined['full_name'].apply(clean_name)
         
         def normalize_for_join(val):
              parts = val.split(' ')
