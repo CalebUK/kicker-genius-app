@@ -19,6 +19,8 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # --- CONFIGURATION ---
 CURRENT_SEASON = 2025
+SEASON_START_DATE = datetime(2025, 9, 4) # Week 1 Kickoff (Thursday)
+FORCE_WEEK = None # Set to an integer (e.g., 12) to override calendar math for testing
 
 # --- STADIUM COORDINATES ---
 STADIUM_COORDS = {
@@ -52,16 +54,22 @@ def load_data_with_retry(func, name, max_retries=5, delay=5):
                 raise e
 
 def get_current_nfl_week():
-   
-    try:
-        schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
-        if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
-        today = datetime.now().strftime('%Y-%m-%d')
-        upcoming = schedule[schedule['gameday'] >= today]
-        return int(upcoming['week'].min()) if not upcoming.empty else 18
-    except:
-        return 1
+    """Calculates the current NFL week based on the start date (Instant)."""
+    if FORCE_WEEK is not None:
+        print(f"   ⚠️ DEBUG MODE: Forcing Week {FORCE_WEEK}")
+        return FORCE_WEEK
+        
+    today = datetime.now()
     
+    # If before season starts, default to Week 1
+    if today < SEASON_START_DATE:
+        return 1
+        
+    days_since_start = (today - SEASON_START_DATE).days
+    week_num = (days_since_start // 7) + 1
+    
+    # Clamp between Week 1 and Week 18
+    return max(1, min(18, week_num))
 
 def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     # 1. Check if Game is Finished (Current Time > Game Time + 4 hours)
@@ -727,6 +735,7 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
+                # NO DUPLICATE LIVE COLS HERE
             })
 
         final = final.join(final.apply(process_row, axis=1))
