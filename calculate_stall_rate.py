@@ -53,12 +53,11 @@ def load_data_with_retry(func, name, max_retries=5, delay=5):
 
 def get_current_nfl_week():
     try:
-	return 12
-        #schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
-        #if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
-        #today = datetime.now().strftime('%Y-%m-%d')
-        #upcoming = schedule[schedule['gameday'] >= today]
-        #return int(upcoming['week'].min()) if not upcoming.empty else 18
+	schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
+        if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
+        today = datetime.now().strftime('%Y-%m-%d')
+        upcoming = schedule[schedule['gameday'] >= today]
+        return int(upcoming['week'].min())-1 if not upcoming.empty else 18
     except:
         return 12
 
