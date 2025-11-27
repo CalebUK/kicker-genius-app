@@ -292,6 +292,9 @@ def generate_narrative(row):
     grade = row['grade']
     vegas = row['vegas_implied']
     off_stall = row['off_stall_rate']
+    def_stall = row['def_stall_rate']
+    wind = row['wind']
+    is_dome = row['is_dome']
     
     # --- SENTENCE 1: THE VERDICT ---
     s1_options = []
@@ -339,13 +342,13 @@ def generate_narrative(row):
             f"Vegas projects a shootout ({vegas:.1f} team pts), which means plenty of XP and FG chances.",
             f"Being attached to an offense projected for {vegas:.1f} points is a recipe for success."
         ]
-    elif row['wind'] > 15 and not row['is_dome']:
+    elif wind > 15 and not is_dome:
         s2_options = [
-            f"However, heavy winds ({row['wind']} mph) could severely limit kicking opportunities.",
-            f"Be careful: {row['wind']} mph winds usually downgrade kicking efficiency significantly.",
-            f"The weather is a major concern, with winds gusting over {row['wind']} mph."
+            f"However, heavy winds ({wind} mph) could severely limit kicking opportunities.",
+            f"Be careful: {wind} mph winds usually downgrade kicking efficiency significantly.",
+            f"The weather is a major concern, with winds gusting over {wind} mph."
         ]
-    elif row['is_dome']:
+    elif is_dome:
         s2_options = [
             f"Playing in a dome guarantees perfect kicking conditions.",
             f"The controlled dome environment boosts his accuracy floor.",
@@ -357,11 +360,11 @@ def generate_narrative(row):
             f"The team moves the ball but struggles to finish ({off_stall}% stall), perfect for kickers.",
             f"A {off_stall}% offensive stall rate suggests plenty of drives ending in 3 points."
         ]
-    elif row['def_stall_rate'] > 40:
+    elif def_stall > 40:
         s2_options = [
-            f"The matchup is favorable against a defense that forces FGs ({row['def_stall_rate']}%) in the red zone.",
-            f"His opponent has a 'bend don't break' defense (Stall: {row['def_stall_rate']}%), boosting his value.",
-            f"Facing a defense with a {row['def_stall_rate']}% stall rate usually means extra FG tries."
+            f"The matchup is favorable against a defense that forces FGs ({def_stall}%) in the red zone.",
+            f"His opponent has a 'bend don't break' defense (Stall: {def_stall}%), boosting his value.",
+            f"Facing a defense with a {def_stall}% stall rate usually means extra FG tries."
         ]
     elif vegas < 18:
         s2_options = [
@@ -639,7 +642,7 @@ def run_analysis():
         
         final = pd.merge(stats, model, on='team', how='inner')
         
-        # MERGE LIVE STATS (LATE MERGE)
+        # MERGE LIVE STATS
         final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
         final = pd.merge(final, off_stall_l4, on='team', how='left')
@@ -650,13 +653,7 @@ def run_analysis():
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
         
-        for c in live_cols:
-            if c in final.columns: final[c] = final[c].fillna(0)
-            
         final = final.fillna(0)
-
-        # Generate Narratives LAST
-        final['narrative'] = final.apply(generate_narrative, axis=1)
 
         def process_row(row):
             off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
@@ -718,11 +715,23 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
-                # NO DUPLICATE LIVE COLS HERE
+                'wk_fg_0_19': row['wk_fg_0_19'], 'wk_fg_20_29': row['wk_fg_20_29'],
+                'wk_fg_30_39': row['wk_fg_30_39'], 'wk_fg_40_49': row['wk_fg_40_49'],
+                'wk_fg_50_59': row['wk_fg_50_59'], 'wk_fg_60_plus': row['wk_fg_60_plus'],
+                'wk_fg_miss': row['wk_fg_miss'], 'wk_xp_made': row['wk_xp_made'],
+                'wk_xp_miss': row['wk_xp_miss'],
+                'wk_fg_miss_0_19': row['wk_fg_miss_0_19'],
+                'wk_fg_miss_20_29': row['wk_fg_miss_20_29'],
+                'wk_fg_miss_30_39': row['wk_fg_miss_30_39'],
+                'wk_fg_miss_40_49': row['wk_fg_miss_40_49'],
+                'wk_fg_miss_50_59': row['wk_fg_miss_50_59'],
+                'wk_fg_miss_60_plus': row['wk_fg_miss_60_plus']
             })
 
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
+        
+        final['narrative'] = final.apply(generate_narrative, axis=1)
         
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
