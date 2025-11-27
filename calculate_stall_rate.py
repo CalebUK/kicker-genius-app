@@ -52,8 +52,6 @@ def load_data_with_retry(func, name, max_retries=5, delay=5):
                 raise e
 
 def get_current_nfl_week():
-# FOR TESTING ONLY: Force Week 12
-    #return 12
     try:
         schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
@@ -72,39 +70,49 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
              return 0, "Game Finished"
     except: pass
 
-    # 2. Check Dome
+    # 2. Check Dome Status
     if is_dome: return 0, "Dome"
 
-    # 3. Fetch Forecast (With Fallback)
+    # 3. Robust API Fetch
     coords = STADIUM_COORDS.get(home_team)
-    if not coords: return 0, "Outdoors ☀️" # Default fallback
+    if not coords: return 0, "Outdoors ☀️" 
     
     lat, lon = coords
-    try:
-        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-        
-        data = None
-        for i in range(3):
-            try:
-                resp = requests.get(url, timeout=5)
-                if resp.status_code == 200:
-                    data = resp.json()
+    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
+    
+    data = None
+    # Retry up to 4 times with exponential backoff (1s, 2s, 4s, 8s)
+    for attempt in range(4):
+        try:
+            resp = requests.get(url, timeout=5)
+            if resp.status_code == 200:
+                temp_data = resp.json()
+                # Validate data integrity
+                if 'hourly' in temp_data and 'wind_speed_10m' in temp_data['hourly']:
+                    data = temp_data
                     break
-            except: 
-                time.sleep(1)
+        except Exception as e:
+            print(f"   ⚠️ Weather API attempt {attempt+1} failed for {home_team}: {e}")
         
-        if not data: return 0, "Outdoors ☀️" # API Failed Fallback
-        
+        time.sleep(2 ** attempt)
+    
+    if not data: return 0, "Outdoors ☀️" # Fallback if API fails completely
+    
+    try:
         target = game_dt_str.replace(" ", "T")[:13]
         times = data['hourly']['time']
-        idx = next((i for i, t in enumerate(times) if t.startswith(target)), -1)
-        if idx == -1: return 0, "Outdoors ☀️" # Time not found Fallback
+        
+        # Find matching hour
+        try:
+            idx = next(i for i, t in enumerate(times) if t.startswith(target))
+        except StopIteration:
+            return 0, "Outdoors ☀️" # Time not found in forecast
         
         wind = data['hourly']['wind_speed_10m'][idx]
         precip = data['hourly']['precipitation_probability'][idx]
         temp = data['hourly']['temperature_2m'][idx]
         
-        # 4. Emoji Logic (Restored)
+        # 4. Logic for Emojis
         cond = f"{int(wind)}mph"
         if precip > 40: 
             cond += " 🌨️" if temp <= 32 else " 🌧️"
@@ -112,9 +120,10 @@ def get_weather_forecast(home_team, game_dt_str, is_dome=False):
             cond += " 🌬️"
         else: 
             cond += " ☀️"
+            
         return wind, cond
     except:
-        return 0, "Outdoors ☀️" # Exception Fallback
+        return 0, "Outdoors ☀️"
 
 def scrape_cbs_injuries():
     print("   🌐 Scraping CBS Sports for live injury data...")
@@ -169,7 +178,7 @@ def scrape_fantasy_ownership():
             if not isinstance(val, str): return val
             name_part = val.split('(')[0].strip()
             parts = name_part.split(' ')
-            if len(parts) >= 2: return f"{parts[0][0]}.{parts[-1]}"
+            if len(parts) >= 2: return f"{parts[0][0]}.{parts[1]}"
             return name_part
         df['match_name'] = df['full_name'].apply(clean_name_to_match)
         def clean_pct(val):
@@ -181,24 +190,7 @@ def scrape_fantasy_ownership():
         return pd.DataFrame()
 
 def load_injury_data_safe(season, target_week):
-    print("🏥 Fetching Injury Data...")
-    scraped = scrape_cbs_injuries()
-    if not scraped.empty: return scraped
-    
-    try:
-        injuries = nfl.load_injuries(seasons=[season])
-        if hasattr(injuries, "to_pandas"): injuries = injuries.to_pandas()
-        df = injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
-        df.rename(columns={'practice_status': 'practice_status'}, inplace=True) 
-        return df
-    except Exception: pass
-    
-    try:
-        url = f"https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_{season}.csv"
-        injuries = pd.read_csv(url)
-        return injuries[injuries['week'] == target_week][['gsis_id', 'report_status', 'practice_status']].copy()
-    except Exception: pass
-    
+    # We rely on CBS Scraper + Roster Data now.
     return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
 
 def clean_nan(val):
@@ -336,22 +328,20 @@ def generate_narrative(row):
     
     s1 = random.choice(s1_options)
 
-    # --- SENTENCE 2: THE CONTEXT ---
     s2_options = []
-    
     if vegas > 27:
         s2_options = [
             f"The offense has a massive implied total of {vegas:.1f}, offering a high ceiling.",
             f"Vegas projects a shootout ({vegas:.1f} team pts), which means plenty of XP and FG chances.",
             f"Being attached to an offense projected for {vegas:.1f} points is a recipe for success."
         ]
-    elif row['wind'] > 15 and not row['is_dome']:
+    elif wind > 15 and not is_dome:
         s2_options = [
-            f"However, heavy winds ({row['wind']} mph) could severely limit kicking opportunities.",
-            f"Be careful: {row['wind']} mph winds usually downgrade kicking efficiency significantly.",
-            f"The weather is a major concern, with winds gusting over {row['wind']} mph."
+            f"However, heavy winds ({wind} mph) could severely limit kicking opportunities.",
+            f"Be careful: {wind} mph winds usually downgrade kicking efficiency significantly.",
+            f"The weather is a major concern, with winds gusting over {wind} mph."
         ]
-    elif row['is_dome']:
+    elif is_dome:
         s2_options = [
             f"Playing in a dome guarantees perfect kicking conditions.",
             f"The controlled dome environment boosts his accuracy floor.",
@@ -365,9 +355,9 @@ def generate_narrative(row):
         ]
     elif def_stall > 40:
         s2_options = [
-            f"The matchup is favorable against a defense that forces FGs ({row['def_stall_rate']}%) in the red zone.",
-            f"His opponent has a 'bend don't break' defense (Stall: {row['def_stall_rate']}%), boosting his value.",
-            f"Facing a defense with a {row['def_stall_rate']}% stall rate usually means extra FG tries."
+            f"The matchup is favorable against a defense that forces FGs ({def_stall}%) in the red zone.",
+            f"His opponent has a 'bend don't break' defense (Stall: {def_stall}%), boosting his value.",
+            f"Facing a defense with a {def_stall}% stall rate usually means extra FG tries."
         ]
     elif vegas < 18:
         s2_options = [
@@ -436,7 +426,7 @@ def run_analysis():
         kick_plays['fg_miss_50_59'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'].between(50, 59))
         kick_plays['fg_miss_60_plus'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'] >= 60)
         
-        kick_plays['fg_miss'] = (kick_plays['is_fg']) & (~kick_plays['made']) # Total Miss Count (Fallback)
+        kick_plays['fg_miss'] = (kick_plays['is_fg']) & (~kick_plays['made']) 
         kick_plays['xp_made'] = (kick_plays['is_xp']) & (kick_plays['made'])
         kick_plays['xp_miss'] = (kick_plays['is_xp']) & (~kick_plays['made'])
         kick_plays['real_pts'] = (kick_plays['is_fg'] & kick_plays['made']) * 3 + (kick_plays['is_xp'] & kick_plays['made']) * 1
@@ -453,10 +443,12 @@ def run_analysis():
             fg_0_19=('fg_0_19', 'sum'), fg_20_29=('fg_20_29', 'sum'), fg_30_39=('fg_30_39', 'sum'),
             fg_40_49=('fg_40_49', 'sum'), fg_50_59=('fg_50_59', 'sum'), fg_60_plus=('fg_60_plus', 'sum'),
             
-            fg_miss=('fg_miss', 'sum'), xp_made=('xp_made', 'sum'), xp_miss=('xp_miss', 'sum'), # Fallback values
+            # AGGREGATE MISSES
+            fg_miss=('fg_miss', 'sum'), 
             fg_miss_0_19=('fg_miss_0_19', 'sum'), fg_miss_20_29=('fg_miss_20_29', 'sum'), fg_miss_30_39=('fg_miss_30_39', 'sum'),
             fg_miss_40_49=('fg_miss_40_49', 'sum'), fg_miss_50_59=('fg_miss_50_59', 'sum'), fg_miss_60_plus=('fg_miss_60_plus', 'sum'),
-
+            
+            xp_made=('xp_made', 'sum'), xp_miss=('xp_miss', 'sum'),
             real_pts=('real_pts', 'sum'), dome_kicks=('is_dome', 'sum'),
             total_kicks=('play_id', 'count'), games=('game_id', 'nunique')
         ).reset_index()
@@ -642,6 +634,8 @@ def run_analysis():
         if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         
         final = pd.merge(stats, model, on='team', how='inner')
+        
+        # MERGE LIVE STATS (LATE MERGE)
         final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
         final = pd.merge(final, off_stall_l4, on='team', how='left')
@@ -656,6 +650,9 @@ def run_analysis():
             if c in final.columns: final[c] = final[c].fillna(0)
             
         final = final.fillna(0)
+
+        # Generate Narratives LAST
+        final['narrative'] = final.apply(generate_narrative, axis=1)
 
         def process_row(row):
             off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
@@ -717,12 +714,11 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
+                # NO DUPLICATE LIVE COLS HERE
             })
 
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
-        
-        final['narrative'] = final.apply(generate_narrative, axis=1)
         
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
