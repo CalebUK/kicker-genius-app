@@ -52,6 +52,9 @@ def load_data_with_retry(func, name, max_retries=5, delay=5):
                 raise e
 
 def get_current_nfl_week():
+    # FORCED WEEK 12 FOR TESTING
+    return 12 
+    """
     try:
         schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
@@ -60,6 +63,7 @@ def get_current_nfl_week():
         return int(upcoming['week'].min()) if not upcoming.empty else 18
     except:
         return 1
+    """
 
 def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     # 1. Check if Game is Finished (Current Time > Game Time + 4 hours)
@@ -288,11 +292,9 @@ def generate_narrative(row):
     grade = row['grade']
     vegas = row['vegas_implied']
     off_stall = row['off_stall_rate']
-    def_stall = row['def_stall_rate']
-    wind = row['wind']
-    is_dome = row['is_dome']
     
-    s1 = ""
+    # --- SENTENCE 1: THE VERDICT ---
+    s1_options = []
     if grade >= 100:
         s1_options = [
             f"{name} is a locked-and-loaded RB1 of kickers this week with an elite Grade of {grade}.",
@@ -328,20 +330,22 @@ def generate_narrative(row):
     
     s1 = random.choice(s1_options)
 
+    # --- SENTENCE 2: THE CONTEXT ---
     s2_options = []
+    
     if vegas > 27:
         s2_options = [
             f"The offense has a massive implied total of {vegas:.1f}, offering a high ceiling.",
             f"Vegas projects a shootout ({vegas:.1f} team pts), which means plenty of XP and FG chances.",
             f"Being attached to an offense projected for {vegas:.1f} points is a recipe for success."
         ]
-    elif wind > 15 and not is_dome:
+    elif row['wind'] > 15 and not row['is_dome']:
         s2_options = [
-            f"However, heavy winds ({wind} mph) could severely limit kicking opportunities.",
-            f"Be careful: {wind} mph winds usually downgrade kicking efficiency significantly.",
-            f"The weather is a major concern, with winds gusting over {wind} mph."
+            f"However, heavy winds ({row['wind']} mph) could severely limit kicking opportunities.",
+            f"Be careful: {row['wind']} mph winds usually downgrade kicking efficiency significantly.",
+            f"The weather is a major concern, with winds gusting over {row['wind']} mph."
         ]
-    elif is_dome:
+    elif row['is_dome']:
         s2_options = [
             f"Playing in a dome guarantees perfect kicking conditions.",
             f"The controlled dome environment boosts his accuracy floor.",
@@ -353,11 +357,11 @@ def generate_narrative(row):
             f"The team moves the ball but struggles to finish ({off_stall}% stall), perfect for kickers.",
             f"A {off_stall}% offensive stall rate suggests plenty of drives ending in 3 points."
         ]
-    elif def_stall > 40:
+    elif row['def_stall_rate'] > 40:
         s2_options = [
-            f"The matchup is favorable against a defense that forces FGs ({def_stall}%) in the red zone.",
-            f"His opponent has a 'bend don't break' defense (Stall: {def_stall}%), boosting his value.",
-            f"Facing a defense with a {def_stall}% stall rate usually means extra FG tries."
+            f"The matchup is favorable against a defense that forces FGs ({row['def_stall_rate']}%) in the red zone.",
+            f"His opponent has a 'bend don't break' defense (Stall: {row['def_stall_rate']}%), boosting his value.",
+            f"Facing a defense with a {row['def_stall_rate']}% stall rate usually means extra FG tries."
         ]
     elif vegas < 18:
         s2_options = [
