@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 13,
-    "updated": "2025-11-27 18:45",
+    "updated": "2025-11-27 20:05",
     "league_avgs": {
       "fpts": 69.7,
       "off_stall": 50.7,
@@ -137,7 +137,7 @@
           }
         ]
       },
-      "narrative": "Fire up Fairbairn with confidence; his Matchup Grade of 108.2 is in the elite tier. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Fairbairn is a locked-and-loaded RB1 of kickers this week with an elite Grade of 108.2. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "J.Myers",
@@ -450,11 +450,11 @@
       "spread_display": "-7.0",
       "is_dome": false,
       "weather_data": [
-        7.8,
-        "7mph \u2600\ufe0f"
+        8.1,
+        "8mph \u2600\ufe0f"
       ],
-      "wind": 7.8,
-      "weather_desc": "7mph \u2600\ufe0f",
+      "wind": 8.1,
+      "weather_desc": "8mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -520,7 +520,7 @@
           }
         ]
       },
-      "narrative": "Loop is a strong play this week, sitting comfortably with a Grade of 90.1. The offense has a massive implied total of 29.2, offering a high ceiling."
+      "narrative": "You can trust Loop in your lineup given his solid Grade of 90.1. The offense has a massive implied total of 29.2, offering a high ceiling."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -647,7 +647,7 @@
           }
         ]
       },
-      "narrative": "Lutz is a locked-and-loaded RB1 of kickers this week with an elite Grade of 106.5. His offense has a high stall rate (81.8%), which often leads to FG attempts."
+      "narrative": "Fire up Lutz with confidence; his Matchup Grade of 106.5 is in the elite tier. His offense has a high stall rate (81.8%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -704,11 +704,11 @@
       "spread_display": "+7.0",
       "is_dome": false,
       "weather_data": [
-        7.8,
-        "7mph \u2600\ufe0f"
+        8.1,
+        "8mph \u2600\ufe0f"
       ],
-      "wind": 7.8,
-      "weather_desc": "7mph \u2600\ufe0f",
+      "wind": 8.1,
+      "weather_desc": "8mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -774,7 +774,7 @@
           }
         ]
       },
-      "narrative": "McPherson is a strong play this week, sitting comfortably with a Grade of 95.7. His offense has a high stall rate (61.5%), which often leads to FG attempts."
+      "narrative": "You can trust McPherson in your lineup given his solid Grade of 95.7. His offense has a high stall rate (61.5%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -1029,7 +1029,7 @@
           }
         ]
       },
-      "narrative": "Patterson is a viable streaming option with a respectable Grade of 82.7. His offense has a high stall rate (80.0%), which often leads to FG attempts."
+      "narrative": "Consider Patterson if you need a fill-in; his Grade is a decent 82.7. His offense has a high stall rate (80.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "M.Badgley",
@@ -1157,7 +1157,7 @@
           }
         ]
       },
-      "narrative": "Badgley is a strong play this week, sitting comfortably with a Grade of 99.4. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "You can trust Badgley in your lineup given his solid Grade of 99.4. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -1415,7 +1415,7 @@
           }
         ]
       },
-      "narrative": "Consider Bates if you need a fill-in; his Grade is a decent 82.7. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Bates is a viable streaming option with a respectable Grade of 82.7. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -1542,7 +1542,7 @@
           }
         ]
       },
-      "narrative": "Moody is a risky option this week with a below-average Grade of 75.4. The matchup is favorable against a defense that forces FGs (66.7%) in the red zone."
+      "narrative": "Fade Moody if possible; his Grade of 75.4 suggests low upside. The matchup is favorable against a defense that forces FGs (66.7%) in the red zone."
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -1800,7 +1800,7 @@
           }
         ]
       },
-      "narrative": "Consider Boswell if you need a fill-in; his Grade is a decent 80.8. His offense has a high stall rate (50.0%), which often leads to FG attempts."
+      "narrative": "Boswell is a viable streaming option with a respectable Grade of 80.8. His offense has a high stall rate (50.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "C.Little",
@@ -2183,7 +2183,7 @@
           }
         ]
       },
-      "narrative": "McManus is a strong play this week, sitting comfortably with a Grade of 90.2. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "You can trust McManus in your lineup given his solid Grade of 90.2. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -2311,7 +2311,7 @@
           }
         ]
       },
-      "narrative": "Fade Slye if possible; his Grade of 75.6 suggests low upside. His offense has a high stall rate (57.1%), which often leads to FG attempts."
+      "narrative": "Slye is a risky option this week with a below-average Grade of 75.6. His offense has a high stall rate (57.1%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "E.Pineiro",
@@ -2694,7 +2694,7 @@
           }
         ]
       },
-      "narrative": "Fade Borregales if possible; his Grade of 65.2 suggests low upside. His offense has a high stall rate (55.6%), which often leads to FG attempts."
+      "narrative": "Borregales is a risky option this week with a below-average Grade of 65.2. His offense has a high stall rate (55.6%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -2822,7 +2822,7 @@
           }
         ]
       },
-      "narrative": "Fade McLaughlin if possible; his Grade of 79.0 suggests low upside. His offense has a high stall rate (53.8%), which often leads to FG attempts."
+      "narrative": "McLaughlin is a risky option this week with a below-average Grade of 79.0. His offense has a high stall rate (53.8%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "J.Elliott",
@@ -2879,11 +2879,11 @@
       "spread_display": "-7.0",
       "is_dome": false,
       "weather_data": [
-        14.7,
-        "14mph \u2600\ufe0f"
+        16.1,
+        "16mph \ud83c\udf2c\ufe0f"
       ],
-      "wind": 14.7,
-      "weather_desc": "14mph \u2600\ufe0f",
+      "wind": 16.1,
+      "weather_desc": "16mph \ud83c\udf2c\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -2906,10 +2906,10 @@
       "def_pa": 26.75,
       "def_share": 0.2687675070028011,
       "aggression_pct": 0.0,
-      "grade": 64.2,
-      "proj": 7.1,
+      "grade": 59.2,
+      "proj": 6.9,
       "grade_details": [
-        "-5 Wind"
+        "-10 Heavy Wind"
       ],
       "off_score_val": 35.0,
       "def_score_val": 34.2,
@@ -2949,7 +2949,7 @@
           }
         ]
       },
-      "narrative": "Fade Elliott if possible; his Grade of 64.2 suggests low upside. His offense has a high stall rate (44.4%), which often leads to FG attempts."
+      "narrative": "Elliott is a risky option this week with a below-average Grade of 59.2. However, heavy winds (16.1 mph) could severely limit kicking opportunities."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -3206,7 +3206,7 @@
           }
         ]
       },
-      "narrative": "Fade Reichard if possible; his Grade of 61.9 suggests low upside. His offense has a high stall rate (46.2%), which often leads to FG attempts."
+      "narrative": "Reichard is a risky option this week with a below-average Grade of 61.9. His offense has a high stall rate (46.2%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -3463,135 +3463,7 @@
           }
         ]
       },
-      "narrative": "Fade Mevis if possible; his Grade of 54.4 suggests low upside. The offense has a massive implied total of 27.2, offering a high ceiling."
-    },
-    {
-      "kicker_player_name": "C.Santos",
-      "kicker_player_id": "00-0031203",
-      "team": "CHI",
-      "fg_made": 17,
-      "fg_att": 21,
-      "fg_0_19": 0,
-      "fg_20_29": 2,
-      "fg_30_39": 6,
-      "fg_40_49": 6,
-      "fg_50_59": 3,
-      "fg_60_plus": 0,
-      "fg_miss": 4,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 2,
-      "fg_miss_50_59": 2,
-      "fg_miss_60_plus": 0,
-      "xp_made": 25,
-      "xp_miss": 0,
-      "real_pts": 76,
-      "dome_kicks": 14,
-      "total_kicks": 46,
-      "games": 9,
-      "status": "ACT",
-      "posteam": "CHI",
-      "rz_trips": 56,
-      "acc": 81.0,
-      "dome_pct": 30.0,
-      "fpts": 84,
-      "avg_pts": 9.3,
-      "join_name": "C.Santos",
-      "off_stall_rate_ytd": 54.5,
-      "def_stall_rate_ytd": 38.5,
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/w5mfvjfuflbitwuji1yx",
-      "match_name": "C.Santos",
-      "own_pct": 29.2,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": 0,
-      "injury_status": "Healthy",
-      "injury_color": "green",
-      "injury_details": "Active",
-      "opponent": "PHI",
-      "roof": "outdoors",
-      "game_dt": "2025-11-28 15:00",
-      "total_line": 44.5,
-      "spread_line": 7.0,
-      "home_field": "PHI",
-      "vegas_implied": 18.75,
-      "is_home": false,
-      "spread_display": "+7.0",
-      "is_dome": false,
-      "weather_data": [
-        14.7,
-        "14mph \u2600\ufe0f"
-      ],
-      "wind": 14.7,
-      "weather_desc": "14mph \u2600\ufe0f",
-      "wk_fg_0_19": 0,
-      "wk_fg_20_29": 0,
-      "wk_fg_30_39": 0,
-      "wk_fg_40_49": 0,
-      "wk_fg_50_59": 0,
-      "wk_fg_60_plus": 0,
-      "wk_fg_miss": 0,
-      "wk_xp_made": 0,
-      "wk_xp_miss": 0,
-      "wk_fg_miss_0_19": 0,
-      "wk_fg_miss_20_29": 0,
-      "wk_fg_miss_30_39": 0,
-      "wk_fg_miss_40_49": 0,
-      "wk_fg_miss_50_59": 0,
-      "wk_fg_miss_60_plus": 0,
-      "off_stall_rate": 31.6,
-      "off_ppg": 30.25,
-      "off_share": 0.3485148827800455,
-      "def_stall_rate": 37.5,
-      "def_pa": 13.333333333333334,
-      "def_share": 0.24206349206349206,
-      "aggression_pct": 27.3,
-      "grade": 45.4,
-      "proj": 6.1,
-      "grade_details": [
-        "-5 Wind",
-        "-5 Aggressive Coach"
-      ],
-      "off_score_val": 24.9,
-      "def_score_val": 30.5,
-      "w_team_score": 22.2,
-      "w_def_allowed": 17.1,
-      "off_cap_val": 9.3,
-      "def_cap_val": 5.0,
-      "details_vegas_total": 44.5,
-      "details_vegas_spread": "+7.0",
-      "history": {
-        "l3_actual": 29,
-        "l3_proj": 30.7,
-        "l3_games": [
-          {
-            "week": 12,
-            "status": "ACTIVE",
-            "proj": 10.7,
-            "act": 8,
-            "diff": -2.7,
-            "opp": "PIT"
-          },
-          {
-            "week": 11,
-            "status": "ACTIVE",
-            "proj": 9.3,
-            "act": 15,
-            "diff": 5.7,
-            "opp": "MIN"
-          },
-          {
-            "week": 10,
-            "status": "ACTIVE",
-            "proj": 10.7,
-            "act": 6,
-            "diff": -4.7,
-            "opp": "NYG"
-          }
-        ]
-      },
-      "narrative": "Santos is a risky option this week with a below-average Grade of 45.4. They face a neutral matchup with standard scoring expectations."
+      "narrative": "Mevis is a risky option this week with a below-average Grade of 54.4. The offense has a massive implied total of 27.2, offering a high ceiling."
     },
     {
       "kicker_player_name": "J.Karty",
@@ -3720,6 +3592,134 @@
         ]
       },
       "narrative": "Karty is a risky option this week with a below-average Grade of 54.4. The offense has a massive implied total of 27.2, offering a high ceiling."
+    },
+    {
+      "kicker_player_name": "C.Santos",
+      "kicker_player_id": "00-0031203",
+      "team": "CHI",
+      "fg_made": 17,
+      "fg_att": 21,
+      "fg_0_19": 0,
+      "fg_20_29": 2,
+      "fg_30_39": 6,
+      "fg_40_49": 6,
+      "fg_50_59": 3,
+      "fg_60_plus": 0,
+      "fg_miss": 4,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 0,
+      "fg_miss_40_49": 2,
+      "fg_miss_50_59": 2,
+      "fg_miss_60_plus": 0,
+      "xp_made": 25,
+      "xp_miss": 0,
+      "real_pts": 76,
+      "dome_kicks": 14,
+      "total_kicks": 46,
+      "games": 9,
+      "status": "ACT",
+      "posteam": "CHI",
+      "rz_trips": 56,
+      "acc": 81.0,
+      "dome_pct": 30.0,
+      "fpts": 84,
+      "avg_pts": 9.3,
+      "join_name": "C.Santos",
+      "off_stall_rate_ytd": 54.5,
+      "def_stall_rate_ytd": 38.5,
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/w5mfvjfuflbitwuji1yx",
+      "match_name": "C.Santos",
+      "own_pct": 29.2,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": 0,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active",
+      "opponent": "PHI",
+      "roof": "outdoors",
+      "game_dt": "2025-11-28 15:00",
+      "total_line": 44.5,
+      "spread_line": 7.0,
+      "home_field": "PHI",
+      "vegas_implied": 18.75,
+      "is_home": false,
+      "spread_display": "+7.0",
+      "is_dome": false,
+      "weather_data": [
+        16.1,
+        "16mph \ud83c\udf2c\ufe0f"
+      ],
+      "wind": 16.1,
+      "weather_desc": "16mph \ud83c\udf2c\ufe0f",
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "off_stall_rate": 31.6,
+      "off_ppg": 30.25,
+      "off_share": 0.3485148827800455,
+      "def_stall_rate": 37.5,
+      "def_pa": 13.333333333333334,
+      "def_share": 0.24206349206349206,
+      "aggression_pct": 27.3,
+      "grade": 40.4,
+      "proj": 5.9,
+      "grade_details": [
+        "-10 Heavy Wind",
+        "-5 Aggressive Coach"
+      ],
+      "off_score_val": 24.9,
+      "def_score_val": 30.5,
+      "w_team_score": 22.2,
+      "w_def_allowed": 17.1,
+      "off_cap_val": 9.3,
+      "def_cap_val": 5.0,
+      "details_vegas_total": 44.5,
+      "details_vegas_spread": "+7.0",
+      "history": {
+        "l3_actual": 29,
+        "l3_proj": 30.7,
+        "l3_games": [
+          {
+            "week": 12,
+            "status": "ACTIVE",
+            "proj": 10.7,
+            "act": 8,
+            "diff": -2.7,
+            "opp": "PIT"
+          },
+          {
+            "week": 11,
+            "status": "ACTIVE",
+            "proj": 9.3,
+            "act": 15,
+            "diff": 5.7,
+            "opp": "MIN"
+          },
+          {
+            "week": 10,
+            "status": "ACTIVE",
+            "proj": 10.7,
+            "act": 6,
+            "diff": -4.7,
+            "opp": "NYG"
+          }
+        ]
+      },
+      "narrative": "Santos is a risky option this week with a below-average Grade of 40.4. However, heavy winds (16.1 mph) could severely limit kicking opportunities."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -4103,7 +4103,7 @@
           }
         ]
       },
-      "narrative": "Fade Fitzgerald if possible; his Grade of 67.4 suggests low upside. His offense has a high stall rate (46.7%), which often leads to FG attempts."
+      "narrative": "Fitzgerald is a risky option this week with a below-average Grade of 67.4. His offense has a high stall rate (46.7%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "Y.Koo",
@@ -4357,7 +4357,7 @@
           }
         ]
       },
-      "narrative": "Fade Gillan if possible; his Grade of 52.7 suggests low upside. His offense has a high stall rate (47.4%), which often leads to FG attempts."
+      "narrative": "Gillan is a risky option this week with a below-average Grade of 52.7. His offense has a high stall rate (47.4%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "B.Grupe",
