@@ -731,6 +731,7 @@ def run_analysis():
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
         
+        # Fix: Generate narratives AFTER process_row has added 'grade' and 'proj'
         final['narrative'] = final.apply(generate_narrative, axis=1)
         
         final = final.replace([np.inf, -np.inf, np.nan], None)
