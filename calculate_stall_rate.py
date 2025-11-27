@@ -52,9 +52,6 @@ def load_data_with_retry(func, name, max_retries=5, delay=5):
                 raise e
 
 def get_current_nfl_week():
-    # FORCED WEEK 12 FOR TESTING
-    return 12 
-    """
     try:
         schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
@@ -63,8 +60,7 @@ def get_current_nfl_week():
         return int(upcoming['week'].min()) if not upcoming.empty else 18
     except:
         return 1
-    """
-
+    
 def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     # 1. Check if Game is Finished (Current Time > Game Time + 4 hours)
     try:
