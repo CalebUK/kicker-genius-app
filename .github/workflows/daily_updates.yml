@@ -38,7 +38,7 @@ jobs:
         run: mkdir -p public
 
       - name: 5. Run Analysis Script
-        run: python calculate_stall_rate.py
+        run: python run_engine.py  # <-- Updated to use the new modular engine
         
       - name: 6. Commit and Push (Manual Force)
         run: |
