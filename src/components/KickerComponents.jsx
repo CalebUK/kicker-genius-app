@@ -1,10 +1,8 @@
 import React from 'react';
-import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, BrainCircuit, AlertTriangle, ShieldAlert, UserMinus } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, BrainCircuit, AlertTriangle, ShieldAlert, UserMinus, ChevronDown, ChevronUp } from 'lucide-react';
 import { calcFPts } from '../utils/scoring';
 
-// ... (FootballIcon, HeaderCell, HistoryBars remain unchanged) ...
-// Re-exporting them for completeness of this file block
-
+// --- FOOTBALL ICON ---
 export const FootballIcon = ({ isFire }) => (
   <div className="relative w-full h-full flex items-center justify-center">
     {isFire && (
@@ -24,15 +22,14 @@ export const FootballIcon = ({ isFire }) => (
   </div>
 );
 
+// --- SORTABLE HEADER ---
 export const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) => {
   const isActive = currentSort?.key === sortKey;
+  
   return (
     <th onClick={() => onSort && onSort(sortKey)} className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}>
       <div className="flex flex-col items-center justify-center h-full gap-0.5">
-        <div className="flex items-center gap-1 mt-0.5">
-          <span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>
-          {onSort && (isActive ? (currentSort.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-blue-400" /> : <ArrowDown className="w-3 h-3 text-blue-400" />) : (<ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />))}
-        </div>
+        <div className="flex items-center gap-1 mt-0.5"><span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>{onSort && (isActive ? (currentSort.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-blue-400" /> : <ArrowDown className="w-3 h-3 text-blue-400" />) : (<ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />))}</div>
         <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
       </div>
       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto">
@@ -44,6 +41,7 @@ export const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSo
   );
 };
 
+// --- HISTORY BARS ---
 export const HistoryBars = ({ games }) => {
   if (!games || games.length === 0) return <div className="text-xs text-slate-500">No recent data</div>;
   return (
@@ -63,32 +61,28 @@ export const HistoryBars = ({ games }) => {
   );
 };
 
-// --- PLAYER CELL (UPDATED WITH RANKS IN TOOLTIP) ---
+// --- PLAYER CELL ---
 export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   const injuryColor = player.injury_color || 'slate-600'; 
   const statusText = player.injury_status || '';
-  
   let borderColor = 'border-slate-600';
   if (injuryColor.includes('green')) borderColor = 'border-green-500';
   if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
   if (injuryColor.includes('red-500')) borderColor = 'border-red-500';
   if (injuryColor.includes('yellow')) borderColor = 'border-yellow-500';
-
   let textColor = 'text-slate-400';
   if (injuryColor.includes('green')) textColor = 'text-green-400';
   if (injuryColor.includes('red-700')) textColor = 'text-red-500';
   if (injuryColor.includes('red-500')) textColor = 'text-red-400';
   if (injuryColor.includes('yellow')) textColor = 'text-yellow-400';
-
   const ownPct = player.own_pct || 0;
   let ownColor = 'text-slate-500';
   if (ownPct < 10) ownColor = 'text-blue-400 font-bold'; 
   else if (ownPct > 80) ownColor = 'text-amber-500'; 
-
   const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
-  const imageUrl = isAubrey 
-    ? '/assets/aubrey_custom.png' 
-    : (player.headshot_url || 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png');
+  
+  // FIX: Changed fallback to reliable ESPN placeholder
+  const imageUrl = isAubrey ? '/assets/aubrey_custom.png' : (player.headshot_url || 'https://p.espncdn.com/i/headshots/nfl/players/full/0.png');
 
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
@@ -98,7 +92,7 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   return (
     <td className="px-3 py-4 font-medium text-white">
       <div className="flex flex-col justify-center">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
               <div className="text-xs md:text-sm font-bold text-white leading-tight whitespace-normal break-words flex items-center gap-1">
                 {player.kicker_player_name}
                 {player.isTop5 && <span title="Top 5 Scorer (Season)" className="text-sm">🔥</span>}
@@ -114,27 +108,25 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
                     src={imageUrl} 
                     alt={player.kicker_player_name}
                     className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`}
-                    onError={(e) => { e.target.onerror = null; if (e.target.src.includes('aubrey_custom.png')) { e.target.src = player.headshot_url; } else { e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }}} 
+                    onError={(e) => { 
+                        e.target.onerror = null;
+                        if (e.target.src.includes('aubrey_custom.png')) {
+                            e.target.src = player.headshot_url;
+                        } else {
+                            // FIX: Use reliable ESPN placeholder instead of potentially broken NFL link
+                            e.target.src = 'https://p.espncdn.com/i/headshots/nfl/players/full/0.png';
+                        }
+                    }} 
                 />
-                {/* TOOLTIP WITH RANKS ADDED */}
-                <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
-                   {statusText !== '' && (
-                       match ? ( <> <div className={`font-bold ${textColor} mb-0.5 truncate`}>{displayInjury}</div> <div className="text-slate-400 italic truncate">{displayStatus}</div> </> ) : ( <div className={`font-bold ${textColor} mb-1 break-words`}>{player.injury_status} <span className="text-slate-400 font-normal">({details})</span></div> )
-                   )}
-                   {/* NEW: Ranking Section */}
-                   <div className="mt-2 pt-2 border-t border-slate-700 flex flex-col gap-1">
-                      <div className="flex justify-between">
-                         <span className="text-slate-400">Season Rank:</span>
-                         <span className="text-white font-bold">#{player.ytdRank}</span>
-                      </div>
-                      {player.ppgRank && (
-                         <div className="flex justify-between">
-                             <span className="text-slate-400">Avg/Game Rank:</span>
-                             <span className="text-emerald-400 font-bold">#{player.ppgRank}</span>
-                         </div>
-                      )}
+                {statusText !== '' && (
+                   <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
+                      {match ? ( <> <div className={`font-bold ${textColor} mb-0.5 truncate`}>{displayInjury}</div> <div className="text-slate-400 italic truncate">{displayStatus}</div> </> ) : ( <div className={`font-bold ${textColor} mb-1 break-words`}>{player.injury_status} <span className="text-slate-400 font-normal">({details})</span></div> )}
+                      <div className="mt-2 pt-2 border-t border-slate-700 flex flex-col gap-1">
+                          <div className="flex justify-between"><span className="text-slate-400">Season Rank:</span><span className="text-white font-bold">#{player.ytdRank}</span></div>
+                          {player.ppgRank && (<div className="flex justify-between"><span className="text-slate-400">Avg/Game Rank:</span><span className="text-emerald-400 font-bold">#{player.ppgRank}</span></div>)}
+                       </div>
                    </div>
-                </div>
+                )}
               </div>
               <div className="min-w-0">
                 <div className="text-xs text-slate-400 truncate">{subtext}</div>
@@ -146,8 +138,7 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   );
 };
 
-// ... (MathCard, DeepDiveRow, InjuryCard remain the same) ...
-
+// --- MATH CARD ---
 export const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
@@ -197,10 +188,15 @@ export const InjuryCard = ({ k, borderColor, textColor, scoring }) => {
      const match = (k.injury_details || '').match(/^(.+?)\s\((.+)\)$/);
      return (
          <div className={`flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border ${borderColor} overflow-hidden`}>
-            <img src={k.headshot_url} className={`w-12 h-12 rounded-full border-2 object-cover ${borderColor.replace('border', 'border-')}`} onError={(e) => { e.target.onerror = null; e.target.src = 'https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png'; }} />
-            <div>
-               <div className="font-bold text-white">{k.kicker_player_name} ({k.team})</div>
-               {match ? ( <> <div className={`text-xs font-bold ${textColor}`}>{k.injury_status}: {match[2]}</div> <div className="text-xs text-slate-400 italic">{match[1]}</div> </> ) : ( <div className={`text-xs ${textColor}`}>{k.injury_details}</div> )}
+            <img 
+                src={k.headshot_url} 
+                className={`w-12 h-12 rounded-full border-2 object-cover flex-shrink-0 ${borderColor.replace('border', 'border-')}`} 
+                // FIX: Use reliable ESPN placeholder
+                onError={(e) => { e.target.onerror = null; e.target.src = 'https://p.espncdn.com/i/headshots/nfl/players/full/0.png'; }} 
+            />
+            <div className="min-w-0 flex-1">
+               <div className="font-bold text-white truncate">{k.kicker_player_name} ({k.team})</div>
+               {match ? ( <> <div className={`text-xs font-bold ${textColor} truncate`}>{k.injury_status}: {match[2]}</div> <div className="text-xs text-slate-400 italic truncate">{match[1]}</div> </> ) : ( <div className={`text-xs ${textColor} break-words`}>{k.injury_details}</div> )}
                <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k, scoring)}</div>
             </div>
          </div>
