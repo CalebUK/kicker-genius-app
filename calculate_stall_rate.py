@@ -157,6 +157,7 @@ def run_analysis():
         # --- FIX TEAM USING ROSTER DATA ---
         if not full_roster.empty:
             stats = pd.merge(stats, full_roster, on='kicker_player_id', how='left')
+            # If roster_team exists, overwrite the PBP team
             stats['team'] = np.where(stats['roster_team'].notna(), stats['roster_team'], stats['team'])
             stats.drop(columns=['roster_team'], inplace=True)
         
