@@ -1,6 +1,25 @@
-import React from 'react';
-import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, BrainCircuit, AlertTriangle, ShieldAlert, UserMinus, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, BrainCircuit, AlertTriangle, ShieldAlert, UserMinus } from 'lucide-react';
 import { calcFPts } from '../utils/scoring';
+
+// --- GENERIC HELMET ICON (SVG) ---
+// This replaces the broken 404 images
+export const HelmetIcon = ({ borderColor }) => (
+  <div className={`w-12 h-12 rounded-full bg-slate-800 border-2 flex items-center justify-center shrink-0 ${borderColor || 'border-slate-600'}`}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-slate-500">
+      {/* Helmet Shell */}
+      <path d="M20 13v-3a8 8 0 1 0-16 0v3" />
+      {/* Facemask Bar */}
+      <path d="M4 13h16" />
+      {/* Facemask Jaw */}
+      <path d="M4 13v2a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4v-2" />
+      {/* Vertical Bars */}
+      <line x1="12" y1="13" x2="12" y2="19" />
+      <line x1="8" y1="13" x2="8" y2="18" />
+      <line x1="16" y1="13" x2="16" y2="18" />
+    </svg>
+  </div>
+);
 
 // --- FOOTBALL ICON ---
 export const FootballIcon = ({ isFire }) => (
@@ -41,7 +60,6 @@ export const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSo
   );
 };
 
-// --- HISTORY BARS ---
 export const HistoryBars = ({ games }) => {
   if (!games || games.length === 0) return <div className="text-xs text-slate-500">No recent data</div>;
   return (
@@ -63,26 +81,30 @@ export const HistoryBars = ({ games }) => {
 
 // --- PLAYER CELL ---
 export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
+  const [imgError, setImgError] = useState(false); // Track image load errors
+
   const injuryColor = player.injury_color || 'slate-600'; 
   const statusText = player.injury_status || '';
+  
   let borderColor = 'border-slate-600';
   if (injuryColor.includes('green')) borderColor = 'border-green-500';
   if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
   if (injuryColor.includes('red-500')) borderColor = 'border-red-500';
   if (injuryColor.includes('yellow')) borderColor = 'border-yellow-500';
+
   let textColor = 'text-slate-400';
   if (injuryColor.includes('green')) textColor = 'text-green-400';
   if (injuryColor.includes('red-700')) textColor = 'text-red-500';
   if (injuryColor.includes('red-500')) textColor = 'text-red-400';
   if (injuryColor.includes('yellow')) textColor = 'text-yellow-400';
+
   const ownPct = player.own_pct || 0;
   let ownColor = 'text-slate-500';
   if (ownPct < 10) ownColor = 'text-blue-400 font-bold'; 
   else if (ownPct > 80) ownColor = 'text-amber-500'; 
+
   const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
-  
-  // FIX: Changed fallback to reliable ESPN placeholder
-  const imageUrl = isAubrey ? '/assets/aubrey_custom.png' : (player.headshot_url || 'https://p.espncdn.com/i/headshots/nfl/players/full/0.png');
+  const imageUrl = isAubrey ? '/assets/aubrey_custom.png' : player.headshot_url;
 
   const details = player.injury_details || '';
   const match = details.match(/^(.+?)\s\((.+)\)$/);
@@ -104,20 +126,19 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
           
           <div className="flex items-center gap-3">
               <div className="relative group flex-shrink-0">
-                <img 
-                    src={imageUrl} 
-                    alt={player.kicker_player_name}
-                    className={`w-10 h-10 rounded-full bg-slate-800 border-2 object-cover shrink-0 ${borderColor}`}
-                    onError={(e) => { 
-                        e.target.onerror = null;
-                        if (e.target.src.includes('aubrey_custom.png')) {
-                            e.target.src = player.headshot_url;
-                        } else {
-                            // FIX: Use reliable ESPN placeholder instead of potentially broken NFL link
-                            e.target.src = 'https://p.espncdn.com/i/headshots/nfl/players/full/0.png';
-                        }
-                    }} 
-                />
+                {/* IMAGE OR FALLBACK */}
+                {imgError || !imageUrl ? (
+                    <HelmetIcon borderColor={borderColor} />
+                ) : (
+                    <img 
+                        src={imageUrl} 
+                        alt={player.kicker_player_name}
+                        className={`w-12 h-12 rounded-full border-2 object-cover shrink-0 ${borderColor}`} 
+                        onError={() => setImgError(true)} 
+                    />
+                )}
+
+                {/* TOOLTIP */}
                 {statusText !== '' && (
                    <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
                       {match ? ( <> <div className={`font-bold ${textColor} mb-0.5 truncate`}>{displayInjury}</div> <div className="text-slate-400 italic truncate">{displayStatus}</div> </> ) : ( <div className={`font-bold ${textColor} mb-1 break-words`}>{player.injury_status} <span className="text-slate-400 font-normal">({details})</span></div> )}
@@ -138,7 +159,6 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   );
 };
 
-// --- MATH CARD ---
 export const MathCard = ({ player, leagueAvgs, week }) => {
   if (!player) return null;
   const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
@@ -185,15 +205,20 @@ export const DeepDiveRow = ({ player, leagueAvgs, week, sleeperStatus }) => (
 );
 
 export const InjuryCard = ({ k, borderColor, textColor, scoring }) => {
+     const [imgError, setImgError] = useState(false);
      const match = (k.injury_details || '').match(/^(.+?)\s\((.+)\)$/);
+     
      return (
          <div className={`flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border ${borderColor} overflow-hidden`}>
-            <img 
-                src={k.headshot_url} 
-                className={`w-12 h-12 rounded-full border-2 object-cover flex-shrink-0 ${borderColor.replace('border', 'border-')}`} 
-                // FIX: Use reliable ESPN placeholder
-                onError={(e) => { e.target.onerror = null; e.target.src = 'https://p.espncdn.com/i/headshots/nfl/players/full/0.png'; }} 
-            />
+            {imgError || !k.headshot_url ? (
+               <HelmetIcon borderColor={borderColor} />
+            ) : (
+               <img 
+                 src={k.headshot_url} 
+                 className={`w-12 h-12 rounded-full border-2 object-cover flex-shrink-0 ${borderColor.replace('border', 'border-')}`} 
+                 onError={() => setImgError(true)} 
+               />
+            )}
             <div className="min-w-0 flex-1">
                <div className="font-bold text-white truncate">{k.kicker_player_name} ({k.team})</div>
                {match ? ( <> <div className={`text-xs font-bold ${textColor} truncate`}>{k.injury_status}: {match[2]}</div> <div className="text-xs text-slate-400 italic truncate">{match[1]}</div> </> ) : ( <div className={`text-xs ${textColor} break-words`}>{k.injury_details}</div> )}
