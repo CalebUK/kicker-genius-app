@@ -52,6 +52,9 @@ def load_data_with_retry(func, name, max_retries=5, delay=5):
                 raise e
 
 def get_current_nfl_week():
+    # FORCED WEEK 12 FOR TESTING
+    return 12 
+    """
     try:
         schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule Check")
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
@@ -60,7 +63,8 @@ def get_current_nfl_week():
         return int(upcoming['week'].min()) if not upcoming.empty else 18
     except:
         return 1
-    
+    """
+
 def get_weather_forecast(home_team, game_dt_str, is_dome=False):
     # 1. Check if Game is Finished (Current Time > Game Time + 4 hours)
     try:
@@ -390,15 +394,22 @@ def run_analysis():
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
         
+        # --- FIX: USE ROSTERS TO CORRECT TEAM ---
+        print("   📥 Loading Rosters for Team Updates...")
         try:
             rosters = load_data_with_retry(lambda: nfl.load_rosters(seasons=[CURRENT_SEASON]), "Rosters")
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
-            if rosters.empty: rosters = nfl.load_rosters(seasons=[CURRENT_SEASON-1]).to_pandas()
             
+            # We need ACTIVE + INACTIVE players to get correct team
+            full_roster = rosters[['gsis_id', 'team', 'status']].copy()
+            full_roster.rename(columns={'gsis_id': 'kicker_player_id', 'team': 'roster_team'}, inplace=True)
+            
+            # Keep inactive logic for injuries
             inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
             inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
             inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
         except: 
+            full_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_team'])
             inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
 
         if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
@@ -455,6 +466,13 @@ def run_analysis():
             real_pts=('real_pts', 'sum'), dome_kicks=('is_dome', 'sum'),
             total_kicks=('play_id', 'count'), games=('game_id', 'nunique')
         ).reset_index()
+        
+        # --- FIX TEAM USING ROSTER DATA ---
+        if not full_roster.empty:
+            stats = pd.merge(stats, full_roster, on='kicker_player_id', how='left')
+            # If roster_team exists, overwrite the PBP team
+            stats['team'] = np.where(stats['roster_team'].notna(), stats['roster_team'], stats['team'])
+            stats.drop(columns=['roster_team'], inplace=True)
         
         stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
         stats['acc'] = (stats['fg_made'] / stats['fg_att'] * 100).round(1)
@@ -711,7 +729,6 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
-                # NO DUPLICATE LIVE COLS HERE
             })
 
         final = final.join(final.apply(process_row, axis=1))
