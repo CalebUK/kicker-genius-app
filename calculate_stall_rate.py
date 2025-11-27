@@ -1,296 +1,23 @@
 import nflreadpy as nfl
 import pandas as pd
-import requests
 import json
-import warnings
-from datetime import datetime, timedelta
-import numpy as np
-import time
-import traceback
-import io
-import math
 import sys
-import re 
+import traceback
 import random
+import numpy as np
+from datetime import datetime
 
-# Suppress warnings
-warnings.simplefilter(action='ignore', category=RuntimeWarning)
-warnings.simplefilter(action='ignore', category=FutureWarning)
-
-# --- CONFIGURATION ---
-CURRENT_SEASON = 2025
-SEASON_START_DATE = datetime(2025, 9, 4) # Week 1 Kickoff (Thursday)
-FORCE_WEEK = None # Set to an integer (e.g., 12) to override calendar math for testing
-
-# --- STADIUM COORDINATES ---
-STADIUM_COORDS = {
-    'ARI': (33.5276, -112.2626), 'ATL': (33.7554, -84.4010), 'BAL': (39.2780, -76.6227),
-    'BUF': (42.7738, -78.7870), 'CAR': (35.2258, -80.8528), 'CHI': (41.8623, -87.6167),
-    'CIN': (39.0955, -84.5161), 'CLE': (41.5061, -81.6995), 'DAL': (32.7473, -97.0945),
-    'DEN': (39.7439, -105.0201), 'DET': (42.3400, -83.0456), 'GB': (44.5013, -88.0622),
-    'HOU': (29.6847, -95.4107), 'IND': (39.7601, -86.1639), 'JAX': (30.3240, -81.6373),
-    'KC': (39.0489, -94.4839), 'LA': (33.9534, -118.3390), 'LAC': (33.9534, -118.3390),
-    'LV': (36.0909, -115.1833), 'MIA': (25.9580, -80.2389), 'MIN': (44.9735, -93.2575),
-    'NE': (42.0909, -71.2643), 'NO': (29.9511, -90.0812), 'NYG': (40.8135, -74.0745),
-    'NYJ': (40.8135, -74.0745), 'PHI': (39.9008, -75.1675), 'PIT': (40.4468, -80.0158),
-    'SEA': (47.5952, -122.3316), 'SF': (37.4023, -121.9690), 'TB': (27.9759, -82.5033),
-    'TEN': (36.1665, -86.7713), 'WAS': (38.9076, -76.8645)
-}
-
-# --- RETRY HELPER ---
-def load_data_with_retry(func, name, max_retries=5, delay=5):
-    """Helper to load NFL data with exponential backoff for 503 errors."""
-    for attempt in range(max_retries):
-        try:
-            print(f"   📥 Loading {name} (Attempt {attempt + 1}/{max_retries})...")
-            return func()
-        except Exception as e:
-            print(f"   ⚠️ {name} failed: {e}")
-            if attempt < max_retries - 1:
-                sleep_time = delay * (2 ** attempt) 
-                print(f"   ⏳ Waiting {sleep_time}s before retry...")
-                time.sleep(sleep_time)
-            else:
-                raise e
-
-def get_current_nfl_week():
-    """Calculates the current NFL week based on the start date (Instant)."""
-    if FORCE_WEEK is not None:
-        print(f"   ⚠️ DEBUG MODE: Forcing Week {FORCE_WEEK}")
-        return FORCE_WEEK
-        
-    today = datetime.now()
-    
-    # If before season starts, default to Week 1
-    if today < SEASON_START_DATE:
-        return 1
-        
-    days_since_start = (today - SEASON_START_DATE).days
-    week_num = (days_since_start // 7) + 1
-    
-    # Clamp between Week 1 and Week 18
-    return max(1, min(18, week_num))
-
-def get_weather_forecast(home_team, game_dt_str, is_dome=False):
-    # 1. Check if Game is Finished (Current Time > Game Time + 4 hours)
-    try:
-        game_dt = datetime.strptime(game_dt_str, '%Y-%m-%d %H:%M')
-        time_diff = datetime.now() - game_dt
-        if time_diff.total_seconds() > (4 * 3600): 
-             return 0, "Game Finished"
-    except: pass
-
-    # 2. Check Dome Status
-    if is_dome: return 0, "Dome"
-
-    # 3. Robust API Fetch
-    coords = STADIUM_COORDS.get(home_team)
-    if not coords: return 0, "Outdoors ☀️" 
-    
-    lat, lon = coords
-    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York"
-    
-    data = None
-    # Retry up to 4 times with exponential backoff (1s, 2s, 4s, 8s)
-    for attempt in range(4):
-        try:
-            resp = requests.get(url, timeout=5)
-            if resp.status_code == 200:
-                temp_data = resp.json()
-                # Validate data integrity
-                if 'hourly' in temp_data and 'wind_speed_10m' in temp_data['hourly']:
-                    data = temp_data
-                    break
-        except Exception as e:
-            print(f"   ⚠️ Weather API attempt {attempt+1} failed for {home_team}: {e}")
-        
-        time.sleep(2 ** attempt)
-    
-    if not data: return 0, "Outdoors ☀️" # Fallback if API fails completely
-    
-    try:
-        target = game_dt_str.replace(" ", "T")[:13]
-        times = data['hourly']['time']
-        
-        # Find matching hour
-        try:
-            idx = next(i for i, t in enumerate(times) if t.startswith(target))
-        except StopIteration:
-            return 0, "Outdoors ☀️" # Time not found in forecast
-        
-        wind = data['hourly']['wind_speed_10m'][idx]
-        precip = data['hourly']['precipitation_probability'][idx]
-        temp = data['hourly']['temperature_2m'][idx]
-        
-        # 4. Logic for Emojis
-        cond = f"{int(wind)}mph"
-        if precip > 40: 
-            cond += " 🌨️" if temp <= 32 else " 🌧️"
-        elif wind > 15: 
-            cond += " 🌬️"
-        else: 
-            cond += " ☀️"
-            
-        return wind, cond
-    except:
-        return 0, "Outdoors ☀️"
-
-def scrape_cbs_injuries():
-    print("   🌐 Scraping CBS Sports for live injury data...")
-    url = "https://www.cbssports.com/nfl/injuries/"
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    try:
-        response = requests.get(url, headers=headers, timeout=10)
-        dfs = pd.read_html(io.StringIO(response.text), flavor='html5lib')
-        if not dfs: return pd.DataFrame()
-        combined = pd.concat(dfs, ignore_index=True)
-        combined.columns = [c.lower().strip() for c in combined.columns]
-        
-        col_map = {}
-        for col in combined.columns:
-            if 'player' in col: col_map[col] = 'full_name'
-            elif 'status' in col: col_map[col] = 'cbs_status'   # DISTINCT NAME
-            elif 'injury' in col: col_map[col] = 'cbs_injury'   # DISTINCT NAME
-        combined.rename(columns=col_map, inplace=True)
-        
-        if 'full_name' not in combined.columns: return pd.DataFrame()
-
-        def clean_name(val):
-            if not isinstance(val, str): return val
-            return val.split(' (')[0].strip()
-        combined['full_name'] = combined['full_name'].apply(clean_name)
-        
-        # Create normalized name for joining
-        def normalize_for_join(val):
-             parts = val.split(' ')
-             if len(parts) >= 2: return f"{parts[0][0]}.{parts[-1]}"
-             return val
-        combined['join_name'] = combined['full_name'].apply(normalize_for_join)
-        return combined[['join_name', 'cbs_status', 'cbs_injury']]
-    except Exception as e:
-        print(f"   ⚠️ Scraping failed: {e}")
-        return pd.DataFrame()
-
-def scrape_fantasy_ownership():
-    try:
-        url = "https://www.fantasypros.com/nfl/stats/k.php"
-        headers = {'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html'}
-        response = requests.get(url, headers=headers, timeout=15)
-        dfs = pd.read_html(response.text)
-        if not dfs: return pd.DataFrame()
-        df = dfs[0].copy()
-        df.columns = [str(c).lower() for c in df.columns]
-        player_col = next((c for c in df.columns if 'player' in c), None)
-        rost_col = next((c for c in df.columns if 'rost' in c or 'own' in c), None)
-        if not player_col or not rost_col: return pd.DataFrame()
-        df = df[[player_col, rost_col]].rename(columns={player_col: 'full_name', rost_col: 'own_pct'})
-        def clean_name_to_match(val):
-            if not isinstance(val, str): return val
-            name_part = val.split('(')[0].strip()
-            parts = name_part.split(' ')
-            if len(parts) >= 2: return f"{parts[0][0]}.{parts[1]}"
-            return name_part
-        df['match_name'] = df['full_name'].apply(clean_name_to_match)
-        def clean_pct(val):
-            if not isinstance(val, str): return 0.0 if not isinstance(val, (int, float)) else float(val)
-            return float(val.replace('%', '').strip())
-        df['own_pct'] = df['own_pct'].apply(clean_pct)
-        return df[['match_name', 'own_pct']]
-    except:
-        return pd.DataFrame()
-
-def load_injury_data_safe(season, target_week):
-    # We rely on CBS Scraper + Roster Data now.
-    return pd.DataFrame(columns=['gsis_id', 'report_status', 'practice_status', 'full_name'])
-
-def clean_nan(val):
-    if isinstance(val, float):
-        if pd.isna(val) or np.isinf(val): return None
-    return val
-
-def calculate_stall_metrics(df_pbp):
-    """Calculates stall rates using VECTORIZED operations for speed."""
-    rz_drives = df_pbp[(df_pbp['yardline_100'] <= 25) & (df_pbp['yardline_100'].notnull())]
-    drives = rz_drives[['game_id', 'drive', 'posteam', 'defteam']].drop_duplicates()
-    
-    if drives.empty:
-        return pd.DataFrame(columns=['posteam', 'off_stall_rate']), pd.DataFrame(columns=['defteam', 'def_stall_rate'])
-
-    drive_outcomes = rz_drives.groupby(['game_id', 'drive', 'posteam', 'defteam']).agg(
-        td=('touchdown', 'max'),
-        int=('interception', 'max'),
-        fum=('fumble_lost', 'max')
-    ).reset_index()
-    
-    drive_outcomes['stalled'] = ~((drive_outcomes['td'] == 1) | (drive_outcomes['int'] == 1) | (drive_outcomes['fum'] == 1))
-    
-    off = drive_outcomes.groupby('posteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'off_stall_rate'})
-    defs = drive_outcomes.groupby('defteam')['stalled'].mean().reset_index().rename(columns={'stalled': 'def_stall_rate'})
-    
-    off['off_stall_rate'] = (off['off_stall_rate'] * 100).round(1)
-    defs['def_stall_rate'] = (defs['def_stall_rate'] * 100).round(1)
-    
-    return off, defs
-
-def analyze_past_3_weeks_strict(target_week, pbp, schedule, current_stats):
-    print(f"🔙 Analyzing Last 3 Weeks...")
-    weeks_to_analyze = [w for w in [target_week-1, target_week-2, target_week-3] if w >= 1]
-    
-    def calc_simple_pts(row):
-        if row['play_type'] == 'field_goal':
-            if row['field_goal_result'] == 'made': return 5 if row['kick_distance'] >= 50 else 4 if row['kick_distance'] >= 40 else 3
-            return -1
-        if row['play_type'] == 'extra_point': return 1 if row['extra_point_result'] == 'good' else -1
-        return 0
-    
-    relevant_pbp = pbp[pbp['week'].isin(weeks_to_analyze)].copy()
-    relevant_pbp['pts'] = relevant_pbp.apply(calc_simple_pts, axis=1)
-    actuals_map = relevant_pbp.groupby(['week', 'kicker_player_id'])['pts'].sum().to_dict()
-
-    history_data = {}
-    for _, kicker in current_stats.iterrows():
-        pid = kicker['kicker_player_id']
-        team = kicker['team']
-        team_schedule = schedule[(schedule['week'].isin(weeks_to_analyze)) & 
-                                 ((schedule['home_team'] == team) | (schedule['away_team'] == team))].copy()
-        games_list = []
-        total_act = 0
-        total_proj = 0
-        
-        for wk in weeks_to_analyze:
-            game = team_schedule[team_schedule['week'] == wk]
-            if game.empty:
-                games_list.append({'week': int(wk), 'status': 'BYE', 'proj': 0, 'act': 0, 'diff': 0, 'opp': 'BYE'})
-                continue
-            game = game.iloc[0]
-            is_home = (game['home_team'] == team)
-            opp = game['away_team'] if is_home else game['home_team']
-            
-            player_played = not relevant_pbp[(relevant_pbp['week'] == wk) & (relevant_pbp['kicker_player_id'] == pid)].empty
-            if not player_played:
-                games_list.append({'week': int(wk), 'status': 'DNS', 'proj': 0, 'act': 0, 'diff': 0, 'opp': opp})
-                continue
-            
-            total_line = game['total_line'] if pd.notna(game['total_line']) else 44.0
-            spread_line = game['spread_line'] if pd.notna(game['spread_line']) else 0.0
-            
-            if is_home: vegas_implied = (total_line + spread_line) / 2
-            else: vegas_implied = (total_line - spread_line) / 2
-                
-            base = kicker['avg_pts']
-            mult = 1.15 if vegas_implied > 24 else (0.85 if vegas_implied < 18 else 1.0)
-            proj = round(base * mult, 1)
-            act = int(actuals_map.get((wk, pid), 0))
-            
-            games_list.append({'week': int(wk), 'status': 'ACTIVE', 'proj': proj, 'act': act, 'diff': round(act - proj, 1), 'opp': opp})
-            
-        history_data[pid] = {'l3_actual': int(total_act), 'l3_proj': round(float(total_proj), 1), 'l3_games': games_list}
-    return history_data
+# Import our new modules
+from engine.config import CURRENT_SEASON
+from engine.data import (
+    load_data_with_retry, get_current_nfl_week, scrape_cbs_injuries, 
+    scrape_fantasy_ownership, clean_nan, calculate_stall_metrics, 
+    analyze_past_3_weeks_strict
+)
+from engine.weather import get_weather_forecast
 
 # --- NARRATIVE ENGINE ---
 def generate_narrative(row):
-    """Generates a 2-sentence 'AI' analysis for the kicker."""
-    
     if row['injury_status'] != 'Healthy':
         return f"Monitor status closely as they are currently listed as {row['injury_status']}. This significantly impacts their viability for Week {row.get('week', '')}."
 
@@ -302,88 +29,45 @@ def generate_narrative(row):
     wind = row['wind']
     is_dome = row['is_dome']
     
-    # --- SENTENCE 1: THE VERDICT ---
     s1_options = []
     if grade >= 100:
         s1_options = [
             f"{name} is a locked-and-loaded RB1 of kickers this week with an elite Grade of {grade}.",
-            f"Fire up {name} with confidence; his Matchup Grade of {grade} is in the elite tier.",
-            f"Don't overthink it: {name} is a top-tier option boasting a massive Grade of {grade}.",
-            f"With a stellar Grade of {grade}, {name} offers one of the highest floors on the slate.",
-            f"{name} projects as a matchup-winner this week with a Grade of {grade}."
+            f"Fire up {name} with confidence; his Matchup Grade of {grade} is in the elite tier."
         ]
     elif grade >= 90:
         s1_options = [
             f"{name} is a strong play this week, sitting comfortably with a Grade of {grade}.",
-            f"You can trust {name} in your lineup given his solid Grade of {grade}.",
-            f"{name} offers a safe floor and good upside with a Grade of {grade}.",
-            f"The model sees value in {name}, assigning a strong Grade of {grade}.",
-            f"{name} is a quality starter this week with a Grade of {grade}."
+            f"You can trust {name} in your lineup given his solid Grade of {grade}."
         ]
     elif grade >= 80:
         s1_options = [
             f"{name} is a viable streaming option with a respectable Grade of {grade}.",
-            f"Consider {name} if you need a fill-in; his Grade is a decent {grade}.",
-            f"{name} is a middle-of-the-road play with a Grade of {grade}.",
-            f"With a Grade of {grade}, {name} is a reasonable floor play.",
-            f"{name} is playable in deeper leagues with a Grade of {grade}."
+            f"Consider {name} if you need a fill-in; his Grade is a decent {grade}."
         ]
     else:
         s1_options = [
             f"{name} is a risky option this week with a below-average Grade of {grade}.",
-            f"Fade {name} if possible; his Grade of {grade} suggests low upside.",
-            f"The model is fading {name} this week (Grade: {grade}).",
-            f"Look elsewhere for kicker points; {name} only grades at {grade}.",
-            f"{name} faces significant headwinds, resulting in a Grade of {grade}."
+            f"Fade {name} if possible; his Grade of {grade} suggests low upside."
         ]
     
     s1 = random.choice(s1_options)
 
-    # --- SENTENCE 2: THE CONTEXT ---
     s2_options = []
-    
     if vegas > 27:
-        s2_options = [
-            f"The offense has a massive implied total of {vegas:.1f}, offering a high ceiling.",
-            f"Vegas projects a shootout ({vegas:.1f} team pts), which means plenty of XP and FG chances.",
-            f"Being attached to an offense projected for {vegas:.1f} points is a recipe for success."
-        ]
+        s2_options = [f"The offense has a massive implied total of {vegas:.1f}, offering a high ceiling."]
     elif wind > 15 and not is_dome:
-        s2_options = [
-            f"However, heavy winds ({wind} mph) could severely limit kicking opportunities.",
-            f"Be careful: {wind} mph winds usually downgrade kicking efficiency significantly.",
-            f"The weather is a major concern, with winds gusting over {wind} mph."
-        ]
+        s2_options = [f"However, heavy winds ({wind} mph) could severely limit kicking opportunities."]
     elif is_dome:
-        s2_options = [
-            f"Playing in a dome guarantees perfect kicking conditions.",
-            f"The controlled dome environment boosts his accuracy floor.",
-            f"No weather concerns here; the dome keeps his floor safe."
-        ]
+        s2_options = [f"Playing in a dome guarantees perfect kicking conditions."]
     elif off_stall > 40:
-        s2_options = [
-            f"His offense has a high stall rate ({off_stall}%), which often leads to FG attempts.",
-            f"The team moves the ball but struggles to finish ({off_stall}% stall), perfect for kickers.",
-            f"A {off_stall}% offensive stall rate suggests plenty of drives ending in 3 points."
-        ]
+        s2_options = [f"His offense has a high stall rate ({off_stall}%), which often leads to FG attempts."]
     elif def_stall > 40:
-        s2_options = [
-            f"The matchup is favorable against a defense that forces FGs ({def_stall}%) in the red zone.",
-            f"His opponent has a 'bend don't break' defense (Stall: {def_stall}%), boosting his value.",
-            f"Facing a defense with a {def_stall}% stall rate usually means extra FG tries."
-        ]
+        s2_options = [f"The matchup is favorable against a defense that forces FGs ({def_stall}%) in the red zone."]
     elif vegas < 18:
-        s2_options = [
-            f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting chances.",
-            f"The low team total ({vegas:.1f}) suggests a lack of scoring opportunities.",
-            f"Upside is capped by a poor offensive projection ({vegas:.1f} pts)."
-        ]
+        s2_options = [f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting chances."]
     else:
-        s2_options = [
-            f"They face a neutral matchup with standard scoring expectations.",
-            f"The metrics don't show any major red flags or massive boosts.",
-            f"He is a solid, middle-of-the-road play based on the data."
-        ]
+        s2_options = [f"They face a neutral matchup with standard scoring expectations."]
 
     s2 = random.choice(s2_options)
     return f"{s1} {s2}"
@@ -400,17 +84,15 @@ def run_analysis():
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
         
-        # --- FIX: USE ROSTERS TO CORRECT TEAM ---
+        # --- USE ROSTERS TO CORRECT TEAM ---
         print("   📥 Loading Rosters for Team Updates...")
         try:
             rosters = load_data_with_retry(lambda: nfl.load_rosters(seasons=[CURRENT_SEASON]), "Rosters")
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
             
-            # We need ACTIVE + INACTIVE players to get correct team
             full_roster = rosters[['gsis_id', 'team', 'status']].copy()
             full_roster.rename(columns={'gsis_id': 'kicker_player_id', 'team': 'roster_team'}, inplace=True)
             
-            # Keep inactive logic for injuries
             inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
             inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
             inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
@@ -463,7 +145,6 @@ def run_analysis():
             fg_0_19=('fg_0_19', 'sum'), fg_20_29=('fg_20_29', 'sum'), fg_30_39=('fg_30_39', 'sum'),
             fg_40_49=('fg_40_49', 'sum'), fg_50_59=('fg_50_59', 'sum'), fg_60_plus=('fg_60_plus', 'sum'),
             
-            # AGGREGATE MISSES
             fg_miss=('fg_miss', 'sum'), 
             fg_miss_0_19=('fg_miss_0_19', 'sum'), fg_miss_20_29=('fg_miss_20_29', 'sum'), fg_miss_30_39=('fg_miss_30_39', 'sum'),
             fg_miss_40_49=('fg_miss_40_49', 'sum'), fg_miss_50_59=('fg_miss_50_59', 'sum'), fg_miss_60_plus=('fg_miss_60_plus', 'sum'),
@@ -476,7 +157,6 @@ def run_analysis():
         # --- FIX TEAM USING ROSTER DATA ---
         if not full_roster.empty:
             stats = pd.merge(stats, full_roster, on='kicker_player_id', how='left')
-            # If roster_team exists, overwrite the PBP team
             stats['team'] = np.where(stats['roster_team'].notna(), stats['roster_team'], stats['team'])
             stats.drop(columns=['roster_team'], inplace=True)
         
@@ -735,7 +415,7 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
-                # NO DUPLICATE LIVE COLS HERE
+                # LIVE STATS PASSTHROUGH REMOVED TO AVOID DOUBLE-DIPPING
             })
 
         final = final.join(final.apply(process_row, axis=1))
