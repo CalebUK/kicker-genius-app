@@ -5,6 +5,7 @@ import sys
 import traceback
 import random
 import numpy as np
+import re  # <--- Added required import
 from datetime import datetime
 
 # Import our new modules
@@ -145,6 +146,7 @@ def run_analysis():
             fg_0_19=('fg_0_19', 'sum'), fg_20_29=('fg_20_29', 'sum'), fg_30_39=('fg_30_39', 'sum'),
             fg_40_49=('fg_40_49', 'sum'), fg_50_59=('fg_50_59', 'sum'), fg_60_plus=('fg_60_plus', 'sum'),
             
+            # AGGREGATE MISSES
             fg_miss=('fg_miss', 'sum'), 
             fg_miss_0_19=('fg_miss_0_19', 'sum'), fg_miss_20_29=('fg_miss_20_29', 'sum'), fg_miss_30_39=('fg_miss_30_39', 'sum'),
             fg_miss_40_49=('fg_miss_40_49', 'sum'), fg_miss_50_59=('fg_miss_50_59', 'sum'), fg_miss_60_plus=('fg_miss_60_plus', 'sum'),
@@ -416,7 +418,7 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
-                # LIVE STATS PASSTHROUGH REMOVED TO AVOID DOUBLE-DIPPING
+                # NO DUPLICATE LIVE COLS HERE
             })
 
         final = final.join(final.apply(process_row, axis=1))
