@@ -32,27 +32,24 @@ const AccuracyTab = ({ players, scoring, week }) => {
   const metRate = activeGames.length > 0 ? Math.round((wins / activeGames.length) * 100) : 0; 
 
   // Metric 3: Adjusted Median % (Rounded to nearest 10%)
+  // Step A: Calculate % for each kicker and round to nearest 10
   const roundedPcts = activeGames.map(p => {
       const live = calculateLiveScore(p, scoring);
       const proj = p.proj;
       if (proj === 0) return 0; 
       const rawPct = (live / proj) * 100;
-      return Math.round(rawPct / 10) * 10; 
+      return Math.round(rawPct / 10) * 10; // e.g., 88 -> 90, 92 -> 90
   }).sort((a, b) => a - b);
 
+  // Step B: Find the median of these rounded values
   const mid = Math.floor(roundedPcts.length / 2);
   const medianPct = roundedPcts.length > 0 
     ? (roundedPcts.length % 2 !== 0 ? roundedPcts[mid] : (roundedPcts[mid - 1] + roundedPcts[mid]) / 2)
     : 0;
     
-  // Count kickers within +/- 5% of the median (The "Median Range")
-  const kickersAtMedian = activeGames.filter(p => {
-      const live = calculateLiveScore(p, scoring);
-      const proj = p.proj;
-      if (proj === 0) return false;
-      const pct = (live / proj) * 100;
-      return pct >= (medianPct - 5) && pct <= (medianPct + 5);
-  }).length;
+  // Step C: Count how many kickers fell into this median bucket
+  // Fix: Ensure we count kickers that match the rounded median
+  const kickersAtMedian = roundedPcts.filter(p => p === medianPct).length;
 
 
   // --- 2. FILTER & SORT FOR DISPLAY ---
@@ -73,7 +70,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
         
         {/* --- LIVE MODEL PERFORMANCE TRACKER --- */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-             {/* Card 1: Total Score */}
+             {/* Card 1: Total Score (Win/Loss) */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Activity className="w-3 h-3 text-blue-500"/> Total Points</div>
                  <div className="flex items-baseline gap-2">
@@ -100,14 +97,21 @@ const AccuracyTab = ({ players, scoring, week }) => {
                     <div className="text-slate-200 flex flex-col items-center"><span>{metRate}%</span><span className="text-[8px] text-slate-500 font-normal">MET</span></div>
                     <div className="text-red-400 flex flex-col items-center"><span>{bustRate}%</span><span className="text-[8px] text-slate-500 font-normal">BUST</span></div>
                  </div>
-                 {/* Mini Bar Chart with markers */}
-                 <div className="w-full h-1.5 bg-slate-800 rounded-full mt-1 flex overflow-hidden relative">
+                 {/* Mini Bar Chart with Defined Ticks */}
+                 <div className="w-full h-2 bg-slate-800 rounded-full mt-1 flex overflow-hidden relative">
                     <div className="bg-emerald-500 h-full" style={{width: `${smashRate}%`}}></div>
                     <div className="bg-slate-400 h-full" style={{width: `${metRate}%`}}></div>
                     <div className="bg-red-500 h-full" style={{width: `${bustRate}%`}}></div>
-                    {/* Tick marks for zones */}
-                    <div className="absolute top-0 bottom-0 w-px bg-slate-950 left-1/3"></div>
-                    <div className="absolute top-0 bottom-0 w-px bg-slate-950 left-2/3"></div>
+                    
+                    {/* Tick Marks for Visual Clarity */}
+                    {smashRate > 0 && metRate > 0 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate}%`}}></div>}
+                    {(smashRate + metRate) < 100 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate + metRate}%`}}></div>}
+                 </div>
+                 {/* Labels for Thresholds */}
+                 <div className="flex justify-between text-[8px] text-slate-600 mt-0.5 w-full">
+                     <span>&gt;+3</span>
+                     <span className="text-center">+/-3</span>
+                     <span>&lt;-3</span>
                  </div>
             </div>
 
@@ -120,7 +124,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
                  </div>
             </div>
             
-             {/* Filter Buttons */}
+             {/* Filter Buttons Row */}
              <div className="flex justify-end mb-4">
                 <div className="flex gap-1 p-1 bg-slate-900 rounded-lg border border-slate-800">
                     {['ALL', 'LIVE', 'FINISHED', 'UPCOMING'].map((f) => (
@@ -135,7 +139,9 @@ const AccuracyTab = ({ players, scoring, week }) => {
             {displayPlayers.map((p, i) => {
                 const liveScore = calculateLiveScore(p, scoring);
                 const proj = p.proj;
+                
                 const pct = proj > 0 ? Math.min(100, Math.max(5, (liveScore / proj) * 100)) : 0; 
+                
                 const isBeat = liveScore >= proj;
                 const isSmashed = liveScore >= proj + 3;
                 const status = getGameStatus(p.game_dt);
@@ -180,8 +186,12 @@ const AccuracyTab = ({ players, scoring, week }) => {
                                  })}
                              </div>
                              <img src="/assets/logo.png" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 object-contain opacity-40 pointer-events-none" alt="logo"/>
+
                              <div className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${visualPct}%` }}></div>
-                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${visualPct}% - 16px)` }}><FootballIcon isFire={isSmashed} /></div>
+                             
+                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${visualPct}% - 16px)` }}>
+                                 <FootballIcon isFire={isSmashed} />
+                             </div>
                         </div>
 
                         <div className="flex flex-wrap gap-1.5 relative z-10">
