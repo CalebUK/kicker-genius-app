@@ -4,8 +4,8 @@ export const GLOSSARY_DATA = [
   { header: "Rounding", title: "No Fractional Points", desc: "At Kicker Genius we don't believe in fractional points for Kickers. If a kicker can't get 9.4 points we shouldn't project it. .4 and below will be rounded down and .5 and above will be rounded up.", why: "Realism", source: "Kicker Genius Model" },
   { header: "Proj Acc", title: "Projection Accuracy (L3)", desc: "Total Actual Points vs Total Projected Points over the last 3 weeks.", why: "Model Trust Check", source: "Historical Backtest" },
   
-  // UPDATED ENTRY
-  { header: "Adj Median", title: "Adjusted Median %", desc: "The median performance (Actual/Projected) of all active kickers. Values are rounded to the nearest 10% to filter noise.", why: "Model Health Check", source: "Live Tracker" },
+  // UPDATED ENTRY FOR MEDIAN RANGE
+  { header: "Adj Median", title: "Adjusted Median Range", desc: "The central performance percentage (Actual/Proj) for the week. Kickers are grouped by rounding to the nearest 10%, and we count how many fall into the middle bucket(s).", why: "Typical Performance", source: "Live Tracker" },
 
   { header: "Injury", title: "Injury Status", desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.", why: "Availability Risk", source: "NFL Official + CBS Scraper" },
   { header: "Avg FPts", title: "Average Fantasy Points", desc: "Average points scored per game played this season.", why: "Consistency Metric", source: "nflreadpy (Play-by-Play)" },

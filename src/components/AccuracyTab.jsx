@@ -31,8 +31,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
   const bustRate = activeGames.length > 0 ? Math.round((busts / activeGames.length) * 100) : 0;
   const metRate = activeGames.length > 0 ? Math.round((wins / activeGames.length) * 100) : 0; 
 
-  // Metric 3: Adjusted Median % (Rounded to nearest 10%)
-  // Step A: Calculate % for each kicker and round to nearest 10
+  // Metric 3: Adjusted Median Range (Logic Update)
   const roundedPcts = activeGames.map(p => {
       const live = calculateLiveScore(p, scoring);
       const proj = p.proj;
@@ -41,14 +40,28 @@ const AccuracyTab = ({ players, scoring, week }) => {
       return Math.round(rawPct / 10) * 10; 
   }).sort((a, b) => a - b);
 
-  // Step B: Find the median of these rounded values
-  const mid = Math.floor(roundedPcts.length / 2);
-  const medianPct = roundedPcts.length > 0 
-    ? (roundedPcts.length % 2 !== 0 ? roundedPcts[mid] : (roundedPcts[mid - 1] + roundedPcts[mid]) / 2)
-    : 0;
-    
-  // Step C: Count how many kickers fell into this median bucket
-  const kickersAtMedian = roundedPcts.filter(p => p === medianPct).length;
+  let medianLabel = "0%";
+  let kickersInRange = 0;
+
+  if (roundedPcts.length > 0) {
+      const mid = Math.floor(roundedPcts.length / 2);
+      // If odd, take middle. If even, take range between two middles.
+      if (roundedPcts.length % 2 !== 0) {
+          const val = roundedPcts[mid];
+          medianLabel = `${val}%`;
+          kickersInRange = roundedPcts.filter(v => v === val).length;
+      } else {
+          const low = roundedPcts[mid - 1];
+          const high = roundedPcts[mid];
+          if (low === high) {
+              medianLabel = `${low}%`;
+              kickersInRange = roundedPcts.filter(v => v === low).length;
+          } else {
+              medianLabel = `${low}-${high}%`;
+              kickersInRange = roundedPcts.filter(v => v >= low && v <= high).length;
+          }
+      }
+  }
 
 
   // --- 2. FILTER & SORT FOR DISPLAY ---
@@ -114,16 +127,12 @@ const AccuracyTab = ({ players, scoring, week }) => {
                  </div>
             </div>
 
-             {/* Card 4: Adjusted Median (UPDATED WITH DEBUG INFO) */}
+             {/* Card 4: Adjusted Median (UPDATED LOGIC) */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Target className="w-3 h-3 text-amber-500"/> Adjusted Median</div>
-                 <div className="text-3xl font-black text-white">{medianPct}%</div>
+                 <div className="text-3xl font-black text-white">{medianLabel}</div>
                  <div className="text-[10px] text-slate-400">
-                    {kickersAtMedian} of {activeGames.length} kickers
-                 </div>
-                 {/* NEW: Debug line showing the calculated median value */}
-                 <div className="text-[9px] text-slate-600 mt-1 border-t border-slate-800 pt-1">
-                    Median Value: {medianPct}%
+                    {kickersInRange} of {activeGames.length} kickers in range
                  </div>
             </div>
             
@@ -186,7 +195,6 @@ const AccuracyTab = ({ players, scoring, week }) => {
 
                         {/* FOOTBALL FIELD PROGRESS BAR */}
                         <div className="h-8 w-full bg-emerald-900 rounded-md relative mb-4 border-2 border-emerald-800 overflow-hidden mt-2 shadow-inner group">
-                             {/* Field Markings */}
                              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-800 to-emerald-950 opacity-80"></div>
                              <div className="absolute left-0 top-0 bottom-0 w-2 bg-white/90 z-0"></div>
                              <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/90 z-0"></div>
