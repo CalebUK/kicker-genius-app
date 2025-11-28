@@ -15,10 +15,6 @@ const AccuracyTab = ({ players, scoring, week }) => {
 
   // Calculate differences for active games
   const diffs = activeGames.map(p => calculateLiveScore(p, scoring) - p.proj);
-  const totalActual = activeGames.reduce((acc, p) => acc + calculateLiveScore(p, scoring), 0);
-  const totalProj = activeGames.reduce((acc, p) => acc + p.proj, 0);
-  const overallDiff = totalActual - totalProj;
-  const overallDiffSign = overallDiff >= 0 ? '+' : '';
   
   // Metric 1: Win Rate (Within +/- 3 points)
   const wins = diffs.filter(d => Math.abs(d) <= 3).length;
@@ -29,25 +25,13 @@ const AccuracyTab = ({ players, scoring, week }) => {
   const busts = diffs.filter(d => d < -3).length;
   const smashRate = activeGames.length > 0 ? Math.round((smashes / activeGames.length) * 100) : 0;
   const bustRate = activeGames.length > 0 ? Math.round((busts / activeGames.length) * 100) : 0;
-  const metRate = activeGames.length > 0 ? Math.round((wins / activeGames.length) * 100) : 0; // "Met" is essentially the win rate logic here
 
-  // Metric 3: Median % Error (Rounded to nearest 10%)
-  const pctDiffs = activeGames.map(p => {
-      const live = calculateLiveScore(p, scoring);
-      const proj = p.proj;
-      if (proj === 0) return 0; // Edge case
-      const rawPct = (live / proj) * 100;
-      return Math.round(rawPct / 10) * 10; // Round to nearest 10
-  }).sort((a, b) => a - b);
-
-  const mid = Math.floor(pctDiffs.length / 2);
-  const medianPct = pctDiffs.length > 0 
-    ? (pctDiffs.length % 2 !== 0 ? pctDiffs[mid] : (pctDiffs[mid - 1] + pctDiffs[mid]) / 2)
+  // Metric 3: Median Error
+  const sortedDiffs = [...diffs].sort((a, b) => a - b);
+  const mid = Math.floor(sortedDiffs.length / 2);
+  const medianError = sortedDiffs.length > 0 
+    ? (sortedDiffs.length % 2 !== 0 ? sortedDiffs[mid] : (sortedDiffs[mid - 1] + sortedDiffs[mid]) / 2)
     : 0;
-    
-  // Count how many kickers hit this exact median %
-  const kickersAtMedian = pctDiffs.filter(p => p === medianPct).length;
-
 
   // --- 2. FILTER & SORT FOR DISPLAY ---
   const displayPlayers = players.filter(p => {
@@ -67,59 +51,45 @@ const AccuracyTab = ({ players, scoring, week }) => {
         
         {/* --- LIVE MODEL PERFORMANCE TRACKER --- */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-             {/* Card 1: Total Score (Win/Loss) */}
+             {/* Card 1: Win Rate */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
-                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Activity className="w-3 h-3 text-blue-500"/> Total Points</div>
-                 <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-white">{totalActual}</span>
-                    <span className="text-sm text-slate-400">vs {totalProj.toFixed(0)} Proj</span>
-                 </div>
-                 <div className={`text-[10px] font-bold ${overallDiff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {overallDiffSign}{overallDiff.toFixed(1)} Diff
-                 </div>
-            </div>
-
-            {/* Card 2: Win Rate */}
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
-                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Target className="w-3 h-3 text-emerald-500"/> Accuracy</div>
+                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Target className="w-3 h-3 text-blue-500"/> Accuracy Rate</div>
                  <div className="text-3xl font-black text-white">{winRate}%</div>
-                 <div className="text-[10px] text-slate-400">Within +/- 3 pts</div>
+                 <div className="text-[10px] text-slate-400">Within +/- 3 pts of proj</div>
             </div>
 
-            {/* Card 3: Smash/Met/Bust */}
+            {/* Card 2: Smash vs Bust */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
-                 <div className="text-xs font-bold text-slate-500 uppercase mb-2 flex items-center gap-1"><TrendingUp className="w-3 h-3 text-purple-500"/> Performance</div>
-                 <div className="flex justify-between items-end text-xs font-bold w-full px-1">
-                    <div className="text-emerald-400 flex flex-col items-center"><span>{smashRate}%</span><span className="text-[8px] text-slate-500 font-normal">SMASH</span></div>
-                    <div className="text-slate-200 flex flex-col items-center"><span>{metRate}%</span><span className="text-[8px] text-slate-500 font-normal">MET</span></div>
-                    <div className="text-red-400 flex flex-col items-center"><span>{bustRate}%</span><span className="text-[8px] text-slate-500 font-normal">BUST</span></div>
+                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Activity className="w-3 h-3 text-purple-500"/> Volatility</div>
+                 <div className="flex items-center gap-3">
+                    <div className="text-emerald-400 font-bold flex items-center"><ArrowUp className="w-4 h-4"/> {smashRate}%</div>
+                    <div className="h-4 w-px bg-slate-700"></div>
+                    <div className="text-red-400 font-bold flex items-center"><ArrowDown className="w-4 h-4"/> {bustRate}%</div>
                  </div>
-                 {/* Mini Bar Chart */}
-                 <div className="w-full h-1.5 bg-slate-800 rounded-full mt-1 flex overflow-hidden">
-                    <div className="bg-emerald-500 h-full" style={{width: `${smashRate}%`}}></div>
-                    <div className="bg-slate-400 h-full" style={{width: `${metRate}%`}}></div>
-                    <div className="bg-red-500 h-full" style={{width: `${bustRate}%`}}></div>
-                 </div>
+                 <div className="text-[10px] text-slate-400">Smash ({'>'} +3) vs Bust ({'<'} -3)</div>
             </div>
 
-             {/* Card 4: Median % Error */}
+             {/* Card 3: Median Error */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
-                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Target className="w-3 h-3 text-amber-500"/> Median %</div>
-                 <div className="text-3xl font-black text-white">{medianPct}%</div>
-                 <div className="text-[10px] text-slate-400">
-                    {kickersAtMedian} of {activeGames.length} kickers
+                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><TrendingUp className="w-3 h-3 text-amber-500"/> Median Error</div>
+                 <div className={`text-3xl font-black ${medianError > 0 ? 'text-emerald-400' : medianError < 0 ? 'text-red-400' : 'text-white'}`}>
+                    {medianError > 0 ? '+' : ''}{medianError.toFixed(1)}
                  </div>
+                 <div className="text-[10px] text-slate-400">Typical miss amount (pts)</div>
             </div>
+            
+             {/* Filter Buttons */}
+             <div className="flex items-center justify-center md:justify-end">
+                <div className="flex flex-col gap-2 w-full">
+                    <div className="text-[10px] text-slate-500 font-bold uppercase text-center md:text-right">Filter Games</div>
+                    <div className="flex gap-1 p-1 bg-slate-950 rounded-lg border border-slate-800 justify-center md:justify-end">
+                        {['ALL', 'LIVE', 'FINISHED', 'UPCOMING'].map((f) => (
+                            <button key={f} onClick={() => setFilter(f)} className={`px-3 py-2 rounded-md text-[10px] font-bold transition-all ${filter === f ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}>{f}</button>
+                        ))}
+                    </div>
+                </div>
+             </div>
         </div>
-        
-         {/* Filter Buttons Row */}
-         <div className="flex justify-end mb-4">
-            <div className="flex gap-1 p-1 bg-slate-900 rounded-lg border border-slate-800">
-                {['ALL', 'LIVE', 'FINISHED', 'UPCOMING'].map((f) => (
-                    <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${filter === f ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}>{f}</button>
-                ))}
-            </div>
-         </div>
 
         {/* --- PLAYER CARDS --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -127,7 +97,10 @@ const AccuracyTab = ({ players, scoring, week }) => {
                 const liveScore = calculateLiveScore(p, scoring);
                 const proj = p.proj;
                 
-                // Performance % Calculation
+                // Visual Progress % (Capped for bar width)
+                const visualPct = proj > 0 ? Math.min(100, Math.max(5, (liveScore / proj) * 100)) : 0; 
+                
+                // Actual Performance % (Uncapped for text)
                 const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
 
                 const isBeat = liveScore >= proj;
@@ -143,9 +116,6 @@ const AccuracyTab = ({ players, scoring, week }) => {
                 const isSpecial = p.kicker_player_name.includes('Aubrey') || p.team === 'DAL';
                 const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
                 const glowClass = isSmashed ? "shadow-[0_0_15px_rgba(59,130,246,0.5)] border-blue-400" : "";
-
-                // Visual % for Bar Width (Capped at 100% so bar doesn't overflow)
-                const visualPct = Math.min(100, Math.max(5, performancePct));
 
                 return (
                     <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass} ${glowClass}`}>
@@ -170,6 +140,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
 
                         {/* FOOTBALL FIELD PROGRESS BAR */}
                         <div className="h-8 w-full bg-emerald-900 rounded-md relative mb-4 border-2 border-emerald-800 overflow-hidden mt-2 shadow-inner group">
+                             {/* Field Markings */}
                              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-800 to-emerald-950 opacity-80"></div>
                              <div className="absolute left-0 top-0 bottom-0 w-2 bg-white/90 z-0"></div>
                              <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/90 z-0"></div>
@@ -202,8 +173,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
                         </div>
 
                         <div className="flex flex-wrap gap-1.5 relative z-10">
-                            
-                            {/* NEW: PERFORMANCE % BADGE */}
+                            {/* NEW: PERFORMANCE BADGE */}
                             {proj > 0 && (
                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${performancePct >= 100 ? 'bg-emerald-900/50 text-emerald-400 border-emerald-700' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>
                                     {performancePct}% of Proj
