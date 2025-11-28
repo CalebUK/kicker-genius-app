@@ -3,6 +3,10 @@ export const GLOSSARY_DATA = [
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
   { header: "Rounding", title: "No Fractional Points", desc: "At Kicker Genius we don't believe in fractional points for Kickers. If a kicker can't get 9.4 points we shouldn't project it. .4 and below will be rounded down and .5 and above will be rounded up.", why: "Realism", source: "Kicker Genius Model" },
   { header: "Proj Acc", title: "Projection Accuracy (L3)", desc: "Total Actual Points vs Total Projected Points over the last 3 weeks.", why: "Model Trust Check", source: "Historical Backtest" },
+  
+  // NEW ENTRY
+  { header: "Adj Median", title: "Adjusted Median %", desc: "The median performance % (Actual/Proj) of all active kickers, rounded to the nearest 10% bucket. Shows the typical outcome.", why: "Model Health Check", source: "Live Tracker" },
+
   { header: "Injury", title: "Injury Status", desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.", why: "Availability Risk", source: "NFL Official + CBS Scraper" },
   { header: "Avg FPts", title: "Average Fantasy Points", desc: "Average points scored per game played this season.", why: "Consistency Metric", source: "nflreadpy (Play-by-Play)" },
   { header: "L4 Off %", title: "Offensive Stall Rate (L4)", desc: "% of drives inside the 25 that fail to score a TD over the last 4 weeks.", why: "Recent Trend Volume", source: "nflreadpy (Play-by-Play)" },
@@ -23,13 +27,13 @@ export const DEFAULT_SCORING = {
   fg0_19: 3, fg20_29: 3, fg30_39: 3, fg40_49: 4, fg50_59: 5, fg60_plus: 5,
   xp_made: 1,
   
-  // Misses (Default to 0 or -1 depending on preference, set to -1 for standard)
+  // Misses 
+  fg_miss: -1, 
   fg_miss_0_19: -1, fg_miss_20_29: -1, fg_miss_30_39: -1, 
   fg_miss_40_49: -1, fg_miss_50_59: -1, fg_miss_60_plus: -1,
   xp_miss: -1
 };
 
-// Config for the UI Generator (Grouped for cleaner Settings Tab)
 export const SCORING_CONFIG = [
   { label: "0-19 Yards", makeKey: "fg0_19", missKey: "fg_miss_0_19" },
   { label: "20-29 Yards", makeKey: "fg20_29", missKey: "fg_miss_20_29" },
@@ -41,5 +45,5 @@ export const SCORING_CONFIG = [
 ];
 
 export const SETTING_LABELS = {
-  // Kept for legacy support if needed, but SCORING_CONFIG drives the UI now
+  // Kept for legacy support if needed
 };
