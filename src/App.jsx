@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock, Bot } from 'lucide-react';
+import { TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock, Bot } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
 import { DEFAULT_SCORING } from './data/constants';
-import { calcFPts, calcProj } from './utils/scoring';
+import { calcFPts, calcProj, fetchSleeperScores } from './utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
 import SettingsTab from './components/SettingsTab';
@@ -25,39 +25,59 @@ const App = () => {
 
   // Sleeper State
   const [sleeperLeagueId, setSleeperLeagueId] = useState('');
-  const [sleeperLeagueName, setSleeperLeagueName] = useState(''); // NEW: Store League Name
+  const [sleeperLeagueName, setSleeperLeagueName] = useState('');
   const [sleeperUser, setSleeperUser] = useState('');
   const [sleeperMyKickers, setSleeperMyKickers] = useState(new Set());
   const [sleeperTakenKickers, setSleeperTakenKickers] = useState(new Set());
   const [sleeperLoading, setSleeperLoading] = useState(false);
   const [sleeperFilter, setSleeperFilter] = useState(false);
   const [sleeperScoringUpdated, setSleeperScoringUpdated] = useState(false);
+  
+  // LIVE SCORING STATE
+  const [liveScores, setLiveScores] = useState({});
+  const [sleeperIdMap, setSleeperIdMap] = useState({});
 
   useEffect(() => {
     const savedScoring = localStorage.getItem('kicker_scoring');
     const savedLeagueId = localStorage.getItem('sleeper_league_id');
-    const savedLeagueName = localStorage.getItem('sleeper_league_name'); // NEW: Load name
+    const savedLeagueName = localStorage.getItem('sleeper_league_name');
     const savedUser = localStorage.getItem('sleeper_username');
     
     const savedMyKickers = localStorage.getItem('sleeper_my_kickers');
     const savedTakenKickers = localStorage.getItem('sleeper_taken_kickers');
+    const savedIdMap = localStorage.getItem('sleeper_id_map');
     
-    if (savedScoring) {
-      try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } 
-      catch (e) { console.error(e); }
-    }
+    if (savedScoring) { try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } catch (e) {} }
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
     if (savedLeagueName) setSleeperLeagueName(savedLeagueName);
     if (savedUser) setSleeperUser(savedUser);
 
-    if (savedMyKickers) { try { setSleeperMyKickers(new Set(JSON.parse(savedMyKickers))); } catch (e) { console.error(e); } }
-    if (savedTakenKickers) { try { setSleeperTakenKickers(new Set(JSON.parse(savedTakenKickers))); } catch (e) { console.error(e); } }
+    if (savedMyKickers) { try { setSleeperMyKickers(new Set(JSON.parse(savedMyKickers))); } catch (e) {} }
+    if (savedTakenKickers) { try { setSleeperTakenKickers(new Set(JSON.parse(savedTakenKickers))); } catch (e) {} }
+    if (savedIdMap) { try { setSleeperIdMap(JSON.parse(savedIdMap)); } catch (e) {} }
 
     fetch('/kicker_data.json?v=' + new Date().getTime())
       .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
       .then(json => { setData(json); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
   }, []);
+
+  // --- POLLING FOR LIVE SCORES ---
+  useEffect(() => {
+      if (!sleeperLeagueId || !data?.meta?.week) return;
+      
+      const pollScores = async () => {
+          const scores = await fetchSleeperScores(sleeperLeagueId, data.meta.week);
+          if (scores && Object.keys(scores).length > 0) {
+              setLiveScores(scores);
+          }
+      };
+
+      pollScores(); // Initial call
+      const interval = setInterval(pollScores, 60000); // Every 60s
+      return () => clearInterval(interval);
+  }, [sleeperLeagueId, data?.meta?.week]);
+
 
   const updateScoring = (key, val) => {
     const numVal = val === '' ? 0 : parseFloat(val);
@@ -76,14 +96,15 @@ const App = () => {
       setSleeperLoading(true);
       setSleeperScoringUpdated(false);
       try {
+          // 1. Roster Check
           const rostersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/rosters`);
-          if (!rostersRes.ok) throw new Error("League ID is invalid or not public.");
+          if (!rostersRes.ok) throw new Error("League ID invalid or private.");
           const rosters = await rostersRes.json();
           
+          // 2. League Info
           const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
           const leagueData = await leagueRes.json();
           
-          // NEW: Save League Name
           const leagueName = leagueData.name || "Unknown League";
           setSleeperLeagueName(leagueName);
           localStorage.setItem('sleeper_league_name', leagueName);
@@ -91,38 +112,28 @@ const App = () => {
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
              const genMiss = s.fgmiss || 0;
-             
              const generic50Plus = s.fgm_50p || 5; 
              const genericMiss50Plus = s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss;
 
              const newScoring = {
-                fg0_19: s.fgm_0_19 || 3,
-                fg20_29: s.fgm_20_29 || 3,
-                fg30_39: s.fgm_30_39 || 3,
-                fg40_49: s.fgm_40_49 || 4,
-                
+                fg0_19: s.fgm_0_19 || 3, fg20_29: s.fgm_20_29 || 3, fg30_39: s.fgm_30_39 || 3, fg40_49: s.fgm_40_49 || 4,
                 fg50_59: s.fgm_50_59 !== undefined ? s.fgm_50_59 : generic50Plus,
                 fg60_plus: s.fgm_60_plus !== undefined ? s.fgm_60_plus : (s.fgm_60p !== undefined ? s.fgm_60p : generic50Plus),
-                
-                xp_made: s.xpm || 1,
-                xp_miss: s.xpmiss || 0,
-                
+                xp_made: s.xpm || 1, xp_miss: s.xpmiss || 0,
                 fg_miss_0_19: s.fgmiss_0_19 !== undefined ? s.fgmiss_0_19 : genMiss,
                 fg_miss_20_29: s.fgmiss_20_29 !== undefined ? s.fgmiss_20_29 : genMiss,
                 fg_miss_30_39: s.fgmiss_30_39 !== undefined ? s.fgmiss_30_39 : genMiss,
                 fg_miss_40_49: s.fgmiss_40_49 !== undefined ? s.fgmiss_40_49 : genMiss,
-                
                 fg_miss_50_59: s.fgmiss_50_59 !== undefined ? s.fgmiss_50_59 : genericMiss50Plus,
                 fg_miss_60_plus: s.fgmiss_60_plus !== undefined ? s.fgmiss_60_plus : (s.fgmiss_60p !== undefined ? s.fgmiss_60p : genericMiss50Plus),
-                
                 fg_miss: genMiss 
              };
-             
              setScoring(newScoring);
              localStorage.setItem('kicker_scoring', JSON.stringify(newScoring));
              setSleeperScoringUpdated(true);
           }
 
+          // 3. User ID Map
           let myUserId = null;
           if (sleeperUser) {
              const usersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/users`);
@@ -131,11 +142,13 @@ const App = () => {
              if (me) myUserId = me.user_id;
           }
 
+          // 4. Players DB for Mapping
           const playersRes = await fetch('https://api.sleeper.app/v1/players/nfl'); 
           const allPlayers = await playersRes.json();
 
           const mySet = new Set();
           const takenSet = new Set();
+          const newIdMap = {}; // Map "B.Aubrey" -> "4039"
 
           rosters.forEach(roster => {
               const isMine = roster.owner_id === myUserId;
@@ -145,6 +158,9 @@ const App = () => {
                       const first = player.first_name.charAt(0);
                       const last = player.last_name;
                       const joinName = `${first}.${last}`;
+                      
+                      newIdMap[joinName] = playerId; // SAVE ID MAPPING
+
                       if (isMine) mySet.add(joinName);
                       else takenSet.add(joinName);
                   }
@@ -153,16 +169,19 @@ const App = () => {
 
           setSleeperMyKickers(mySet);
           setSleeperTakenKickers(takenSet);
+          setSleeperIdMap(newIdMap);
+          
           localStorage.setItem('sleeper_league_id', sleeperLeagueId);
           localStorage.setItem('sleeper_username', sleeperUser);
           localStorage.setItem('sleeper_my_kickers', JSON.stringify(Array.from(mySet)));
           localStorage.setItem('sleeper_taken_kickers', JSON.stringify(Array.from(takenSet)));
+          localStorage.setItem('sleeper_id_map', JSON.stringify(newIdMap));
           
           setSleeperLoading(false);
       } catch (err) {
           console.error("Sleeper Sync Failed", err);
           setSleeperLoading(false);
-          alert("Failed to sync Sleeper league. Check League ID.");
+          alert(`Sync Failed: ${err.message}. Check League ID.`);
       }
   };
 
@@ -180,11 +199,9 @@ const App = () => {
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
   
-  // --- RANKING CALCULATIONS ---
   const ytdRankMap = new Map();
   [...rankings].sort((a, b) => calcFPts(b, scoring) - calcFPts(a, scoring)).forEach((p, i) => ytdRankMap.set(p.kicker_player_name, i + 1));
   
-  // 2. PPG Rank (Min 50% games) - UPDATED from 0.8 to 0.5
   const ppgRankMap = new Map();
   const gamesThreshold = (meta.week - 1) * 0.5; 
   [...rankings]
@@ -196,17 +213,23 @@ const App = () => {
      const ytdPts = calcFPts(p, scoring);
      const pWithYtd = { ...p, fpts_ytd: ytdPts };
      const proj = calcProj(pWithYtd, p.grade);
-     
      const l3_games = p.history?.l3_games || [];
      const l3_proj_sum = l3_games.reduce((acc, g) => acc + Math.round(Number(g.proj)), 0);
      const l3_act_sum = l3_games.reduce((acc, g) => acc + Number(g.act), 0); 
 
-     const teamCode = p.team || '';
      let sleeperStatus = null;
      const joinName = p.join_name;
      if (sleeperMyKickers.has(joinName)) sleeperStatus = 'MY_TEAM';
      else if (sleeperTakenKickers.has(joinName)) sleeperStatus = 'TAKEN';
      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
+
+     // MERGE LIVE SLEEPER SCORE
+     // We use the join_name to find the Sleeper ID from our map, then look up the score
+     let sleeperLive = null;
+     const sleeperId = sleeperIdMap[joinName];
+     if (sleeperId && liveScores[sleeperId] !== undefined) {
+         sleeperLive = liveScores[sleeperId];
+     }
 
      return { 
          ...pWithYtd, 
@@ -217,7 +240,8 @@ const App = () => {
          acc_diff: l3_act_sum - l3_proj_sum, 
          sleeperStatus,
          ytdRank: ytdRankMap.get(p.kicker_player_name),
-         ppgRank: ppgRankMap.get(p.kicker_player_name)
+         ppgRank: ppgRankMap.get(p.kicker_player_name),
+         sleeper_live_score: sleeperLive // Pass to calculateLiveScore
      };
   }).filter(p => p.proj > 0); 
 
@@ -237,7 +261,6 @@ const App = () => {
           const bMine = b.sleeperStatus === 'MY_TEAM';
           if (aMine && !bMine) return -1;
           if (!aMine && bMine) return 1;
-          
           let valA = a[sortConfig.key];
           let valB = b[sortConfig.key];
           if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
@@ -286,12 +309,6 @@ const App = () => {
 
   const ytdAvgs = { fpts: calculateLeagueAvg(ytdSorted, 'fpts'), avg_fpts: calculateLeagueAvg(ytdSorted, 'avg_fpts'), pct: calculateLeagueAvg(ytdSorted, 'pct_val'), longs: calculateLeagueAvg(ytdSorted, 'longs'), dome_pct: calculateLeagueAvg(ytdSorted, 'dome_pct'), rz_trips: calculateLeagueAvg(ytdSorted, 'rz_trips'), off_stall: calculateLeagueAvg(ytdSorted, 'off_stall_rate_ytd'), def_stall: calculateLeagueAvg(ytdSorted, 'def_stall_rate_ytd') };
 
-  const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
-  const bucketOutDoubtful = injuries.filter(k => ['OUT', 'Doubtful', 'Inactive'].includes(k.injury_status));
-  const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
-
-  const aubreyExample = processed.find(p => p.kicker_player_name.includes('Aubrey')) || processed[0];
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -315,23 +332,7 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {/* TABS - Pass leagueName down to SettingsTab */}
-        {activeTab === 'settings' && ( 
-            <SettingsTab 
-                scoring={scoring} 
-                updateScoring={updateScoring} 
-                resetScoring={resetScoring} 
-                sleeperLeagueId={sleeperLeagueId} 
-                setSleeperLeagueId={setSleeperLeagueId} 
-                sleeperUser={sleeperUser} 
-                setSleeperUser={setSleeperUser} 
-                syncSleeper={syncSleeper} 
-                sleeperLoading={sleeperLoading} 
-                sleeperScoringUpdated={sleeperScoringUpdated} 
-                sleeperMyKickers={sleeperMyKickers}
-                sleeperLeagueName={sleeperLeagueName} // NEW PROP
-            /> 
-        )}
+        {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers} sleeperLeagueName={sleeperLeagueName}/> )}
 
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
@@ -403,7 +404,7 @@ const App = () => {
           </div>
         )}
         
-        {activeTab === 'accuracy' && <AccuracyTab players={processed} scoring={scoring} week={meta.week} />}
+        {activeTab === 'accuracy' && <AccuracyTab players={processed} scoring={scoring} week={meta.week} sleeperLeagueId={sleeperLeagueId} />}
         
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
