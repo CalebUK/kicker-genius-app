@@ -69,32 +69,26 @@ export const getGameStatus = (gameDtStr) => {
   if (!gameDtStr) return 'UPCOMING';
   
   try {
-      // 1. Parse the game string (e.g., "2025-11-28 13:00")
-      // We assume this time is in US Eastern Time (ET) because that's what nflreadpy returns.
-      // We append "-05:00" (EST) or "-04:00" (EDT) context. 
-      // Ideally, we'd use a library like date-fns-tz, but for raw JS:
+      // 1. Parse game time string (e.g., "2025-11-28 13:00")
+      // Append "EST" (UTC-5) to force the browser to interpret it as Eastern Time
+      // This handles both Standard (EST) and Daylight (EDT) roughly correct for NFL season
+      const gameDate = new Date(`${gameDtStr.replace(' ', 'T')}-05:00`);
       
-      // Simple Approach: Create a date object relative to UTC, then subtract the offset 
-      // to make it comparable to Date.now() which is UTC-based.
-      
-      const gameTime = new Date(gameDtStr.replace(' ', 'T')); // Browser interprets as local
-      
-      // Check if valid date
-      if (isNaN(gameTime.getTime())) return 'UPCOMING';
+      if (isNaN(gameDate.getTime())) return 'UPCOMING';
 
-      const now = new Date();
+      const now = new Date(); // Current time in user's local timezone (but comparable globally via UTC)
       
       // Calculate difference in milliseconds
-      const diffMs = now - gameTime;
+      const diffMs = now - gameDate;
       const diffHours = diffMs / (1000 * 60 * 60);
       
       // Logic:
       // If diff is negative, game is in future -> UPCOMING
-      // If diff is between 0 and 4 hours -> LIVE
-      // If diff is > 4 hours -> FINISHED
+      // If diff is between 0 and 4.5 hours -> LIVE
+      // If diff is > 4.5 hours -> FINISHED
       
       if (diffHours < 0) return 'UPCOMING';
-      if (diffHours >= 0 && diffHours < 4.5) return 'LIVE'; // Extended to 4.5h for OT
+      if (diffHours >= 0 && diffHours < 4.5) return 'LIVE'; 
       return 'FINISHED';
       
   } catch (e) { 
