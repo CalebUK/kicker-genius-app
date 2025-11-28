@@ -32,23 +32,27 @@ const AccuracyTab = ({ players, scoring, week }) => {
   const metRate = activeGames.length > 0 ? Math.round((wins / activeGames.length) * 100) : 0; 
 
   // Metric 3: Adjusted Median % (Rounded to nearest 10%)
-  // Step A: Calculate % for each kicker and round to nearest 10
   const roundedPcts = activeGames.map(p => {
       const live = calculateLiveScore(p, scoring);
       const proj = p.proj;
       if (proj === 0) return 0; 
       const rawPct = (live / proj) * 100;
-      return Math.round(rawPct / 10) * 10; // e.g., 88 -> 90, 92 -> 90
+      return Math.round(rawPct / 10) * 10; 
   }).sort((a, b) => a - b);
 
-  // Step B: Find the median of these rounded values
   const mid = Math.floor(roundedPcts.length / 2);
   const medianPct = roundedPcts.length > 0 
     ? (roundedPcts.length % 2 !== 0 ? roundedPcts[mid] : (roundedPcts[mid - 1] + roundedPcts[mid]) / 2)
     : 0;
     
-  // Step C: Count how many kickers fell into this median bucket
-  const kickersAtMedian = roundedPcts.filter(p => p === medianPct).length;
+  // Count kickers within +/- 5% of the median (The "Median Range")
+  const kickersAtMedian = activeGames.filter(p => {
+      const live = calculateLiveScore(p, scoring);
+      const proj = p.proj;
+      if (proj === 0) return false;
+      const pct = (live / proj) * 100;
+      return pct >= (medianPct - 5) && pct <= (medianPct + 5);
+  }).length;
 
 
   // --- 2. FILTER & SORT FOR DISPLAY ---
@@ -69,7 +73,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
         
         {/* --- LIVE MODEL PERFORMANCE TRACKER --- */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-             {/* Card 1: Total Score (Win/Loss) */}
+             {/* Card 1: Total Score */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Activity className="w-3 h-3 text-blue-500"/> Total Points</div>
                  <div className="flex items-baseline gap-2">
@@ -96,11 +100,14 @@ const AccuracyTab = ({ players, scoring, week }) => {
                     <div className="text-slate-200 flex flex-col items-center"><span>{metRate}%</span><span className="text-[8px] text-slate-500 font-normal">MET</span></div>
                     <div className="text-red-400 flex flex-col items-center"><span>{bustRate}%</span><span className="text-[8px] text-slate-500 font-normal">BUST</span></div>
                  </div>
-                 {/* Mini Bar Chart */}
-                 <div className="w-full h-1.5 bg-slate-800 rounded-full mt-1 flex overflow-hidden">
+                 {/* Mini Bar Chart with markers */}
+                 <div className="w-full h-1.5 bg-slate-800 rounded-full mt-1 flex overflow-hidden relative">
                     <div className="bg-emerald-500 h-full" style={{width: `${smashRate}%`}}></div>
                     <div className="bg-slate-400 h-full" style={{width: `${metRate}%`}}></div>
                     <div className="bg-red-500 h-full" style={{width: `${bustRate}%`}}></div>
+                    {/* Tick marks for zones */}
+                    <div className="absolute top-0 bottom-0 w-px bg-slate-950 left-1/3"></div>
+                    <div className="absolute top-0 bottom-0 w-px bg-slate-950 left-2/3"></div>
                  </div>
             </div>
 
@@ -113,7 +120,7 @@ const AccuracyTab = ({ players, scoring, week }) => {
                  </div>
             </div>
             
-             {/* Filter Buttons Row */}
+             {/* Filter Buttons */}
              <div className="flex justify-end mb-4">
                 <div className="flex gap-1 p-1 bg-slate-900 rounded-lg border border-slate-800">
                     {['ALL', 'LIVE', 'FINISHED', 'UPCOMING'].map((f) => (
@@ -128,13 +135,11 @@ const AccuracyTab = ({ players, scoring, week }) => {
             {displayPlayers.map((p, i) => {
                 const liveScore = calculateLiveScore(p, scoring);
                 const proj = p.proj;
-                
-                // Performance % Calculation
-                const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
-
+                const pct = proj > 0 ? Math.min(100, Math.max(5, (liveScore / proj) * 100)) : 0; 
                 const isBeat = liveScore >= proj;
                 const isSmashed = liveScore >= proj + 3;
                 const status = getGameStatus(p.game_dt);
+                const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
                 
                 let statusColor = "bg-slate-800 text-slate-400";
                 let StatusIcon = Calendar;
@@ -145,8 +150,6 @@ const AccuracyTab = ({ players, scoring, week }) => {
                 const isSpecial = p.kicker_player_name.includes('Aubrey') || p.team === 'DAL';
                 const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
                 const glowClass = isSmashed ? "shadow-[0_0_15px_rgba(59,130,246,0.5)] border-blue-400" : "";
-
-                // Visual % for Bar Width (Capped at 100% so bar doesn't overflow)
                 const visualPct = Math.min(100, Math.max(5, performancePct));
 
                 return (
@@ -161,64 +164,33 @@ const AccuracyTab = ({ players, scoring, week }) => {
                         </div>
 
                         <div className="flex justify-between items-end mb-2 relative z-10">
-                            <div className="text-left">
-                                <span className={`text-3xl font-black ${isSmashed ? 'text-blue-400' : isBeat ? 'text-emerald-400' : 'text-white'}`}>{liveScore}</span>
-                                <span className="text-xs text-slate-500 ml-1">pts</span>
-                            </div>
-                            <div className="text-xs text-slate-400 font-bold text-right">
-                                PROJECTED: <span className="text-white text-base">{proj}</span>
-                            </div>
+                            <div className="text-left"><span className={`text-3xl font-black ${isSmashed ? 'text-blue-400' : isBeat ? 'text-emerald-400' : 'text-white'}`}>{liveScore}</span><span className="text-xs text-slate-500 ml-1">pts</span></div>
+                            <div className="text-xs text-slate-400 font-bold text-right">PROJECTED: <span className="text-white text-base">{proj}</span></div>
                         </div>
 
                         {/* FOOTBALL FIELD PROGRESS BAR */}
                         <div className="h-8 w-full bg-emerald-900 rounded-md relative mb-4 border-2 border-emerald-800 overflow-hidden mt-2 shadow-inner group">
-                             {/* Field Markings */}
                              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-800 to-emerald-950 opacity-80"></div>
                              <div className="absolute left-0 top-0 bottom-0 w-2 bg-white/90 z-0"></div>
                              <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/90 z-0"></div>
                              <div className="absolute inset-0 flex justify-between px-4 items-center pointer-events-none z-0">
                                  {[...Array(9)].map((_, idx) => {
                                      const isMidfield = idx === 4;
-                                     return (
-                                         <div 
-                                            key={idx} 
-                                            className={`${isMidfield ? 'h-full w-0.5 bg-white/80' : 'h-[60%] w-px bg-white/40'}`}
-                                         ></div>
-                                     );
+                                     return <div key={idx} className={`${isMidfield ? 'h-full w-0.5 bg-white/80' : 'h-[60%] w-px bg-white/40'}`}></div>;
                                  })}
                              </div>
                              <img src="/assets/logo.png" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 object-contain opacity-40 pointer-events-none" alt="logo"/>
-
-                             {/* Fill Bar */}
-                             <div 
-                                className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} 
-                                style={{ width: `${visualPct}%` }}
-                             ></div>
-                             
-                             {/* Ball Icon */}
-                             <div 
-                                className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" 
-                                style={{ left: `calc(${visualPct}% - 16px)` }}
-                             >
-                                 <FootballIcon isFire={isSmashed} />
-                             </div>
+                             <div className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${visualPct}%` }}></div>
+                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${visualPct}% - 16px)` }}><FootballIcon isFire={isSmashed} /></div>
                         </div>
 
                         <div className="flex flex-wrap gap-1.5 relative z-10">
-                            
-                            {/* NEW: PERFORMANCE % BADGE */}
-                            {proj > 0 && (
-                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${performancePct >= 100 ? 'bg-emerald-900/50 text-emerald-400 border-emerald-700' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>
-                                    {performancePct}% of Proj
-                                </span>
-                            )}
-
+                            {proj > 0 && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${performancePct >= 100 ? 'bg-emerald-900/50 text-emerald-400 border-emerald-700' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>{performancePct}% of Proj</span>}
                             {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
                             {(p.wk_fg_40_49 > 0) && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{p.wk_fg_40_49}x 40-49</span>}
                             {(p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39 > 0) && <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39}x Short FG</span>}
                             {(p.wk_xp_made > 0) && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_xp_made}x XP</span>}
                             {(p.wk_fg_miss > 0 || p.wk_xp_miss > 0) && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{p.wk_fg_miss + p.wk_xp_miss} Miss</span>}
-                            
                             {liveScore === 0 && status !== 'UPCOMING' && <span className="text-[10px] text-slate-600 italic px-1">No points yet</span>}
                         </div>
                         
