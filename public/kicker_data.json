@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 13,
-    "updated": "2025-11-30 21:23",
+    "updated": "2025-11-30 22:25",
     "league_avgs": {
       "fpts": 71.3,
       "off_stall": 53.2,
@@ -266,7 +266,7 @@
           }
         ]
       },
-      "narrative": "Fire up Dicker with confidence; his Matchup Grade of 102.7 is in the elite tier. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Dicker is a locked-and-loaded RB1 of kickers this week with an elite Grade of 102.7. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -394,7 +394,7 @@
           }
         ]
       },
-      "narrative": "McPherson is a locked-and-loaded RB1 of kickers this week with an elite Grade of 112.5. His offense has a high stall rate (78.6%), which often leads to FG attempts."
+      "narrative": "Fire up McPherson with confidence; his Matchup Grade of 112.5 is in the elite tier. His offense has a high stall rate (78.6%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -451,11 +451,11 @@
       "spread_display": "-6.0",
       "is_dome": false,
       "weather_data": [
-        6.1,
-        "6mph \u2600\ufe0f"
+        5.6,
+        "5mph \u2600\ufe0f"
       ],
-      "wind": 6.1,
-      "weather_desc": "6mph \u2600\ufe0f",
+      "wind": 5.6,
+      "weather_desc": "5mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -519,7 +519,7 @@
           }
         ]
       },
-      "narrative": "Fire up Lutz with confidence; his Matchup Grade of 104.4 is in the elite tier. His offense has a high stall rate (75.0%), which often leads to FG attempts."
+      "narrative": "Lutz is a locked-and-loaded RB1 of kickers this week with an elite Grade of 104.4. His offense has a high stall rate (75.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -775,7 +775,7 @@
           }
         ]
       },
-      "narrative": "You can trust Aubrey in your lineup given his solid Grade of 93.2. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Aubrey is a strong play this week, sitting comfortably with a Grade of 93.2. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -905,7 +905,7 @@
           }
         ]
       },
-      "narrative": "You can trust Fairbairn in your lineup given his solid Grade of 94.1. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Fairbairn is a strong play this week, sitting comfortably with a Grade of 94.1. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -1161,7 +1161,7 @@
           }
         ]
       },
-      "narrative": "Fade Butker if possible; his Grade of 73.5 suggests low upside. The offense has a massive implied total of 28.5, offering a high ceiling."
+      "narrative": "Butker is a risky option this week with a below-average Grade of 73.5. The offense has a massive implied total of 28.5, offering a high ceiling."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -1290,7 +1290,7 @@
           }
         ]
       },
-      "narrative": "Bates is a risky option this week with a below-average Grade of 79.1. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Fade Bates if possible; his Grade of 79.1 suggests low upside. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "M.Badgley",
@@ -1419,7 +1419,7 @@
           }
         ]
       },
-      "narrative": "Fire up Badgley with confidence; his Matchup Grade of 100.7 is in the elite tier. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Badgley is a locked-and-loaded RB1 of kickers this week with an elite Grade of 100.7. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -1672,7 +1672,7 @@
           }
         ]
       },
-      "narrative": "Fade Borregales if possible; his Grade of 70.7 suggests low upside. His offense has a high stall rate (64.3%), which often leads to FG attempts."
+      "narrative": "Borregales is a risky option this week with a below-average Grade of 70.7. His offense has a high stall rate (64.3%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -2053,7 +2053,7 @@
           }
         ]
       },
-      "narrative": "Consider Patterson if you need a fill-in; his Grade is a decent 87.7. His offense has a high stall rate (81.8%), which often leads to FG attempts."
+      "narrative": "Patterson is a viable streaming option with a respectable Grade of 87.7. His offense has a high stall rate (81.8%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "C.Little",
@@ -2308,7 +2308,7 @@
           }
         ]
       },
-      "narrative": "Fade Reichard if possible; his Grade of 61.1 suggests low upside. His offense has a high stall rate (50.0%), which often leads to FG attempts."
+      "narrative": "Reichard is a risky option this week with a below-average Grade of 61.1. His offense has a high stall rate (50.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -2365,11 +2365,11 @@
       "spread_display": "+6.0",
       "is_dome": false,
       "weather_data": [
-        6.1,
-        "6mph \u2600\ufe0f"
+        5.6,
+        "5mph \u2600\ufe0f"
       ],
-      "wind": 6.1,
-      "weather_desc": "6mph \u2600\ufe0f",
+      "wind": 5.6,
+      "weather_desc": "5mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -2816,7 +2816,7 @@
           }
         ]
       },
-      "narrative": "Elliott is a risky option this week with a below-average Grade of 66.0. His offense has a high stall rate (46.2%), which often leads to FG attempts."
+      "narrative": "Fade Elliott if possible; his Grade of 66.0 suggests low upside. His offense has a high stall rate (46.2%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -2943,7 +2943,7 @@
           }
         ]
       },
-      "narrative": "Fade Slye if possible; his Grade of 67.6 suggests low upside. The matchup is favorable against a defense that forces FGs (54.5%) in the red zone."
+      "narrative": "Slye is a risky option this week with a below-average Grade of 67.6. The matchup is favorable against a defense that forces FGs (54.5%) in the red zone."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -3199,7 +3199,7 @@
           }
         ]
       },
-      "narrative": "McLaughlin is a risky option this week with a below-average Grade of 64.7. His offense has a high stall rate (53.8%), which often leads to FG attempts."
+      "narrative": "Fade McLaughlin if possible; his Grade of 64.7 suggests low upside. His offense has a high stall rate (53.8%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "Y.Koo",
@@ -3326,7 +3326,7 @@
           }
         ]
       },
-      "narrative": "Koo is a risky option this week with a below-average Grade of 54.6. His offense has a high stall rate (53.3%), which often leads to FG attempts."
+      "narrative": "Fade Koo if possible; his Grade of 54.6 suggests low upside. His offense has a high stall rate (53.3%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -3451,7 +3451,7 @@
           }
         ]
       },
-      "narrative": "Fade Szmyt if possible; his Grade of 72.2 suggests low upside. His offense has a high stall rate (63.6%), which often leads to FG attempts."
+      "narrative": "Szmyt is a risky option this week with a below-average Grade of 72.2. His offense has a high stall rate (63.6%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -3706,7 +3706,7 @@
           }
         ]
       },
-      "narrative": "Fade Fitzgerald if possible; his Grade of 77.9 suggests low upside. His offense has a high stall rate (58.3%), which often leads to FG attempts."
+      "narrative": "Fitzgerald is a risky option this week with a below-average Grade of 77.9. His offense has a high stall rate (58.3%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -3833,7 +3833,7 @@
           }
         ]
       },
-      "narrative": "Ryland is a risky option this week with a below-average Grade of 66.8. His offense has a high stall rate (50.0%), which often leads to FG attempts."
+      "narrative": "Fade Ryland if possible; his Grade of 66.8 suggests low upside. His offense has a high stall rate (50.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "J.Gillan",
@@ -3960,7 +3960,7 @@
           }
         ]
       },
-      "narrative": "Fade Gillan if possible; his Grade of 54.6 suggests low upside. His offense has a high stall rate (53.3%), which often leads to FG attempts."
+      "narrative": "Gillan is a risky option this week with a below-average Grade of 54.6. His offense has a high stall rate (53.3%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "B.Grupe",
