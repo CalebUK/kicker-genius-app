@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 13,
-    "updated": "2025-11-30 02:24",
+    "updated": "2025-11-30 04:02",
     "league_avgs": {
       "fpts": 71.3,
       "off_stall": 53.2,
@@ -137,7 +137,7 @@
           }
         ]
       },
-      "narrative": "Myers is a strong play this week, sitting comfortably with a Grade of 96.4. His offense has a high stall rate (64.3%), which often leads to FG attempts."
+      "narrative": "You can trust Myers in your lineup given his solid Grade of 96.4. His offense has a high stall rate (64.3%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "C.Dicker",
@@ -393,7 +393,7 @@
           }
         ]
       },
-      "narrative": "Fire up McPherson with confidence; his Matchup Grade of 112.5 is in the elite tier. His offense has a high stall rate (78.6%), which often leads to FG attempts."
+      "narrative": "McPherson is a locked-and-loaded RB1 of kickers this week with an elite Grade of 112.5. His offense has a high stall rate (78.6%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -450,11 +450,11 @@
       "spread_display": "-6.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        5.1,
+        "5mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 5.1,
+      "weather_desc": "5mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -647,7 +647,7 @@
           }
         ]
       },
-      "narrative": "Fairbairn is a viable streaming option with a respectable Grade of 89.1. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Consider Fairbairn if you need a fill-in; his Grade is a decent 89.1. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -774,7 +774,7 @@
           }
         ]
       },
-      "narrative": "Loop is a strong play this week, sitting comfortably with a Grade of 98.2. The offense has a massive implied total of 29.8, offering a high ceiling."
+      "narrative": "You can trust Loop in your lineup given his solid Grade of 98.2. The offense has a massive implied total of 29.8, offering a high ceiling."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -1031,7 +1031,7 @@
           }
         ]
       },
-      "narrative": "You can trust Badgley in your lineup given his solid Grade of 95.7. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Badgley is a strong play this week, sitting comfortably with a Grade of 95.7. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -1285,7 +1285,7 @@
           }
         ]
       },
-      "narrative": "Little is a risky option this week with a below-average Grade of 69.8. The matchup is favorable against a defense that forces FGs (70.0%) in the red zone."
+      "narrative": "Fade Little if possible; his Grade of 69.8 suggests low upside. The matchup is favorable against a defense that forces FGs (70.0%) in the red zone."
     },
     {
       "kicker_player_name": "R.Patterson",
@@ -1342,11 +1342,11 @@
       "spread_display": "-5.5",
       "is_dome": false,
       "weather_data": [
-        13.8,
-        "13mph \u2600\ufe0f"
+        14.0,
+        "14mph \u2600\ufe0f"
       ],
-      "wind": 13.8,
-      "weather_desc": "13mph \u2600\ufe0f",
+      "wind": 14.0,
+      "weather_desc": "14mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -1413,7 +1413,7 @@
           }
         ]
       },
-      "narrative": "Patterson is a viable streaming option with a respectable Grade of 82.7. His offense has a high stall rate (81.8%), which often leads to FG attempts."
+      "narrative": "Consider Patterson if you need a fill-in; his Grade is a decent 82.7. His offense has a high stall rate (81.8%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -1542,7 +1542,7 @@
           }
         ]
       },
-      "narrative": "Fade Bates if possible; his Grade of 79.1 suggests low upside. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Bates is a risky option this week with a below-average Grade of 79.1. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -1672,7 +1672,7 @@
           }
         ]
       },
-      "narrative": "Boswell is a viable streaming option with a respectable Grade of 86.3. However, heavy winds (16.2 mph) could severely limit kicking opportunities."
+      "narrative": "Consider Boswell if you need a fill-in; his Grade is a decent 86.3. However, heavy winds (16.2 mph) could severely limit kicking opportunities."
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -1729,10 +1729,10 @@
       "spread_display": "-3.0",
       "is_dome": false,
       "weather_data": [
-        12.2,
+        12.4,
         "12mph \u2600\ufe0f"
       ],
-      "wind": 12.2,
+      "wind": 12.4,
       "weather_desc": "12mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -1857,10 +1857,10 @@
       "spread_display": "+3.0",
       "is_dome": false,
       "weather_data": [
-        12.2,
+        12.4,
         "12mph \u2600\ufe0f"
       ],
-      "wind": 12.2,
+      "wind": 12.4,
       "weather_desc": "12mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -1928,7 +1928,7 @@
           }
         ]
       },
-      "narrative": "Fire up Folk with confidence; his Matchup Grade of 100.3 is in the elite tier. His offense has a high stall rate (60.0%), which often leads to FG attempts."
+      "narrative": "Folk is a locked-and-loaded RB1 of kickers this week with an elite Grade of 100.3. His offense has a high stall rate (60.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -2180,7 +2180,7 @@
           }
         ]
       },
-      "narrative": "Fade Borregales if possible; his Grade of 70.7 suggests low upside. His offense has a high stall rate (64.3%), which often leads to FG attempts."
+      "narrative": "Borregales is a risky option this week with a below-average Grade of 70.7. His offense has a high stall rate (64.3%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -2237,11 +2237,11 @@
       "spread_display": "-3.0",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        16.2,
+        "16mph \ud83c\udf2c\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 16.2,
+      "weather_desc": "16mph \ud83c\udf2c\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -2264,9 +2264,10 @@
       "def_pa": 22.666666666666668,
       "def_share": 0.3886021505376344,
       "aggression_pct": 42.9,
-      "grade": 89.0,
-      "proj": 7.7,
+      "grade": 79.0,
+      "proj": 7.3,
       "grade_details": [
+        "-10 Heavy Wind",
         "+5 Tight Game",
         "-5 Aggressive Coach"
       ],
@@ -2308,7 +2309,7 @@
           }
         ]
       },
-      "narrative": "Consider Prater if you need a fill-in; his Grade is a decent 89.0. His offense has a high stall rate (62.5%), which often leads to FG attempts."
+      "narrative": "Fade Prater if possible; his Grade of 79.0 suggests low upside. However, heavy winds (16.2 mph) could severely limit kicking opportunities."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -2365,10 +2366,10 @@
       "spread_display": "-3.5",
       "is_dome": false,
       "weather_data": [
-        8.2,
+        8.0,
         "8mph \u2600\ufe0f"
       ],
-      "wind": 8.2,
+      "wind": 8.0,
       "weather_desc": "8mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -2435,7 +2436,7 @@
           }
         ]
       },
-      "narrative": "McLaughlin is a risky option this week with a below-average Grade of 64.7. His offense has a high stall rate (53.8%), which often leads to FG attempts."
+      "narrative": "Fade McLaughlin if possible; his Grade of 64.7 suggests low upside. His offense has a high stall rate (53.8%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "W.Reichard",
@@ -2492,11 +2493,11 @@
       "spread_display": "+11.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        3.2,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 3.2,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -2563,7 +2564,7 @@
           }
         ]
       },
-      "narrative": "Reichard is a risky option this week with a below-average Grade of 61.1. His offense has a high stall rate (50.0%), which often leads to FG attempts."
+      "narrative": "Fade Reichard if possible; his Grade of 61.1 suggests low upside. His offense has a high stall rate (50.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -2690,7 +2691,7 @@
           }
         ]
       },
-      "narrative": "Fade Moody if possible; his Grade of 53.3 suggests low upside. His offense has a high stall rate (42.9%), which often leads to FG attempts."
+      "narrative": "Moody is a risky option this week with a below-average Grade of 53.3. His offense has a high stall rate (42.9%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -2819,7 +2820,7 @@
           }
         ]
       },
-      "narrative": "McManus is a risky option this week with a below-average Grade of 68.0. Playing in a dome guarantees perfect kicking conditions."
+      "narrative": "Fade McManus if possible; his Grade of 68.0 suggests low upside. Playing in a dome guarantees perfect kicking conditions."
     },
     {
       "kicker_player_name": "C.Santos",
@@ -2946,7 +2947,7 @@
           }
         ]
       },
-      "narrative": "Santos is a risky option this week with a below-average Grade of 59.3. The matchup is favorable against a defense that forces FGs (46.2%) in the red zone."
+      "narrative": "Fade Santos if possible; his Grade of 59.3 suggests low upside. The matchup is favorable against a defense that forces FGs (46.2%) in the red zone."
     },
     {
       "kicker_player_name": "J.Elliott",
@@ -3071,7 +3072,7 @@
           }
         ]
       },
-      "narrative": "Elliott is a risky option this week with a below-average Grade of 66.0. His offense has a high stall rate (46.2%), which often leads to FG attempts."
+      "narrative": "Fade Elliott if possible; his Grade of 66.0 suggests low upside. His offense has a high stall rate (46.2%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -3256,11 +3257,11 @@
       "spread_display": "-10.5",
       "is_dome": false,
       "weather_data": [
-        6.5,
-        "6mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 6.5,
-      "weather_desc": "6mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -3384,11 +3385,11 @@
       "spread_display": "+5.5",
       "is_dome": false,
       "weather_data": [
-        24.7,
-        "24mph \ud83c\udf2c\ufe0f"
+        23.7,
+        "23mph \ud83c\udf2c\ufe0f"
       ],
-      "wind": 24.7,
-      "weather_desc": "24mph \ud83c\udf2c\ufe0f",
+      "wind": 23.7,
+      "weather_desc": "23mph \ud83c\udf2c\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -3454,7 +3455,7 @@
           }
         ]
       },
-      "narrative": "Szmyt is a risky option this week with a below-average Grade of 62.2. However, heavy winds (24.7 mph) could severely limit kicking opportunities."
+      "narrative": "Fade Szmyt if possible; his Grade of 62.2 suggests low upside. However, heavy winds (23.7 mph) could severely limit kicking opportunities."
     },
     {
       "kicker_player_name": "R.Fitzgerald",
@@ -3511,11 +3512,11 @@
       "spread_display": "+10.5",
       "is_dome": false,
       "weather_data": [
-        6.5,
-        "6mph \u2600\ufe0f"
+        3.7,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 6.5,
-      "weather_desc": "6mph \u2600\ufe0f",
+      "wind": 3.7,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -3581,7 +3582,7 @@
           }
         ]
       },
-      "narrative": "Fitzgerald is a risky option this week with a below-average Grade of 77.9. His offense has a high stall rate (58.3%), which often leads to FG attempts."
+      "narrative": "Fade Fitzgerald if possible; his Grade of 77.9 suggests low upside. His offense has a high stall rate (58.3%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -3638,10 +3639,10 @@
       "spread_display": "+3.5",
       "is_dome": false,
       "weather_data": [
-        8.2,
+        8.0,
         "8mph \u2600\ufe0f"
       ],
-      "wind": 8.2,
+      "wind": 8.0,
       "weather_desc": "8mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -3708,7 +3709,7 @@
           }
         ]
       },
-      "narrative": "Ryland is a risky option this week with a below-average Grade of 66.8. His offense has a high stall rate (50.0%), which often leads to FG attempts."
+      "narrative": "Fade Ryland if possible; his Grade of 66.8 suggests low upside. His offense has a high stall rate (50.0%), which often leads to FG attempts."
     },
     {
       "kicker_player_name": "Y.Koo",
@@ -4019,11 +4020,11 @@
       "spread_display": "+5.5",
       "is_dome": false,
       "weather_data": [
-        13.8,
-        "13mph \u2600\ufe0f"
+        14.0,
+        "14mph \u2600\ufe0f"
       ],
-      "wind": 13.8,
-      "weather_desc": "13mph \u2600\ufe0f",
+      "wind": 14.0,
+      "weather_desc": "14mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -4276,10 +4277,10 @@
       "spread_display": "-3.0",
       "is_dome": false,
       "weather_data": [
-        12.2,
+        12.4,
         "12mph \u2600\ufe0f"
       ],
-      "wind": 12.2,
+      "wind": 12.4,
       "weather_desc": "12mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -4533,11 +4534,11 @@
       "spread_display": "-10.5",
       "is_dome": false,
       "weather_data": [
-        6.5,
-        "6mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 6.5,
-      "weather_desc": "6mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -4662,11 +4663,11 @@
       "spread_display": "-5.5",
       "is_dome": false,
       "weather_data": [
-        24.7,
-        "24mph \ud83c\udf2c\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 24.7,
-      "weather_desc": "24mph \ud83c\udf2c\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -4692,7 +4693,6 @@
       "grade": 0.0,
       "proj": 0.0,
       "grade_details": [
-        "-10 Heavy Wind",
         "+5 Elite Talent",
         "-5 Aggressive Coach",
         "\u26d4 OUT"
@@ -4921,11 +4921,11 @@
       "spread_display": "-5.5",
       "is_dome": false,
       "weather_data": [
-        24.7,
-        "24mph \ud83c\udf2c\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 24.7,
-      "weather_desc": "24mph \ud83c\udf2c\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -4951,7 +4951,6 @@
       "grade": 0.0,
       "proj": 0.0,
       "grade_details": [
-        "-10 Heavy Wind",
         "-5 Aggressive Coach",
         "\u26d4 PRACTICE SQUAD"
       ],
