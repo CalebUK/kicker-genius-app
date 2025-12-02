@@ -42,20 +42,44 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const metRate = totalKickers > 0 ? Math.round((met / totalKickers) * 100) : 0; 
 
   // Metric 3: Kicker Quartile Character Lineup
-  const quartileIcons = Array(10).fill(null).map((_, i) => {
-      const percentile = i * 10;
-      const isMiddle = percentile >= 30 && percentile <= 60; 
+  // To ensure 50% highlight (5 icons), we find the start index based on data skew
+  const totalIcons = 10;
+  const highlightCount = 5; // 50% of 10
+  
+  // Determine "Center of Gravity" for the highlight block
+  // If Median is close to Min, shift block left. If close to Max, shift right.
+  let startIdx = 2; // Default center (indices 2,3,4,5,6)
+  
+  if (diffs.length > 0) {
+      const min = diffs[0];
+      const max = diffs[diffs.length - 1];
+      const med = diffs[Math.floor(diffs.length / 2)];
       
-      // Markers for 25th (Index 2/3), 50th (Index 5), 75th (Index 7/8)
-      // Use 2, 5, 8 for distinct visual markers
-      const isQ1 = i === 2; 
-      const isMedian = i === 5; 
-      const isQ3 = i === 8;
+      if (max !== min) {
+          // Calculate where median falls between min and max (0 to 1)
+          const relativePos = (med - min) / (max - min);
+          // Map 0..1 to valid start indices (0 to 5)
+          // We want the median icon (index ~ relativePos * 10) to be roughly in the middle of the block
+          const targetCenter = Math.floor(relativePos * 10);
+          startIdx = Math.max(0, Math.min(10 - highlightCount, targetCenter - 2));
+      }
+  }
+
+  const quartileIcons = Array(10).fill(null).map((_, i) => {
+      // Highlight logic: strictly 5 icons starting from calculated startIdx
+      const isMiddle = i >= startIdx && i < (startIdx + highlightCount);
+      
+      // Markers: Min (0), Median (5 or dynamic?), Max (9)
+      // Let's keep fixed positions for Q1/Med/Q3 markers for simplicity, or map them to the highlight block
+      // Visual markers for distribution:
+      const isQ1 = i === startIdx; // Start of highlight
+      const isMedian = i === startIdx + 2; // Middle of highlight
+      const isQ3 = i === startIdx + 4; // End of highlight
 
       return { isMiddle, isMedian, isQ1, isQ3 };
   });
   
-  // Calculate boundaries for Q1, Median, Q3, Min, Max
+  // Calculate boundaries
   const getPercentileValue = (pct) => {
       if (diffs.length === 0) return 0;
       const n = diffs.length;
@@ -71,12 +95,6 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const q1Val = getPercentileValue(25);
   const medianVal = getPercentileValue(50);
   const q3Val = getPercentileValue(75);
-  
-  const q1Range = `${minVal} to ${q1Val.toFixed(1)}`;
-  const q2Range = `${q1Val.toFixed(1)} to ${medianVal.toFixed(1)}`;
-  const q3Range = `${medianVal.toFixed(1)} to ${q3Val.toFixed(1)}`;
-  const q4Range = `${q3Val.toFixed(1)} to ${maxVal}`;
-
 
   // --- 2. FILTER & SORT FOR DISPLAY ---
   const displayPlayers = players.filter(p => {
@@ -124,8 +142,8 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
             {/* Card 2: Accuracy Rate */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Target className="w-3 h-3 text-emerald-500"/> Accuracy Rate</div>
-                 <div className="text-3xl font-black text-white">{wins}</div>
-                 <div className="text-[10px] text-slate-400">of {totalKickers} within +/- 3 pts ({winRate}%)</div>
+                 <div className="text-3xl font-black text-white">{winRate}%</div>
+                 <div className="text-[10px] text-slate-400">{wins} of {totalKickers} within +/- 3 pts</div>
             </div>
 
             {/* Card 3: Performance (With Counts) */}
@@ -146,7 +164,6 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                     {smashRate > 0 && metRate > 0 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate}%`}}></div>}
                     {(smashRate + metRate) < 100 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate + metRate}%`}}></div>}
                  </div>
-                 {/* Labels for Thresholds */}
                  <div className="flex justify-between text-[8px] text-slate-600 mt-0.5 w-full">
                      <span>&gt;+3</span><span className="text-center">+/-3</span><span>&lt;-3</span>
                  </div>
@@ -157,29 +174,28 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                  <div className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-1"><Users className="w-3 h-3 text-amber-500"/> Kicker Quartile</div>
                  
                  <div className="flex justify-between items-end relative h-8 px-1">
-                    {/* FIX: Use 10 icons for 10% segments */}
                     {quartileIcons.map((q, i) => (
                         <div key={i} className="relative flex flex-col items-center group">
                             
-                            {/* Marker 75th Percentile (Q3) */}
-                            {q.isQ3 && (
-                                <div className="absolute -top-5 bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
-                                    Q3: {q3Val > 0 ? '+' : ''}{q3Val.toFixed(0)}
-                                </div>
-                            )}
-
-                            {/* Marker 50th Percentile (Median) */}
+                            {/* Median Flag */}
                             {q.isMedian && (
                                 <div className="absolute -top-7 bg-amber-500 text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md whitespace-nowrap z-40 transform -translate-x-1/2 left-1/2">
                                     Med: {medianVal > 0 ? '+' : ''}{medianVal.toFixed(0)}
                                     <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-amber-500"></div>
                                 </div>
                             )}
-                            
-                             {/* Marker 25th Percentile (Q1) */}
+
+                            {/* Q1 Flag (Left) */}
                             {q.isQ1 && (
-                                <div className="absolute -top-5 bg-red-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
+                                <div className="absolute -top-5 bg-slate-700 text-slate-300 text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-20 transform -translate-x-1/2 left-1/2 opacity-80">
                                     Q1: {q1Val > 0 ? '+' : ''}{q1Val.toFixed(0)}
+                                </div>
+                            )}
+
+                            {/* Q3 Flag (Right) */}
+                            {q.isQ3 && (
+                                <div className="absolute -top-5 bg-slate-700 text-slate-300 text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-20 transform -translate-x-1/2 left-1/2 opacity-80">
+                                    Q3: {q3Val > 0 ? '+' : ''}{q3Val.toFixed(0)}
                                 </div>
                             )}
                             
@@ -215,7 +231,10 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
             {displayPlayers.map((p, i) => {
                 const liveScore = calculateLiveScore(p, scoring);
                 const proj = p.proj;
+                
+                // Performance % Calculation
                 const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
+
                 const isBeat = liveScore >= proj;
                 const isSmashed = liveScore >= proj + 3;
                 const status = getGameStatus(p.game_dt);
@@ -229,7 +248,10 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                 const isSpecial = p.kicker_player_name.includes('Aubrey') || p.team === 'DAL';
                 const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
                 const glowClass = isSmashed ? "shadow-[0_0_15px_rgba(59,130,246,0.5)] border-blue-400" : "";
+
+                // Visual % for Bar Width (Capped at 100% so bar doesn't overflow)
                 const visualPct = Math.min(100, Math.max(5, performancePct));
+                const usingSleeperData = p.sleeper_live_score !== undefined && p.sleeper_live_score !== null;
 
                 return (
                     <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass} ${glowClass}`}>
@@ -270,16 +292,24 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                              </div>
                              <img src="/assets/logo.png" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 object-contain opacity-40 pointer-events-none" alt="logo"/>
 
-                             <div className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${visualPct}%` }}></div>
+                             {/* Fill Bar */}
+                             <div 
+                                className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} 
+                                style={{ width: `${visualPct}%` }}
+                             ></div>
                              
-                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" 
-                                style={{ left: `calc(${visualPct}% - 16px)` }}>
+                             {/* Ball Icon */}
+                             <div 
+                                className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" 
+                                style={{ left: `calc(${visualPct}% - 16px)` }}
+                             >
                                  <FootballIcon isFire={isSmashed} />
                              </div>
                         </div>
 
                         <div className="flex flex-wrap gap-1.5 relative z-10">
-                            {(p.sleeper_live_score !== undefined && p.sleeper_live_score !== null) && (
+                            {/* SLEEPER BADGE */}
+                            {usingSleeperData && (
                                 <span className="text-[10px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded border border-purple-700 flex items-center gap-1">
                                     <Bot className="w-3 h-3" /> Sleeper Data
                                 </span>
@@ -291,12 +321,15 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                                 </span>
                             )}
                             
-                            {/* Granular badges follow... */}
-                            {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
-                            {(p.wk_fg_40_49 > 0) && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{p.wk_fg_40_49}x 40-49</span>}
-                            {(p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39 > 0) && <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39}x Short FG</span>}
-                            {(p.wk_xp_made > 0) && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_xp_made}x XP</span>}
-                            {(p.wk_fg_miss > 0 || p.wk_xp_miss > 0) && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{p.wk_fg_miss + p.wk_xp_miss} Miss</span>}
+                            {!usingSleeperData && (
+                                <>
+                                {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
+                                {(p.wk_fg_40_49 > 0) && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{p.wk_fg_40_49}x 40-49</span>}
+                                {(p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39 > 0) && <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39}x Short FG</span>}
+                                {(p.wk_xp_made > 0) && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_xp_made}x XP</span>}
+                                {(p.wk_fg_miss > 0 || p.wk_xp_miss > 0) && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{p.wk_fg_miss + p.wk_xp_miss} Miss</span>}
+                                </>
+                            )}
                             
                             {liveScore === 0 && status !== 'UPCOMING' && <span className="text-[10px] text-slate-600 italic px-1">No points yet</span>}
                         </div>
