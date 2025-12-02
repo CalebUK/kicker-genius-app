@@ -1,5 +1,25 @@
 export const calcFPts = (p, scoring) => {
   if (!p || !scoring) return 0;
+  
+  // Calculate Granular Miss Penalty
+  const granularMissPenalty = 
+    ((p.fg_miss_0_19||0) * scoring.fg_miss_0_19) +
+    ((p.fg_miss_20_29||0) * scoring.fg_miss_20_29) +
+    ((p.fg_miss_30_39||0) * scoring.fg_miss_30_39) +
+    ((p.fg_miss_40_49||0) * scoring.fg_miss_40_49) +
+    ((p.fg_miss_50_59||0) * scoring.fg_miss_50_59) +
+    ((p.fg_miss_60_plus||0) * scoring.fg_miss_60_plus);
+    
+  // Calculate General Penalty (Fallback)
+  // Only use general penalty if granular data is missing (0) but total misses exist
+  const totalMisses = p.fg_miss || 0;
+  const hasGranularData = (
+      (p.fg_miss_0_19||0) + (p.fg_miss_20_29||0) + (p.fg_miss_30_39||0) + 
+      (p.fg_miss_40_49||0) + (p.fg_miss_50_59||0) + (p.fg_miss_60_plus||0)
+  ) > 0;
+
+  const missPenalty = hasGranularData ? granularMissPenalty : (totalMisses * scoring.fg_miss);
+
   return (
     // Makes
     ((p.fg_0_19||0) * scoring.fg0_19) + 
@@ -11,19 +31,10 @@ export const calcFPts = (p, scoring) => {
     
     // XP
     ((p.xp_made||0) * scoring.xp_made) + 
+    ((p.xp_miss||0) * scoring.xp_miss) +
 
-    // Misses - Granular (Future Proofing) + General Fallback
-    ((p.fg_miss_0_19||0) * scoring.fg_miss_0_19) +
-    ((p.fg_miss_20_29||0) * scoring.fg_miss_20_29) +
-    ((p.fg_miss_30_39||0) * scoring.fg_miss_30_39) +
-    ((p.fg_miss_40_49||0) * scoring.fg_miss_40_49) +
-    ((p.fg_miss_50_59||0) * scoring.fg_miss_50_59) +
-    ((p.fg_miss_60_plus||0) * scoring.fg_miss_60_plus) +
-    
-    // Use General Miss if granular not available/applicable
-    ((p.fg_miss||0) * scoring.fg_miss) + 
-    
-    ((p.xp_miss||0) * scoring.xp_miss)
+    // Smart Miss Penalty
+    missPenalty
   );
 };
 
@@ -46,34 +57,46 @@ export const calculateLiveScore = (p, scoring) => {
   }
 
   // 2. Fallback to Python Engine Data
+  
+  // Calculate Granular Miss Penalty
+  const granularMissPenalty = 
+    ((p.wk_fg_miss_0_19||0) * scoring.fg_miss_0_19) +
+    ((p.wk_fg_miss_20_29||0) * scoring.fg_miss_20_29) +
+    ((p.wk_fg_miss_30_39||0) * scoring.fg_miss_30_39) +
+    ((p.wk_fg_miss_40_49||0) * scoring.fg_miss_40_49) +
+    ((p.wk_fg_miss_50_59||0) * scoring.fg_miss_50_59) +
+    ((p.wk_fg_miss_60_plus||0) * scoring.fg_miss_60_plus);
+
+  // Calculate General Penalty (Fallback)
+  const totalMisses = p.wk_fg_miss || 0;
+  const hasGranularData = (
+      (p.wk_fg_miss_0_19||0) + (p.wk_fg_miss_20_29||0) + (p.wk_fg_miss_30_39||0) + 
+      (p.wk_fg_miss_40_49||0) + (p.wk_fg_miss_50_59||0) + (p.wk_fg_miss_60_plus||0)
+  ) > 0;
+
+  const missPenalty = hasGranularData ? granularMissPenalty : (totalMisses * scoring.fg_miss);
+
   return (
+      // Makes
       ((p.wk_fg_0_19 || 0) * scoring.fg0_19) +
       ((p.wk_fg_20_29 || 0) * scoring.fg20_29) +
       ((p.wk_fg_30_39 || 0) * scoring.fg30_39) +
       ((p.wk_fg_40_49 || 0) * scoring.fg40_49) +
       ((p.wk_fg_50_59 || 0) * scoring.fg50_59) +
       ((p.wk_fg_60_plus || 0) * scoring.fg60_plus) +
+      
+      // XP
       ((p.wk_xp_made || 0) * scoring.xp_made) +
+      ((p.wk_xp_miss || 0) * scoring.xp_miss) +
       
-      // Granular Misses
-      ((p.wk_fg_miss_0_19 || 0) * scoring.fg_miss_0_19) +
-      ((p.wk_fg_miss_20_29 || 0) * scoring.fg_miss_20_29) +
-      ((p.wk_fg_miss_30_39 || 0) * scoring.fg_miss_30_39) +
-      ((p.wk_fg_miss_40_49 || 0) * scoring.fg_miss_40_49) +
-      ((p.wk_fg_miss_50_59 || 0) * scoring.fg_miss_50_59) +
-      ((p.wk_fg_miss_60_plus || 0) * scoring.fg_miss_60_plus) +
-      
-      // General Miss Fallback
-      ((p.wk_fg_miss || 0) * scoring.fg_miss) +
-      
-      ((p.wk_xp_miss || 0) * scoring.xp_miss)
+      // Miss Penalty (Smart Logic)
+      missPenalty
   );
 };
 
 export const getGameStatus = (gameDtStr) => {
   if (!gameDtStr) return 'UPCOMING';
   try {
-      // Force Eastern Time interpretation
       const gameDate = new Date(`${gameDtStr.replace(' ', 'T')}-05:00`);
       if (isNaN(gameDate.getTime())) return 'UPCOMING';
 
@@ -87,7 +110,7 @@ export const getGameStatus = (gameDtStr) => {
   } catch (e) { return 'UPCOMING'; }
 };
 
-// --- NEW SLEEPER LIVE FETCH ---
+// --- SLEEPER LIVE FETCH ---
 export const fetchSleeperScores = async (leagueId, week) => {
     if (!leagueId || !week) return {};
     try {
@@ -95,7 +118,6 @@ export const fetchSleeperScores = async (leagueId, week) => {
         if (!res.ok) return {};
         const matchups = await res.json();
         
-        // Extract points map: { sleeper_player_id: points }
         const scores = {};
         matchups.forEach(m => {
             if (m.players_points) {
