@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { PlayCircle, CheckCircle2, Clock, Calendar, Target, TrendingUp, Activity, ArrowUp, ArrowDown, Minus, Bot, BarChart3, Users, User, Flag } from 'lucide-react';
+import { PlayCircle, CheckCircle2, Clock, Calendar, Target, TrendingUp, Activity, ArrowUp, ArrowDown, Minus, Bot, BarChart3, Users, User, Flag, ChevronDown } from 'lucide-react';
 import { calculateLiveScore, getGameStatus } from '../utils/scoring';
 import { FootballIcon } from './KickerComponents';
 
 const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const [filter, setFilter] = useState('ALL');
+  
+  // --- NEW: Week Selection State ---
+  // Default to the current week passed from props
+  const [selectedWeek, setSelectedWeek] = useState(week);
 
   // --- 1. CALCULATE SITE METRICS (LIVE/FINISHED ONLY) ---
   const activeGames = players.filter(p => {
@@ -42,44 +46,16 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const metRate = totalKickers > 0 ? Math.round((met / totalKickers) * 100) : 0; 
 
   // Metric 3: Kicker Quartile Character Lineup
-  // To ensure 50% highlight (5 icons), we find the start index based on data skew
-  const totalIcons = 10;
-  const highlightCount = 5; // 50% of 10
-  
-  // Determine "Center of Gravity" for the highlight block
-  // If Median is close to Min, shift block left. If close to Max, shift right.
-  let startIdx = 2; // Default center (indices 2,3,4,5,6)
-  
-  if (diffs.length > 0) {
-      const min = diffs[0];
-      const max = diffs[diffs.length - 1];
-      const med = diffs[Math.floor(diffs.length / 2)];
-      
-      if (max !== min) {
-          // Calculate where median falls between min and max (0 to 1)
-          const relativePos = (med - min) / (max - min);
-          // Map 0..1 to valid start indices (0 to 5)
-          // We want the median icon (index ~ relativePos * 10) to be roughly in the middle of the block
-          const targetCenter = Math.floor(relativePos * 10);
-          startIdx = Math.max(0, Math.min(10 - highlightCount, targetCenter - 2));
-      }
-  }
-
   const quartileIcons = Array(10).fill(null).map((_, i) => {
-      // Highlight logic: strictly 5 icons starting from calculated startIdx
-      const isMiddle = i >= startIdx && i < (startIdx + highlightCount);
-      
-      // Markers: Min (0), Median (5 or dynamic?), Max (9)
-      // Let's keep fixed positions for Q1/Med/Q3 markers for simplicity, or map them to the highlight block
-      // Visual markers for distribution:
-      const isQ1 = i === startIdx; // Start of highlight
-      const isMedian = i === startIdx + 2; // Middle of highlight
-      const isQ3 = i === startIdx + 4; // End of highlight
-
-      return { isMiddle, isMedian, isQ1, isQ3 };
+      const percentile = i * 10;
+      const isMiddle = percentile >= 30 && percentile <= 60; 
+      const isQ1 = i === 2; 
+      const isMedian = i === 5; 
+      const isQ3 = i === 8;
+      const isMinMax = i === 0 || i === 9;
+      return { isMiddle, isMedian, isQ1, isQ3, isMinMax };
   });
   
-  // Calculate boundaries
   const getPercentileValue = (pct) => {
       if (diffs.length === 0) return 0;
       const n = diffs.length;
@@ -95,6 +71,15 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const q1Val = getPercentileValue(25);
   const medianVal = getPercentileValue(50);
   const q3Val = getPercentileValue(75);
+  
+  const q1Range = `${minVal} to ${q1Val.toFixed(1)}`;
+  const q2Range = `${q1Val.toFixed(1)} to ${medianVal.toFixed(1)}`;
+  const q3Range = `${medianVal.toFixed(1)} to ${q3Val.toFixed(1)}`;
+  const q4Range = `${q3Val.toFixed(1)} to ${maxVal}`;
+
+  // Format helper
+  const fmt = (n) => (n > 0 ? `+${n.toFixed(0)}` : n.toFixed(0));
+
 
   // --- 2. FILTER & SORT FOR DISPLAY ---
   const displayPlayers = players.filter(p => {
@@ -117,13 +102,37 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
         
-        {/* NOTE FOR SLEEPER SYNC */}
-        {!sleeperLeagueId && (
-            <div className="bg-blue-900/20 border border-blue-800 p-3 rounded-lg flex items-center gap-3 text-sm text-blue-200">
-                <Bot className="w-5 h-5 text-blue-400" />
-                <span><strong>Pro Tip:</strong> Sync your Sleeper League in Settings to get instant, real-time scoring updates for this tab.</span>
+        {/* HEADER ROW: Week Selector & Sleeper Sync Note */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            {/* WEEK SELECTOR DROPDOWN */}
+            <div className="relative group">
+                <button className="flex items-center gap-2 bg-slate-900 border border-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+                    <Calendar className="w-4 h-4 text-blue-400" />
+                    <span className="font-bold">Week {selectedWeek}</span>
+                    <ChevronDown className="w-4 h-4 text-slate-500" />
+                </button>
+                {/* Dropdown Menu */}
+                <div className="absolute top-full left-0 mt-2 w-32 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden hidden group-hover:block z-50">
+                    {Array.from({ length: week }, (_, i) => i + 1).reverse().map((w) => (
+                        <button 
+                            key={w} 
+                            onClick={() => setSelectedWeek(w)}
+                            className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-800 ${w === selectedWeek ? 'text-blue-400 font-bold bg-slate-800/50' : 'text-slate-300'}`}
+                        >
+                            Week {w}
+                        </button>
+                    ))}
+                </div>
             </div>
-        )}
+
+            {/* Sleeper Note */}
+            {!sleeperLeagueId && (
+                <div className="bg-blue-900/20 border border-blue-800 p-2 px-4 rounded-lg flex items-center gap-2 text-xs text-blue-200 flex-1 justify-center md:justify-start">
+                    <Bot className="w-4 h-4 text-blue-400" />
+                    <span>Sync Sleeper for live scoring updates.</span>
+                </div>
+            )}
+        </div>
 
         {/* --- LIVE MODEL PERFORMANCE TRACKER --- */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -164,38 +173,43 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                     {smashRate > 0 && metRate > 0 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate}%`}}></div>}
                     {(smashRate + metRate) < 100 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate + metRate}%`}}></div>}
                  </div>
+                 {/* Labels for Thresholds */}
                  <div className="flex justify-between text-[8px] text-slate-600 mt-0.5 w-full">
                      <span>&gt;+3</span><span className="text-center">+/-3</span><span>&lt;-3</span>
                  </div>
             </div>
 
-             {/* Card 4: Kicker Quartile (Character Lineup with Markers) */}
+             {/* Card 4: Kicker Quartile Character Lineup */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-1"><Users className="w-3 h-3 text-amber-500"/> Kicker Quartile</div>
                  
                  <div className="flex justify-between items-end relative h-8 px-1">
+                    {/* Min/Max Markers */}
+                    {quartileIcons[0].isMinMax && <div className="absolute left-0 top-0 text-[8px] text-white font-bold transform -translate-x-1/2 -translate-y-full">Min: {fmt(minVal)}</div>}
+                    {quartileIcons[9].isMinMax && <div className="absolute right-0 top-0 text-[8px] text-white font-bold transform translate-x-1/2 -translate-y-full">Max: {fmt(maxVal)}</div>}
+
+                    {/* Character Icons with Markers */}
                     {quartileIcons.map((q, i) => (
                         <div key={i} className="relative flex flex-col items-center group">
-                            
-                            {/* Median Flag */}
+                            {/* Marker: Q3 */}
+                            {q.isQ3 && (
+                                <div className="absolute -top-5 bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
+                                    Q3: {fmt(q3Val)}
+                                </div>
+                            )}
+
+                            {/* Marker: Median */}
                             {q.isMedian && (
                                 <div className="absolute -top-7 bg-amber-500 text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md whitespace-nowrap z-40 transform -translate-x-1/2 left-1/2">
-                                    Med: {medianVal > 0 ? '+' : ''}{medianVal.toFixed(0)}
+                                    Med: {fmt(medianVal)}
                                     <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-amber-500"></div>
                                 </div>
                             )}
-
-                            {/* Q1 Flag (Left) */}
+                            
+                             {/* Marker: Q1 */}
                             {q.isQ1 && (
-                                <div className="absolute -top-5 bg-slate-700 text-slate-300 text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-20 transform -translate-x-1/2 left-1/2 opacity-80">
-                                    Q1: {q1Val > 0 ? '+' : ''}{q1Val.toFixed(0)}
-                                </div>
-                            )}
-
-                            {/* Q3 Flag (Right) */}
-                            {q.isQ3 && (
-                                <div className="absolute -top-5 bg-slate-700 text-slate-300 text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-20 transform -translate-x-1/2 left-1/2 opacity-80">
-                                    Q3: {q3Val > 0 ? '+' : ''}{q3Val.toFixed(0)}
+                                <div className="absolute -top-5 bg-red-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
+                                    Q1: {fmt(q1Val)}
                                 </div>
                             )}
                             
@@ -208,11 +222,11 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                     ))}
                  </div>
                  
-                 {/* Min/Max Labels */}
-                 <div className="flex justify-between text-[8px] text-slate-500 mt-1 w-full px-1">
-                     <span className="text-red-400 font-bold">Min: {minVal}</span>
-                     <span className="text-center text-slate-400">Middle 50%</span>
-                     <span className="text-emerald-400 font-bold">Max: {maxVal}</span>
+                 {/* Legend/Labels */}
+                 <div className="text-[8px] text-slate-500 text-center mt-1 w-full flex justify-center gap-3">
+                     <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-red-400"></div> Q1 Outliers</span>
+                     <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div> Middle 50%</span>
+                     <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div> Q4 Outliers</span>
                  </div>
             </div>
             
@@ -231,10 +245,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
             {displayPlayers.map((p, i) => {
                 const liveScore = calculateLiveScore(p, scoring);
                 const proj = p.proj;
-                
-                // Performance % Calculation
                 const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
-
                 const isBeat = liveScore >= proj;
                 const isSmashed = liveScore >= proj + 3;
                 const status = getGameStatus(p.game_dt);
@@ -249,7 +260,6 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                 const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
                 const glowClass = isSmashed ? "shadow-[0_0_15px_rgba(59,130,246,0.5)] border-blue-400" : "";
 
-                // Visual % for Bar Width (Capped at 100% so bar doesn't overflow)
                 const visualPct = Math.min(100, Math.max(5, performancePct));
                 const usingSleeperData = p.sleeper_live_score !== undefined && p.sleeper_live_score !== null;
 
