@@ -134,6 +134,7 @@ def scrape_fantasy_ownership():
     except:
         return pd.DataFrame()
 
+
 def clean_nan(val):
     if isinstance(val, float):
         if pd.isna(val) or np.isinf(val): return None

@@ -6,6 +6,7 @@ import sys
 import traceback
 import random
 import numpy as np
+import os
 from datetime import datetime
 
 # Import our new modules
@@ -13,11 +14,11 @@ from engine.config import CURRENT_SEASON
 from engine.data import (
     load_data_with_retry, get_current_nfl_week, scrape_cbs_injuries, 
     scrape_fantasy_ownership, clean_nan, calculate_stall_metrics, 
-    analyze_past_3_weeks_strict, get_kicker_scores_for_week
+    analyze_past_3_weeks_strict, get_kicker_scores_for_week 
 )
 from engine.weather import get_weather_forecast
 
-# --- NARRATIVE ENGINE ---
+# --- NARRATIVE ENGINE (Keep existing function) ---
 def generate_narrative(row):
     if row['injury_status'] != 'Healthy':
         return f"Monitor status closely as they are currently listed as {row['injury_status']}. This significantly impacts their viability for Week {row.get('week', '')}."
@@ -78,20 +79,50 @@ def run_analysis():
         target_week = get_current_nfl_week()
         print(f"🚀 Starting Analysis for Week {target_week}...")
         
+        # Load existing data to preserve history
+        history = {}
+        try:
+            if os.path.exists("public/kicker_data.json"):
+                with open("public/kicker_data.json", "r") as f:
+                    existing_data = json.load(f)
+                    history = existing_data.get("history", {})
+        except Exception as e:
+            print(f"⚠️ Could not load existing history: {e}")
+
         pbp = load_data_with_retry(lambda: nfl.load_pbp(seasons=[CURRENT_SEASON]), "PBP")
         schedule = load_data_with_retry(lambda: nfl.load_schedules(seasons=[CURRENT_SEASON]), "Schedule")
         players = load_data_with_retry(lambda: nfl.load_players(), "Players")
         
+        if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
+        if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
+        if hasattr(players, "to_pandas"): players = players.to_pandas()
+        
+        # --- HISTORICAL DATA CAPTURE (Last Week) ---
+        last_week = target_week - 1
+        if last_week > 0 and str(last_week) not in history:
+            print(f"💾 Caching results for Week {last_week}...")
+            # Calculate actual scores for last week
+            last_week_scores = get_kicker_scores_for_week(pbp, last_week)
+            
+            # We need the projections for last week to compare against. 
+            # Ideally, we would have saved the full object, but if we are just starting, 
+            # we can try to reconstruct or check if they exist in the 'rankings' of the loaded JSON 
+            # IF the loaded JSON was from last week. 
+            
+            # For now, let's save what we can: The Actuals. 
+            # The frontend can use current week's 'l3_games' history to find the projection.
+            history[str(last_week)] = last_week_scores.to_dict(orient='records')
+        
+        
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
         
-        # --- USE ROSTERS TO CORRECT TEAM AND FILTER POSITION ---
+        # --- USE ROSTERS TO CORRECT TEAM ---
         print("   📥 Loading Rosters for Team Updates...")
         try:
             rosters = load_data_with_retry(lambda: nfl.load_rosters(seasons=[CURRENT_SEASON]), "Rosters")
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
             
-            # We need 'position' to filter out punters
             full_roster = rosters[['gsis_id', 'team', 'status', 'position']].copy()
             full_roster.rename(columns={'gsis_id': 'kicker_player_id', 'team': 'roster_team'}, inplace=True)
             
@@ -102,9 +133,6 @@ def run_analysis():
             full_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_team', 'position'])
             inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
 
-        if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
-        if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
-        if hasattr(players, "to_pandas"): players = players.to_pandas()
 
         # --- RAW STATS ---
         kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
@@ -147,7 +175,6 @@ def run_analysis():
             fg_0_19=('fg_0_19', 'sum'), fg_20_29=('fg_20_29', 'sum'), fg_30_39=('fg_30_39', 'sum'),
             fg_40_49=('fg_40_49', 'sum'), fg_50_59=('fg_50_59', 'sum'), fg_60_plus=('fg_60_plus', 'sum'),
             
-            # AGGREGATE MISSES
             fg_miss=('fg_miss', 'sum'), 
             fg_miss_0_19=('fg_miss_0_19', 'sum'), fg_miss_20_29=('fg_miss_20_29', 'sum'), fg_miss_30_39=('fg_miss_30_39', 'sum'),
             fg_miss_40_49=('fg_miss_40_49', 'sum'), fg_miss_50_59=('fg_miss_50_59', 'sum'), fg_miss_60_plus=('fg_miss_60_plus', 'sum'),
@@ -160,10 +187,8 @@ def run_analysis():
         # --- FIX TEAM USING ROSTER DATA & FILTER BY POSITION ---
         if not full_roster.empty:
             stats = pd.merge(stats, full_roster, on='kicker_player_id', how='left')
-            # If roster_team exists, overwrite the PBP team
             stats['team'] = np.where(stats['roster_team'].notna(), stats['roster_team'], stats['team'])
             
-            # FILTER: Only keep players listed as 'K' or those without a position (in case rosters are incomplete)
             stats = stats[
                 (stats['position'] == 'K') | (stats['position'].isna())
             ]
@@ -363,6 +388,9 @@ def run_analysis():
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
         
+        for c in live_cols:
+            if c in final.columns: final[c] = final[c].fillna(0)
+            
         final = final.fillna(0)
 
         def process_row(row):
@@ -451,7 +479,9 @@ def run_analysis():
                     "def_stall": clean_nan(round(lg_def_avg, 1)),
                     "l4_off_ppg": clean_nan(round(off_ppg['off_ppg'].mean(), 1)),
                     "l4_def_pa": clean_nan(round(def_pa['def_pa'].mean(), 1))
-                }
+                },
+                # ADDED HISTORY KEY TO SAVE PREVIOUS WEEKS
+                "history": history 
             },
             "rankings": final.to_dict(orient='records'),
             "ytd": ytd_sorted.to_dict(orient='records'),
