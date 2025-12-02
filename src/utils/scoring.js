@@ -55,7 +55,7 @@ export const calculateLiveScore = (p, scoring) => {
       ((p.wk_fg_60_plus || 0) * scoring.fg60_plus) +
       ((p.wk_xp_made || 0) * scoring.xp_made) +
       
-      // Granular Misses (using 40-49 range as proxy for general if needed, or exact bucket)
+      // Granular Misses
       ((p.wk_fg_miss_0_19 || 0) * scoring.fg_miss_0_19) +
       ((p.wk_fg_miss_20_29 || 0) * scoring.fg_miss_20_29) +
       ((p.wk_fg_miss_30_39 || 0) * scoring.fg_miss_30_39) +
@@ -70,37 +70,21 @@ export const calculateLiveScore = (p, scoring) => {
   );
 };
 
-// FIXED: Timezone-Aware Game Status
 export const getGameStatus = (gameDtStr) => {
   if (!gameDtStr) return 'UPCOMING';
-  
   try {
-      // 1. Parse game time string (e.g., "2025-11-28 13:00")
-      // Append "EST" (UTC-5) to force the browser to interpret it as Eastern Time
-      // This handles both Standard (EST) and Daylight (EDT) roughly correct for NFL season
+      // Force Eastern Time interpretation
       const gameDate = new Date(`${gameDtStr.replace(' ', 'T')}-05:00`);
-      
       if (isNaN(gameDate.getTime())) return 'UPCOMING';
 
-      const now = new Date(); // Current time in user's local timezone (but comparable globally via UTC)
-      
-      // Calculate difference in milliseconds
+      const now = new Date();
       const diffMs = now - gameDate;
       const diffHours = diffMs / (1000 * 60 * 60);
-      
-      // Logic:
-      // If diff is negative, game is in future -> UPCOMING
-      // If diff is between 0 and 4.5 hours -> LIVE
-      // If diff is > 4.5 hours -> FINISHED
       
       if (diffHours < 0) return 'UPCOMING';
       if (diffHours >= 0 && diffHours < 4.5) return 'LIVE'; 
       return 'FINISHED';
-      
-  } catch (e) { 
-      console.error("Date parse error", e);
-      return 'UPCOMING'; 
-  }
+  } catch (e) { return 'UPCOMING'; }
 };
 
 // --- NEW SLEEPER LIVE FETCH ---
