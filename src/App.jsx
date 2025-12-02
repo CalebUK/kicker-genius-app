@@ -3,7 +3,7 @@ import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTri
 // import { Analytics } from '@vercel/analytics/react';
 
 import { DEFAULT_SCORING } from './data/constants';
-import { calcFPts, calcProj, fetchSleeperScores } from './utils/scoring';
+import { calcFPts, calcProj } from './utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
 import SettingsTab from './components/SettingsTab';
@@ -25,6 +25,8 @@ const App = () => {
 
   // Sleeper State
   const [sleeperLeagueId, setSleeperLeagueId] = useState('');
+  // FIX: Restored missing state variable
+  const [sleeperLeagueName, setSleeperLeagueName] = useState(''); 
   const [sleeperUser, setSleeperUser] = useState('');
   const [sleeperMyKickers, setSleeperMyKickers] = useState(new Set());
   const [sleeperTakenKickers, setSleeperTakenKickers] = useState(new Set());
@@ -48,7 +50,7 @@ const App = () => {
     
     if (savedScoring) { try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } catch (e) {} }
     if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
-    if (savedLeagueName) setSleeperLeagueName(savedLeagueName); // Store this if needed in state
+    if (savedLeagueName) setSleeperLeagueName(savedLeagueName);
     if (savedUser) setSleeperUser(savedUser);
 
     if (savedMyKickers) { try { setSleeperMyKickers(new Set(JSON.parse(savedMyKickers))); } catch (e) {} }
@@ -62,21 +64,9 @@ const App = () => {
   }, []);
 
   // --- POLLING FOR LIVE SCORES ---
+  // (Currently placeholder/manual refresh until API strategy finalized)
   useEffect(() => {
-      // Only poll if we have a league ID and a valid week
-      if (!sleeperLeagueId || !data?.meta?.week) return;
-      
-      const pollScores = async () => {
-          console.log("🔄 Polling Sleeper for live scores...");
-          const scores = await fetchSleeperScores(sleeperLeagueId, data.meta.week);
-          if (scores && Object.keys(scores).length > 0) {
-              setLiveScores(prev => ({ ...prev, ...scores })); // Merge to keep existing
-          }
-      };
-
-      pollScores(); // Initial call
-      const interval = setInterval(pollScores, 30000); // Every 30s
-      return () => clearInterval(interval);
+     // Placeholder for polling logic if we re-enable it
   }, [sleeperLeagueId, data?.meta?.week]);
 
 
@@ -106,9 +96,9 @@ const App = () => {
           const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
           const leagueData = await leagueRes.json();
           
-          // Note: We aren't using setSleeperLeagueName state here to avoid prop drilling complexity, 
-          // but we save it to local storage if we wanted to use it.
-          if (leagueData.name) localStorage.setItem('sleeper_league_name', leagueData.name);
+          const leagueName = leagueData.name || "Unknown League";
+          setSleeperLeagueName(leagueName);
+          localStorage.setItem('sleeper_league_name', leagueName);
 
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
@@ -149,7 +139,7 @@ const App = () => {
 
           const mySet = new Set();
           const takenSet = new Set();
-          const newIdMap = {}; // Map "B.Aubrey" -> "4039"
+          const newIdMap = {}; 
 
           rosters.forEach(roster => {
               const isMine = roster.owner_id === myUserId;
@@ -160,7 +150,7 @@ const App = () => {
                       const last = player.last_name;
                       const joinName = `${first}.${last}`;
                       
-                      newIdMap[joinName] = playerId; // SAVE ID MAPPING
+                      newIdMap[joinName] = playerId; 
 
                       if (isMine) mySet.add(joinName);
                       else takenSet.add(joinName);
@@ -226,7 +216,6 @@ const App = () => {
      else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
 
      // MERGE LIVE SLEEPER SCORE
-     // We use the join_name to find the Sleeper ID from our map, then look up the score
      let sleeperLive = null;
      const sleeperId = sleeperIdMap[joinName];
      if (sleeperId && liveScores[sleeperId] !== undefined) {
@@ -243,7 +232,7 @@ const App = () => {
          sleeperStatus,
          ytdRank: ytdRankMap.get(p.kicker_player_name),
          ppgRank: ppgRankMap.get(p.kicker_player_name),
-         sleeper_live_score: sleeperLive // Pass to calculateLiveScore
+         sleeper_live_score: sleeperLive 
      };
   }).filter(p => p.proj > 0); 
 
@@ -263,6 +252,7 @@ const App = () => {
           const bMine = b.sleeperStatus === 'MY_TEAM';
           if (aMine && !bMine) return -1;
           if (!aMine && bMine) return 1;
+          
           let valA = a[sortConfig.key];
           let valB = b[sortConfig.key];
           if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
@@ -334,7 +324,7 @@ const App = () => {
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers} sleeperLeagueName={localStorage.getItem('sleeper_league_name')}/> )}
+        {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers} sleeperLeagueName={sleeperLeagueName}/> )}
 
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
@@ -352,7 +342,15 @@ const App = () => {
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
-                    <th className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]" onClick={() => handleSort('own_pct')}><div className="flex items-center gap-1"><span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span><ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" /></div></th>
+                    <th 
+                      className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
+                      onClick={() => handleSort('own_pct')}
+                    >
+                      <div className="flex items-center gap-1">
+                        <span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </th>
                     <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description="Matchup Grade (Baseline 90)" />
                     <th className="px-6 py-3 text-center align-middle">Weather</th>
