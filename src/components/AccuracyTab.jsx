@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlayCircle, CheckCircle2, Clock, Calendar, Target, TrendingUp, Activity, ArrowUp, ArrowDown, Minus, Bot } from 'lucide-react';
+import { PlayCircle, CheckCircle2, Clock, Calendar, Target, TrendingUp, Activity, ArrowUp, ArrowDown, Minus, Bot, BarChart3 } from 'lucide-react';
 import { calculateLiveScore, getGameStatus } from '../utils/scoring';
 import { FootballIcon } from './KickerComponents';
 
@@ -12,19 +12,18 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
       if (p.proj <= 0) return false;
       
       // EXCLUDE INACTIVE PLAYERS ("INA")
-      // Checks 'roster_status' (from Python engine) or 'status' (raw JSON)
       const statusVal = p.roster_status || p.status;
       if (statusVal === 'INA') return false;
-      
-      // Also check injury_status for explicit OUT/IR just in case
       if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
-
+      
       const status = getGameStatus(p.game_dt);
       return status === 'LIVE' || status === 'FINISHED';
   });
 
+  const totalKickers = activeGames.length;
+
   // Calculate differences for active games
-  const diffs = activeGames.map(p => calculateLiveScore(p, scoring) - p.proj);
+  const diffs = activeGames.map(p => calculateLiveScore(p, scoring) - p.proj).sort((a, b) => a - b);
   const totalActual = activeGames.reduce((acc, p) => acc + calculateLiveScore(p, scoring), 0);
   const totalProj = activeGames.reduce((acc, p) => acc + p.proj, 0);
   const overallDiff = totalActual - totalProj;
@@ -32,54 +31,38 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   
   // Metric 1: Win Rate (Within +/- 3 points)
   const wins = diffs.filter(d => Math.abs(d) <= 3).length;
-  const winRate = activeGames.length > 0 ? Math.round((wins / activeGames.length) * 100) : 0;
+  const winRate = totalKickers > 0 ? Math.round((wins / totalKickers) * 100) : 0;
 
   // Metric 2: Smash vs Bust Rate
   const smashes = diffs.filter(d => d > 3).length;
   const busts = diffs.filter(d => d < -3).length;
-  const smashRate = activeGames.length > 0 ? Math.round((smashes / activeGames.length) * 100) : 0;
-  const bustRate = activeGames.length > 0 ? Math.round((busts / activeGames.length) * 100) : 0;
-  const metRate = activeGames.length > 0 ? Math.round((wins / activeGames.length) * 100) : 0; 
+  const met = diffs.filter(d => Math.abs(d) <= 3).length;
 
-  // Metric 3: Adjusted Median % (Rounded to nearest 10%)
-  const roundedPcts = activeGames.map(p => {
-      const live = calculateLiveScore(p, scoring);
-      const proj = p.proj;
-      if (proj === 0) return 0; 
-      const rawPct = (live / proj) * 100;
-      return Math.round(rawPct / 10) * 10; 
-  }).sort((a, b) => a - b);
+  const smashRate = totalKickers > 0 ? Math.round((smashes / totalKickers) * 100) : 0;
+  const bustRate = totalKickers > 0 ? Math.round((busts / totalKickers) * 100) : 0;
+  const metRate = totalKickers > 0 ? Math.round((met / totalKickers) * 100) : 0; 
 
-  let medianLabel = "0%";
-  let kickersInRange = 0;
-
-  if (roundedPcts.length > 0) {
-      const mid = Math.floor(roundedPcts.length / 2);
-      // If odd, take middle. If even, take range between two middles.
-      if (roundedPcts.length % 2 !== 0) {
-          const val = roundedPcts[mid];
-          medianLabel = `${val}%`;
-          // Count kickers exactly matching this bucket
-          kickersInRange = roundedPcts.filter(v => v === val).length;
-      } else {
-          const low = roundedPcts[mid - 1];
-          const high = roundedPcts[mid];
-          if (low === high) {
-              medianLabel = `${low}%`;
-              kickersInRange = roundedPcts.filter(v => v === low).length;
-          } else {
-              // If the median falls between buckets, show the range
-              medianLabel = `${low}-${high}%`;
-              kickersInRange = roundedPcts.filter(v => v >= low && v <= high).length;
-          }
-      }
+  // Metric 3: Quartile Chart Data (Differential)
+  // We need to find the boundaries for Q1 (0-25%), Q2 (25-50%), Q3 (50-75%), Q4 (75-100%)
+  let q1_range = "N/A", q2_range = "N/A", q3_range = "N/A", q4_range = "N/A";
+  
+  if (diffs.length >= 4) {
+      const q1_idx = Math.floor(diffs.length * 0.25);
+      const q2_idx = Math.floor(diffs.length * 0.50);
+      const q3_idx = Math.floor(diffs.length * 0.75);
+      
+      // Format: "Min to Max" for that quartile
+      q1_range = `${diffs[0].toFixed(0)} to ${diffs[q1_idx].toFixed(0)}`;
+      q2_range = `${diffs[q1_idx].toFixed(0)} to ${diffs[q2_idx].toFixed(0)}`;
+      q3_range = `${diffs[q2_idx].toFixed(0)} to ${diffs[q3_idx].toFixed(0)}`;
+      q4_range = `${diffs[q3_idx].toFixed(0)} to ${diffs[diffs.length-1].toFixed(0)}`;
   }
+
 
   // --- 2. FILTER & SORT FOR DISPLAY ---
   const displayPlayers = players.filter(p => {
       if (p.proj <= 0) return false;
       
-      // EXCLUDE INACTIVE PLAYERS FROM CARD VIEW TOO
       const statusVal = p.roster_status || p.status;
       if (statusVal === 'INA') return false;
       if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
@@ -107,7 +90,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
 
         {/* --- LIVE MODEL PERFORMANCE TRACKER --- */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-             {/* Card 1: Total Score (Win/Loss) */}
+             {/* Card 1: Total Score */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Activity className="w-3 h-3 text-blue-500"/> Total Points</div>
                  <div className="flex items-baseline gap-2">
@@ -115,7 +98,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                     <span className="text-sm text-slate-400">vs {totalProj.toFixed(0)} Proj</span>
                  </div>
                  <div className={`text-[10px] font-bold ${overallDiff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {overallDiffSign}{overallDiff.toFixed(1)} Diff
+                    {overallDiffSign}{overallDiff.toFixed(1)} Diff ({totalKickers} Kickers)
                  </div>
             </div>
 
@@ -123,16 +106,16 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Target className="w-3 h-3 text-emerald-500"/> Accuracy Rate</div>
                  <div className="text-3xl font-black text-white">{winRate}%</div>
-                 <div className="text-[10px] text-slate-400">Within +/- 3 pts</div>
+                 <div className="text-[10px] text-slate-400">{wins} of {totalKickers} within +/- 3 pts</div>
             </div>
 
-            {/* Card 3: Smash/Met/Bust */}
+            {/* Card 3: Smash/Met/Bust (With Counts) */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-2 flex items-center gap-1"><TrendingUp className="w-3 h-3 text-purple-500"/> Performance</div>
                  <div className="flex justify-between items-end text-xs font-bold w-full px-1">
-                    <div className="text-emerald-400 flex flex-col items-center"><span>{smashRate}%</span><span className="text-[8px] text-slate-500 font-normal">SMASH</span></div>
-                    <div className="text-slate-200 flex flex-col items-center"><span>{metRate}%</span><span className="text-[8px] text-slate-500 font-normal">MET</span></div>
-                    <div className="text-red-400 flex flex-col items-center"><span>{bustRate}%</span><span className="text-[8px] text-slate-500 font-normal">BUST</span></div>
+                    <div className="text-emerald-400 flex flex-col items-center"><span>{smashes}</span><span className="text-[8px] text-slate-500 font-normal">SMASH</span></div>
+                    <div className="text-slate-200 flex flex-col items-center"><span>{met}</span><span className="text-[8px] text-slate-500 font-normal">MET</span></div>
+                    <div className="text-red-400 flex flex-col items-center"><span>{busts}</span><span className="text-[8px] text-slate-500 font-normal">BUST</span></div>
                  </div>
                  {/* Mini Bar Chart with Defined Ticks */}
                  <div className="w-full h-2 bg-slate-800 rounded-full mt-1 flex overflow-hidden relative">
@@ -140,11 +123,9 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                     <div className="bg-slate-400 h-full" style={{width: `${metRate}%`}}></div>
                     <div className="bg-red-500 h-full" style={{width: `${bustRate}%`}}></div>
                     
-                    {/* Tick Marks for Visual Clarity */}
                     {smashRate > 0 && metRate > 0 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate}%`}}></div>}
                     {(smashRate + metRate) < 100 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate + metRate}%`}}></div>}
                  </div>
-                 {/* Labels for Thresholds */}
                  <div className="flex justify-between text-[8px] text-slate-600 mt-0.5 w-full">
                      <span>&gt;+3</span>
                      <span className="text-center">+/-3</span>
@@ -152,13 +133,32 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                  </div>
             </div>
 
-             {/* Card 4: Adjusted Median */}
+             {/* Card 4: Performance Quartiles (Differential) */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
-                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Target className="w-3 h-3 text-amber-500"/> Adjusted Median</div>
-                 <div className="text-3xl font-black text-white">{medianLabel}</div>
-                 <div className="text-[10px] text-slate-400">
-                    {kickersInRange} of {activeGames.length} kickers in range
-                 </div>
+                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><BarChart3 className="w-3 h-3 text-amber-500"/> Diff Quartiles</div>
+                 
+                 {diffs.length >= 4 ? (
+                     <div className="flex w-full h-8 mt-1 rounded overflow-hidden border border-slate-700">
+                        <div className="flex-1 bg-red-900/40 flex items-center justify-center text-[9px] text-red-200 border-r border-slate-800 flex-col" title="Bottom 25%">
+                            <span className="font-bold">Q1</span>
+                            <span className="text-[8px] opacity-70">{q1_range}</span>
+                        </div>
+                        <div className="flex-1 bg-red-900/20 flex items-center justify-center text-[9px] text-red-100 border-r border-slate-800 flex-col" title="25-50%">
+                            <span className="font-bold">Q2</span>
+                            <span className="text-[8px] opacity-70">{q2_range}</span>
+                        </div>
+                        <div className="flex-1 bg-emerald-900/20 flex items-center justify-center text-[9px] text-emerald-100 border-r border-slate-800 flex-col" title="50-75%">
+                            <span className="font-bold">Q3</span>
+                            <span className="text-[8px] opacity-70">{q3_range}</span>
+                        </div>
+                        <div className="flex-1 bg-emerald-900/40 flex items-center justify-center text-[9px] text-emerald-200 flex-col" title="Top 25%">
+                            <span className="font-bold">Q4</span>
+                            <span className="text-[8px] opacity-70">{q4_range}</span>
+                        </div>
+                     </div>
+                 ) : (
+                     <div className="text-xs text-slate-500 text-center py-2">Not enough data</div>
+                 )}
             </div>
             
              {/* Filter Buttons Row */}
