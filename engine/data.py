@@ -46,6 +46,8 @@ def get_kicker_scores_for_week(pbp_data, target_week):
     
     # Simple scoring logic needed for calculating the actual points
     def calc_simple_pts(row):
+        # Using a fixed standard scoring for historical actuals to calculate total points reliably
+        # The frontend will later use user settings on the granularity of makes/misses
         if row['play_type'] == 'field_goal':
             if row['field_goal_result'] == 'made': return 5 if row['kick_distance'] >= 50 else 4 if row['kick_distance'] >= 40 else 3
             return -1
@@ -82,19 +84,18 @@ def scrape_cbs_injuries():
         col_map = {}
         for col in combined.columns:
             if 'player' in col: col_map[col] = 'full_name'
-            elif 'status' in col: col_map[col] = 'cbs_status'
-            elif 'injury' in col: col_map[col] = 'cbs_injury'
+            elif 'status' in col: col_map[col] = 'cbs_status'   # DISTINCT NAME
+            elif 'injury' in col: col_map[col] = 'cbs_injury'   # DISTINCT NAME
         combined.rename(columns=col_map, inplace=True)
         
         if 'full_name' not in combined.columns: return pd.DataFrame()
 
         def clean_name(val):
             if not isinstance(val, str): return val
-            clean = re.sub(r'\s+(Jr\.?|Sr\.?|III|II|IV)$', '', val, flags=re.IGNORECASE)
-            return clean.split(' (')[0].strip()
-            
+            return val.split(' (')[0].strip()
         combined['full_name'] = combined['full_name'].apply(clean_name)
         
+        # Create normalized name for joining
         def normalize_for_join(val):
              parts = val.split(' ')
              if len(parts) >= 2: return f"{parts[0][0]}.{parts[-1]}"
@@ -118,13 +119,20 @@ def scrape_fantasy_ownership():
         rost_col = next((c for c in df.columns if 'rost' in c or 'own' in c), None)
         if not player_col or not rost_col: return pd.DataFrame()
         df = df[[player_col, rost_col]].rename(columns={player_col: 'full_name', rost_col: 'own_pct'})
-        
-        df['match_name'] = df['full_name'].apply(lambda x: x.split('(')[0].strip().split(' ')[0][0] + "." + x.split('(')[0].strip().split(' ')[1] if isinstance(x, str) else x)
-        df['own_pct'] = df['own_pct'].apply(lambda x: float(str(x).replace('%','').strip()) if str(x).replace('%','').strip().replace('.','').isdigit() else 0.0)
+        def clean_name_to_match(val):
+            if not isinstance(val, str): return val
+            name_part = val.split('(')[0].strip()
+            parts = name_part.split(' ')
+            if len(parts) >= 2: return f"{parts[0][0]}.{parts[1]}"
+            return name_part
+        df['match_name'] = df['full_name'].apply(clean_name_to_match)
+        def clean_pct(val):
+            if not isinstance(val, str): return 0.0 if not isinstance(val, (int, float)) else float(val)
+            return float(val.replace('%', '').strip())
+        df['own_pct'] = df['own_pct'].apply(clean_pct)
         return df[['match_name', 'own_pct']]
     except:
         return pd.DataFrame()
-
 
 def clean_nan(val):
     if isinstance(val, float):

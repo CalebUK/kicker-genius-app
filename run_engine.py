@@ -13,14 +13,12 @@ from engine.config import CURRENT_SEASON
 from engine.data import (
     load_data_with_retry, get_current_nfl_week, scrape_cbs_injuries, 
     scrape_fantasy_ownership, clean_nan, calculate_stall_metrics, 
-    analyze_past_3_weeks_strict, get_kicker_scores_for_week # ADDED IMPORT
+    analyze_past_3_weeks_strict, get_kicker_scores_for_week
 )
 from engine.weather import get_weather_forecast
 
-# --- NARRATIVE ENGINE (OMITTED) ---
-
+# --- NARRATIVE ENGINE ---
 def generate_narrative(row):
-    # ... (Narrative logic remains unchanged) ...
     if row['injury_status'] != 'Healthy':
         return f"Monitor status closely as they are currently listed as {row['injury_status']}. This significantly impacts their viability for Week {row.get('week', '')}."
 
@@ -87,13 +85,13 @@ def run_analysis():
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
         
-        # --- ROSTER LOADER (OMITTED - SAME AS BEFORE) ---
-        
-        # ... (rest of roster loading logic) ...
+        # --- USE ROSTERS TO CORRECT TEAM AND FILTER POSITION ---
+        print("   📥 Loading Rosters for Team Updates...")
         try:
             rosters = load_data_with_retry(lambda: nfl.load_rosters(seasons=[CURRENT_SEASON]), "Rosters")
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
             
+            # We need 'position' to filter out punters
             full_roster = rosters[['gsis_id', 'team', 'status', 'position']].copy()
             full_roster.rename(columns={'gsis_id': 'kicker_player_id', 'team': 'roster_team'}, inplace=True)
             
@@ -108,7 +106,7 @@ def run_analysis():
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         if hasattr(players, "to_pandas"): players = players.to_pandas()
 
-        # --- RAW STATS (OMITTED - SAME AS BEFORE) ---
+        # --- RAW STATS ---
         kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
         kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
         
@@ -149,6 +147,7 @@ def run_analysis():
             fg_0_19=('fg_0_19', 'sum'), fg_20_29=('fg_20_29', 'sum'), fg_30_39=('fg_30_39', 'sum'),
             fg_40_49=('fg_40_49', 'sum'), fg_50_59=('fg_50_59', 'sum'), fg_60_plus=('fg_60_plus', 'sum'),
             
+            # AGGREGATE MISSES
             fg_miss=('fg_miss', 'sum'), 
             fg_miss_0_19=('fg_miss_0_19', 'sum'), fg_miss_20_29=('fg_miss_20_29', 'sum'), fg_miss_30_39=('fg_miss_30_39', 'sum'),
             fg_miss_40_49=('fg_miss_40_49', 'sum'), fg_miss_50_59=('fg_miss_50_59', 'sum'), fg_miss_60_plus=('fg_miss_60_plus', 'sum'),
@@ -161,6 +160,7 @@ def run_analysis():
         # --- FIX TEAM USING ROSTER DATA & FILTER BY POSITION ---
         if not full_roster.empty:
             stats = pd.merge(stats, full_roster, on='kicker_player_id', how='left')
+            # If roster_team exists, overwrite the PBP team
             stats['team'] = np.where(stats['roster_team'].notna(), stats['roster_team'], stats['team'])
             
             # FILTER: Only keep players listed as 'K' or those without a position (in case rosters are incomplete)
