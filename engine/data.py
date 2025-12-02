@@ -4,7 +4,7 @@ import requests
 import io
 import time
 import numpy as np
-import re  # <--- Added missing import
+import re
 from datetime import datetime, timedelta
 from engine.config import CURRENT_SEASON, SEASON_START_DATE, FORCE_WEEK
 
@@ -30,13 +30,43 @@ def get_current_nfl_week():
     if today < SEASON_START_DATE: return 1
     
     # FIX: Rollover on Tuesday instead of Thursday
-    # Season started on a Thursday. 
-    # To make the week roll over on Tuesday (2 days early), we ADD 2 days to the elapsed time.
-    # This effectively "fast forwards" the calendar so Tuesday acts like the start of the new week block.
     days_since_start = (today - SEASON_START_DATE + timedelta(days=2)).days
     
     week_num = (days_since_start // 7) + 1
     return max(1, min(18, week_num))
+
+# --- NEW FUNCTION: GET KICKER SCORES FOR A SPECIFIC WEEK ---
+def get_kicker_scores_for_week(pbp_data, target_week):
+    """
+    Calculates total fantasy points, FG makes, and FG misses for all kickers 
+    in a given week (for historical/actual score checks).
+    """
+    week_plays = pbp_data[pbp_data['week'] == target_week].copy()
+    week_plays = week_plays.dropna(subset=['kicker_player_name'])
+    
+    # Simple scoring logic needed for calculating the actual points
+    def calc_simple_pts(row):
+        if row['play_type'] == 'field_goal':
+            if row['field_goal_result'] == 'made': return 5 if row['kick_distance'] >= 50 else 4 if row['kick_distance'] >= 40 else 3
+            return -1
+        if row['play_type'] == 'extra_point': return 1 if row['extra_point_result'] == 'good' else -1
+        return 0
+
+    week_plays['pts'] = week_plays.apply(calc_simple_pts, axis=1)
+    week_plays['is_fg_made'] = (week_plays['play_type'] == 'field_goal') & (week_plays['field_goal_result'] == 'made')
+    week_plays['is_fg_miss'] = (week_plays['play_type'] == 'field_goal') & (week_plays['field_goal_result'] == 'missed')
+    week_plays['is_xp_miss'] = (week_plays['play_type'] == 'extra_point') & (week_plays['extra_point_result'] == 'failed')
+    
+    scores = week_plays.groupby('kicker_player_id').agg(
+        actual_fpts=('pts', 'sum'),
+        fg_made=('is_fg_made', 'sum'),
+        fg_miss=('is_fg_miss', 'sum'),
+        xp_miss=('is_xp_miss', 'sum'),
+    ).reset_index()
+    
+    return scores.rename(columns={'kicker_player_id': 'kicker_player_id', 'actual_fpts': 'wk_actual'})
+
+# --- SCRAPING FUNCTIONS (OMITTED - NO CHANGES) ---
 
 def scrape_cbs_injuries():
     print("   🌐 Scraping CBS Sports for live injury data...")
@@ -58,10 +88,8 @@ def scrape_cbs_injuries():
         
         if 'full_name' not in combined.columns: return pd.DataFrame()
 
-        # Use regex to clean name if needed, or simpler split
         def clean_name(val):
             if not isinstance(val, str): return val
-            # Remove suffix like Jr., Sr., III using regex
             clean = re.sub(r'\s+(Jr\.?|Sr\.?|III|II|IV)$', '', val, flags=re.IGNORECASE)
             return clean.split(' (')[0].strip()
             
@@ -97,12 +125,14 @@ def scrape_fantasy_ownership():
     except:
         return pd.DataFrame()
 
+
 def clean_nan(val):
     if isinstance(val, float):
         if pd.isna(val) or np.isinf(val): return None
     return val
 
 def calculate_stall_metrics(df_pbp):
+    """Calculates stall rates using VECTORIZED operations for speed."""
     rz_drives = df_pbp[(df_pbp['yardline_100'] <= 25) & (df_pbp['yardline_100'].notnull())]
     drives = rz_drives[['game_id', 'drive', 'posteam', 'defteam']].drop_duplicates()
     

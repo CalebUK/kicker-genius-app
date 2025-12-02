@@ -4,8 +4,8 @@ import requests
 import io
 import time
 import numpy as np
-import re
-from datetime import datetime
+import re  # <--- Added missing import
+from datetime import datetime, timedelta
 from engine.config import CURRENT_SEASON, SEASON_START_DATE, FORCE_WEEK
 
 def load_data_with_retry(func, name, max_retries=5, delay=5):
@@ -28,7 +28,13 @@ def get_current_nfl_week():
         
     today = datetime.now()
     if today < SEASON_START_DATE: return 1
-    days_since_start = (today - SEASON_START_DATE).days
+    
+    # FIX: Rollover on Tuesday instead of Thursday
+    # Season started on a Thursday. 
+    # To make the week roll over on Tuesday (2 days early), we ADD 2 days to the elapsed time.
+    # This effectively "fast forwards" the calendar so Tuesday acts like the start of the new week block.
+    days_since_start = (today - SEASON_START_DATE + timedelta(days=2)).days
+    
     week_num = (days_since_start // 7) + 1
     return max(1, min(18, week_num))
 
