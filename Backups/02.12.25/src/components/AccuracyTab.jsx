@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlayCircle, CheckCircle2, Clock, Calendar, Target, TrendingUp, Activity, ArrowUp, ArrowDown, Minus, Bot, BarChart3 } from 'lucide-react';
+import { PlayCircle, CheckCircle2, Clock, Calendar, Target, TrendingUp, Activity, ArrowUp, ArrowDown, Minus, Bot, Users, User } from 'lucide-react';
 import { calculateLiveScore, getGameStatus } from '../utils/scoring';
 import { FootballIcon } from './KickerComponents';
 
@@ -10,19 +10,19 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const activeGames = players.filter(p => {
       if (p.proj <= 0) return false;
       
+      // EXCLUDE INACTIVE PLAYERS ("INA")
       const statusVal = p.roster_status || p.status;
       if (statusVal === 'INA') return false;
       if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
-      
+
       const status = getGameStatus(p.game_dt);
       return status === 'LIVE' || status === 'FINISHED';
   });
 
   const totalKickers = activeGames.length;
 
-  // Calculate differentials (Actual - Projected)
+  // Calculate differences for active games
   const diffs = activeGames.map(p => calculateLiveScore(p, scoring) - p.proj).sort((a, b) => a - b);
-  
   const totalActual = activeGames.reduce((acc, p) => acc + calculateLiveScore(p, scoring), 0);
   const totalProj = activeGames.reduce((acc, p) => acc + p.proj, 0);
   const overallDiff = totalActual - totalProj;
@@ -41,29 +41,30 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const bustRate = totalKickers > 0 ? Math.round((busts / totalKickers) * 100) : 0;
   const metRate = totalKickers > 0 ? Math.round((met / totalKickers) * 100) : 0; 
 
-  // Metric 3: Quartile Data
-  let q1Range = "N/A", q2Range = "N/A", q3Range = "N/A", q4Range = "N/A";
-  let minVal = "N/A", maxVal = "N/A";
-
-  if (diffs.length >= 4) {
-      minVal = diffs[0].toFixed(0);
-      maxVal = diffs[diffs.length - 1].toFixed(0);
-
-      const q1End = Math.floor(diffs.length * 0.25);
-      const medianIdx = Math.floor(diffs.length * 0.50);
-      const q3End = Math.floor(diffs.length * 0.75);
+  // Metric 3: Kicker Quartile Character Lineup
+  const quartileIcons = Array(10).fill(null).map((_, i) => {
+      const percentile = i * 10;
+      const isMiddle = percentile >= 30 && percentile <= 60; 
       
-      // Define ranges. 
-      // Q1: Min -> 25th
-      // Q2: 25th -> Median
-      // Q3: Median -> 75th
-      // Q4: 75th -> Max
-      q1Range = `${diffs[0].toFixed(0)} to ${diffs[q1End].toFixed(0)}`;
-      q2Range = `${diffs[q1End].toFixed(0)} to ${diffs[medianIdx].toFixed(0)}`;
-      q3Range = `${diffs[medianIdx].toFixed(0)} to ${diffs[q3End].toFixed(0)}`;
-      q4Range = `${diffs[q3End].toFixed(0)} to ${diffs[diffs.length - 1].toFixed(0)}`;
-  }
+      // Markers for 25th (Index 2), 50th (Index 5), 75th (Index 7)
+      const isQ1 = i === 2; 
+      const isMedian = i === 5; 
+      const isQ3 = i === 7;
 
+      return { isMiddle, isMedian, isQ1, isQ3 };
+  });
+  
+  // Calculate values for flags
+  const getPercentileVal = (pct) => {
+      if (diffs.length === 0) return "0";
+      const idx = Math.floor((pct / 100) * diffs.length);
+      const val = diffs[Math.min(idx, diffs.length - 1)];
+      return val > 0 ? `+${val.toFixed(0)}` : val.toFixed(0);
+  };
+
+  const q1Val = getPercentileVal(25);
+  const medianVal = getPercentileVal(50);
+  const q3Val = getPercentileVal(75);
 
   // --- 2. FILTER & SORT FOR DISPLAY ---
   const displayPlayers = players.filter(p => {
@@ -86,6 +87,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
         
+        {/* NOTE FOR SLEEPER SYNC */}
         {!sleeperLeagueId && (
             <div className="bg-blue-900/20 border border-blue-800 p-3 rounded-lg flex items-center gap-3 text-sm text-blue-200">
                 <Bot className="w-5 h-5 text-blue-400" />
@@ -95,86 +97,94 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
 
         {/* --- LIVE MODEL PERFORMANCE TRACKER --- */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-             
              {/* Card 1: Total Score */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
-                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Activity className="w-3 h-3 text-blue-500"/> Total Points ({totalKickers} Kickers)</div>
+                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Activity className="w-3 h-3 text-blue-500"/> Total Points</div>
                  <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-black text-white">{totalActual}</span>
                     <span className="text-sm text-slate-400">vs {totalProj.toFixed(0)} Proj</span>
                  </div>
                  <div className={`text-[10px] font-bold ${overallDiff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {overallDiffSign}{overallDiff.toFixed(1)} Diff
+                    {overallDiffSign}{overallDiff.toFixed(1)} Diff ({totalKickers} Kickers)
                  </div>
             </div>
 
-            {/* Card 2: Accuracy Rate */}
+            {/* Card 2: Win Rate */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Target className="w-3 h-3 text-emerald-500"/> Accuracy Rate</div>
                  <div className="text-3xl font-black text-white">{winRate}%</div>
                  <div className="text-[10px] text-slate-400">{wins} of {totalKickers} within +/- 3 pts</div>
             </div>
 
-            {/* Card 3: Performance (With Counts) */}
+            {/* Card 3: Smash/Met/Bust */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-2 flex items-center gap-1"><TrendingUp className="w-3 h-3 text-purple-500"/> Performance</div>
                  <div className="flex justify-between items-end text-xs font-bold w-full px-1">
-                    <div className="text-emerald-400 flex flex-col items-center"><span>{smashes}</span><span className="text-[8px] text-slate-500 font-normal">SMASH</span></div>
-                    <div className="text-slate-200 flex flex-col items-center"><span>{met}</span><span className="text-[8px] text-slate-500 font-normal">MET</span></div>
-                    <div className="text-red-400 flex flex-col items-center"><span>{busts}</span><span className="text-[8px] text-slate-500 font-normal">BUST</span></div>
+                    <div className="text-emerald-400 flex flex-col items-center"><span>{smashRate}%</span><span className="text-[8px] text-slate-500 font-normal">SMASH</span></div>
+                    <div className="text-slate-200 flex flex-col items-center"><span>{metRate}%</span><span className="text-[8px] text-slate-500 font-normal">MET</span></div>
+                    <div className="text-red-400 flex flex-col items-center"><span>{bustRate}%</span><span className="text-[8px] text-slate-500 font-normal">BUST</span></div>
                  </div>
+                 {/* Mini Bar Chart */}
                  <div className="w-full h-2 bg-slate-800 rounded-full mt-1 flex overflow-hidden relative">
                     <div className="bg-emerald-500 h-full" style={{width: `${smashRate}%`}}></div>
                     <div className="bg-slate-400 h-full" style={{width: `${metRate}%`}}></div>
                     <div className="bg-red-500 h-full" style={{width: `${bustRate}%`}}></div>
-                    {/* Ticks */}
                     {smashRate > 0 && metRate > 0 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate}%`}}></div>}
                     {(smashRate + metRate) < 100 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate + metRate}%`}}></div>}
                  </div>
                  <div className="flex justify-between text-[8px] text-slate-600 mt-0.5 w-full">
-                     <span>&gt;+3</span><span className="text-center">+/-3</span><span>&lt;-3</span>
+                     <span>&gt;+3</span>
+                     <span className="text-center">+/-3</span>
+                     <span>&lt;-3</span>
                  </div>
             </div>
 
-             {/* Card 4: Kicker Quartile */}
+             {/* Card 4: Kicker Quartile (With Q1, Median, Q3 Markers) */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
-                 <div className="text-xs font-bold text-slate-500 uppercase mb-2 flex items-center justify-between">
-                    <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3 text-amber-500"/> Kicker Quartile</span>
-                    <span className="text-[8px] text-slate-400">Min: {minVal} | Max: {maxVal}</span>
+                 <div className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-1"><Users className="w-3 h-3 text-amber-500"/> Kicker Quartile</div>
+                 
+                 <div className="flex justify-between items-end relative h-8 px-1">
+                    {quartileIcons.map((q, i) => (
+                        <div key={i} className="relative flex flex-col items-center group">
+                            
+                            {/* Median Flag */}
+                            {q.isMedian && (
+                                <div className="absolute -top-7 bg-amber-500 text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
+                                    Med: {medianVal}
+                                    <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-amber-500"></div>
+                                </div>
+                            )}
+
+                            {/* Q1 Flag (Left) */}
+                            {q.isQ1 && (
+                                <div className="absolute -top-5 bg-slate-700 text-slate-300 text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-20 transform -translate-x-1/2 left-1/2 opacity-80">
+                                    Q1: {q1Val}
+                                </div>
+                            )}
+
+                            {/* Q3 Flag (Right) */}
+                            {q.isQ3 && (
+                                <div className="absolute -top-5 bg-slate-700 text-slate-300 text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-20 transform -translate-x-1/2 left-1/2 opacity-80">
+                                    Q3: {q3Val}
+                                </div>
+                            )}
+                            
+                            {/* Character Icon */}
+                            <User 
+                                className={`w-4 h-4 transition-colors ${q.isMiddle ? 'text-blue-400 scale-110' : 'text-slate-600 scale-90'} ${q.isMedian ? 'text-amber-400 scale-125 z-10' : ''}`} 
+                                strokeWidth={q.isMiddle ? 3 : 2}
+                            />
+                        </div>
+                    ))}
                  </div>
                  
-                 {diffs.length >= 4 ? (
-                     <div className="flex w-full h-8 mt-0 rounded overflow-hidden border border-slate-700">
-                        <div className="flex-1 bg-red-900/30 flex items-center justify-center text-[9px] text-red-200 border-r border-slate-800 flex-col relative">
-                            <span className="font-bold z-10">Q1</span>
-                            <span className="text-[8px] opacity-70 z-10">{q1_range}</span>
-                        </div>
-                        {/* Middle 50% Highlighted */}
-                        <div className="flex-[2] bg-blue-900/40 flex items-center justify-center text-[9px] text-blue-100 border-r border-slate-800 flex-col relative border-t-2 border-b-2 border-blue-500/50 box-border">
-                            <div className="flex justify-around w-full px-2">
-                                <div className="flex flex-col items-center">
-                                    <span className="font-bold">Q2</span>
-                                    <span className="text-[8px] opacity-70">{q2_range}</span>
-                                </div>
-                                <div className="h-full w-px bg-blue-500/30"></div>
-                                <div className="flex flex-col items-center">
-                                    <span className="font-bold">Q3</span>
-                                    <span className="text-[8px] opacity-70">{q3_range}</span>
-                                </div>
-                            </div>
-                            <div className="absolute -bottom-3 text-[7px] font-bold text-blue-400 uppercase tracking-wide bg-slate-900 px-1 rounded">Middle 50%</div>
-                        </div>
-                        <div className="flex-1 bg-emerald-900/30 flex items-center justify-center text-[9px] text-emerald-200 flex-col relative">
-                            <span className="font-bold z-10">Q4</span>
-                            <span className="text-[8px] opacity-70 z-10">{q4_range}</span>
-                        </div>
-                     </div>
-                 ) : (
-                     <div className="text-xs text-slate-500 text-center py-2 bg-slate-950 rounded">Waiting for more data...</div>
-                 )}
+                 <div className="text-[8px] text-slate-500 text-center mt-1 flex justify-center gap-3">
+                     <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-slate-600"></div> Outlier</span>
+                     <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div> Middle 50%</span>
+                 </div>
             </div>
             
-             {/* Filter Buttons */}
+             {/* Filter Buttons Row */}
              <div className="flex justify-end mb-4">
                 <div className="flex gap-1 p-1 bg-slate-900 rounded-lg border border-slate-800">
                     {['ALL', 'LIVE', 'FINISHED', 'UPCOMING'].map((f) => (
@@ -189,11 +199,10 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
             {displayPlayers.map((p, i) => {
                 const liveScore = calculateLiveScore(p, scoring);
                 const proj = p.proj;
-                const pct = proj > 0 ? Math.min(100, Math.max(5, (liveScore / proj) * 100)) : 0; 
+                const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
                 const isBeat = liveScore >= proj;
                 const isSmashed = liveScore >= proj + 3;
                 const status = getGameStatus(p.game_dt);
-                const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
                 
                 let statusColor = "bg-slate-800 text-slate-400";
                 let StatusIcon = Calendar;
@@ -228,7 +237,6 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                             </div>
                         </div>
 
-                        {/* FOOTBALL FIELD PROGRESS BAR */}
                         <div className="h-8 w-full bg-emerald-900 rounded-md relative mb-4 border-2 border-emerald-800 overflow-hidden mt-2 shadow-inner group">
                              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-800 to-emerald-950 opacity-80"></div>
                              <div className="absolute left-0 top-0 bottom-0 w-2 bg-white/90 z-0"></div>
@@ -246,23 +254,14 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                              </div>
                              <img src="/assets/logo.png" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 object-contain opacity-40 pointer-events-none" alt="logo"/>
 
-                             {/* Fill Bar */}
-                             <div 
-                                className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} 
-                                style={{ width: `${visualPct}%` }}
-                             ></div>
+                             <div className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${visualPct}%` }}></div>
                              
-                             {/* Ball Icon */}
-                             <div 
-                                className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" 
-                                style={{ left: `calc(${visualPct}% - 16px)` }}
-                             >
+                             <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center filter drop-shadow-lg" style={{ left: `calc(${visualPct}% - 16px)` }}>
                                  <FootballIcon isFire={isSmashed} />
                              </div>
                         </div>
 
                         <div className="flex flex-wrap gap-1.5 relative z-10">
-                            {/* SLEEPER BADGE */}
                             {usingSleeperData && (
                                 <span className="text-[10px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded border border-purple-700 flex items-center gap-1">
                                     <Bot className="w-3 h-3" /> Sleeper Data
