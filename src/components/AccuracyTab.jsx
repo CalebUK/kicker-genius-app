@@ -9,28 +9,51 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // --- DATA PREPARATION ---
+  // We need to unify "Current Week" data and "Historical" data into a common format for the charts
   const { activeGames, isHistorical } = useMemo(() => {
-      // Since historical data backend isn't ready, we just use current players for now
-      // This structure is ready for when we add the history switch logic
-      const games = players.filter(p => {
-          if (p.proj <= 0) return false;
-          
-          const statusVal = p.roster_status || p.status;
-          if (statusVal === 'INA') return false;
-          if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
-          
-          const status = getGameStatus(p.game_dt);
-          return status === 'LIVE' || status === 'FINISHED';
-      });
-      return { activeGames: games, isHistorical: false };
+      if (selectedWeek === week) {
+          // CURRENT WEEK LOGIC
+          const games = players.filter(p => {
+              if (p.proj <= 0) return false;
+              
+              const statusVal = p.roster_status || p.status;
+              if (statusVal === 'INA') return false;
+              if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
+              
+              const status = getGameStatus(p.game_dt);
+              return status === 'LIVE' || status === 'FINISHED';
+          });
+          return { activeGames: games, isHistorical: false };
+      } else {
+          // HISTORICAL WEEK LOGIC (From l3_games)
+          const games = players.map(p => {
+              const hist = p.history?.l3_games?.find(g => g.week === selectedWeek);
+              if (!hist || hist.status === 'BYE' || hist.status === 'DNS') return null;
+              
+              // Normalize to match "player" object structure
+              return {
+                  ...p,
+                  proj: hist.proj,
+                  live_score_override: hist.act, // Use historical actual
+                  status_override: 'FINISHED'
+              };
+          }).filter(Boolean);
+          return { activeGames: games, isHistorical: true };
+      }
   }, [players, week, selectedWeek]);
+
+  // Helper to get score (handles live vs historical override)
+  const getScore = (p) => {
+      if (isHistorical && p.live_score_override !== undefined) return p.live_score_override;
+      return calculateLiveScore(p, scoring);
+  };
 
   const totalKickers = activeGames.length;
 
   // Calculate differentials (Actual - Projected)
-  const diffs = activeGames.map(p => calculateLiveScore(p, scoring) - p.proj).sort((a, b) => a - b);
+  const diffs = activeGames.map(p => getScore(p) - p.proj).sort((a, b) => a - b);
   
-  const totalActual = activeGames.reduce((acc, p) => acc + calculateLiveScore(p, scoring), 0);
+  const totalActual = activeGames.reduce((acc, p) => acc + getScore(p), 0);
   const totalProj = activeGames.reduce((acc, p) => acc + p.proj, 0);
   const overallDiff = totalActual - totalProj;
   const overallDiffSign = overallDiff >= 0 ? '+' : '';
@@ -102,9 +125,8 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
 
   // --- 2. FILTER & SORT FOR DISPLAY ---
   const displayPlayers = activeGames.sort((a, b) => {
-      const scoreA = calculateLiveScore(a, scoring);
-      const scoreB = calculateLiveScore(b, scoring);
-      // Always sort by live score desc for leaderboard
+      const scoreA = getScore(a);
+      const scoreB = getScore(b);
       return scoreB - scoreA; 
   });
 
@@ -186,58 +208,90 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                     <div className="text-slate-200 flex flex-col items-center"><span>{met}</span><span className="text-[8px] text-slate-500 font-normal">MET</span></div>
                     <div className="text-red-400 flex flex-col items-center"><span>{busts}</span><span className="text-[8px] text-slate-500 font-normal">BUST</span></div>
                  </div>
+                 {/* Mini Bar Chart with Defined Ticks */}
                  <div className="w-full h-2 bg-slate-800 rounded-full mt-1 flex overflow-hidden relative">
                     <div className="bg-emerald-500 h-full" style={{width: `${smashRate}%`}}></div>
                     <div className="bg-slate-400 h-full" style={{width: `${metRate}%`}}></div>
                     <div className="bg-red-500 h-full" style={{width: `${bustRate}%`}}></div>
+                    
+                    {/* Tick Marks for Visual Clarity */}
                     {smashRate > 0 && metRate > 0 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate}%`}}></div>}
                     {(smashRate + metRate) < 100 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate + metRate}%`}}></div>}
                  </div>
-                 <div className="flex justify-between text-[8px] text-slate-600 mt-0.5 w-full"><span>&gt;+3</span><span className="text-center">+/-3</span><span>&lt;-3</span></div>
+                 <div className="flex justify-between text-[8px] text-slate-600 mt-0.5 w-full">
+                     <span>&gt;+3</span><span className="text-center">+/-3</span><span>&lt;-3</span>
+                 </div>
             </div>
 
-             {/* Card 4: Kicker Quartile (Character Lineup with Markers) */}
+             {/* Card 4: Kicker Quartile Character Lineup */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-1"><Users className="w-3 h-3 text-amber-500"/> Kicker Quartile</div>
                  
                  <div className="flex justify-between items-end relative h-8 px-1">
+                    {/* Min/Max Markers */}
                     {quartileIcons[0].isMin && <div className="absolute left-0 top-0 text-[8px] text-white font-bold transform -translate-x-1/2 -translate-y-full">Min: {safeFmt(minVal)}</div>}
                     {quartileIcons[9].isMax && <div className="absolute right-0 top-0 text-[8px] text-white font-bold transform translate-x-1/2 -translate-y-full">Max: {safeFmt(maxVal)}</div>}
 
+                    {/* Character Icons with Markers */}
                     {quartileIcons.map((q, i) => (
                         <div key={i} className="relative flex flex-col items-center group">
-                            {q.isQ3 && <div className="absolute -top-5 bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">Q3: {safeFmt(q3Val)}</div>}
+                            
+                            {/* Marker: Q3 */}
+                            {q.isQ3 && (
+                                <div className="absolute -top-5 bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
+                                    Q3: {safeFmt(q3Val)}
+                                </div>
+                            )}
+
+                            {/* Marker: Median */}
                             {q.isMedian && (
                                 <div className="absolute -top-7 bg-amber-500 text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md whitespace-nowrap z-40 transform -translate-x-1/2 left-1/2">
                                     Med: {safeFmt(medianVal)}
                                     <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-amber-500"></div>
                                 </div>
                             )}
-                            {q.isQ1 && <div className="absolute -top-5 bg-red-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">Q1: {safeFmt(q1Val)}</div>}
-                            <User className={`w-4 h-4 transition-colors ${q.isMiddle ? 'text-blue-400 scale-110' : 'text-slate-600 scale-90'} ${q.isMedian ? 'text-amber-400 scale-125 z-10' : ''}`} strokeWidth={q.isMiddle ? 3 : 2}/>
+                            
+                             {/* Marker: Q1 */}
+                            {q.isQ1 && (
+                                <div className="absolute -top-5 bg-red-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
+                                    Q1: {safeFmt(q1Val)}
+                                </div>
+                            )}
+                            
+                            {/* Character Icon */}
+                            <User 
+                                className={`w-4 h-4 transition-colors ${q.isMiddle ? 'text-blue-400 scale-110' : 'text-slate-600 scale-90'} ${q.isMedian ? 'text-amber-400 scale-125 z-10' : ''}`} 
+                                strokeWidth={q.isMiddle ? 3 : 2}
+                            />
                         </div>
                     ))}
                  </div>
                  
+                 {/* Legend/Labels */}
                  <div className="text-[8px] text-slate-500 text-center mt-1 w-full flex justify-center gap-3">
                      <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-red-400"></div> Q1 Outliers</span>
                      <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div> Middle 50%</span>
                      <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div> Q4 Outliers</span>
                  </div>
             </div>
+            
         </div>
 
         {/* --- PLAYER CARDS --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {displayPlayers.map((p, i) => {
-                const liveScore = calculateLiveScore(p, scoring);
+                // Determine score to display (Live or Historical)
+                const liveScore = getScore(p);
                 const proj = p.proj;
                 
                 const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
 
-                const isBeat = liveScore >= proj;
-                const isSmashed = liveScore >= proj + 3;
+                // Historical status override or live status
                 const status = isHistorical ? 'FINISHED' : getGameStatus(p.game_dt);
+                
+                // Visual States
+                const isSmashed = liveScore >= proj + 3;
+                const isBeat = liveScore >= proj;
                 
                 let statusColor = "bg-slate-800 text-slate-400";
                 let StatusIcon = Calendar;
@@ -249,8 +303,6 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                 const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
                 const glowClass = isSmashed ? "shadow-[0_0_15px_rgba(59,130,246,0.5)] border-blue-400" : "";
                 const visualPct = Math.min(100, Math.max(5, performancePct));
-
-                const usingSleeperData = !isHistorical && p.sleeper_live_score !== undefined && p.sleeper_live_score !== null;
 
                 return (
                     <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass} ${glowClass}`}>
@@ -300,21 +352,15 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                         </div>
 
                         <div className="flex flex-wrap gap-1.5 relative z-10">
-                            {/* SLEEPER BADGE */}
-                            {usingSleeperData && (
-                                <span className="text-[10px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded border border-purple-700 flex items-center gap-1">
-                                    <Bot className="w-3 h-3" /> Sleeper Data
-                                </span>
-                            )}
-                            
+                            {/* PERFORMANCE % BADGE */}
                             {proj > 0 && (
                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${performancePct >= 100 ? 'bg-emerald-900/50 text-emerald-400 border-emerald-700' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>
                                     {performancePct}% of Proj
                                 </span>
                             )}
-                            
-                            {/* Show breakdown only if NOT using Sleeper (since Sleeper is total only) OR if Historical */}
-                            {(!usingSleeperData || isHistorical) && (
+
+                            {/* Only show live granular badges if NOT historical (since history only has totals) */}
+                            {!isHistorical && (
                                 <>
                                 {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
                                 {(p.wk_fg_40_49 > 0) && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{p.wk_fg_40_49}x 40-49</span>}
