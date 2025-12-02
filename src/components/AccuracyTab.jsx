@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlayCircle, CheckCircle2, Clock, Calendar, Target, TrendingUp, Activity, ArrowUp, ArrowDown, Minus, Bot, BarChart3, Users, User } from 'lucide-react';
+import { PlayCircle, CheckCircle2, Clock, Calendar, Target, TrendingUp, Activity, ArrowUp, ArrowDown, Minus, Bot, BarChart3, Users, User, Flag } from 'lucide-react';
 import { calculateLiveScore, getGameStatus } from '../utils/scoring';
 import { FootballIcon } from './KickerComponents';
 
@@ -46,9 +46,11 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
       const percentile = i * 10;
       const isMiddle = percentile >= 30 && percentile <= 60; 
       
+      // Markers for 25th (Index 2/3), 50th (Index 5), 75th (Index 7/8)
+      // Use 2, 5, 8 for distinct visual markers
       const isQ1 = i === 2; 
       const isMedian = i === 5; 
-      const isQ3 = i === 7;
+      const isQ3 = i === 8;
 
       return { isMiddle, isMedian, isQ1, isQ3 };
   });
@@ -150,50 +152,52 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                  </div>
             </div>
 
-             {/* Card 4: Kicker Quartile (Differential) */}
+             {/* Card 4: Kicker Quartile (Character Lineup with Markers) */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
-                 <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center justify-between">
-                    <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3 text-amber-500"/> Kicker Quartile</span>
-                    <span className="text-[8px] text-slate-400">Min: {minVal} | Max: {maxVal}</span>
+                 <div className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-1"><Users className="w-3 h-3 text-amber-500"/> Kicker Quartile</div>
+                 
+                 <div className="flex justify-between items-end relative h-8 px-1">
+                    {/* FIX: Use 10 icons for 10% segments */}
+                    {quartileIcons.map((q, i) => (
+                        <div key={i} className="relative flex flex-col items-center group">
+                            
+                            {/* Marker 75th Percentile (Q3) */}
+                            {q.isQ3 && (
+                                <div className="absolute -top-5 bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
+                                    Q3: {q3Val > 0 ? '+' : ''}{q3Val.toFixed(0)}
+                                </div>
+                            )}
+
+                            {/* Marker 50th Percentile (Median) */}
+                            {q.isMedian && (
+                                <div className="absolute -top-7 bg-amber-500 text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md whitespace-nowrap z-40 transform -translate-x-1/2 left-1/2">
+                                    Med: {medianVal > 0 ? '+' : ''}{medianVal.toFixed(0)}
+                                    <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-amber-500"></div>
+                                </div>
+                            )}
+                            
+                             {/* Marker 25th Percentile (Q1) */}
+                            {q.isQ1 && (
+                                <div className="absolute -top-5 bg-red-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
+                                    Q1: {q1Val > 0 ? '+' : ''}{q1Val.toFixed(0)}
+                                </div>
+                            )}
+                            
+                            {/* Character Icon */}
+                            <User 
+                                className={`w-4 h-4 transition-colors ${q.isMiddle ? 'text-blue-400 scale-110' : 'text-slate-600 scale-90'} ${q.isMedian ? 'text-amber-400 scale-125 z-10' : ''}`} 
+                                strokeWidth={q.isMiddle ? 3 : 2}
+                            />
+                        </div>
+                    ))}
                  </div>
                  
-                 {/* Quartile Vis */}
-                 {diffs.length >= 4 ? (
-                     <div className="flex w-full h-8 mt-0 rounded overflow-hidden border border-slate-700 relative">
-                        {/* Q1: Bottom 25% (Red/Outlier) */}
-                        <div className="flex-1 bg-red-900/40 flex items-center justify-center text-[9px] text-red-200 border-r border-slate-800 flex-col" title="Bottom 25%">
-                            <span className="font-bold">Q1</span>
-                            <span className="text-[8px] opacity-70">{q1Range}</span>
-                        </div>
-                        {/* Q2/Q3: Middle 50% (Blue/In-Range) */}
-                        <div className="flex-[2] bg-blue-900/40 flex items-center justify-center text-[9px] text-blue-100 border-r border-slate-800 flex-col relative border-t-2 border-b-2 border-blue-500/50 box-content">
-                            <div className="flex justify-around w-full px-2">
-                                <div className="flex flex-col items-center">
-                                    <span className="font-bold">Q2</span>
-                                    <span className="text-[8px] opacity-70">{q2Range}</span>
-                                </div>
-                                <div className="h-full w-px bg-blue-500/30"></div>
-                                <div className="flex flex-col items-center">
-                                    <span className="font-bold">Q3</span>
-                                    <span className="text-[8px] opacity-70">{q3Range}</span>
-                                </div>
-                            </div>
-                            <div className="absolute -bottom-3 text-[7px] font-bold text-blue-400 uppercase tracking-wide bg-slate-900 px-1 rounded">Middle 50%</div>
-                        </div>
-                        {/* Q4: Top 25% (Green/Outlier) */}
-                        <div className="flex-1 bg-emerald-900/30 flex items-center justify-center text-[9px] text-emerald-200 flex-col relative">
-                            <span className="font-bold z-10">Q4</span>
-                            <span className="text-[8px] opacity-70 z-10">{q4Range}</span>
-                        </div>
-                        
-                        {/* Min Marker */}
-                        <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 text-white text-[8px] font-bold">Min: {minVal}</div>
-                        {/* Max Marker */}
-                        <div className="absolute right-[-10px] top-1/2 -translate-y-1/2 text-white text-[8px] font-bold">Max: {maxVal}</div>
-                     </div>
-                 ) : (
-                     <div className="text-xs text-slate-500 text-center py-2 bg-slate-950 rounded">Waiting for more data...</div>
-                 )}
+                 {/* Min/Max Labels */}
+                 <div className="flex justify-between text-[8px] text-slate-500 mt-1 w-full px-1">
+                     <span className="text-red-400 font-bold">Min: {minVal}</span>
+                     <span className="text-center text-slate-400">Middle 50%</span>
+                     <span className="text-emerald-400 font-bold">Max: {maxVal}</span>
+                 </div>
             </div>
             
              {/* Filter Buttons Row */}
@@ -211,9 +215,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
             {displayPlayers.map((p, i) => {
                 const liveScore = calculateLiveScore(p, scoring);
                 const proj = p.proj;
-                
                 const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
-
                 const isBeat = liveScore >= proj;
                 const isSmashed = liveScore >= proj + 3;
                 const status = getGameStatus(p.game_dt);
@@ -227,9 +229,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                 const isSpecial = p.kicker_player_name.includes('Aubrey') || p.team === 'DAL';
                 const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
                 const glowClass = isSmashed ? "shadow-[0_0_15px_rgba(59,130,246,0.5)] border-blue-400" : "";
-
                 const visualPct = Math.min(100, Math.max(5, performancePct));
-                const usingSleeperData = p.sleeper_live_score !== undefined && p.sleeper_live_score !== null;
 
                 return (
                     <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass} ${glowClass}`}>
@@ -279,8 +279,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                         </div>
 
                         <div className="flex flex-wrap gap-1.5 relative z-10">
-                            {/* SLEEPER BADGE */}
-                            {usingSleeperData && (
+                            {(p.sleeper_live_score !== undefined && p.sleeper_live_score !== null) && (
                                 <span className="text-[10px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded border border-purple-700 flex items-center gap-1">
                                     <Bot className="w-3 h-3" /> Sleeper Data
                                 </span>
@@ -292,15 +291,12 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                                 </span>
                             )}
                             
-                            {!usingSleeperData && (
-                                <>
-                                {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
-                                {(p.wk_fg_40_49 > 0) && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{p.wk_fg_40_49}x 40-49</span>}
-                                {(p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39 > 0) && <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39}x Short FG</span>}
-                                {(p.wk_xp_made > 0) && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_xp_made}x XP</span>}
-                                {(p.wk_fg_miss > 0 || p.wk_xp_miss > 0) && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{p.wk_fg_miss + p.wk_xp_miss} Miss</span>}
-                                </>
-                            )}
+                            {/* Granular badges follow... */}
+                            {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
+                            {(p.wk_fg_40_49 > 0) && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{p.wk_fg_40_49}x 40-49</span>}
+                            {(p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39 > 0) && <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_fg_0_19 + p.wk_fg_20_29 + p.wk_fg_30_39}x Short FG</span>}
+                            {(p.wk_xp_made > 0) && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{p.wk_xp_made}x XP</span>}
+                            {(p.wk_fg_miss > 0 || p.wk_xp_miss > 0) && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{p.wk_fg_miss + p.wk_xp_miss} Miss</span>}
                             
                             {liveScore === 0 && status !== 'UPCOMING' && <span className="text-[10px] text-slate-600 italic px-1">No points yet</span>}
                         </div>
