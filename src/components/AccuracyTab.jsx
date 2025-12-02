@@ -6,12 +6,19 @@ import { FootballIcon } from './KickerComponents';
 const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const [filter, setFilter] = useState('ALL');
 
-  // --- FILTER LOGIC: LIVE/FINISHED & ACTIVE ONLY ---
+  // --- 1. CALCULATE SITE METRICS (LIVE/FINISHED ONLY) ---
   const activeGames = players.filter(p => {
-      // Exclude players with 0 projection or inactive status
+      // Exclude players with 0 projection
       if (p.proj <= 0) return false;
-      if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
       
+      // EXCLUDE INACTIVE PLAYERS ("INA")
+      // Checks 'roster_status' (from Python engine) or 'status' (raw JSON)
+      const statusVal = p.roster_status || p.status;
+      if (statusVal === 'INA') return false;
+      
+      // Also check injury_status for explicit OUT/IR just in case
+      if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
+
       const status = getGameStatus(p.game_dt);
       return status === 'LIVE' || status === 'FINISHED';
   });
@@ -34,7 +41,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const bustRate = activeGames.length > 0 ? Math.round((busts / activeGames.length) * 100) : 0;
   const metRate = activeGames.length > 0 ? Math.round((wins / activeGames.length) * 100) : 0; 
 
-  // Metric 3: Adjusted Median % (Logic Update - Bucket Range)
+  // Metric 3: Adjusted Median % (Rounded to nearest 10%)
   const roundedPcts = activeGames.map(p => {
       const live = calculateLiveScore(p, scoring);
       const proj = p.proj;
@@ -48,22 +55,20 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
 
   if (roundedPcts.length > 0) {
       const mid = Math.floor(roundedPcts.length / 2);
+      // If odd, take middle. If even, take range between two middles.
       if (roundedPcts.length % 2 !== 0) {
-          // Odd number of items: Median is the middle one
           const val = roundedPcts[mid];
           medianLabel = `${val}%`;
-          // Count kickers exactly matching this bucket (e.g. 90%)
+          // Count kickers exactly matching this bucket
           kickersInRange = roundedPcts.filter(v => v === val).length;
       } else {
-          // Even number: Median is between two values (e.g., 70 and 110)
           const low = roundedPcts[mid - 1];
           const high = roundedPcts[mid];
-          
           if (low === high) {
               medianLabel = `${low}%`;
               kickersInRange = roundedPcts.filter(v => v === low).length;
           } else {
-              // If the median falls between buckets, show the range and count both buckets
+              // If the median falls between buckets, show the range
               medianLabel = `${low}-${high}%`;
               kickersInRange = roundedPcts.filter(v => v >= low && v <= high).length;
           }
@@ -73,7 +78,10 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   // --- 2. FILTER & SORT FOR DISPLAY ---
   const displayPlayers = players.filter(p => {
       if (p.proj <= 0) return false;
+      
       // EXCLUDE INACTIVE PLAYERS FROM CARD VIEW TOO
+      const statusVal = p.roster_status || p.status;
+      if (statusVal === 'INA') return false;
       if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
 
       const status = getGameStatus(p.game_dt);
@@ -144,7 +152,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                  </div>
             </div>
 
-             {/* Card 4: Adjusted Median (Fixed Bucket Logic) */}
+             {/* Card 4: Adjusted Median */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Target className="w-3 h-3 text-amber-500"/> Adjusted Median</div>
                  <div className="text-3xl font-black text-white">{medianLabel}</div>
