@@ -1,3 +1,4 @@
+import re
 import nflreadpy as nfl
 import pandas as pd
 import json
@@ -5,7 +6,6 @@ import sys
 import traceback
 import random
 import numpy as np
-import re  # <--- Added required import
 from datetime import datetime
 
 # Import our new modules
@@ -85,20 +85,21 @@ def run_analysis():
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
         
-        # --- USE ROSTERS TO CORRECT TEAM ---
+        # --- USE ROSTERS TO CORRECT TEAM AND FILTER POSITION ---
         print("   📥 Loading Rosters for Team Updates...")
         try:
             rosters = load_data_with_retry(lambda: nfl.load_rosters(seasons=[CURRENT_SEASON]), "Rosters")
             if hasattr(rosters, "to_pandas"): rosters = rosters.to_pandas()
             
-            full_roster = rosters[['gsis_id', 'team', 'status']].copy()
+            # We need 'position' to filter out punters
+            full_roster = rosters[['gsis_id', 'team', 'status', 'position']].copy()
             full_roster.rename(columns={'gsis_id': 'kicker_player_id', 'team': 'roster_team'}, inplace=True)
             
             inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
             inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
             inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
         except: 
-            full_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_team'])
+            full_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_team', 'position'])
             inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
 
         if hasattr(pbp, "to_pandas"): pbp = pbp.to_pandas()
@@ -146,7 +147,6 @@ def run_analysis():
             fg_0_19=('fg_0_19', 'sum'), fg_20_29=('fg_20_29', 'sum'), fg_30_39=('fg_30_39', 'sum'),
             fg_40_49=('fg_40_49', 'sum'), fg_50_59=('fg_50_59', 'sum'), fg_60_plus=('fg_60_plus', 'sum'),
             
-            # AGGREGATE MISSES
             fg_miss=('fg_miss', 'sum'), 
             fg_miss_0_19=('fg_miss_0_19', 'sum'), fg_miss_20_29=('fg_miss_20_29', 'sum'), fg_miss_30_39=('fg_miss_30_39', 'sum'),
             fg_miss_40_49=('fg_miss_40_49', 'sum'), fg_miss_50_59=('fg_miss_50_59', 'sum'), fg_miss_60_plus=('fg_miss_60_plus', 'sum'),
@@ -156,12 +156,20 @@ def run_analysis():
             total_kicks=('play_id', 'count'), games=('game_id', 'nunique')
         ).reset_index()
         
-        # --- FIX TEAM USING ROSTER DATA ---
+        # --- FIX TEAM USING ROSTER DATA & FILTER BY POSITION ---
         if not full_roster.empty:
             stats = pd.merge(stats, full_roster, on='kicker_player_id', how='left')
-            # If roster_team exists, overwrite the PBP team
+            # Overwrite PBP team with Roster team
             stats['team'] = np.where(stats['roster_team'].notna(), stats['roster_team'], stats['team'])
-            stats.drop(columns=['roster_team'], inplace=True)
+            
+            # FILTER: Only keep players listed as 'K' (Kicker)
+            # Note: Some practice squad kickers might not have a position in roster file, 
+            # so we keep them if position is NaN (fallback to PBP logic) or if position is 'K'
+            stats = stats[
+                (stats['position'] == 'K') | (stats['position'].isna())
+            ]
+            
+            stats.drop(columns=['roster_team', 'position'], inplace=True)
         
         stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
         stats['acc'] = (stats['fg_made'] / stats['fg_att'] * 100).round(1)
