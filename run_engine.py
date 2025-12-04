@@ -70,24 +70,9 @@ def run_analysis():
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
-        # 2. INITIALIZE HISTORY
-        # We want to rebuild history or load it. 
-        history = {}
-        
-        # Loop through ALL weeks up to current to build Actuals
-        # This ensures we have granular stats for Weeks 1-13 even if we didn't save them before.
-        print(f"📊 Rebuilding History for Weeks 1 to {target_week}...")
-        for w in range(1, target_week + 1):
-            week_str = str(w)
-            print(f"   - Processing Week {w}...")
-            
-            # Get Actuals (Granular)
-            actuals_df = get_kicker_scores_for_week(pbp, w)
-            
-            if not actuals_df.empty:
-                # Convert to list of dicts
-                # We initialize the list with just the actual stats
-                history[week_str] = actuals_df.to_dict(orient='records')
+        # 2. HISTORY MANAGEMENT
+        history = load_history()
+        history = update_history(history, pbp, target_week)
         
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
@@ -108,7 +93,7 @@ def run_analysis():
             full_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_team', 'position'])
             inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
 
-        # --- RAW STATS AGGREGATION (CURRENT SEASON TOTALS) ---
+        # --- RAW STATS AGGREGATION ---
         kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
         kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
         
@@ -183,12 +168,12 @@ def run_analysis():
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
 
+        # Calculate Stall Metrics
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
-        off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
-        def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
-        if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
-        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) 
+        # RENAME COLUMNS EXPLICITLY BEFORE MERGE TO AVOID KEYERROR
+        off_stall_seas = off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd', 'posteam': 'team'})
+        def_stall_seas = def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd', 'defteam': 'team'})
         
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
         stats = pd.merge(stats, def_stall_seas, on='team', how='left')
@@ -198,17 +183,12 @@ def run_analysis():
         history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
         
         # --- INJECT PROJECTIONS INTO HISTORY ---
-        # Now that we have history_data (which contains l3_games), we can update our 'history' dict
-        # with the projection values for the last 3 weeks.
-        
         for pid, h_data in history_data.items():
             l3 = h_data.get('l3_games', [])
             for game in l3:
                 wk_str = str(game['week'])
                 proj = game['proj']
-                
                 if wk_str in history:
-                    # Find this player in the history list
                     for record in history[wk_str]:
                         if record['id'] == pid:
                             record['proj'] = proj
@@ -293,10 +273,13 @@ def run_analysis():
         max_wk = pbp['week'].max()
         start_wk = max(1, max_wk - 3)
         recent_pbp = pbp[pbp['week'] >= start_wk].copy()
+        
+        # Calculate Last 4 Weeks Stall Metrics
         off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
         lg_off_avg = off_stall_l4['off_stall_rate'].mean()
         lg_def_avg = def_stall_l4['def_stall_rate'].mean()
 
+        # AGGREGATE AGGRESSION
         fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
         fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
@@ -307,7 +290,7 @@ def run_analysis():
         away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
         all_scores = pd.concat([home_scores, away_scores])
         
-        # Define off_ppg and def_pa here
+        # DEFINE OFF_PPG & DEF_PA HERE
         off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
         
         home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
@@ -355,6 +338,11 @@ def run_analysis():
         model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
         model['wind'] = model['weather_data'].apply(lambda x: x[0])
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
+
+        # Rename L4 stats before merge to avoid errors
+        if 'posteam' in off_stall_l4.columns: off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
+        if 'defteam' in def_stall_l4.columns: def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
+        if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
 
         final = pd.merge(stats, model, on='team', how='inner')
         final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
@@ -429,10 +417,13 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
+                # LIVE STATS PASSTHROUGH REMOVED TO AVOID DOUBLE-DIPPING
             })
 
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
+        
+        # Fix: Generate narratives AFTER process_row has added 'grade' and 'proj'
         final['narrative'] = final.apply(generate_narrative, axis=1)
         
         final = final.replace([np.inf, -np.inf, np.nan], None)
