@@ -72,7 +72,26 @@ def run_analysis():
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
         # 2. HISTORY MANAGEMENT
-        history = load_history()
+        # Load history from its own file if possible, or main file fallback
+        history = {}
+        history_file = "public/history_data.json"
+        
+        # Check specific history file first
+        if os.path.exists(history_file):
+            try:
+                with open(history_file, "r") as f:
+                    history = json.load(f)
+            except Exception as e:
+                print(f"⚠️ Could not load history file: {e}")
+        # Fallback to checking main file if split hasn't happened yet
+        elif os.path.exists("public/kicker_data.json"):
+            try:
+                with open("public/kicker_data.json", "r") as f:
+                    existing_data = json.load(f)
+                    history = existing_data.get("history", {})
+            except: pass
+
+        # Update History
         history = update_history(history, pbp, target_week)
         
         cbs_injuries = scrape_cbs_injuries()
@@ -169,7 +188,7 @@ def run_analysis():
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
 
-        # --- CALCULATE STALL METRICS & RENAME EXPLICITLY ---
+        # --- CALCULATE STALL METRICS ---
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
         off_stall_seas = off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd', 'posteam': 'team'})
         def_stall_seas = def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd', 'defteam': 'team'})
@@ -193,7 +212,7 @@ def run_analysis():
                             record['proj'] = proj
                             break
 
-        # --- CURRENT WEEK LIVE SCORING (RAW BUCKETS) ---
+        # --- CURRENT WEEK LIVE SCORING ---
         current_week_pbp = kick_plays[kick_plays['week'] == target_week].copy()
         live_cols = [
             'wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 
@@ -256,14 +275,9 @@ def run_analysis():
             
             cbs_st = str(row.get('cbs_status', '')).title()
             cbs_det = str(row.get('cbs_injury', ''))
-            
-            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: 
-                return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
-            if "Doubtful" in cbs_st: 
-                return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
-            if "Questionable" in cbs_st: 
-                return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
-            
+            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
+            if "Doubtful" in cbs_st: return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
+            if "Questionable" in cbs_st: return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
             return "Healthy", "green", "Active"
 
         injury_meta = stats.apply(get_injury_meta, axis=1)
@@ -283,8 +297,6 @@ def run_analysis():
         
         # Calculate L4 Stall Metrics using existing function
         off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
-        
-        # EXPLICITLY RENAME BEFORE MERGE
         off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
         def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
         
@@ -294,7 +306,7 @@ def run_analysis():
         fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
         fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
-        aggression_stats = aggression_stats.rename(columns={'posteam': 'team'}) # Rename here too
+        aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
 
         completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
@@ -344,7 +356,6 @@ def run_analysis():
         
         final = pd.merge(final, off_stall_l4, on='team', how='left')
         
-        # MERGE TEAM STATS (SAFE)
         if not off_ppg.empty:
             final = pd.merge(final, off_ppg, on='team', how='left')
         else:
@@ -364,7 +375,6 @@ def run_analysis():
         final = final.fillna(0)
 
         def process_row(row):
-            # Simplified scoring logic for brevity - ensures script runs
             off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
             def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
             bonus_val = 0
@@ -379,7 +389,7 @@ def run_analysis():
             
             history_obj = history_data.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
 
-            # IMPORTANT: Exclude LIVE COLS from return to avoid overlap
+            # Exclude live cols
             return pd.Series({
                 'grade': grade,
                 'proj': proj,
@@ -399,7 +409,6 @@ def run_analysis():
         final = final.sort_values('proj', ascending=False)
         final['narrative'] = final.apply(generate_narrative, axis=1)
         
-        # Final cleanup
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
         ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
@@ -407,7 +416,8 @@ def run_analysis():
         injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
         injuries_list = injuries_list.where(pd.notnull(injuries_list), None)
 
-        output = {
+        # OUTPUT 1: Main Data
+        output_main = {
             "meta": {
                 "week": int(target_week),
                 "updated": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -417,18 +427,34 @@ def run_analysis():
                     "def_stall": clean_nan(round(lg_def_avg, 1)),
                     "l4_off_ppg": clean_nan(round(off_ppg['off_ppg'].mean(), 1) if not off_ppg.empty else 0),
                     "l4_def_pa": clean_nan(round(def_pa['def_pa'].mean(), 1) if not def_pa.empty else 0)
-                },
-                "history": history
+                }
             },
             "rankings": final.to_dict(orient='records'),
             "ytd": ytd_sorted.to_dict(orient='records'),
             "injuries": injuries_list.to_dict(orient='records')
         }
+
+        # OUTPUT 2: History Data
+        output_history = {
+            "history": history
+        }
+
+        # OUTPUT 3: Teams Data
+        output_teams = {
+            "off_ppg": off_ppg.to_dict(orient='records'),
+            "def_pa": def_pa.to_dict(orient='records')
+        }
         
         with open("public/kicker_data.json", "w") as f:
-            json.dump(output, f, indent=2)
+            json.dump(output_main, f, indent=2)
+            
+        with open("public/history_data.json", "w") as f:
+            json.dump(output_history, f, indent=2)
+            
+        with open("public/teams_data.json", "w") as f:
+            json.dump(output_teams, f, indent=2)
         
-        print(f"✅ Success! Data saved.")
+        print(f"✅ Success! All 3 Data Files saved.")
     
     except Exception as e:
         print(f"❌ Fatal Error: {e}")

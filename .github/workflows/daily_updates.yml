@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0 # Fetch full history to avoid shallow clone issues
+          fetch-depth: 0
 
       - name: 2. Set up Python Environment (3.10)
         uses: actions/setup-python@v4
@@ -47,29 +47,21 @@ jobs:
           git config --global user.name "KickerGenius Bot"
           git config --global user.email "bot@kickergenius.com"
           
-          # Stash any changes temporarily to pull cleanly
           git stash
-          
-          # Pull latest changes to avoid conflict
           git pull --rebase origin main
-          
-          # Apply our changes back
           git stash pop || echo "No stash to pop"
           
-          # Check status before adding
           echo "--- Git Status Before Add ---"
           git status
           
-          # Force add the specific file
-          git add public/kicker_data.json
+          # Force add ALL generated JSON files
+          git add public/*.json
           
-          # Check if there are actual changes to commit
           if git diff-index --quiet HEAD --; then
-            echo "No changes detected (file matched exactly)."
+            echo "No changes detected."
           else
-            git commit -m "Data Bot Update: Week ${{ github.event.inputs.week }} Kicker Projections"
+            git commit -m "Data Bot Update: Split JSON Files"
             
-            # Retry push logic in case of race condition
             n=0
             until [ "$n" -ge 5 ]
             do
