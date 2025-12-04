@@ -71,18 +71,11 @@ def run_analysis():
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
-        # 2. FULL HISTORY REBUILD
-        history = {}
-        print(f"📊 Rebuilding Full History (Weeks 1-{target_week})...")
-        
-        for w in range(1, target_week + 1):
-            # Get Granular Actuals for this week
-            actuals_df = get_kicker_scores_for_week(pbp, w)
-            if not actuals_df.empty:
-                history[str(w)] = actuals_df.to_dict(orient='records')
+        # 2. HISTORY MANAGEMENT
+        history = load_history()
+        history = update_history(history, pbp, target_week)
         
         # 3. TEAM STATS HISTORY
-        print("📊 Generating Team Stats History...")
         team_history = get_weekly_team_stats(schedule, target_week)
         
         cbs_injuries = scrape_cbs_injuries()
@@ -113,7 +106,7 @@ def run_analysis():
         kick_plays['made'] = ((kick_plays['is_fg'] & (kick_plays['field_goal_result'] == 'made')) | 
                               (kick_plays['is_xp'] & (kick_plays['extra_point_result'] == 'good')))
         
-        # Granular Buckets (Season Totals)
+        # Granular Buckets
         kick_plays['fg_0_19'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'] < 20)
         kick_plays['fg_20_29'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(20, 29))
         kick_plays['fg_30_39'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(30, 39))
@@ -179,10 +172,12 @@ def run_analysis():
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
 
-        # --- CALCULATE STALL METRICS ---
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
-        off_stall_seas = off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd', 'posteam': 'team'})
-        def_stall_seas = def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd', 'defteam': 'team'})
+        off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
+        def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
+        
+        if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
+        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) 
         
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
         stats = pd.merge(stats, def_stall_seas, on='team', how='left')
@@ -282,23 +277,48 @@ def run_analysis():
         max_wk = pbp['week'].max()
         start_wk = max(1, max_wk - 3)
         recent_pbp = pbp[pbp['week'] >= start_wk].copy()
-        
-        # --- MODULAR TEAM STATS ---
-        off_ppg, def_pa = calculate_team_stats(schedule, target_week)
-        
-        # Calculate L4 Stall Metrics using existing function
         off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
-        off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
-        def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
-        
         lg_off_avg = off_stall_l4['off_stall_rate'].mean()
         lg_def_avg = def_stall_l4['def_stall_rate'].mean()
 
+        # --- RE-CALCULATE AND RESTORE VARIABLES ---
         fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
         fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
-        aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
+        aggression_stats = aggression_stats.rename(columns={'posteam': 'team'}) # RENAME HERE
+
+        completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
+        home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
+        away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
+        all_scores = pd.concat([home_scores, away_scores])
+        
+        # --- RESTORE OFF_PPG CALCULATION ---
+        off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
+        off_ppg['off_ppg'] = off_ppg['off_ppg'].round(1)
+        
+        home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
+        away_allowed = completed[['away_team', 'home_score']].rename(columns={'away_team': 'team', 'home_score': 'pts_allowed'})
+        all_allowed = pd.concat([home_allowed, away_allowed])
+        
+        # --- RESTORE DEF_PA CALCULATION ---
+        def_pa = all_allowed.groupby('team')['pts_allowed'].mean().reset_index().rename(columns={'pts_allowed': 'def_pa', 'team': 'opponent'})
+        def_pa['def_pa'] = def_pa['def_pa'].round(1)
+
+        l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
+        kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
+        kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True)
+        home_g = completed[['game_id', 'home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'total'})
+        away_g = completed[['game_id', 'away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'total'})
+        all_g = pd.concat([home_g, away_g])
+        share_df = pd.merge(all_g, kicker_game_pts, left_on=['game_id', 'team'], right_on=['game_id', 'posteam'], how='left').fillna(0)
+        share_df['share'] = share_df.apply(lambda x: x['kicker_pts'] / x['total'] if x['total'] > 0 else 0, axis=1)
+        off_share = share_df.groupby('team')['share'].mean().reset_index().rename(columns={'share': 'off_share'})
+        
+        matchup_lookup = schedule[['game_id', 'home_team', 'away_team']]
+        share_df = pd.merge(share_df, matchup_lookup, on='game_id')
+        share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
+        def_share = share_df.groupby('opponent')['share'].mean().reset_index().rename(columns={'share': 'def_share'})
 
         matchups = schedule[schedule['week'] == target_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']].copy()
         matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
@@ -332,6 +352,7 @@ def run_analysis():
         
         final = pd.merge(final, off_stall_l4, on='team', how='left')
         
+        # MERGE TEAM STATS (Now safe)
         if not off_ppg.empty:
             final = pd.merge(final, off_ppg, on='team', how='left')
         else:
@@ -341,7 +362,7 @@ def run_analysis():
         final = pd.merge(final, def_stall_l4, on='opponent', how='left')
         
         if not def_pa.empty:
-            final = pd.merge(final, def_pa.rename(columns={'team': 'opponent'}), on='opponent', how='left')
+            final = pd.merge(final, def_pa, on='opponent', how='left')
         else:
             final['def_pa'] = 0
             
@@ -365,7 +386,7 @@ def run_analysis():
             
             history_obj = history_data.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
 
-            # Exclude live cols
+            # IMPORTANT: Exclude LIVE COLS from return to avoid overlap
             return pd.Series({
                 'grade': grade,
                 'proj': proj,
@@ -385,7 +406,6 @@ def run_analysis():
         final = final.sort_values('proj', ascending=False)
         final['narrative'] = final.apply(generate_narrative, axis=1)
         
-        # Final cleanup
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
         ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
@@ -404,7 +424,8 @@ def run_analysis():
                     "def_stall": clean_nan(round(lg_def_avg, 1)),
                     "l4_off_ppg": clean_nan(round(off_ppg['off_ppg'].mean(), 1) if not off_ppg.empty else 0),
                     "l4_def_pa": clean_nan(round(def_pa['def_pa'].mean(), 1) if not def_pa.empty else 0)
-                }
+                },
+                # Remove history from main file to keep it light
             },
             "rankings": final.to_dict(orient='records'),
             "ytd": ytd_sorted.to_dict(orient='records'),
