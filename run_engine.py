@@ -350,6 +350,7 @@ def run_analysis():
             
             history_obj = history_data.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
 
+            # DO NOT include live columns in return since they are already in 'final'
             return pd.Series({
                 'grade': grade,
                 'proj': proj,
@@ -363,17 +364,6 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
-                'wk_fg_0_19': row['wk_fg_0_19'], 'wk_fg_20_29': row['wk_fg_20_29'],
-                'wk_fg_30_39': row['wk_fg_30_39'], 'wk_fg_40_49': row['wk_fg_40_49'],
-                'wk_fg_50_59': row['wk_fg_50_59'], 'wk_fg_60_plus': row['wk_fg_60_plus'],
-                'wk_fg_miss': row['wk_fg_miss'], 'wk_xp_made': row['wk_xp_made'],
-                'wk_xp_miss': row['wk_xp_miss'],
-                'wk_fg_miss_0_19': row['wk_fg_miss_0_19'],
-                'wk_fg_miss_20_29': row['wk_fg_miss_20_29'],
-                'wk_fg_miss_30_39': row['wk_fg_miss_30_39'],
-                'wk_fg_miss_40_49': row['wk_fg_miss_40_49'],
-                'wk_fg_miss_50_59': row['wk_fg_miss_50_59'],
-                'wk_fg_miss_60_plus': row['wk_fg_miss_60_plus']
             })
 
         final = final.join(final.apply(process_row, axis=1))
