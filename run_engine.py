@@ -172,36 +172,18 @@ def run_analysis():
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
 
-        # --- CALCULATE STALL METRICS ---
-        max_wk = pbp['week'].max()
-        start_wk = max(1, max_wk - 3)
-        recent_pbp = pbp[pbp['week'] >= start_wk].copy()
+        off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
+        off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
+        def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
         
-        off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
-        # Explicitly rename columns immediately
-        off_stall_l4 = off_stall_l4.rename(columns={'off_stall_rate': 'off_stall_rate_ytd', 'posteam': 'team'})
-        def_stall_l4 = def_stall_l4.rename(columns={'def_stall_rate': 'def_stall_rate_ytd', 'defteam': 'team'})
+        if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
+        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) 
         
-        # Use standard merge for stall metrics now that 'team' column is guaranteed
-        stats = pd.merge(stats, off_stall_l4, on='team', how='left')
-        stats = pd.merge(stats, def_stall_l4, left_on='opponent', right_on='team', how='left') # Assuming 'opponent' is in stats? No, stats is by player.
-        # Wait, stats is by player. It has 'team'. It does NOT have 'opponent' yet. 
-        # Opponent comes from the Schedule merge later.
-        
-        # Let's fix the merge logic for stall rates. 
-        # 'off_stall_seas' is for the player's TEAM. 'def_stall_seas' is also for the player's TEAM (how often THEIR defense stalls opponents?)
-        # No, def_stall usually refers to the OPPONENT's defense.
-        # But at this stage (stats dataframe), we only know the player's TEAM. We don't know the opponent yet.
-        # So we merge the TEAM's defensive stats (how good THEIR defense is) if we want.
-        # BUT the original logic merged 'def_stall_seas' on 'team'. 
-        # Let's stick to merging on 'team' for now.
-        
+        stats = pd.merge(stats, off_stall_seas, on='team', how='left')
+        stats = pd.merge(stats, def_stall_seas, on='team', how='left')
         stats['off_stall_rate_ytd'] = stats['off_stall_rate_ytd'].fillna(0)
-        # stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0) # We merged on opponent, which doesn't exist.
-        
-        # Let's merge def_stall on 'team' as per original logic (maybe it was tracking own defense?)
-        # Actually, let's just merge off_stall_l4 to stats for now, and handle opponent data after schedule merge.
-        
+        stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
+
         history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
         
         # --- INJECT PROJECTIONS INTO HISTORY ---
@@ -292,7 +274,22 @@ def run_analysis():
         qualified = stats[stats['fg_att'] >= 5]
         elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
 
-        # --- RE-CALCULATE AND RESTORE VARIABLES ---
+        max_wk = pbp['week'].max()
+        start_wk = max(1, max_wk - 3)
+        recent_pbp = pbp[pbp['week'] >= start_wk].copy()
+        
+        # --- MODULAR TEAM STATS ---
+        off_ppg, def_pa = calculate_team_stats(schedule, target_week)
+        
+        # Calculate L4 Stall Metrics using existing function
+        off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
+        # Explicitly rename before merge
+        off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team', 'off_stall_rate': 'off_stall_rate'})
+        def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent', 'def_stall_rate': 'def_stall_rate'})
+        
+        lg_off_avg = off_stall_l4['off_stall_rate'].mean()
+        lg_def_avg = def_stall_l4['def_stall_rate'].mean()
+
         fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
         fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
@@ -304,17 +301,13 @@ def run_analysis():
         away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
         all_scores = pd.concat([home_scores, away_scores])
         
-        # --- RESTORE OFF_PPG CALCULATION ---
+        # DEFINE OFF_PPG & DEF_PA HERE
         off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
-        off_ppg['off_ppg'] = off_ppg['off_ppg'].round(1)
         
         home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
         away_allowed = completed[['away_team', 'home_score']].rename(columns={'away_team': 'team', 'home_score': 'pts_allowed'})
         all_allowed = pd.concat([home_allowed, away_allowed])
-        
-        # --- RESTORE DEF_PA CALCULATION ---
         def_pa = all_allowed.groupby('team')['pts_allowed'].mean().reset_index().rename(columns={'pts_allowed': 'def_pa', 'team': 'opponent'})
-        def_pa['def_pa'] = def_pa['def_pa'].round(1)
 
         l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
         kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
@@ -325,7 +318,6 @@ def run_analysis():
         share_df = pd.merge(all_g, kicker_game_pts, left_on=['game_id', 'team'], right_on=['game_id', 'posteam'], how='left').fillna(0)
         share_df['share'] = share_df.apply(lambda x: x['kicker_pts'] / x['total'] if x['total'] > 0 else 0, axis=1)
         off_share = share_df.groupby('team')['share'].mean().reset_index().rename(columns={'share': 'off_share'})
-        
         matchup_lookup = schedule[['game_id', 'home_team', 'away_team']]
         share_df = pd.merge(share_df, matchup_lookup, on='game_id')
         share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
@@ -361,11 +353,9 @@ def run_analysis():
         final = pd.merge(stats, model, on='team', how='inner')
         final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
-        # Explicitly rename off_stall_l4 column before merge
-        off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team', 'off_stall_rate': 'off_stall_rate'})
+        # --- NOW DO THE MERGES IN ORDER (SAFE) ---
         final = pd.merge(final, off_stall_l4, on='team', how='left')
         
-        # MERGE TEAM STATS (Now safe)
         if not off_ppg.empty:
             final = pd.merge(final, off_ppg, on='team', how='left')
         else:
@@ -373,8 +363,9 @@ def run_analysis():
             
         final = pd.merge(final, off_share, on='team', how='left')
         
-        # Rename def_stall_l4 column before merge
-        def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent', 'def_stall_rate': 'def_stall_rate'})
+        # Merge DEF STALL rate (renamed column ensures safety)
+        # Note: We merge def_stall_l4 on 'opponent' because it represents the opponent's defense
+        # But wait, `def_stall_l4` was renamed to 'opponent'.
         final = pd.merge(final, def_stall_l4, on='opponent', how='left')
         
         if not def_pa.empty:
@@ -388,6 +379,7 @@ def run_analysis():
         final = final.fillna(0)
 
         def process_row(row):
+            # Simplified scoring logic for brevity - ensures script runs
             off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
             def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
             bonus_val = 0
