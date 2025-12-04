@@ -32,47 +32,28 @@ def generate_narrative(row):
     wind = row['wind']
     is_dome = row['is_dome']
     
-    s1_options = []
-    if grade >= 100:
-        s1_options = [
-            f"{name} is a locked-and-loaded RB1 of kickers this week with an elite Grade of {grade}.",
-            f"Fire up {name} with confidence; his Matchup Grade of {grade} is in the elite tier."
-        ]
-    elif grade >= 90:
-        s1_options = [
-            f"{name} is a strong play this week, sitting comfortably with a Grade of {grade}.",
-            f"You can trust {name} in your lineup given his solid Grade of {grade}."
-        ]
-    elif grade >= 80:
-        s1_options = [
-            f"{name} is a viable streaming option with a respectable Grade of {grade}.",
-            f"Consider {name} if you need a fill-in; his Grade is a decent {grade}."
-        ]
-    else:
-        s1_options = [
-            f"{name} is a risky option this week with a below-average Grade of {grade}.",
-            f"Fade {name} if possible; his Grade of {grade} suggests low upside."
-        ]
-    
+    s1_options = [
+        f"{name} is a locked-and-loaded RB1 of kickers this week.",
+        f"Fire up {name} with confidence.",
+        f"{name} is a strong play this week.",
+        f"You can trust {name} in your lineup.",
+        f"{name} is a viable streaming option.",
+        f"Consider {name} if you need a fill-in.",
+        f"{name} is a risky option this week.",
+        f"Fade {name} if possible."
+    ]
     s1 = random.choice(s1_options)
 
-    s2_options = []
-    if vegas > 27:
-        s2_options = [f"The offense has a massive implied total of {vegas:.1f}, offering a high ceiling."]
-    elif wind > 15 and not is_dome:
-        s2_options = [f"However, heavy winds ({wind} mph) could severely limit kicking opportunities."]
-    elif is_dome:
-        s2_options = [f"Playing in a dome guarantees perfect kicking conditions."]
-    elif off_stall > 40:
-        s2_options = [f"His offense has a high stall rate ({off_stall}%), which often leads to FG attempts."]
-    elif def_stall > 40:
-        s2_options = [f"The matchup is favorable against a defense that forces FGs ({def_stall}%) in the red zone."]
-    elif vegas < 18:
-        s2_options = [f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting chances."]
-    else:
-        s2_options = [f"They face a neutral matchup with standard scoring expectations."]
-
+    s2_options = [
+        f"The offense has a massive implied total of {vegas:.1f}.",
+        f"Heavy winds ({wind} mph) could limit opportunities.",
+        f"Playing in a dome guarantees perfect conditions.",
+        f"His offense has a high stall rate ({off_stall}%).",
+        f"The matchup is favorable against a porous defense.",
+        f"Be cautious, as the team has a low implied total."
+    ]
     s2 = random.choice(s2_options)
+    
     return f"{s1} {s2}"
 
 def run_analysis():
@@ -89,9 +70,24 @@ def run_analysis():
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
-        # 2. HISTORY MANAGEMENT
-        history = load_history()
-        history = update_history(history, pbp, target_week)
+        # 2. INITIALIZE HISTORY
+        # We want to rebuild history or load it. 
+        history = {}
+        
+        # Loop through ALL weeks up to current to build Actuals
+        # This ensures we have granular stats for Weeks 1-13 even if we didn't save them before.
+        print(f"📊 Rebuilding History for Weeks 1 to {target_week}...")
+        for w in range(1, target_week + 1):
+            week_str = str(w)
+            print(f"   - Processing Week {w}...")
+            
+            # Get Actuals (Granular)
+            actuals_df = get_kicker_scores_for_week(pbp, w)
+            
+            if not actuals_df.empty:
+                # Convert to list of dicts
+                # We initialize the list with just the actual stats
+                history[week_str] = actuals_df.to_dict(orient='records')
         
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
@@ -112,7 +108,7 @@ def run_analysis():
             full_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_team', 'position'])
             inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
 
-        # --- RAW STATS AGGREGATION ---
+        # --- RAW STATS AGGREGATION (CURRENT SEASON TOTALS) ---
         kick_plays = pbp[pbp['play_type'].isin(['field_goal', 'extra_point'])].copy()
         kick_plays = kick_plays.dropna(subset=['kicker_player_name'])
         
@@ -187,7 +183,6 @@ def run_analysis():
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
 
-        # --- CALCULATE LEAGUE AVERAGES (Define off_ppg here so it's available for output) ---
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
         off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
         def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
@@ -201,8 +196,25 @@ def run_analysis():
         stats['def_stall_rate_ytd'] = stats['def_stall_rate_ytd'].fillna(0)
 
         history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
+        
+        # --- INJECT PROJECTIONS INTO HISTORY ---
+        # Now that we have history_data (which contains l3_games), we can update our 'history' dict
+        # with the projection values for the last 3 weeks.
+        
+        for pid, h_data in history_data.items():
+            l3 = h_data.get('l3_games', [])
+            for game in l3:
+                wk_str = str(game['week'])
+                proj = game['proj']
+                
+                if wk_str in history:
+                    # Find this player in the history list
+                    for record in history[wk_str]:
+                        if record['id'] == pid:
+                            record['proj'] = proj
+                            break
 
-        # --- NEW: CURRENT WEEK LIVE SCORING (RAW BUCKETS) ---
+        # --- NEW: CURRENT WEEK LIVE SCORING ---
         current_week_pbp = kick_plays[kick_plays['week'] == target_week].copy()
         live_cols = [
             'wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 
@@ -265,14 +277,9 @@ def run_analysis():
             
             cbs_st = str(row.get('cbs_status', '')).title()
             cbs_det = str(row.get('cbs_injury', ''))
-            
-            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: 
-                return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
-            if "Doubtful" in cbs_st: 
-                return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
-            if "Questionable" in cbs_st: 
-                return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
-            
+            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
+            if "Doubtful" in cbs_st: return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
+            if "Questionable" in cbs_st: return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
             return "Healthy", "green", "Active"
 
         injury_meta = stats.apply(get_injury_meta, axis=1)
@@ -290,7 +297,6 @@ def run_analysis():
         lg_off_avg = off_stall_l4['off_stall_rate'].mean()
         lg_def_avg = def_stall_l4['def_stall_rate'].mean()
 
-        # --- RE-AGGREGATE AGGRESSION & POINTS FOR LATE USE ---
         fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
         fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
@@ -301,7 +307,7 @@ def run_analysis():
         away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
         all_scores = pd.concat([home_scores, away_scores])
         
-        # DEFINE OFF_PPG & DEF_PA HERE
+        # Define off_ppg and def_pa here
         off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
         
         home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
@@ -350,13 +356,7 @@ def run_analysis():
         model['wind'] = model['weather_data'].apply(lambda x: x[0])
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
-        if 'posteam' in off_stall_l4.columns: off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
-        if 'defteam' in def_stall_l4.columns: def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
-        if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
-        
         final = pd.merge(stats, model, on='team', how='inner')
-        
-        # MERGE LIVE STATS
         final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
         final = pd.merge(final, off_stall_l4, on='team', how='left')
@@ -429,13 +429,10 @@ def run_analysis():
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
-                # EXCLUDE live cols to prevent overlap
             })
 
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
-        
-        # Correctly call generate_narrative after 'grade' is available
         final['narrative'] = final.apply(generate_narrative, axis=1)
         
         final = final.replace([np.inf, -np.inf, np.nan], None)
@@ -456,7 +453,7 @@ def run_analysis():
                     "l4_off_ppg": clean_nan(round(off_ppg['off_ppg'].mean(), 1)),
                     "l4_def_pa": clean_nan(round(def_pa['def_pa'].mean(), 1))
                 },
-                "history": history 
+                "history": history
             },
             "rankings": final.to_dict(orient='records'),
             "ytd": ytd_sorted.to_dict(orient='records'),
