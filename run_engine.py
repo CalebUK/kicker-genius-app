@@ -20,14 +20,42 @@ from engine.history import load_history, update_history
 from engine.weather import get_weather_forecast
 from engine.team_stats import calculate_team_stats
 
-# --- NARRATIVE ENGINE (Omitted for brevity, same as before) ---
+# --- NARRATIVE ENGINE ---
 def generate_narrative(row):
     if row['injury_status'] != 'Healthy':
-        return f"Monitor status closely as they are currently listed as {row['injury_status']}."
+        return f"Monitor status closely as they are currently listed as {row['injury_status']}. This significantly impacts their viability for Week {row.get('week', '')}."
+
     name = row['kicker_player_name'].split('.')[-1]
     grade = row['grade']
-    s1 = "Strong Play" if grade > 90 else "Risky" if grade < 80 else "Solid Option"
-    return f"{name} is a {s1}."
+    vegas = row['vegas_implied']
+    off_stall = row['off_stall_rate']
+    def_stall = row['def_stall_rate']
+    wind = row['wind']
+    is_dome = row['is_dome']
+    
+    s1_options = [
+        f"{name} is a locked-and-loaded RB1 of kickers this week.",
+        f"Fire up {name} with confidence.",
+        f"{name} is a strong play this week.",
+        f"You can trust {name} in your lineup.",
+        f"{name} is a viable streaming option.",
+        f"Consider {name} if you need a fill-in.",
+        f"{name} is a risky option this week.",
+        f"Fade {name} if possible."
+    ]
+    s1 = random.choice(s1_options)
+
+    s2_options = [
+        f"The offense has a massive implied total of {vegas:.1f}.",
+        f"Heavy winds ({wind} mph) could limit opportunities.",
+        f"Playing in a dome guarantees perfect conditions.",
+        f"His offense has a high stall rate ({off_stall}%).",
+        f"The matchup is favorable against a porous defense.",
+        f"Be cautious, as the team has a low implied total."
+    ]
+    s2 = random.choice(s2_options)
+    
+    return f"{s1} {s2}"
 
 def run_analysis():
     try:
@@ -44,34 +72,8 @@ def run_analysis():
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
         # 2. HISTORY MANAGEMENT
-        # Load existing JSON to preserve any manually saved projections
         history = load_history()
-        
-        # REBUILD ACTUALS for Weeks 1 to target_week
-        # This ensures we have the 'actual' score for every week based on PBP
-        print(f"📊 Rebuilding/Updating History for Weeks 1 to {target_week}...")
-        for w in range(1, target_week + 1):
-            week_str = str(w)
-            actuals_df = get_kicker_scores_for_week(pbp, w)
-            
-            if not actuals_df.empty:
-                new_records = actuals_df.to_dict(orient='records')
-                
-                # Merge with existing history to preserve projections if they exist
-                if week_str in history:
-                    existing_records = history[week_str]
-                    # Map existing projections to the new actuals
-                    # Create a lookup map for existing projections: id -> proj
-                    proj_map = {r['id']: r.get('proj', 0) for r in existing_records}
-                    
-                    for record in new_records:
-                        pid = record['id']
-                        if pid in proj_map:
-                            record['proj'] = proj_map[pid]
-                        else:
-                            record['proj'] = 0 # Default if no projection found
-                
-                history[week_str] = new_records
+        history = update_history(history, pbp, target_week)
         
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
@@ -167,12 +169,10 @@ def run_analysis():
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
 
+        # --- CALCULATE STALL METRICS & RENAME EXPLICITLY ---
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
-        off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
-        def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
-        
-        if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
-        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) 
+        off_stall_seas = off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd', 'posteam': 'team'})
+        def_stall_seas = def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd', 'defteam': 'team'})
         
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
         stats = pd.merge(stats, def_stall_seas, on='team', how='left')
@@ -181,8 +181,7 @@ def run_analysis():
 
         history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
         
-        # --- INJECT RECENT PROJECTIONS INTO HISTORY ---
-        # Backfill projections for Week 11, 12, 13 from the l3_games data we just calculated
+        # --- INJECT PROJECTIONS INTO HISTORY ---
         for pid, h_data in history_data.items():
             l3 = h_data.get('l3_games', [])
             for game in l3:
@@ -257,9 +256,14 @@ def run_analysis():
             
             cbs_st = str(row.get('cbs_status', '')).title()
             cbs_det = str(row.get('cbs_injury', ''))
-            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
-            if "Doubtful" in cbs_st: return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
-            if "Questionable" in cbs_st: return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
+            
+            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: 
+                return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
+            if "Doubtful" in cbs_st: 
+                return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
+            if "Questionable" in cbs_st: 
+                return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
+            
             return "Healthy", "green", "Active"
 
         injury_meta = stats.apply(get_injury_meta, axis=1)
@@ -273,28 +277,27 @@ def run_analysis():
         max_wk = pbp['week'].max()
         start_wk = max(1, max_wk - 3)
         recent_pbp = pbp[pbp['week'] >= start_wk].copy()
+        
+        # --- MODULAR TEAM STATS ---
+        off_ppg, def_pa = calculate_team_stats(schedule, target_week)
+        
+        # Calculate L4 Stall Metrics using existing function
         off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
+        
+        # EXPLICITLY RENAME BEFORE MERGE
+        off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
+        def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
+        
         lg_off_avg = off_stall_l4['off_stall_rate'].mean()
         lg_def_avg = def_stall_l4['def_stall_rate'].mean()
 
         fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
         fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
+        aggression_stats = aggression_stats.rename(columns={'posteam': 'team'}) # Rename here too
         aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
 
         completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
-        home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
-        away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
-        all_scores = pd.concat([home_scores, away_scores])
-        
-        # DEFINE OFF_PPG & DEF_PA HERE
-        off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
-        
-        home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
-        away_allowed = completed[['away_team', 'home_score']].rename(columns={'away_team': 'team', 'home_score': 'pts_allowed'})
-        all_allowed = pd.concat([home_allowed, away_allowed])
-        def_pa = all_allowed.groupby('team')['pts_allowed'].mean().reset_index().rename(columns={'pts_allowed': 'def_pa', 'team': 'opponent'})
-
         l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
         kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
         kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True)
@@ -394,10 +397,9 @@ def run_analysis():
 
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
-        
-        # Fix: Generate narratives AFTER process_row has added 'grade' and 'proj'
         final['narrative'] = final.apply(generate_narrative, axis=1)
         
+        # Final cleanup
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
         ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
@@ -413,8 +415,8 @@ def run_analysis():
                     "fpts": clean_nan(round(stats['fpts'].mean(), 1)),
                     "off_stall": clean_nan(round(lg_off_avg, 1)),
                     "def_stall": clean_nan(round(lg_def_avg, 1)),
-                    "l4_off_ppg": clean_nan(round(off_ppg['off_ppg'].mean(), 1)),
-                    "l4_def_pa": clean_nan(round(def_pa['def_pa'].mean(), 1))
+                    "l4_off_ppg": clean_nan(round(off_ppg['off_ppg'].mean(), 1) if not off_ppg.empty else 0),
+                    "l4_def_pa": clean_nan(round(def_pa['def_pa'].mean(), 1) if not def_pa.empty else 0)
                 },
                 "history": history
             },
