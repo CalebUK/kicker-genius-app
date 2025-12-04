@@ -35,7 +35,7 @@ def get_current_nfl_week():
     week_num = (days_since_start // 7) + 1
     return max(1, min(18, week_num))
 
-# --- UPDATED FUNCTION: GET GRANULAR KICKER STATS FOR A SPECIFIC WEEK ---
+# --- NEW FUNCTION: GET GRANULAR KICKER STATS FOR A SPECIFIC WEEK ---
 def get_kicker_scores_for_week(pbp_data, target_week):
     """
     Calculates granular FG/XP stats for all kickers in a given week.

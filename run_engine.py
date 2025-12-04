@@ -18,7 +18,7 @@ from engine.data import (
 )
 from engine.history import load_history, update_history 
 from engine.weather import get_weather_forecast
-from engine.team_stats import calculate_team_stats
+from engine.team_stats import calculate_team_stats, get_weekly_team_stats
 
 # --- NARRATIVE ENGINE ---
 def generate_narrative(row):
@@ -71,33 +71,24 @@ def run_analysis():
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
-        # 2. HISTORY MANAGEMENT
-        # Load history from its own file if possible, or main file fallback
+        # 2. FULL HISTORY REBUILD
         history = {}
-        history_file = "public/history_data.json"
+        print(f"📊 Rebuilding Full History (Weeks 1-{target_week})...")
         
-        # Check specific history file first
-        if os.path.exists(history_file):
-            try:
-                with open(history_file, "r") as f:
-                    history = json.load(f)
-            except Exception as e:
-                print(f"⚠️ Could not load history file: {e}")
-        # Fallback to checking main file if split hasn't happened yet
-        elif os.path.exists("public/kicker_data.json"):
-            try:
-                with open("public/kicker_data.json", "r") as f:
-                    existing_data = json.load(f)
-                    history = existing_data.get("history", {})
-            except: pass
-
-        # Update History
-        history = update_history(history, pbp, target_week)
+        for w in range(1, target_week + 1):
+            # Get Granular Actuals for this week
+            actuals_df = get_kicker_scores_for_week(pbp, w)
+            if not actuals_df.empty:
+                history[str(w)] = actuals_df.to_dict(orient='records')
+        
+        # 3. TEAM STATS HISTORY
+        print("📊 Generating Team Stats History...")
+        team_history = get_weekly_team_stats(schedule, target_week)
         
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
         
-        # 3. Roster Logic
+        # 4. Roster Logic
         print("   📥 Loading Rosters...")
         try:
             rosters = load_data_with_retry(lambda: nfl.load_rosters(seasons=[CURRENT_SEASON]), "Rosters")
@@ -122,7 +113,7 @@ def run_analysis():
         kick_plays['made'] = ((kick_plays['is_fg'] & (kick_plays['field_goal_result'] == 'made')) | 
                               (kick_plays['is_xp'] & (kick_plays['extra_point_result'] == 'good')))
         
-        # Granular Buckets
+        # Granular Buckets (Season Totals)
         kick_plays['fg_0_19'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'] < 20)
         kick_plays['fg_20_29'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(20, 29))
         kick_plays['fg_30_39'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'].between(30, 39))
@@ -309,21 +300,6 @@ def run_analysis():
         aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
         aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
 
-        completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
-        l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
-        kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
-        kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True)
-        home_g = completed[['game_id', 'home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'total'})
-        away_g = completed[['game_id', 'away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'total'})
-        all_g = pd.concat([home_g, away_g])
-        share_df = pd.merge(all_g, kicker_game_pts, left_on=['game_id', 'team'], right_on=['game_id', 'posteam'], how='left').fillna(0)
-        share_df['share'] = share_df.apply(lambda x: x['kicker_pts'] / x['total'] if x['total'] > 0 else 0, axis=1)
-        off_share = share_df.groupby('team')['share'].mean().reset_index().rename(columns={'share': 'off_share'})
-        matchup_lookup = schedule[['game_id', 'home_team', 'away_team']]
-        share_df = pd.merge(share_df, matchup_lookup, on='game_id')
-        share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
-        def_share = share_df.groupby('opponent')['share'].mean().reset_index().rename(columns={'share': 'def_share'})
-
         matchups = schedule[schedule['week'] == target_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']].copy()
         matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
         matchups['total_line'] = matchups['total_line'].fillna(44.0)
@@ -409,6 +385,7 @@ def run_analysis():
         final = final.sort_values('proj', ascending=False)
         final['narrative'] = final.apply(generate_narrative, axis=1)
         
+        # Final cleanup
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
         ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
@@ -441,8 +418,7 @@ def run_analysis():
 
         # OUTPUT 3: Teams Data
         output_teams = {
-            "off_ppg": off_ppg.to_dict(orient='records'),
-            "def_pa": def_pa.to_dict(orient='records')
+            "team_history": team_history 
         }
         
         with open("public/kicker_data.json", "w") as f:
