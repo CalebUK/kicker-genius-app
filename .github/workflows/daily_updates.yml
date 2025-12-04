@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # Fetch full history to avoid shallow clone issues
 
       - name: 2. Set up Python Environment (3.10)
         uses: actions/setup-python@v4
@@ -38,13 +39,22 @@ jobs:
         run: mkdir -p public
 
       - name: 5. Run Analysis Script
-        run: python run_engine.py  # <-- Updated to use the new modular engine
+        run: python run_engine.py
         
-      - name: 6. Commit and Push (Manual Force)
+      - name: 6. Commit and Push
         run: |
           # Configure the Bot Identity
           git config --global user.name "KickerGenius Bot"
           git config --global user.email "bot@kickergenius.com"
+          
+          # Stash any changes temporarily to pull cleanly
+          git stash
+          
+          # Pull latest changes to avoid conflict
+          git pull --rebase origin main
+          
+          # Apply our changes back
+          git stash pop || echo "No stash to pop"
           
           # Check status before adding
           echo "--- Git Status Before Add ---"
@@ -53,15 +63,20 @@ jobs:
           # Force add the specific file
           git add public/kicker_data.json
           
-          # Check status after adding
-          echo "--- Git Status After Add ---"
-          git status
-          
-          # Commit and Push if there are changes
+          # Check if there are actual changes to commit
           if git diff-index --quiet HEAD --; then
             echo "No changes detected (file matched exactly)."
           else
             git commit -m "Data Bot Update: Week ${{ github.event.inputs.week }} Kicker Projections"
-            git push
+            
+            # Retry push logic in case of race condition
+            n=0
+            until [ "$n" -ge 5 ]
+            do
+               git pull --rebase origin main && git push && break
+               n=$((n+1)) 
+               sleep 5
+            done
+            
             echo "✅ Changes pushed successfully."
           fi
