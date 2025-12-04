@@ -1,0 +1,262 @@
+{
+  "off_ppg": [
+    {
+      "team": "ARI",
+      "off_ppg": 21.2
+    },
+    {
+      "team": "ATL",
+      "off_ppg": 25.0
+    },
+    {
+      "team": "BAL",
+      "off_ppg": 21.8
+    },
+    {
+      "team": "BUF",
+      "off_ppg": 25.5
+    },
+    {
+      "team": "CAR",
+      "off_ppg": 19.2
+    },
+    {
+      "team": "CHI",
+      "off_ppg": 24.5
+    },
+    {
+      "team": "CIN",
+      "off_ppg": 21.3
+    },
+    {
+      "team": "CLE",
+      "off_ppg": 17.0
+    },
+    {
+      "team": "DAL",
+      "off_ppg": 29.3
+    },
+    {
+      "team": "DEN",
+      "off_ppg": 19.7
+    },
+    {
+      "team": "DET",
+      "off_ppg": 27.8
+    },
+    {
+      "team": "GB",
+      "off_ppg": 22.0
+    },
+    {
+      "team": "HOU",
+      "off_ppg": 23.8
+    },
+    {
+      "team": "IND",
+      "off_ppg": 22.3
+    },
+    {
+      "team": "JAX",
+      "off_ppg": 29.0
+    },
+    {
+      "team": "KC",
+      "off_ppg": 23.3
+    },
+    {
+      "team": "LA",
+      "off_ppg": 31.2
+    },
+    {
+      "team": "LAC",
+      "off_ppg": 20.7
+    },
+    {
+      "team": "LV",
+      "off_ppg": 11.8
+    },
+    {
+      "team": "MIA",
+      "off_ppg": 22.3
+    },
+    {
+      "team": "MIN",
+      "off_ppg": 10.5
+    },
+    {
+      "team": "NE",
+      "off_ppg": 28.5
+    },
+    {
+      "team": "NO",
+      "off_ppg": 14.7
+    },
+    {
+      "team": "NYG",
+      "off_ppg": 20.5
+    },
+    {
+      "team": "NYJ",
+      "off_ppg": 19.5
+    },
+    {
+      "team": "PHI",
+      "off_ppg": 15.5
+    },
+    {
+      "team": "PIT",
+      "off_ppg": 19.8
+    },
+    {
+      "team": "SEA",
+      "off_ppg": 29.8
+    },
+    {
+      "team": "SF",
+      "off_ppg": 28.2
+    },
+    {
+      "team": "TB",
+      "off_ppg": 20.5
+    },
+    {
+      "team": "TEN",
+      "off_ppg": 13.3
+    },
+    {
+      "team": "WAS",
+      "off_ppg": 20.3
+    }
+  ],
+  "def_pa": [
+    {
+      "team": "ARI",
+      "def_pa": 33.0
+    },
+    {
+      "team": "ATL",
+      "def_pa": 24.5
+    },
+    {
+      "team": "BAL",
+      "def_pa": 19.2
+    },
+    {
+      "team": "BUF",
+      "def_pa": 23.0
+    },
+    {
+      "team": "CAR",
+      "def_pa": 23.0
+    },
+    {
+      "team": "CHI",
+      "def_pa": 20.0
+    },
+    {
+      "team": "CIN",
+      "def_pa": 24.7
+    },
+    {
+      "team": "CLE",
+      "def_pa": 21.5
+    },
+    {
+      "team": "DAL",
+      "def_pa": 21.7
+    },
+    {
+      "team": "DEN",
+      "def_pa": 17.3
+    },
+    {
+      "team": "DET",
+      "def_pa": 24.0
+    },
+    {
+      "team": "GB",
+      "def_pa": 15.0
+    },
+    {
+      "team": "HOU",
+      "def_pa": 19.2
+    },
+    {
+      "team": "IND",
+      "def_pa": 22.7
+    },
+    {
+      "team": "JAX",
+      "def_pa": 17.2
+    },
+    {
+      "team": "KC",
+      "def_pa": 24.3
+    },
+    {
+      "team": "LA",
+      "def_pa": 20.8
+    },
+    {
+      "team": "LAC",
+      "def_pa": 19.7
+    },
+    {
+      "team": "LV",
+      "def_pa": 24.5
+    },
+    {
+      "team": "MIA",
+      "def_pa": 14.3
+    },
+    {
+      "team": "MIN",
+      "def_pa": 23.8
+    },
+    {
+      "team": "NE",
+      "def_pa": 18.0
+    },
+    {
+      "team": "NO",
+      "def_pa": 17.3
+    },
+    {
+      "team": "NYG",
+      "def_pa": 29.5
+    },
+    {
+      "team": "NYJ",
+      "def_pa": 23.5
+    },
+    {
+      "team": "PHI",
+      "def_pa": 16.0
+    },
+    {
+      "team": "PIT",
+      "def_pa": 23.5
+    },
+    {
+      "team": "SEA",
+      "def_pa": 16.8
+    },
+    {
+      "team": "SF",
+      "def_pa": 20.2
+    },
+    {
+      "team": "TB",
+      "def_pa": 30.8
+    },
+    {
+      "team": "TEN",
+      "def_pa": 23.7
+    },
+    {
+      "team": "WAS",
+      "def_pa": 29.0
+    }
+  ]
+}

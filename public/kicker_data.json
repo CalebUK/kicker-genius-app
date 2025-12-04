@@ -1,714 +1,13 @@
 {
   "meta": {
     "week": 14,
-    "updated": "2025-12-04 20:01",
+    "updated": "2025-12-04 20:15",
     "league_avgs": {
       "fpts": 75.3,
       "off_stall": 51.3,
       "def_stall": 50.3,
       "l4_off_ppg": 21.9,
       "l4_def_pa": 21.9
-    },
-    "history": {
-      "13": [
-        {
-          "id": "00-0023853",
-          "name": "M.Prater",
-          "fg_0_19": 0,
-          "fg_20_29": 1,
-          "fg_30_39": 1,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 1,
-          "proj": 7.3
-        },
-        {
-          "id": "00-0025565",
-          "name": "N.Folk",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 1,
-          "fg_40_49": 0,
-          "fg_50_59": 1,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 1,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 1,
-          "xp_made": 3,
-          "xp_miss": 0,
-          "proj": 7.1
-        },
-        {
-          "id": "00-0029822",
-          "name": "B.McManus",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 1,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 4,
-          "xp_miss": 0,
-          "proj": 7.4
-        },
-        {
-          "id": "00-0031136",
-          "name": "C.Boswell",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 1,
-          "xp_miss": 0,
-          "proj": 8.8
-        },
-        {
-          "id": "00-0031203",
-          "name": "C.Santos",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 1,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 3,
-          "xp_miss": 0,
-          "proj": 9.0
-        },
-        {
-          "id": "00-0031492",
-          "name": "J.Myers",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 1,
-          "fg_40_49": 1,
-          "fg_50_59": 2,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 13.3
-        },
-        {
-          "id": "00-0032065",
-          "name": "B.Pinion",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 0,
-          "xp_miss": 0
-        },
-        {
-          "id": "00-0032569",
-          "name": "W.Lutz",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 2,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 3,
-          "xp_miss": 0,
-          "proj": 8.5
-        },
-        {
-          "id": "00-0032726",
-          "name": "K.Fairbairn",
-          "fg_0_19": 0,
-          "fg_20_29": 1,
-          "fg_30_39": 0,
-          "fg_40_49": 1,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 11.3
-        },
-        {
-          "id": "00-0033303",
-          "name": "H.Butker",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 4,
-          "xp_miss": 0,
-          "proj": 9.0
-        },
-        {
-          "id": "00-0033702",
-          "name": "Y.Koo",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 1,
-          "xp_miss": 0,
-          "proj": 5.6
-        },
-        {
-          "id": "00-0033787",
-          "name": "J.Elliott",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 1,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 1,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 1,
-          "xp_made": 0,
-          "xp_miss": 1,
-          "proj": 6.8
-        },
-        {
-          "id": "00-0033862",
-          "name": "Z.Gonzalez",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 1,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 1,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 1,
-          "xp_made": 3,
-          "xp_miss": 0,
-          "proj": 10.0
-        },
-        {
-          "id": "00-0034084",
-          "name": "M.Badgley",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 1,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 1,
-          "xp_miss": 1,
-          "proj": 7.4
-        },
-        {
-          "id": "00-0034161",
-          "name": "D.Carlson",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 5.2
-        },
-        {
-          "id": "00-0035192",
-          "name": "J.Slye",
-          "fg_0_19": 0,
-          "fg_20_29": 1,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 0,
-          "xp_miss": 0,
-          "proj": 8.2
-        },
-        {
-          "id": "00-0035269",
-          "name": "M.Gay",
-          "fg_0_19": 0,
-          "fg_20_29": 1,
-          "fg_30_39": 1,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 7.1
-        },
-        {
-          "id": "00-0035358",
-          "name": "C.McLaughlin",
-          "fg_0_19": 0,
-          "fg_20_29": 1,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 1,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 10.1
-        },
-        {
-          "id": "00-0036816",
-          "name": "R.Patterson",
-          "fg_0_19": 0,
-          "fg_20_29": 1,
-          "fg_30_39": 2,
-          "fg_40_49": 1,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 1,
-          "xp_miss": 0,
-          "proj": 8.5
-        },
-        {
-          "id": "00-0036854",
-          "name": "E.McPherson",
-          "fg_0_19": 0,
-          "fg_20_29": 1,
-          "fg_30_39": 2,
-          "fg_40_49": 2,
-          "fg_50_59": 1,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 9.2
-        },
-        {
-          "id": "00-0037224",
-          "name": "C.Dicker",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 1,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 4,
-          "xp_miss": 0,
-          "proj": 11.4
-        },
-        {
-          "id": "00-0037692",
-          "name": "B.Aubrey",
-          "fg_0_19": 0,
-          "fg_20_29": 1,
-          "fg_30_39": 1,
-          "fg_40_49": 1,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 11.3
-        },
-        {
-          "id": "00-0038428",
-          "name": "A.Szmyt",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 0,
-          "xp_miss": 0,
-          "proj": 5.5
-        },
-        {
-          "id": "00-0038562",
-          "name": "J.Moody",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 2,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 10.0
-        },
-        {
-          "id": "00-0038567",
-          "name": "C.Ryland",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 1,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 1,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 1,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 7.3
-        },
-        {
-          "id": "00-0039059",
-          "name": "E.Evans",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 0,
-          "xp_miss": 0
-        },
-        {
-          "id": "00-0039172",
-          "name": "J.Bates",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 1,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 3,
-          "xp_miss": 0,
-          "proj": 9.0
-        },
-        {
-          "id": "00-0039229",
-          "name": "C.Smyth",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 1,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 0,
-          "xp_miss": 0,
-          "proj": 5.0
-        },
-        {
-          "id": "00-0039404",
-          "name": "W.Reichard",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 0,
-          "xp_miss": 0,
-          "proj": 7.6
-        },
-        {
-          "id": "00-0039409",
-          "name": "C.Little",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 1,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 9.2
-        },
-        {
-          "id": "00-0039498",
-          "name": "H.Mevis",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 4,
-          "xp_miss": 0,
-          "proj": 7.5
-        },
-        {
-          "id": "00-0039634",
-          "name": "A.McNamara",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 0,
-          "xp_miss": 0
-        },
-        {
-          "id": "00-0040074",
-          "name": "T.Loop",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 0,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 2,
-          "xp_miss": 0,
-          "proj": 9.7
-        },
-        {
-          "id": "00-0040200",
-          "name": "A.Borregales",
-          "fg_0_19": 0,
-          "fg_20_29": 3,
-          "fg_30_39": 1,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 1,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 1,
-          "xp_made": 3,
-          "xp_miss": 0,
-          "proj": 9.8
-        },
-        {
-          "id": "00-0040279",
-          "name": "R.Fitzgerald",
-          "fg_0_19": 0,
-          "fg_20_29": 0,
-          "fg_30_39": 1,
-          "fg_40_49": 0,
-          "fg_50_59": 0,
-          "fg_60_plus": 0,
-          "fg_miss_0_19": 0,
-          "fg_miss_20_29": 0,
-          "fg_miss_30_39": 0,
-          "fg_miss_40_49": 0,
-          "fg_miss_50_59": 0,
-          "fg_miss_60_plus": 0,
-          "fg_miss": 0,
-          "xp_made": 4,
-          "xp_miss": 0,
-          "proj": 5.2
-        }
-      ]
     }
   },
   "rankings": [
@@ -835,7 +134,7 @@
           }
         ]
       },
-      "narrative": "Fade Myers if possible. The offense has a massive implied total of 25.8."
+      "narrative": "Consider Myers if you need a fill-in. The offense has a massive implied total of 25.8."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -960,7 +259,7 @@
           }
         ]
       },
-      "narrative": "Fairbairn is a viable streaming option. Heavy winds (9.7 mph) could limit opportunities."
+      "narrative": "Fire up Fairbairn with confidence. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -1017,11 +316,11 @@
       "spread_display": "+5.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        5.9,
+        "5mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 5.9,
+      "weather_desc": "5mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -1085,7 +384,7 @@
           }
         ]
       },
-      "narrative": "McPherson is a strong play this week. The matchup is favorable against a porous defense."
+      "narrative": "Fade McPherson if possible. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -1210,7 +509,7 @@
           }
         ]
       },
-      "narrative": "Consider Moody if you need a fill-in. The offense has a massive implied total of 20.0."
+      "narrative": "Moody is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "C.Dicker",
@@ -1335,7 +634,7 @@
           }
         ]
       },
-      "narrative": "Fire up Dicker with confidence. The matchup is favorable against a porous defense."
+      "narrative": "Dicker is a strong play this week. The offense has a massive implied total of 19.5."
     },
     {
       "kicker_player_name": "R.Patterson",
@@ -1392,11 +691,11 @@
       "spread_display": "-2.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        3.8,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 3.8,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -1460,7 +759,7 @@
           }
         ]
       },
-      "narrative": "You can trust Patterson in your lineup. Playing in a dome guarantees perfect conditions."
+      "narrative": "Patterson is a strong play this week. The offense has a massive implied total of 22.0."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -1585,7 +884,7 @@
           }
         ]
       },
-      "narrative": "McLaughlin is a viable streaming option. The offense has a massive implied total of 25.0."
+      "narrative": "Fade McLaughlin if possible. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -1710,7 +1009,7 @@
           }
         ]
       },
-      "narrative": "Fade Boswell if possible. The matchup is favorable against a porous defense."
+      "narrative": "Fire up Boswell with confidence. The offense has a massive implied total of 18.5."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -1835,7 +1134,7 @@
           }
         ]
       },
-      "narrative": "Slye is a viable streaming option. His offense has a high stall rate (57.1%)."
+      "narrative": "Slye is a viable streaming option. Heavy winds (3.4 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -1960,7 +1259,7 @@
           }
         ]
       },
-      "narrative": "You can trust Aubrey in your lineup. Playing in a dome guarantees perfect conditions."
+      "narrative": "Aubrey is a viable streaming option. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "W.Reichard",
@@ -2085,7 +1384,7 @@
           }
         ]
       },
-      "narrative": "Consider Reichard if you need a fill-in. His offense has a high stall rate (44.4%)."
+      "narrative": "Reichard is a viable streaming option. His offense has a high stall rate (44.4%)."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -2210,7 +1509,7 @@
           }
         ]
       },
-      "narrative": "Loop is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 24.0."
+      "narrative": "You can trust Loop in your lineup. His offense has a high stall rate (57.9%)."
     },
     {
       "kicker_player_name": "N.Folk",
@@ -2335,7 +1634,7 @@
           }
         ]
       },
-      "narrative": "You can trust Folk in your lineup. The matchup is favorable against a porous defense."
+      "narrative": "Consider Folk if you need a fill-in. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -2460,7 +1759,7 @@
           }
         ]
       },
-      "narrative": "Prater is a risky option this week. His offense has a high stall rate (60.0%)."
+      "narrative": "Prater is a risky option this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -2585,7 +1884,7 @@
           }
         ]
       },
-      "narrative": "Ryland is a strong play this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "You can trust Ryland in your lineup. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -2710,7 +2009,7 @@
           }
         ]
       },
-      "narrative": "Lutz is a viable streaming option. The offense has a massive implied total of 24.0."
+      "narrative": "Lutz is a strong play this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -2835,7 +2134,7 @@
           }
         ]
       },
-      "narrative": "Fade Butker if possible. His offense has a high stall rate (46.7%)."
+      "narrative": "Butker is a risky option this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -2960,7 +2259,7 @@
           }
         ]
       },
-      "narrative": "Szmyt is a risky option this week. His offense has a high stall rate (69.2%)."
+      "narrative": "You can trust Szmyt in your lineup. The offense has a massive implied total of 19.0."
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -3085,7 +2384,7 @@
           }
         ]
       },
-      "narrative": "Gonzalez is a strong play this week. The offense has a massive implied total of 18.8."
+      "narrative": "Consider Gonzalez if you need a fill-in. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -3210,7 +2509,7 @@
           }
         ]
       },
-      "narrative": "Fire up Bates with confidence. The matchup is favorable against a porous defense."
+      "narrative": "You can trust Bates in your lineup. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.Santos",
@@ -3335,7 +2634,7 @@
           }
         ]
       },
-      "narrative": "Santos is a strong play this week. Be cautious, as the team has a low implied total."
+      "narrative": "Fire up Santos with confidence. Heavy winds (13.3 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.Little",
@@ -3460,7 +2759,7 @@
           }
         ]
       },
-      "narrative": "Little is a viable streaming option. His offense has a high stall rate (22.2%)."
+      "narrative": "Fade Little if possible. Heavy winds (4.8 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -3585,7 +2884,7 @@
           }
         ]
       },
-      "narrative": "Fade Carlson if possible. Heavy winds (0.0 mph) could limit opportunities."
+      "narrative": "Consider Carlson if you need a fill-in. The offense has a massive implied total of 16.5."
     },
     {
       "kicker_player_name": "J.Elliott",
@@ -3710,7 +3009,7 @@
           }
         ]
       },
-      "narrative": "Elliott is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
+      "narrative": "You can trust Elliott in your lineup. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -3835,7 +3134,7 @@
           }
         ]
       },
-      "narrative": "McManus is a strong play this week. Heavy winds (13.3 mph) could limit opportunities."
+      "narrative": "Consider McManus if you need a fill-in. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -3960,7 +3259,7 @@
           }
         ]
       },
-      "narrative": "Consider Mevis if you need a fill-in. The offense has a massive implied total of 28.0."
+      "narrative": "Fade Mevis if possible. His offense has a high stall rate (14.3%)."
     },
     {
       "kicker_player_name": "J.Karty",
@@ -4142,11 +3441,11 @@
       "spread_display": "+8.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        14.3,
+        "14mph \ud83c\udf27\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 14.3,
+      "weather_desc": "14mph \ud83c\udf27\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
@@ -4267,11 +3566,11 @@
       "spread_display": "+8.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        14.3,
+        "14mph \ud83c\udf27\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 14.3,
+      "weather_desc": "14mph \ud83c\udf27\ufe0f",
       "wk_fg_0_19": 0,
       "wk_fg_20_29": 0,
       "wk_fg_30_39": 0,
