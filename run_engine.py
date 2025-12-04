@@ -33,27 +33,44 @@ def generate_narrative(row):
     is_dome = row['is_dome']
     
     s1_options = [
-        f"{name} is a locked-and-loaded RB1 of kickers this week.",
-        f"Fire up {name} with confidence.",
-        f"{name} is a strong play this week.",
-        f"You can trust {name} in your lineup.",
-        f"{name} is a viable streaming option.",
-        f"Consider {name} if you need a fill-in.",
-        f"{name} is a risky option this week.",
-        f"Fade {name} if possible."
+        f"{name} is a locked-and-loaded RB1 of kickers this week with an elite Grade of {grade}.",
+        f"Fire up {name} with confidence; his Matchup Grade of {grade} is in the elite tier."
     ]
+    elif grade >= 90:
+        s1_options = [
+            f"{name} is a strong play this week, sitting comfortably with a Grade of {grade}.",
+            f"You can trust {name} in your lineup given his solid Grade of {grade}."
+        ]
+    elif grade >= 80:
+        s1_options = [
+            f"{name} is a viable streaming option with a respectable Grade of {grade}.",
+            f"Consider {name} if you need a fill-in; his Grade is a decent {grade}."
+        ]
+    else:
+        s1_options = [
+            f"{name} is a risky option this week with a below-average Grade of {grade}.",
+            f"Fade {name} if possible; his Grade of {grade} suggests low upside."
+        ]
+    
     s1 = random.choice(s1_options)
 
-    s2_options = [
-        f"The offense has a massive implied total of {vegas:.1f}.",
-        f"Heavy winds ({wind} mph) could limit opportunities.",
-        f"Playing in a dome guarantees perfect conditions.",
-        f"His offense has a high stall rate ({off_stall}%).",
-        f"The matchup is favorable against a porous defense.",
-        f"Be cautious, as the team has a low implied total."
-    ]
+    s2_options = []
+    if vegas > 27:
+        s2_options = [f"The offense has a massive implied total of {vegas:.1f}, offering a high ceiling."]
+    elif wind > 15 and not is_dome:
+        s2_options = [f"However, heavy winds ({wind} mph) could severely limit kicking opportunities."]
+    elif is_dome:
+        s2_options = [f"Playing in a dome guarantees perfect kicking conditions."]
+    elif off_stall > 40:
+        s2_options = [f"His offense has a high stall rate ({off_stall}%), which often leads to FG attempts."]
+    elif def_stall > 40:
+        s2_options = [f"The matchup is favorable against a defense that forces FGs ({def_stall}%) in the red zone."]
+    elif vegas < 18:
+        s2_options = [f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting chances."]
+    else:
+        s2_options = [f"They face a neutral matchup with standard scoring expectations."]
+
     s2 = random.choice(s2_options)
-    
     return f"{s1} {s2}"
 
 def run_analysis():
@@ -70,18 +87,9 @@ def run_analysis():
         if hasattr(schedule, "to_pandas"): schedule = schedule.to_pandas()
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
-        # 2. REBUILD FULL HISTORY (Weeks 1 to target_week)
-        history = {}
-        print(f"📊 Rebuilding History for Weeks 1 to {target_week}...")
-        
-        for w in range(1, target_week + 1):
-            week_str = str(w)
-            # Get Actuals (Granular) for this week
-            actuals_df = get_kicker_scores_for_week(pbp, w)
-            
-            if not actuals_df.empty:
-                # Save list of dicts for this week
-                history[week_str] = actuals_df.to_dict(orient='records')
+        # 2. HISTORY MANAGEMENT
+        history = load_history()
+        history = update_history(history, pbp, target_week)
         
         cbs_injuries = scrape_cbs_injuries()
         ownership_data = scrape_fantasy_ownership()
@@ -291,10 +299,39 @@ def run_analysis():
         lg_off_avg = off_stall_l4['off_stall_rate'].mean()
         lg_def_avg = def_stall_l4['def_stall_rate'].mean()
 
-        # ... (Middle section for aggression, schedule, etc. similar to before) ...
-        # Re-implementing core merge logic for brevity in this block
+        # --- RE-AGGREGATE AGGRESSION & POINTS FOR LATE USE ---
+        fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
+        fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
+        aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
+        aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
+
+        completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
+        home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
+        away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
+        all_scores = pd.concat([home_scores, away_scores])
         
-        # Matchups & Weather
+        # DEFINE OFF_PPG & DEF_PA HERE (Safe Scope)
+        off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
+        
+        home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
+        away_allowed = completed[['away_team', 'home_score']].rename(columns={'away_team': 'team', 'home_score': 'pts_allowed'})
+        all_allowed = pd.concat([home_allowed, away_allowed])
+        def_pa = all_allowed.groupby('team')['pts_allowed'].mean().reset_index().rename(columns={'pts_allowed': 'def_pa', 'team': 'opponent'})
+
+        l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
+        kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
+        kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True)
+        home_g = completed[['game_id', 'home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'total'})
+        away_g = completed[['game_id', 'away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'total'})
+        all_g = pd.concat([home_g, away_g])
+        share_df = pd.merge(all_g, kicker_game_pts, left_on=['game_id', 'team'], right_on=['game_id', 'posteam'], how='left').fillna(0)
+        share_df['share'] = share_df.apply(lambda x: x['kicker_pts'] / x['total'] if x['total'] > 0 else 0, axis=1)
+        off_share = share_df.groupby('team')['share'].mean().reset_index().rename(columns={'share': 'off_share'})
+        matchup_lookup = schedule[['game_id', 'home_team', 'away_team']]
+        share_df = pd.merge(share_df, matchup_lookup, on='game_id')
+        share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
+        def_share = share_df.groupby('opponent')['share'].mean().reset_index().rename(columns={'share': 'def_share'})
+
         matchups = schedule[schedule['week'] == target_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']].copy()
         matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
         matchups['total_line'] = matchups['total_line'].fillna(44.0)
@@ -316,49 +353,89 @@ def run_analysis():
         
         model = pd.concat([home_view, away_view])
         model['is_dome'] = model['roof'].isin(['dome', 'closed'])
+        
         print("🌤️ Fetching Weather...")
         model['weather_data'] = model.apply(lambda x: get_weather_forecast(x['home_field'], x['game_dt'], x['is_dome']), axis=1)
         model['wind'] = model['weather_data'].apply(lambda x: x[0])
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
+        if 'posteam' in off_stall_l4.columns: off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team'})
+        if 'defteam' in def_stall_l4.columns: def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent'})
+        if 'posteam' in aggression_stats.columns: aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
+        
         final = pd.merge(stats, model, on='team', how='inner')
+        
+        # MERGE LIVE STATS
         final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
-        # Mock missing columns for now since we skipped full merge chain in this snippet for safety
-        for col in ['off_stall_rate', 'def_stall_rate', 'off_ppg', 'def_pa', 'off_share', 'def_share', 'aggression_pct']:
-            if col not in final.columns: final[col] = 0
-            
-        for c in live_cols:
-            if c in final.columns: final[c] = final[c].fillna(0)
+        final = pd.merge(final, off_stall_l4, on='team', how='left')
+        final = pd.merge(final, off_ppg, on='team', how='left')
+        final = pd.merge(final, off_share, on='team', how='left')
+        final = pd.merge(final, def_stall_l4, on='opponent', how='left')
+        final = pd.merge(final, def_pa, on='opponent', how='left')
+        final = pd.merge(final, def_share, on='opponent', how='left')
+        final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
+        
         final = final.fillna(0)
 
         def process_row(row):
-            # Simplified scoring logic for brevity - ensures script runs
             off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
             def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
+            
+            bonuses = []
             bonus_val = 0
-            if row['is_dome']: bonus_val += 10
+            
+            if row['is_dome']: 
+                bonus_val += 10; bonuses.append("+10 Dome")
+            else:
+                wind = row['wind']
+                weather_desc = row['weather_desc']
+                if wind > 15: bonus_val -= 10; bonuses.append("-10 Heavy Wind")
+                elif wind > 10: bonus_val -= 5; bonuses.append("-5 Wind")
+                if "🌨️" in weather_desc: bonus_val -= 10; bonuses.append("-10 Snow")
+                elif "🌧️" in weather_desc: bonus_val -= 5; bonuses.append("-5 Rain")
+                
+            if row['home_field'] == 'DEN': bonus_val += 5; bonuses.append("+5 Mile High")
+            if abs(float(row['spread_display'])) < 3.5: bonus_val += 5; bonuses.append("+5 Tight Game")
+            elif abs(float(row['spread_display'])) > 9.5: bonus_val -= 5; bonuses.append("-5 Blowout Risk")
+            
+            if row['fpts'] >= elite_thresh: bonus_val += 5; bonuses.append("+5 Elite Talent")
+            if row['aggression_pct'] > 25.0: bonus_val -= 5; bonuses.append("-5 Aggressive Coach")
+            
             grade = round(off_score + def_score + bonus_val, 1)
+            
             base_proj = row['avg_pts'] * (grade / 90)
-            proj = round(base_proj, 1)
+            
+            w_team_score = (row['vegas_implied'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas_implied'] > 0 else row['off_ppg']
+            w_def_allowed = (row['vegas_implied'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas_implied'] > 0 else row['def_pa']
+            
+            s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
+            off_cap = w_team_score * (s_off * 1.2)
+            s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
+            def_cap = w_def_allowed * (s_def * 1.2)
+            
+            final_cap = min(off_cap, def_cap)
+            weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
+            proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
             
             if row['injury_status'] in ['OUT', 'CUT', 'Practice Squad', 'IR', 'Inactive']:
                 proj = 0.0
                 grade = 0.0
+                bonuses.append(f"⛔ {row['injury_status'].upper()}")
             
             history_obj = history_data.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
 
-            # DO NOT include live columns in return since they are already in 'final'
+            # IMPORTANT: Exclude LIVE COLS from return to avoid overlap
             return pd.Series({
                 'grade': grade,
                 'proj': proj,
-                'grade_details': [],
+                'grade_details': bonuses,
                 'off_score_val': round(off_score, 1),
                 'def_score_val': round(def_score, 1),
-                'w_team_score': 0,
-                'w_def_allowed': 0,
-                'off_cap_val': 0,
-                'def_cap_val': 0,
+                'w_team_score': round(w_team_score, 1),
+                'w_def_allowed': round(w_def_allowed, 1),
+                'off_cap_val': round(off_cap, 1),
+                'def_cap_val': round(def_cap, 1),
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
@@ -366,9 +443,10 @@ def run_analysis():
 
         final = final.join(final.apply(process_row, axis=1))
         final = final.sort_values('proj', ascending=False)
+        
+        # Fix: Generate narratives AFTER process_row has added 'grade' and 'proj'
         final['narrative'] = final.apply(generate_narrative, axis=1)
         
-        # Final cleanup
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
         ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
