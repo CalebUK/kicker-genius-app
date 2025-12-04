@@ -14,12 +14,12 @@ from engine.config import CURRENT_SEASON
 from engine.data import (
     load_data_with_retry, get_current_nfl_week, scrape_cbs_injuries, 
     scrape_fantasy_ownership, clean_nan, calculate_stall_metrics, 
-    analyze_past_3_weeks_strict
+    analyze_past_3_weeks_strict, get_kicker_scores_for_week 
 )
 from engine.history import load_history, update_history # NEW IMPORT
 from engine.weather import get_weather_forecast
 
-# --- NARRATIVE ENGINE (OMITTED FOR BREVITY - SAME AS BEFORE) ---
+# --- NARRATIVE ENGINE ---
 def generate_narrative(row):
     if row['injury_status'] != 'Healthy':
         return f"Monitor status closely as they are currently listed as {row['injury_status']}. This significantly impacts their viability for Week {row.get('week', '')}."
@@ -32,21 +32,48 @@ def generate_narrative(row):
     wind = row['wind']
     is_dome = row['is_dome']
     
-    s1_options = ["Top Tier", "Solid Play", "Risky", "Fade"] # Simplified for brevity in this block
-    # ... (Use full logic from previous file if re-copying manually, but for this update focused on history):
-    s1 = "Solid Play" # Placeholder for the function signature, ensuring it doesn't break
-    # (In real deployment, keep the full text generation logic here)
-    return f"{name} is a {s1} based on the model." 
+    s1_options = []
+    if grade >= 100:
+        s1_options = [
+            f"{name} is a locked-and-loaded RB1 of kickers this week with an elite Grade of {grade}.",
+            f"Fire up {name} with confidence; his Matchup Grade of {grade} is in the elite tier."
+        ]
+    elif grade >= 90:
+        s1_options = [
+            f"{name} is a strong play this week, sitting comfortably with a Grade of {grade}.",
+            f"You can trust {name} in your lineup given his solid Grade of {grade}."
+        ]
+    elif grade >= 80:
+        s1_options = [
+            f"{name} is a viable streaming option with a respectable Grade of {grade}.",
+            f"Consider {name} if you need a fill-in; his Grade is a decent {grade}."
+        ]
+    else:
+        s1_options = [
+            f"{name} is a risky option this week with a below-average Grade of {grade}.",
+            f"Fade {name} if possible; his Grade of {grade} suggests low upside."
+        ]
+    
+    s1 = random.choice(s1_options)
 
-# (Restoring full narrative function to ensure no regression)
-def generate_narrative(row):
-    if row['injury_status'] != 'Healthy': return f"Monitor status closely as they are currently listed as {row['injury_status']}."
-    name = row['kicker_player_name'].split('.')[-1]; grade = row['grade']; vegas = row['vegas_implied']; 
-    off_stall = row['off_stall_rate']; def_stall = row['def_stall_rate']; wind = row['wind']; is_dome = row['is_dome']
-    s1 = "Strong Play" if grade > 90 else "Risky" if grade < 80 else "Solid Option";
-    s2 = "Good Matchup" if def_stall > 40 else "Neutral Spot";
-    return f"{name} is a {s1}. {s2}."
+    s2_options = []
+    if vegas > 27:
+        s2_options = [f"The offense has a massive implied total of {vegas:.1f}, offering a high ceiling."]
+    elif wind > 15 and not is_dome:
+        s2_options = [f"However, heavy winds ({wind} mph) could severely limit kicking opportunities."]
+    elif is_dome:
+        s2_options = [f"Playing in a dome guarantees perfect kicking conditions."]
+    elif off_stall > 40:
+        s2_options = [f"His offense has a high stall rate ({off_stall}%), which often leads to FG attempts."]
+    elif def_stall > 40:
+        s2_options = [f"The matchup is favorable against a defense that forces FGs ({def_stall}%) in the red zone."]
+    elif vegas < 18:
+        s2_options = [f"Be cautious, as the team has a low implied total ({vegas:.1f}), limiting chances."]
+    else:
+        s2_options = [f"They face a neutral matchup with standard scoring expectations."]
 
+    s2 = random.choice(s2_options)
+    return f"{s1} {s2}"
 
 def run_analysis():
     try:
@@ -140,7 +167,11 @@ def run_analysis():
         if not full_roster.empty:
             stats = pd.merge(stats, full_roster, on='kicker_player_id', how='left')
             stats['team'] = np.where(stats['roster_team'].notna(), stats['roster_team'], stats['team'])
-            stats = stats[(stats['position'] == 'K') | (stats['position'].isna())]
+            
+            stats = stats[
+                (stats['position'] == 'K') | (stats['position'].isna())
+            ]
+            
             stats.drop(columns=['roster_team', 'position'], inplace=True)
         
         stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
@@ -174,7 +205,7 @@ def run_analysis():
 
         history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
 
-        # --- NEW: CURRENT WEEK LIVE SCORING ---
+        # --- NEW: CURRENT WEEK LIVE SCORING (RAW BUCKETS) ---
         current_week_pbp = kick_plays[kick_plays['week'] == target_week].copy()
         live_cols = [
             'wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 
@@ -237,9 +268,14 @@ def run_analysis():
             
             cbs_st = str(row.get('cbs_status', '')).title()
             cbs_det = str(row.get('cbs_injury', ''))
-            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
-            if "Doubtful" in cbs_st: return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
-            if "Questionable" in cbs_st: return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
+            
+            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: 
+                return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
+            if "Doubtful" in cbs_st: 
+                return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
+            if "Questionable" in cbs_st: 
+                return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
+            
             return "Healthy", "green", "Active"
 
         injury_meta = stats.apply(get_injury_meta, axis=1)
