@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 def calculate_team_stats(schedule_df, current_week, window=4):
     """
@@ -40,3 +41,64 @@ def calculate_team_stats(schedule_df, current_week, window=4):
     def_pa['def_pa'] = def_pa['def_pa'].round(1)
 
     return off_ppg, def_pa
+
+def get_weekly_team_stats(schedule_df, current_week):
+    """
+    Generates a dictionary of weekly stats for every team up to the current week.
+    Returns: { "DAL": [{ "week": 1, "pts": 33, "pa": 17, "vegas": 44.5 }, ...], ... }
+    """
+    if schedule_df.empty:
+        return {}
+        
+    # Filter for all completed games or games with lines up to current week
+    # We include current week to show vegas lines even if score isn't final
+    games = schedule_df[schedule_df['week'] <= current_week].copy()
+    
+    team_stats = {}
+    
+    # Initialize dict for all teams found in schedule
+    all_teams = set(games['home_team'].unique()) | set(games['away_team'].unique())
+    for team in all_teams:
+        if pd.notna(team):
+            team_stats[team] = []
+
+    for _, game in games.iterrows():
+        wk = int(game['week'])
+        home = game['home_team']
+        away = game['away_team']
+        
+        # Vegas Implied Totals
+        total = game['total_line'] if pd.notna(game['total_line']) else 0
+        spread = game['spread_line'] if pd.notna(game['spread_line']) else 0
+        
+        # Calculate implied points
+        home_implied = (total + spread) / 2
+        away_implied = (total - spread) / 2
+        
+        # Actual Scores (if available)
+        home_score = game['home_score'] if pd.notna(game['home_score']) else None
+        away_score = game['away_score'] if pd.notna(game['away_score']) else None
+        
+        # Add Home Record
+        if home in team_stats:
+            team_stats[home].append({
+                "week": wk,
+                "pts": home_score,
+                "pa": away_score,
+                "vegas_implied": round(home_implied, 1),
+                "opponent": away,
+                "is_home": True
+            })
+            
+        # Add Away Record
+        if away in team_stats:
+            team_stats[away].append({
+                "week": wk,
+                "pts": away_score,
+                "pa": home_score,
+                "vegas_implied": round(away_implied, 1),
+                "opponent": home,
+                "is_home": False
+            })
+            
+    return team_stats
