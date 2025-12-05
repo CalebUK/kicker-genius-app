@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 14,
-    "updated": "2025-12-05 11:04",
+    "updated": "2025-12-05 11:31",
     "league_avgs": {
       "fpts": 75.3,
       "off_stall": 51.3,
@@ -92,7 +92,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Myers is a viable streaming option. Be cautious, as the team has a low implied total."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Myers is a viable streaming option. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -147,11 +162,11 @@
       "spread_display": "+3.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        10.2,
+        "10mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 10.2,
+      "weather_desc": "10mph \u2600\ufe0f",
       "off_stall_rate": 55.0,
       "off_ppg": 23.8,
       "off_share": 0.4035929951690821,
@@ -175,7 +190,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Fairbairn is a viable streaming option. Playing in a dome guarantees perfect conditions."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Consider Fairbairn if you need a fill-in. His offense has a high stall rate (55.0%)."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -258,7 +288,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Fade McPherson if possible. His offense has a high stall rate (78.6%)."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Consider McPherson if you need a fill-in. Heavy winds (1.1 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -341,7 +386,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Fade Moody if possible. The offense has a massive implied total of 20.5."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Consider Moody if you need a fill-in. The offense has a massive implied total of 20.5."
     },
     {
       "kicker_player_name": "C.Dicker",
@@ -424,7 +484,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "You can trust Dicker in your lineup. His offense has a high stall rate (53.8%)."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Dicker is a strong play this week. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "R.Patterson",
@@ -507,7 +582,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Patterson is a locked-and-loaded RB1 of kickers this week. Playing in a dome guarantees perfect conditions."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Consider Patterson if you need a fill-in. The offense has a massive implied total of 22.0."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -590,7 +680,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "McLaughlin is a viable streaming option. The matchup is favorable against a porous defense."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "You can trust McLaughlin in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -673,7 +778,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Fade Boswell if possible. The matchup is favorable against a porous defense."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Consider Boswell if you need a fill-in. His offense has a high stall rate (50.0%)."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -756,7 +876,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "You can trust Slye in your lineup. The offense has a massive implied total of 14.5."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Slye is a locked-and-loaded RB1 of kickers this week. His offense has a high stall rate (57.1%)."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -839,7 +974,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Consider Aubrey if you need a fill-in. The matchup is favorable against a porous defense."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Aubrey is a risky option this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "W.Reichard",
@@ -922,7 +1072,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Reichard is a viable streaming option. The offense has a massive implied total of 22.0."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Reichard is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 22.0."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -1005,7 +1170,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Loop is a strong play this week. The matchup is favorable against a porous defense."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "You can trust Loop in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "N.Folk",
@@ -1060,11 +1240,11 @@
       "spread_display": "+2.5",
       "is_dome": false,
       "weather_data": [
-        2.9,
-        "2mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 2.9,
-      "weather_desc": "2mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "off_stall_rate": 57.1,
       "off_ppg": 19.5,
       "off_share": 0.30238095238095236,
@@ -1088,7 +1268,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Folk is a viable streaming option. The matchup is favorable against a porous defense."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Folk is a locked-and-loaded RB1 of kickers this week. His offense has a high stall rate (57.1%)."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -1171,7 +1366,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Fire up Prater with confidence. His offense has a high stall rate (60.0%)."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Consider Prater if you need a fill-in. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -1254,7 +1464,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Consider Ryland if you need a fill-in. Be cautious, as the team has a low implied total."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Ryland is a viable streaming option. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -1337,7 +1562,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Lutz is a viable streaming option. Heavy winds (0.0 mph) could limit opportunities."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Consider Lutz if you need a fill-in. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -1420,7 +1660,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "You can trust Butker in your lineup. Playing in a dome guarantees perfect conditions."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Butker is a locked-and-loaded RB1 of kickers this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -1503,7 +1758,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Szmyt is a viable streaming option. The offense has a massive implied total of 19.0."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Szmyt is a viable streaming option. His offense has a high stall rate (69.2%)."
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -1586,7 +1856,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Consider Gonzalez if you need a fill-in. The offense has a massive implied total of 18.8."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "You can trust Gonzalez in your lineup. The offense has a massive implied total of 18.8."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -1669,7 +1954,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Fade Bates if possible. The matchup is favorable against a porous defense."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Bates is a locked-and-loaded RB1 of kickers this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "C.Santos",
@@ -1752,7 +2052,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Santos is a viable streaming option. Heavy winds (11.3 mph) could limit opportunities."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Santos is a locked-and-loaded RB1 of kickers this week. Heavy winds (11.3 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.Little",
@@ -1835,7 +2150,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Fire up Little with confidence. His offense has a high stall rate (22.2%)."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Little is a viable streaming option. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -1918,7 +2248,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "You can trust Carlson in your lineup. Heavy winds (0.0 mph) could limit opportunities."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Carlson is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 16.5."
     },
     {
       "kicker_player_name": "J.Elliott",
@@ -2001,7 +2346,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Elliott is a risky option this week. His offense has a high stall rate (46.2%)."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Fire up Elliott with confidence. His offense has a high stall rate (46.2%)."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -2084,7 +2444,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "McManus is a viable streaming option. Be cautious, as the team has a low implied total."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Fade McManus if possible. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -2167,7 +2542,22 @@
         "l3_proj": 0,
         "l3_games": []
       },
-      "narrative": "Mevis is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 28.0."
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
+      "narrative": "Mevis is a risky option this week. His offense has a high stall rate (14.3%)."
     },
     {
       "kicker_player_name": "J.Karty",
@@ -2250,6 +2640,21 @@
         "l3_proj": 0,
         "l3_games": []
       },
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
       "narrative": "Monitor status closely as they are currently listed as Practice Squad. This significantly impacts their viability for Week ."
     },
     {
@@ -2333,6 +2738,21 @@
         "l3_proj": 0,
         "l3_games": []
       },
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
       "narrative": "Monitor status closely as they are currently listed as Practice Squad. This significantly impacts their viability for Week ."
     },
     {
@@ -2416,6 +2836,21 @@
         "l3_proj": 0,
         "l3_games": []
       },
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
       "narrative": "Monitor status closely as they are currently listed as Practice Squad. This significantly impacts their viability for Week ."
     },
     {
@@ -2499,6 +2934,21 @@
         "l3_proj": 0,
         "l3_games": []
       },
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
       "narrative": "Monitor status closely as they are currently listed as CUT. This significantly impacts their viability for Week ."
     },
     {
@@ -2582,6 +3032,21 @@
         "l3_proj": 0,
         "l3_games": []
       },
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
       "narrative": "Monitor status closely as they are currently listed as CUT. This significantly impacts their viability for Week ."
     },
     {
@@ -2665,6 +3130,21 @@
         "l3_proj": 0,
         "l3_games": []
       },
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
       "narrative": "Monitor status closely as they are currently listed as Practice Squad. This significantly impacts their viability for Week ."
     },
     {
@@ -2748,6 +3228,21 @@
         "l3_proj": 0,
         "l3_games": []
       },
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
       "narrative": "Monitor status closely as they are currently listed as IR. This significantly impacts their viability for Week ."
     },
     {
@@ -2803,11 +3298,11 @@
       "spread_display": "+3.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        10.2,
+        "10mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 10.2,
+      "weather_desc": "10mph \u2600\ufe0f",
       "off_stall_rate": 55.0,
       "off_ppg": 23.8,
       "off_share": 0.4035929951690821,
@@ -2831,6 +3326,21 @@
         "l3_proj": 0,
         "l3_games": []
       },
+      "wk_fg_0_19": 0,
+      "wk_fg_20_29": 0,
+      "wk_fg_30_39": 0,
+      "wk_fg_40_49": 0,
+      "wk_fg_50_59": 0,
+      "wk_fg_60_plus": 0,
+      "wk_fg_miss": 0,
+      "wk_xp_made": 0,
+      "wk_xp_miss": 0,
+      "wk_fg_miss_0_19": 0,
+      "wk_fg_miss_20_29": 0,
+      "wk_fg_miss_30_39": 0,
+      "wk_fg_miss_40_49": 0,
+      "wk_fg_miss_50_59": 0,
+      "wk_fg_miss_60_plus": 0,
       "narrative": "Monitor status closely as they are currently listed as CUT. This significantly impacts their viability for Week ."
     }
   ],
