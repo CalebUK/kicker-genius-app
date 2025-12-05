@@ -12,7 +12,7 @@ import GlossaryTab from './components/GlossaryTab';
 
 const App = () => {
   const [data, setData] = useState(null);
-  const [historyData, setHistoryData] = useState(null); // NEW STATE FOR HISTORY
+  const [historyData, setHistoryData] = useState(null);
   const [activeTab, setActiveTab] = useState('potential');
   const [expandedRow, setExpandedRow] = useState(null);
   const [scoring, setScoring] = useState(DEFAULT_SCORING);
@@ -29,7 +29,8 @@ const App = () => {
   const [sleeperLeagueName, setSleeperLeagueName] = useState(''); 
   const [sleeperUser, setSleeperUser] = useState('');
   const [sleeperMyKickers, setSleeperMyKickers] = useState(new Set());
-  const [sleeperTakenKickers, setSleeperTakenKickers] = new Set());
+  // FIX: Corrected syntax error here
+  const [sleeperTakenKickers, setSleeperTakenKickers] = useState(new Set());
   const [sleeperLoading, setSleeperLoading] = useState(false);
   const [sleeperFilter, setSleeperFilter] = useState(false);
   const [sleeperScoringUpdated, setSleeperScoringUpdated] = useState(false);
@@ -49,14 +50,18 @@ const App = () => {
       };
       
       try {
+          // Fetch both main data and history data
           const [main, history] = await Promise.all([
               fetchJson('/kicker_data.json'),
-              fetchJson('/history_data.json').catch(() => ({})) // Fail gracefully if history is missing
+              fetchJson('/history_data.json').catch(() => ({})) 
           ]);
           
           setData(main);
           setHistoryData(history);
       } catch (err) {
+          console.error("Fetch Error:", err);
+          // Fallback if history fails but main succeeds? 
+          // For now, just show error to be safe.
           setError(err.message);
       } finally {
           setLoading(false);
@@ -82,28 +87,26 @@ const App = () => {
     if (savedTakenKickers) { try { setSleeperTakenKickers(new Set(JSON.parse(savedTakenKickers))); } catch (e) {} }
     if (savedIdMap) { try { setSleeperIdMap(JSON.parse(savedIdMap)); } catch (e) {} }
 
-    fetchData(); // Load data on mount
+    fetchData(); 
   }, [fetchData]);
 
   // --- POLLING FOR LIVE SCORES ---
   useEffect(() => {
-      // Only poll if we have a league ID and a valid week
       if (!sleeperLeagueId || !data?.meta?.week) return;
       
       const pollScores = async () => {
           if (typeof fetchSleeperScores === 'function') {
             console.log("🔄 Polling Sleeper for live scores...");
-            // Use current week from meta
             const scores = await fetchSleeperScores(sleeperLeagueId, data.meta.week);
             if (scores && Object.keys(scores).length > 0) {
-                setLiveScores(prev => ({ ...prev, ...scores })); // Merge to keep existing
+                setLiveScores(prev => ({ ...prev, ...scores })); 
             }
           }
       };
 
       if (!loading && sleeperLeagueId) {
-          pollScores(); // Initial call
-          const interval = setInterval(pollScores, 30000); // Every 30s
+          pollScores(); 
+          const interval = setInterval(pollScores, 30000); 
           return () => clearInterval(interval);
       }
   }, [sleeperLeagueId, data?.meta?.week, loading]);
@@ -133,9 +136,10 @@ const App = () => {
           const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
           const leagueData = await leagueRes.json();
           
-          const leagueName = leagueData.name || "Unknown League";
-          setSleeperLeagueName(leagueName);
-          localStorage.setItem('sleeper_league_name', leagueName);
+          if (leagueData.name) {
+             setSleeperLeagueName(leagueData.name);
+             localStorage.setItem('sleeper_league_name', leagueData.name);
+          }
 
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
@@ -219,8 +223,8 @@ const App = () => {
 
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
 
-  if (loading || !data || !historyData) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Error</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Failed to load necessary JSON files.</p></div>;
+  if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
+  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Error</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Failed to load necessary JSON files.</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
@@ -255,6 +259,19 @@ const App = () => {
      const sleeperId = sleeperIdMap[joinName];
      if (sleeperId && liveScores[sleeperId] !== undefined) {
          sleeperLive = liveScores[sleeperId];
+     }
+     
+     // Attach full history from historyData if available
+     let fullHistory = p.history; 
+     if (historyData && historyData.history) {
+         // historyData structure: { history: { "1": [players...], "2": [...] } }
+         // We want to attach this global history access to the player object for AccuracyTab to use
+         // But AccuracyTab receives the full 'processed' list and 'historyData' separately? 
+         // No, currently AccuracyTab only receives 'players' (processed).
+         
+         // We need to update AccuracyTab to receive 'historyData' as a prop.
+         // For now, let's attach a reference or rely on AccuracyTab to be updated.
+         // Actually, I will pass historyData to AccuracyTab in the render section below.
      }
 
      return { 
