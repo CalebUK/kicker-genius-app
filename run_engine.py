@@ -72,22 +72,29 @@ def run_analysis():
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
         # 2. HISTORY MANAGEMENT
+        # Load history from its own file if possible, or main file fallback
         history = {}
         history_file = "public/history_data.json"
+        
         if os.path.exists(history_file):
             try:
                 with open(history_file, "r") as f:
-                    history = json.load(f).get("history", {})
-            except: pass
+                    history_json = json.load(f)
+                    history = history_json.get("history", {})
+            except Exception as e:
+                print(f"⚠️ Could not load history file: {e}")
         elif os.path.exists("public/kicker_data.json"):
             try:
                 with open("public/kicker_data.json", "r") as f:
-                    history = json.load(f).get("history", {})
+                    existing_data = json.load(f)
+                    history = existing_data.get("history", {})
             except: pass
 
+        # Update History
         history = update_history(history, pbp, target_week)
         
         # 3. TEAM STATS HISTORY
+        print("📊 Generating Team Stats History...")
         team_history = get_weekly_team_stats(schedule, target_week)
         
         cbs_injuries = scrape_cbs_injuries()
@@ -103,8 +110,6 @@ def run_analysis():
             full_roster.rename(columns={'gsis_id': 'kicker_player_id', 'team': 'roster_team'}, inplace=True)
             
             # FIX: DEDUPLICATE ROSTERS BY PLAYER ID
-            # Players can appear multiple times if they moved teams or changed status
-            # We keep the most recent entry (assuming file is somewhat ordered or we just take first valid)
             full_roster = full_roster.drop_duplicates(subset=['kicker_player_id'], keep='first')
             
             inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
@@ -112,7 +117,6 @@ def run_analysis():
             inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
             # Deduplicate inactive roster too
             inactive_roster = inactive_roster.drop_duplicates(subset=['kicker_player_id'])
-
         except: 
             full_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_team', 'position'])
             inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
@@ -196,12 +200,14 @@ def run_analysis():
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
 
-        off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
-        off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
-        def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
+        # --- CALCULATE STALL METRICS ---
+        # Note: 'calculate_team_stats' gives PPG/PA averages for ranking
+        # 'get_weekly_team_stats' gives full breakdown for JSON
+        off_ppg, def_pa = calculate_team_stats(schedule, target_week)
         
-        if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
-        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) 
+        off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
+        off_stall_seas = off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd', 'posteam': 'team'})
+        def_stall_seas = def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd', 'defteam': 'team'})
         
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
         stats = pd.merge(stats, def_stall_seas, on='team', how='left')
@@ -222,7 +228,7 @@ def run_analysis():
                             record['proj'] = proj
                             break
 
-        # --- CURRENT WEEK LIVE SCORING ---
+        # --- CURRENT WEEK LIVE SCORING (RAW BUCKETS) ---
         current_week_pbp = kick_plays[kick_plays['week'] == target_week].copy()
         live_cols = [
             'wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 
@@ -301,15 +307,7 @@ def run_analysis():
         max_wk = pbp['week'].max()
         start_wk = max(1, max_wk - 3)
         recent_pbp = pbp[pbp['week'] >= start_wk].copy()
-        
-        # --- MODULAR TEAM STATS ---
-        off_ppg, def_pa = calculate_team_stats(schedule, target_week)
-        
-        # Calculate L4 Stall Metrics using existing function
         off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
-        off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team', 'off_stall_rate': 'off_stall_rate'})
-        def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent', 'def_stall_rate': 'def_stall_rate'})
-        
         lg_off_avg = off_stall_l4['off_stall_rate'].mean()
         lg_def_avg = def_stall_l4['def_stall_rate'].mean()
 
@@ -317,7 +315,7 @@ def run_analysis():
         fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
         aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
-        aggression_stats = aggression_stats.rename(columns={'posteam': 'team'}) 
+        aggression_stats = aggression_stats.rename(columns={'posteam': 'team'}) # RENAME HERE
 
         completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
         home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
@@ -401,6 +399,7 @@ def run_analysis():
         final = final.fillna(0)
 
         def process_row(row):
+            # Simplified scoring logic for brevity - ensures script runs
             off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
             def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
             bonus_val = 0
@@ -435,6 +434,7 @@ def run_analysis():
         final = final.sort_values('proj', ascending=False)
         final['narrative'] = final.apply(generate_narrative, axis=1)
         
+        # Final cleanup
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
         ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
