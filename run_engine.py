@@ -167,11 +167,7 @@ def run_analysis():
         if not full_roster.empty:
             stats = pd.merge(stats, full_roster, on='kicker_player_id', how='left')
             stats['team'] = np.where(stats['roster_team'].notna(), stats['roster_team'], stats['team'])
-            
-            stats = stats[
-                (stats['position'] == 'K') | (stats['position'].isna())
-            ]
-            
+            stats = stats[(stats['position'] == 'K') | (stats['position'].isna())]
             stats.drop(columns=['roster_team', 'position'], inplace=True)
         
         stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
@@ -190,6 +186,51 @@ def run_analysis():
             return clean
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
+        
+        # --- MERGE EXTERNAL DATA (INJURIES & OWNERSHIP) ---
+        headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
+        if headshot_col:
+            player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
+            stats = pd.merge(stats, player_map, on='kicker_player_id', how='left')
+        else:
+            stats['headshot_url'] = None
+        stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
+        
+        if not ownership_data.empty:
+            stats = pd.merge(stats, ownership_data, left_on='kicker_player_name', right_on='match_name', how='left')
+            stats['own_pct'] = stats['own_pct'].fillna(0.0)
+        else:
+            stats['own_pct'] = 0.0
+
+        if 'join_name' in cbs_injuries.columns:
+            stats = pd.merge(stats, cbs_injuries, left_on='join_name', right_on='join_name', how='left')
+        else:
+            stats['cbs_status'] = None
+            stats['cbs_injury'] = None
+            
+        stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
+        
+        # --- INJURY META CALCULATION ---
+        def get_injury_meta(row):
+            roster_st = str(row.get('roster_status', '')) if pd.notna(row.get('roster_status', '')) else ""
+            if roster_st in ['RES', 'NON', 'SUS', 'PUP']: return "IR", "red-700", f"Roster: {roster_st}"
+            if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']: return "CUT", "red-700", "Released"
+            if roster_st == 'DEV': return "Practice Squad", "yellow-500", "Roster: Practice Squad"
+            
+            cbs_st = str(row.get('cbs_status', '')).title()
+            cbs_det = str(row.get('cbs_injury', ''))
+            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
+            if "Doubtful" in cbs_st: return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
+            if "Questionable" in cbs_st: return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
+            return "Healthy", "green", "Active"
+
+        injury_meta = stats.apply(get_injury_meta, axis=1)
+        stats['injury_status'] = [x[0] for x in injury_meta]
+        stats['injury_color'] = [x[1] for x in injury_meta]
+        stats['injury_details'] = [x[2] for x in injury_meta]
+
+        qualified = stats[stats['fg_att'] >= 5]
+        elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
 
         # --- CALCULATE STALL METRICS ---
         max_wk = pbp['week'].max()
@@ -198,7 +239,6 @@ def run_analysis():
         
         # Calculate Last 4 Weeks Stall Metrics
         off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
-        # RENAME COLUMNS EXPLICITLY BEFORE MERGE
         off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team', 'off_stall_rate': 'off_stall_rate'})
         def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent', 'def_stall_rate': 'def_stall_rate'})
         
@@ -234,7 +274,6 @@ def run_analysis():
         share_df = pd.merge(all_g, kicker_game_pts, left_on=['game_id', 'team'], right_on=['game_id', 'posteam'], how='left').fillna(0)
         share_df['share'] = share_df.apply(lambda x: x['kicker_pts'] / x['total'] if x['total'] > 0 else 0, axis=1)
         off_share = share_df.groupby('team')['share'].mean().reset_index().rename(columns={'share': 'off_share'})
-        
         matchup_lookup = schedule[['game_id', 'home_team', 'away_team']]
         share_df = pd.merge(share_df, matchup_lookup, on='game_id')
         share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
