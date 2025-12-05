@@ -4,7 +4,7 @@ import numpy as np
 def calculate_team_stats(schedule_df, current_week, window=4):
     """
     Calculates Offensive PPG (Points Per Game) and Defensive PA (Points Allowed)
-    for each team over the last `window` weeks.
+    for each team over the last `window` weeks. Used for the main engine logic.
     """
     if schedule_df.empty:
         return pd.DataFrame(), pd.DataFrame()
@@ -71,9 +71,17 @@ def get_weekly_team_stats(schedule_df, current_week):
         total = game['total_line'] if pd.notna(game['total_line']) else 0
         spread = game['spread_line'] if pd.notna(game['spread_line']) else 0
         
-        # Calculate implied points
-        home_implied = (total + spread) / 2
-        away_implied = (total - spread) / 2
+        # Calculate implied points (approximated based on spread)
+        # If spread is -3 for Home, Home is favored by 3.
+        # Home Implied = (Total / 2) + (Spread / 2) ? No, spread is usually negative for favorite.
+        # Standard formula: Favorite = (Total - Spread)/2 ? No.
+        # If Spread is -3 (Home Favored), Home Score > Away Score.
+        # Home = (Total - Spread) / 2  -- e.g. (45 - (-3))/2 = 24
+        # Away = (Total + Spread) / 2  -- e.g. (45 + (-3))/2 = 21
+        # NOTE: nflreadpy spread_line is usually "Home Team Spread". Negative means Home is favorite.
+        
+        home_implied = (total - spread) / 2
+        away_implied = (total + spread) / 2
         
         # Actual Scores (if available)
         home_score = game['home_score'] if pd.notna(game['home_score']) else None
