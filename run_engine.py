@@ -72,13 +72,16 @@ def run_analysis():
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
         # 2. HISTORY MANAGEMENT
+        # Load history from its own file if possible, or main file fallback
         history = {}
         history_file = "public/history_data.json"
+        
         if os.path.exists(history_file):
             try:
                 with open(history_file, "r") as f:
                     history = json.load(f).get("history", {})
-            except: pass
+            except Exception as e:
+                print(f"⚠️ Could not load history file: {e}")
         elif os.path.exists("public/kicker_data.json"):
             try:
                 with open("public/kicker_data.json", "r") as f:
@@ -86,9 +89,25 @@ def run_analysis():
                     history = existing_data.get("history", {})
             except: pass
 
-        history = update_history(history, pbp, target_week)
+        # REBUILD FULL HISTORY (Weeks 1 to target_week)
+        print(f"📊 Updating History for Weeks 1 to {target_week}...")
+        for w in range(1, target_week + 1):
+            week_str = str(w)
+            actuals_df = get_kicker_scores_for_week(pbp, w)
+            
+            if not actuals_df.empty:
+                new_records = actuals_df.to_dict(orient='records')
+                if week_str in history:
+                    existing_records = history[week_str]
+                    proj_map = {r['id']: r.get('proj', 0) for r in existing_records}
+                    for record in new_records:
+                        pid = record['id']
+                        if pid in proj_map: record['proj'] = proj_map[pid]
+                        else: record['proj'] = 0 
+                history[week_str] = new_records
         
         # 3. TEAM STATS HISTORY
+        print("📊 Generating Team Stats History...")
         team_history = get_weekly_team_stats(schedule, target_week)
         
         cbs_injuries = scrape_cbs_injuries()
@@ -186,51 +205,6 @@ def run_analysis():
             return clean
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
-        
-        # --- MERGE EXTERNAL DATA (INJURIES & OWNERSHIP) ---
-        headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
-        if headshot_col:
-            player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
-            stats = pd.merge(stats, player_map, on='kicker_player_id', how='left')
-        else:
-            stats['headshot_url'] = None
-        stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
-        
-        if not ownership_data.empty:
-            stats = pd.merge(stats, ownership_data, left_on='kicker_player_name', right_on='match_name', how='left')
-            stats['own_pct'] = stats['own_pct'].fillna(0.0)
-        else:
-            stats['own_pct'] = 0.0
-
-        if 'join_name' in cbs_injuries.columns:
-            stats = pd.merge(stats, cbs_injuries, left_on='join_name', right_on='join_name', how='left')
-        else:
-            stats['cbs_status'] = None
-            stats['cbs_injury'] = None
-            
-        stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
-        
-        # --- INJURY META CALCULATION ---
-        def get_injury_meta(row):
-            roster_st = str(row.get('roster_status', '')) if pd.notna(row.get('roster_status', '')) else ""
-            if roster_st in ['RES', 'NON', 'SUS', 'PUP']: return "IR", "red-700", f"Roster: {roster_st}"
-            if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']: return "CUT", "red-700", "Released"
-            if roster_st == 'DEV': return "Practice Squad", "yellow-500", "Roster: Practice Squad"
-            
-            cbs_st = str(row.get('cbs_status', '')).title()
-            cbs_det = str(row.get('cbs_injury', ''))
-            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
-            if "Doubtful" in cbs_st: return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
-            if "Questionable" in cbs_st: return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
-            return "Healthy", "green", "Active"
-
-        injury_meta = stats.apply(get_injury_meta, axis=1)
-        stats['injury_status'] = [x[0] for x in injury_meta]
-        stats['injury_color'] = [x[1] for x in injury_meta]
-        stats['injury_details'] = [x[2] for x in injury_meta]
-
-        qualified = stats[stats['fg_att'] >= 5]
-        elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
 
         # --- CALCULATE STALL METRICS ---
         max_wk = pbp['week'].max()
@@ -257,7 +231,7 @@ def run_analysis():
         away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
         all_scores = pd.concat([home_scores, away_scores])
         
-        # DEFINE OFF_PPG & DEF_PA HERE
+        # DEFINE OFF_PPG & DEF_PA HERE (Safe Scope)
         off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
         
         home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
@@ -307,25 +281,44 @@ def run_analysis():
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
         final = pd.merge(stats, model, on='team', how='inner')
-        # final = pd.merge(final, live_stats, on='kicker_player_id', how='left') # Live stats removed for now to focus on history rebuild
+        final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
-        # SAFE MERGES
         final = pd.merge(final, off_stall_l4, on='team', how='left')
-        if not off_ppg.empty: final = pd.merge(final, off_ppg, on='team', how='left')
-        else: final['off_ppg'] = 0
+        
+        # MERGE TEAM STATS (SAFE)
+        if not off_ppg.empty:
+            final = pd.merge(final, off_ppg, on='team', how='left')
+        else:
+            final['off_ppg'] = 0
             
         final = pd.merge(final, off_share, on='team', how='left')
-        
         final = pd.merge(final, def_stall_l4, on='opponent', how='left')
         
-        if not def_pa.empty: final = pd.merge(final, def_pa.rename(columns={'team': 'opponent'}), on='opponent', how='left')
-        else: final['def_pa'] = 0
+        if not def_pa.empty:
+            final = pd.merge(final, def_pa.rename(columns={'team': 'opponent'}), on='opponent', how='left')
+        else:
+            final['def_pa'] = 0
             
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
         
         final = final.drop_duplicates(subset=['kicker_player_id'])
         final = final.fillna(0)
+
+        # Define history_data before process_row
+        history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
+        
+        # --- INJECT PROJECTIONS INTO HISTORY ---
+        for pid, h_data in history_data.items():
+            l3 = h_data.get('l3_games', [])
+            for game in l3:
+                wk_str = str(game['week'])
+                proj = game['proj']
+                if wk_str in history:
+                    for record in history[wk_str]:
+                        if record['id'] == pid:
+                            record['proj'] = proj
+                            break
 
         def process_row(row):
             # Simplified scoring logic for brevity - ensures script runs
