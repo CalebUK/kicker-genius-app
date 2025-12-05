@@ -1,13 +1,13 @@
 {
   "meta": {
     "week": 14,
-    "updated": "2025-12-05 08:28",
+    "updated": "2025-12-05 08:47",
     "league_avgs": {
       "fpts": 75.3,
       "off_stall": 51.3,
       "def_stall": 50.3,
-      "l4_off_ppg": 21.9,
-      "l4_def_pa": 21.9
+      "l4_off_ppg": 22.0,
+      "l4_def_pa": 22.1
     }
   },
   "rankings": [
@@ -87,7 +87,7 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 64.7,
-      "off_ppg": 29.8,
+      "off_ppg": 29.75,
       "off_share": 0.4852134707397865,
       "def_stall_rate": 66.7,
       "def_pa": 24.5,
@@ -134,7 +134,7 @@
           }
         ]
       },
-      "narrative": "Consider Myers if you need a fill-in. His offense has a high stall rate (64.7%)."
+      "narrative": "Myers is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -212,10 +212,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 55.0,
-      "off_ppg": 23.8,
+      "off_ppg": 23.75,
       "off_share": 0.4035929951690821,
       "def_stall_rate": 64.3,
-      "def_pa": 24.3,
+      "def_pa": 24.333333333333332,
       "def_share": 0.4940371456500489,
       "aggression_pct": 30.8,
       "grade": 94.0,
@@ -259,7 +259,7 @@
           }
         ]
       },
-      "narrative": "Consider Fairbairn if you need a fill-in. Playing in a dome guarantees perfect conditions."
+      "narrative": "Consider Fairbairn if you need a fill-in. His offense has a high stall rate (55.0%)."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -337,7 +337,7 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 78.6,
-      "off_ppg": 21.3,
+      "off_ppg": 21.333333333333332,
       "off_share": 0.5083333333333333,
       "def_stall_rate": 66.7,
       "def_pa": 23.0,
@@ -384,7 +384,7 @@
           }
         ]
       },
-      "narrative": "McPherson is a risky option this week. The offense has a massive implied total of 24.0."
+      "narrative": "You can trust McPherson in your lineup. His offense has a high stall rate (78.6%)."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -462,10 +462,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 38.5,
-      "off_ppg": 20.3,
+      "off_ppg": 20.333333333333332,
       "off_share": 0.34265734265734266,
       "def_stall_rate": 62.5,
-      "def_pa": 23.8,
+      "def_pa": 23.75,
       "def_share": 0.5456036039560067,
       "aggression_pct": 44.4,
       "grade": 89.7,
@@ -509,7 +509,7 @@
           }
         ]
       },
-      "narrative": "You can trust Moody in your lineup. His offense has a high stall rate (38.5%)."
+      "narrative": "Moody is a strong play this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "C.Dicker",
@@ -587,7 +587,7 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 53.8,
-      "off_ppg": 20.7,
+      "off_ppg": 20.666666666666668,
       "off_share": 0.5552688172043011,
       "def_stall_rate": 46.2,
       "def_pa": 16.0,
@@ -634,7 +634,7 @@
           }
         ]
       },
-      "narrative": "Fade Dicker if possible. The offense has a massive implied total of 19.5."
+      "narrative": "You can trust Dicker in your lineup. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "R.Patterson",
@@ -712,7 +712,7 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 86.7,
-      "off_ppg": 22.3,
+      "off_ppg": 22.333333333333332,
       "off_share": 0.48134920634920636,
       "def_stall_rate": 41.2,
       "def_pa": 23.5,
@@ -759,7 +759,7 @@
           }
         ]
       },
-      "narrative": "Patterson is a viable streaming option. His offense has a high stall rate (86.7%)."
+      "narrative": "Patterson is a risky option this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -840,7 +840,7 @@
       "off_ppg": 20.5,
       "off_share": 0.2525621118012422,
       "def_stall_rate": 66.7,
-      "def_pa": 17.3,
+      "def_pa": 17.333333333333332,
       "def_share": 0.39285714285714285,
       "aggression_pct": 62.5,
       "grade": 94.3,
@@ -884,7 +884,7 @@
           }
         ]
       },
-      "narrative": "McLaughlin is a risky option this week. His offense has a high stall rate (52.9%)."
+      "narrative": "McLaughlin is a locked-and-loaded RB1 of kickers this week. His offense has a high stall rate (52.9%)."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -962,10 +962,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 50.0,
-      "off_ppg": 19.8,
+      "off_ppg": 19.75,
       "off_share": 0.24495798319327733,
       "def_stall_rate": 68.4,
-      "def_pa": 19.2,
+      "def_pa": 19.25,
       "def_share": 0.5046052631578948,
       "aggression_pct": 50.0,
       "grade": 93.4,
@@ -1009,7 +1009,7 @@
           }
         ]
       },
-      "narrative": "Fade Boswell if possible. The offense has a massive implied total of 18.5."
+      "narrative": "You can trust Boswell in your lineup. Heavy winds (7.1 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -1087,7 +1087,7 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 57.1,
-      "off_ppg": 13.3,
+      "off_ppg": 13.333333333333334,
       "off_share": 0.5961538461538461,
       "def_stall_rate": 66.7,
       "def_pa": 21.5,
@@ -1134,7 +1134,7 @@
           }
         ]
       },
-      "narrative": "Slye is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
+      "narrative": "You can trust Slye in your lineup. Heavy winds (4.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -1212,10 +1212,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 43.8,
-      "off_ppg": 29.3,
+      "off_ppg": 29.5,
       "off_share": 0.20423998044965788,
       "def_stall_rate": 46.7,
-      "def_pa": 24.0,
+      "def_pa": 25.2,
       "def_share": 0.2731915933528837,
       "aggression_pct": 37.5,
       "grade": 81.3,
@@ -1259,7 +1259,7 @@
           }
         ]
       },
-      "narrative": "Fire up Aubrey with confidence. His offense has a high stall rate (43.8%)."
+      "narrative": "You can trust Aubrey in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "W.Reichard",
@@ -1384,7 +1384,7 @@
           }
         ]
       },
-      "narrative": "Fade Reichard if possible. Be cautious, as the team has a low implied total."
+      "narrative": "Reichard is a strong play this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -1462,7 +1462,7 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 57.9,
-      "off_ppg": 21.8,
+      "off_ppg": 21.75,
       "off_share": 0.3952150908672648,
       "def_stall_rate": 52.9,
       "def_pa": 23.5,
@@ -1509,7 +1509,7 @@
           }
         ]
       },
-      "narrative": "Fire up Loop with confidence. Playing in a dome guarantees perfect conditions."
+      "narrative": "Loop is a viable streaming option. Heavy winds (7.1 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "N.Folk",
@@ -1590,7 +1590,7 @@
       "off_ppg": 19.5,
       "off_share": 0.30238095238095236,
       "def_stall_rate": 50.0,
-      "def_pa": 14.3,
+      "def_pa": 14.333333333333334,
       "def_share": 0.26395173453996984,
       "aggression_pct": 28.6,
       "grade": 84.3,
@@ -1634,7 +1634,7 @@
           }
         ]
       },
-      "narrative": "Folk is a strong play this week. Heavy winds (2.9 mph) could limit opportunities."
+      "narrative": "Folk is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -1715,7 +1715,7 @@
       "off_ppg": 25.5,
       "off_share": 0.23371365476628636,
       "def_stall_rate": 63.6,
-      "def_pa": 24.7,
+      "def_pa": 24.666666666666668,
       "def_share": 0.3251454427925016,
       "aggression_pct": 41.7,
       "grade": 97.4,
@@ -1759,7 +1759,7 @@
           }
         ]
       },
-      "narrative": "Prater is a viable streaming option. The offense has a massive implied total of 29.5."
+      "narrative": "Fire up Prater with confidence. Heavy winds (1.1 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -1837,10 +1837,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 45.0,
-      "off_ppg": 21.2,
+      "off_ppg": 21.25,
       "off_share": 0.20421122994652408,
       "def_stall_rate": 64.7,
-      "def_pa": 20.8,
+      "def_pa": 20.75,
       "def_share": 0.28244929942722813,
       "aggression_pct": 57.1,
       "grade": 96.5,
@@ -1884,7 +1884,7 @@
           }
         ]
       },
-      "narrative": "Ryland is a risky option this week. Be cautious, as the team has a low implied total."
+      "narrative": "Consider Ryland if you need a fill-in. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -1962,7 +1962,7 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 61.5,
-      "off_ppg": 19.7,
+      "off_ppg": 19.666666666666668,
       "off_share": 0.4868686868686869,
       "def_stall_rate": 44.4,
       "def_pa": 24.5,
@@ -2009,7 +2009,7 @@
           }
         ]
       },
-      "narrative": "Consider Lutz if you need a fill-in. The matchup is favorable against a porous defense."
+      "narrative": "Lutz is a risky option this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -2087,10 +2087,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 46.7,
-      "off_ppg": 23.3,
+      "off_ppg": 23.333333333333332,
       "off_share": 0.38781736951073337,
       "def_stall_rate": 60.0,
-      "def_pa": 19.2,
+      "def_pa": 19.25,
       "def_share": 0.3840482339801759,
       "aggression_pct": 25.0,
       "grade": 84.1,
@@ -2134,7 +2134,7 @@
           }
         ]
       },
-      "narrative": "Butker is a locked-and-loaded RB1 of kickers this week. The matchup is favorable against a porous defense."
+      "narrative": "Fire up Butker with confidence. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -2215,7 +2215,7 @@
       "off_ppg": 17.0,
       "off_share": 0.31875,
       "def_stall_rate": 53.8,
-      "def_pa": 23.7,
+      "def_pa": 23.666666666666668,
       "def_share": 0.4083333333333334,
       "aggression_pct": 25.0,
       "grade": 96.8,
@@ -2259,7 +2259,7 @@
           }
         ]
       },
-      "narrative": "Fire up Szmyt with confidence. The matchup is favorable against a porous defense."
+      "narrative": "Fade Szmyt if possible. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -2340,7 +2340,7 @@
       "off_ppg": 25.0,
       "off_share": 0.3,
       "def_stall_rate": 40.0,
-      "def_pa": 16.8,
+      "def_pa": 16.75,
       "def_share": 0.12094155844155843,
       "aggression_pct": 0.0,
       "grade": 59.8,
@@ -2384,7 +2384,7 @@
           }
         ]
       },
-      "narrative": "Fade Gonzalez if possible. His offense has a high stall rate (23.1%)."
+      "narrative": "Gonzalez is a locked-and-loaded RB1 of kickers this week. His offense has a high stall rate (23.1%)."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -2462,10 +2462,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 47.4,
-      "off_ppg": 27.8,
+      "off_ppg": 31.0,
       "off_share": 0.23003565062388592,
       "def_stall_rate": 36.4,
-      "def_pa": 21.7,
+      "def_pa": 27.25,
       "def_share": 0.22767857142857142,
       "aggression_pct": 42.9,
       "grade": 75.9,
@@ -2509,7 +2509,7 @@
           }
         ]
       },
-      "narrative": "Consider Bates if you need a fill-in. His offense has a high stall rate (47.4%)."
+      "narrative": "Bates is a risky option this week. The offense has a massive implied total of 29.5."
     },
     {
       "kicker_player_name": "C.Santos",
@@ -2634,7 +2634,7 @@
           }
         ]
       },
-      "narrative": "Santos is a strong play this week. The offense has a massive implied total of 19.0."
+      "narrative": "Santos is a risky option this week. Heavy winds (11.3 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.Little",
@@ -2715,7 +2715,7 @@
       "off_ppg": 29.0,
       "off_share": 0.2638752052545156,
       "def_stall_rate": 53.3,
-      "def_pa": 22.7,
+      "def_pa": 22.666666666666668,
       "def_share": 0.4173913043478261,
       "aggression_pct": 66.7,
       "grade": 59.7,
@@ -2759,7 +2759,7 @@
           }
         ]
       },
-      "narrative": "Fire up Little with confidence. Be cautious, as the team has a low implied total."
+      "narrative": "Little is a risky option this week. Heavy winds (3.8 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -2837,10 +2837,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 50.0,
-      "off_ppg": 11.8,
+      "off_ppg": 11.75,
       "off_share": 0.32767857142857143,
       "def_stall_rate": 33.3,
-      "def_pa": 17.3,
+      "def_pa": 17.333333333333332,
       "def_share": 0.27299016772700985,
       "aggression_pct": 33.3,
       "grade": 75.5,
@@ -2884,7 +2884,7 @@
           }
         ]
       },
-      "narrative": "You can trust Carlson in your lineup. His offense has a high stall rate (50.0%)."
+      "narrative": "Carlson is a viable streaming option. His offense has a high stall rate (50.0%)."
     },
     {
       "kicker_player_name": "J.Elliott",
@@ -2965,7 +2965,7 @@
       "off_ppg": 15.5,
       "off_share": 0.3419642857142857,
       "def_stall_rate": 36.4,
-      "def_pa": 19.7,
+      "def_pa": 19.666666666666668,
       "def_share": 0.22857142857142856,
       "aggression_pct": 0.0,
       "grade": 75.0,
@@ -3009,7 +3009,7 @@
           }
         ]
       },
-      "narrative": "Consider Elliott if you need a fill-in. Heavy winds (0.0 mph) could limit opportunities."
+      "narrative": "Elliott is a risky option this week. His offense has a high stall rate (46.2%)."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -3134,7 +3134,7 @@
           }
         ]
       },
-      "narrative": "Fire up McManus with confidence. The matchup is favorable against a porous defense."
+      "narrative": "Fire up McManus with confidence. The offense has a massive implied total of 25.5."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -3212,7 +3212,7 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 14.3,
-      "off_ppg": 31.2,
+      "off_ppg": 31.25,
       "off_share": 0.18067226890756302,
       "def_stall_rate": 40.0,
       "def_pa": 33.0,
@@ -3259,7 +3259,7 @@
           }
         ]
       },
-      "narrative": "Fade Mevis if possible. Be cautious, as the team has a low implied total."
+      "narrative": "Mevis is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "J.Karty",
@@ -3337,7 +3337,7 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 14.3,
-      "off_ppg": 31.2,
+      "off_ppg": 31.25,
       "off_share": 0.18067226890756302,
       "def_stall_rate": 40.0,
       "def_pa": 33.0,
@@ -3462,10 +3462,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 70.0,
-      "off_ppg": 14.7,
+      "off_ppg": 14.666666666666666,
       "off_share": 0.2901960784313726,
       "def_stall_rate": 40.0,
-      "def_pa": 30.8,
+      "def_pa": 30.75,
       "def_share": 0.22822765469824294,
       "aggression_pct": 42.9,
       "grade": 0.0,
@@ -3587,10 +3587,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 53.3,
-      "off_ppg": 22.3,
+      "off_ppg": 22.333333333333332,
       "off_share": 0.29193548387096774,
       "def_stall_rate": 61.5,
-      "def_pa": 17.2,
+      "def_pa": 17.25,
       "def_share": 0.5902777777777778,
       "aggression_pct": 44.4,
       "grade": 0.0,
@@ -3715,7 +3715,7 @@
       "off_ppg": 25.0,
       "off_share": 0.3,
       "def_stall_rate": 40.0,
-      "def_pa": 16.8,
+      "def_pa": 16.75,
       "def_share": 0.12094155844155843,
       "aggression_pct": 0.0,
       "grade": 0.0,
@@ -3837,10 +3837,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 53.3,
-      "off_ppg": 22.3,
+      "off_ppg": 22.333333333333332,
       "off_share": 0.29193548387096774,
       "def_stall_rate": 61.5,
-      "def_pa": 17.2,
+      "def_pa": 17.25,
       "def_share": 0.5902777777777778,
       "aggression_pct": 44.4,
       "grade": 0.0,
@@ -4087,10 +4087,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 53.3,
-      "off_ppg": 22.3,
+      "off_ppg": 22.333333333333332,
       "off_share": 0.29193548387096774,
       "def_stall_rate": 61.5,
-      "def_pa": 17.2,
+      "def_pa": 17.25,
       "def_share": 0.5902777777777778,
       "aggression_pct": 44.4,
       "grade": 0.0,
@@ -4212,10 +4212,10 @@
       "wk_fg_miss_50_59": 0,
       "wk_fg_miss_60_plus": 0,
       "off_stall_rate": 55.0,
-      "off_ppg": 23.8,
+      "off_ppg": 23.75,
       "off_share": 0.4035929951690821,
       "def_stall_rate": 64.3,
-      "def_pa": 24.3,
+      "def_pa": 24.333333333333332,
       "def_share": 0.4940371456500489,
       "aggression_pct": 30.8,
       "grade": 0.0,
