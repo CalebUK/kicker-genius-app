@@ -206,59 +206,13 @@ def run_analysis():
             return clean
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
-        
-        # --- MERGE EXTERNAL DATA ---
-        headshot_col = 'headshot_url' if 'headshot_url' in players.columns else 'headshot' if 'headshot' in players.columns else None
-        if headshot_col:
-            player_map = players[['gsis_id', headshot_col]].rename(columns={'gsis_id': 'kicker_player_id', headshot_col: 'headshot_url'})
-            stats = pd.merge(stats, player_map, on='kicker_player_id', how='left')
-        else:
-            stats['headshot_url'] = None
-        stats['headshot_url'] = stats['headshot_url'].fillna("https://static.www.nfl.com/image/private/f_auto,q_auto/league/nfl-placeholder.png")
-        
-        if not ownership_data.empty:
-            stats = pd.merge(stats, ownership_data, left_on='kicker_player_name', right_on='match_name', how='left')
-            stats['own_pct'] = stats['own_pct'].fillna(0.0)
-        else:
-            stats['own_pct'] = 0.0
 
-        if 'join_name' in cbs_injuries.columns:
-            stats = pd.merge(stats, cbs_injuries, left_on='join_name', right_on='join_name', how='left')
-        else:
-            stats['cbs_status'] = None
-            stats['cbs_injury'] = None
-            
-        stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
-        
-        # --- INJURY META CALCULATION ---
-        def get_injury_meta(row):
-            roster_st = str(row.get('roster_status', '')) if pd.notna(row.get('roster_status', '')) else ""
-            if roster_st in ['RES', 'NON', 'SUS', 'PUP']: return "IR", "red-700", f"Roster: {roster_st}"
-            if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']: return "CUT", "red-700", "Released"
-            if roster_st == 'DEV': return "Practice Squad", "yellow-500", "Roster: Practice Squad"
-            
-            cbs_st = str(row.get('cbs_status', '')).title()
-            cbs_det = str(row.get('cbs_injury', ''))
-            if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
-            if "Doubtful" in cbs_st: return "Doubtful", "red-400", f"{cbs_st} ({cbs_det})"
-            if "Questionable" in cbs_st: return "Questionable", "yellow-500", f"{cbs_st} ({cbs_det})"
-            return "Healthy", "green", "Active"
-
-        injury_meta = stats.apply(get_injury_meta, axis=1)
-        stats['injury_status'] = [x[0] for x in injury_meta]
-        stats['injury_color'] = [x[1] for x in injury_meta]
-        stats['injury_details'] = [x[2] for x in injury_meta]
-
-        qualified = stats[stats['fg_att'] >= 5]
-        elite_thresh = qualified['fpts'].quantile(0.80) if not qualified.empty else 100
-
+        # --- CALCULATE STALL METRICS ---
         max_wk = pbp['week'].max()
         start_wk = max(1, max_wk - 3)
         recent_pbp = pbp[pbp['week'] >= start_wk].copy()
         
-        # --- MODULAR TEAM STATS ---
-        off_ppg, def_pa = calculate_team_stats(schedule, target_week)
-        
+        # Calculate Last 4 Weeks Stall Metrics
         off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
         off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team', 'off_stall_rate': 'off_stall_rate'})
         def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent', 'def_stall_rate': 'def_stall_rate'})
@@ -266,6 +220,7 @@ def run_analysis():
         lg_off_avg = off_stall_l4['off_stall_rate'].mean()
         lg_def_avg = def_stall_l4['def_stall_rate'].mean()
 
+        # AGGREGATE AGGRESSION
         fourth_downs = recent_pbp[(recent_pbp['down'] == 4) & (recent_pbp['yardline_100'] <= 30)].copy()
         fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
@@ -273,6 +228,18 @@ def run_analysis():
         aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
 
         completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
+        home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
+        away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
+        all_scores = pd.concat([home_scores, away_scores])
+        
+        # DEFINE OFF_PPG & DEF_PA HERE
+        off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
+        
+        home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
+        away_allowed = completed[['away_team', 'home_score']].rename(columns={'away_team': 'team', 'home_score': 'pts_allowed'})
+        all_allowed = pd.concat([home_allowed, away_allowed])
+        def_pa = all_allowed.groupby('team')['pts_allowed'].mean().reset_index().rename(columns={'pts_allowed': 'def_pa', 'team': 'opponent'})
+
         l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
         kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
         kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True)
@@ -358,41 +325,59 @@ def run_analysis():
                             break
 
         def process_row(row):
+            # SAFE INITIALIZATION of calculation variables
+            off_score = 0.0
+            def_score = 0.0
+            grade = 0.0
+            base_proj = 0.0
+            proj = 0.0
+            off_cap = 0.0
+            def_cap = 0.0
+            w_team_score = 0.0
+            w_def_allowed = 0.0
+            bonuses = []
+
             injury_status = row.get('injury_status', 'Healthy')
             if injury_status in ['OUT', 'CUT', 'Practice Squad', 'IR', 'Inactive']:
                 proj = 0.0
                 grade = 0.0
+                bonuses.append(f"⛔ {injury_status}")
             else:
+                # Calculate grading & projections ONLY if active
                 off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
                 def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
                 bonus_val = 0
-                if row['is_dome']: bonus_val += 10
+                if row['is_dome']: 
+                    bonus_val += 10
+                    bonuses.append("+10 Dome")
+                    
                 grade = round(off_score + def_score + bonus_val, 1)
                 base_proj = row['avg_pts'] * (grade / 90)
-                proj = round(base_proj, 1)
+                
+                # Weighted Projection Calculations
+                w_team_score = (row['vegas_implied'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas_implied'] > 0 else row['off_ppg']
+                w_def_allowed = (row['vegas_implied'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas_implied'] > 0 else row['def_pa']
+                
+                s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
+                off_cap = w_team_score * (s_off * 1.2)
+                
+                # Use def_share if available, else fallback
+                d_share_val = row.get('def_share', 0.45)
+                s_def = min(d_share_val if d_share_val > 0 else 0.45, 0.80)
+                def_cap = w_def_allowed * (s_def * 1.2)
+                
+                weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
+                proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
             
             history_obj = history_data.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
-            
-            # Calculate Weighted Projections Here
-            w_team_score = (row['vegas_implied'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas_implied'] > 0 else row['off_ppg']
-            w_def_allowed = (row['vegas_implied'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas_implied'] > 0 else row['def_pa']
-            
-            s_off = min(row['off_share'] if row['off_share'] > 0 else 0.45, 0.80)
-            off_cap = w_team_score * (s_off * 1.2)
-            s_def = min(row['def_share'] if row['def_share'] > 0 else 0.45, 0.80)
-            def_cap = w_def_allowed * (s_def * 1.2)
-            
-            # Refine Projection with Caps
-            weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
-            proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
 
             return pd.Series({
                 'grade': grade,
                 'proj': proj,
-                'grade_details': [],
+                'grade_details': bonuses,
                 'off_score_val': round(off_score, 1),
                 'def_score_val': round(def_score, 1),
-                'w_team_score': round(w_team_score, 1), # FIXED: Using real calculations
+                'w_team_score': round(w_team_score, 1),
                 'w_def_allowed': round(w_def_allowed, 1),
                 'off_cap_val': round(off_cap, 1),
                 'def_cap_val': round(def_cap, 1),
