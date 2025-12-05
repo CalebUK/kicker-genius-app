@@ -132,14 +132,9 @@ def run_analysis():
             full_roster = rosters[['gsis_id', 'team', 'status', 'position']].copy()
             full_roster.rename(columns={'gsis_id': 'kicker_player_id', 'team': 'roster_team'}, inplace=True)
             
-            # FIX: DROP DUPLICATES IN ROSTER TO PREVENT MERGE EXPLOSION
-            full_roster = full_roster.drop_duplicates(subset=['kicker_player_id'])
-
             inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
             inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
             inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
-            # Fix duplicates in inactive roster too
-            inactive_roster = inactive_roster.drop_duplicates(subset=['kicker_player_id'])
         except: 
             full_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_team', 'position'])
             inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
@@ -195,15 +190,11 @@ def run_analysis():
             total_kicks=('play_id', 'count'), games=('game_id', 'nunique')
         ).reset_index()
         
-        # --- FIX TEAM USING ROSTER DATA & FILTER BY POSITION ---
+        # --- FIX TEAM USING ROSTER DATA & FILTER ---
         if not full_roster.empty:
             stats = pd.merge(stats, full_roster, on='kicker_player_id', how='left')
             stats['team'] = np.where(stats['roster_team'].notna(), stats['roster_team'], stats['team'])
-            
-            stats = stats[
-                (stats['position'] == 'K') | (stats['position'].isna())
-            ]
-            
+            stats = stats[(stats['position'] == 'K') | (stats['position'].isna())]
             stats.drop(columns=['roster_team', 'position'], inplace=True)
         
         stats = pd.merge(stats, rz_counts, left_on='team', right_on='posteam', how='left').fillna(0)
@@ -333,8 +324,6 @@ def run_analysis():
         recent_pbp = pbp[pbp['week'] >= start_wk].copy()
         
         # --- MODULAR TEAM STATS ---
-        off_ppg, def_pa = calculate_team_stats(schedule, target_week)
-        
         # Calculate L4 Stall Metrics using existing function
         off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
         off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team', 'off_stall_rate': 'off_stall_rate'})
@@ -350,18 +339,6 @@ def run_analysis():
         aggression_stats = aggression_stats.rename(columns={'posteam': 'team'}) # RENAME HERE
 
         completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
-        home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
-        away_scores = completed[['away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'pts'})
-        all_scores = pd.concat([home_scores, away_scores])
-        
-        # DEFINE OFF_PPG & DEF_PA HERE
-        off_ppg = all_scores.groupby('team')['pts'].mean().reset_index().rename(columns={'pts': 'off_ppg'})
-        
-        home_allowed = completed[['home_team', 'away_score']].rename(columns={'home_team': 'team', 'away_score': 'pts_allowed'})
-        away_allowed = completed[['away_team', 'home_score']].rename(columns={'away_team': 'team', 'home_score': 'pts_allowed'})
-        all_allowed = pd.concat([home_allowed, away_allowed])
-        def_pa = all_allowed.groupby('team')['pts_allowed'].mean().reset_index().rename(columns={'pts_allowed': 'def_pa', 'team': 'opponent'})
-
         l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
         kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
         kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True)
@@ -408,7 +385,6 @@ def run_analysis():
         
         final = pd.merge(final, off_stall_l4, on='team', how='left')
         
-        # MERGE TEAM STATS (SAFE)
         if not off_ppg.empty:
             final = pd.merge(final, off_ppg, on='team', how='left')
         else:
