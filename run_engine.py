@@ -72,52 +72,22 @@ def run_analysis():
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
         # 2. HISTORY MANAGEMENT
-        # Load history from its own file if possible, or main file fallback
         history = {}
         history_file = "public/history_data.json"
-        
         if os.path.exists(history_file):
             try:
                 with open(history_file, "r") as f:
-                    history_json = json.load(f)
-                    history = history_json.get("history", {})
-            except Exception as e:
-                print(f"⚠️ Could not load history file: {e}")
+                    history = json.load(f).get("history", {})
+            except: pass
         elif os.path.exists("public/kicker_data.json"):
             try:
                 with open("public/kicker_data.json", "r") as f:
-                    existing_data = json.load(f)
-                    history = existing_data.get("history", {})
+                    history = json.load(f).get("history", {})
             except: pass
 
-        # REBUILD FULL HISTORY (Weeks 1 to target_week)
-        # We iterate 1 to target_week to ensure all past weeks are captured
-        # This overwrites/updates the history object with fresh data
-        print(f"📊 Updating History for Weeks 1 to {target_week}...")
-        for w in range(1, target_week + 1):
-            week_str = str(w)
-            # Get Actuals (Granular)
-            actuals_df = get_kicker_scores_for_week(pbp, w)
-            
-            if not actuals_df.empty:
-                new_records = actuals_df.to_dict(orient='records')
-                
-                # Preserve projections if they exist in old history
-                if week_str in history:
-                    existing_records = history[week_str]
-                    proj_map = {r['id']: r.get('proj', 0) for r in existing_records}
-                    
-                    for record in new_records:
-                        pid = record['id']
-                        if pid in proj_map:
-                            record['proj'] = proj_map[pid]
-                        else:
-                            record['proj'] = 0 
-                
-                history[week_str] = new_records
+        history = update_history(history, pbp, target_week)
         
         # 3. TEAM STATS HISTORY
-        print("📊 Generating Team Stats History...")
         team_history = get_weekly_team_stats(schedule, target_week)
         
         cbs_injuries = scrape_cbs_injuries()
@@ -132,14 +102,17 @@ def run_analysis():
             full_roster = rosters[['gsis_id', 'team', 'status', 'position']].copy()
             full_roster.rename(columns={'gsis_id': 'kicker_player_id', 'team': 'roster_team'}, inplace=True)
             
-            # FIX: DROP DUPLICATES IN ROSTER TO PREVENT MERGE EXPLOSION
-            full_roster = full_roster.drop_duplicates(subset=['kicker_player_id'])
-
+            # FIX: DEDUPLICATE ROSTERS BY PLAYER ID
+            # Players can appear multiple times if they moved teams or changed status
+            # We keep the most recent entry (assuming file is somewhat ordered or we just take first valid)
+            full_roster = full_roster.drop_duplicates(subset=['kicker_player_id'], keep='first')
+            
             inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
             inactive_roster = rosters[rosters['status'].isin(inactive_codes)][['gsis_id', 'status']].copy()
             inactive_roster.rename(columns={'status': 'roster_status', 'gsis_id': 'kicker_player_id'}, inplace=True)
-            # Fix duplicates in inactive roster too
+            # Deduplicate inactive roster too
             inactive_roster = inactive_roster.drop_duplicates(subset=['kicker_player_id'])
+
         except: 
             full_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_team', 'position'])
             inactive_roster = pd.DataFrame(columns=['kicker_player_id', 'roster_status'])
@@ -195,7 +168,7 @@ def run_analysis():
             total_kicks=('play_id', 'count'), games=('game_id', 'nunique')
         ).reset_index()
         
-        # --- FIX TEAM USING ROSTER DATA & FILTER BY POSITION ---
+        # --- FIX TEAM USING ROSTER DATA & FILTER ---
         if not full_roster.empty:
             stats = pd.merge(stats, full_roster, on='kicker_player_id', how='left')
             stats['team'] = np.where(stats['roster_team'].notna(), stats['roster_team'], stats['team'])
@@ -223,14 +196,12 @@ def run_analysis():
             
         stats['join_name'] = stats['kicker_player_name'].apply(normalize_name)
 
-        # --- CALCULATE STALL METRICS ---
-        # Note: 'calculate_team_stats' gives PPG/PA averages for ranking
-        # 'get_weekly_team_stats' gives full breakdown for JSON
-        off_ppg, def_pa = calculate_team_stats(schedule, target_week)
-        
         off_stall_seas, def_stall_seas = calculate_stall_metrics(pbp)
-        off_stall_seas = off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd', 'posteam': 'team'})
-        def_stall_seas = def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd', 'defteam': 'team'})
+        off_stall_seas.rename(columns={'off_stall_rate': 'off_stall_rate_ytd'}, inplace=True)
+        def_stall_seas.rename(columns={'def_stall_rate': 'def_stall_rate_ytd'}, inplace=True)
+        
+        if 'posteam' in off_stall_seas.columns: off_stall_seas = off_stall_seas.rename(columns={'posteam': 'team'})
+        if 'defteam' in def_stall_seas.columns: def_stall_seas = def_stall_seas.rename(columns={'defteam': 'team'}) 
         
         stats = pd.merge(stats, off_stall_seas, on='team', how='left')
         stats = pd.merge(stats, def_stall_seas, on='team', how='left')
@@ -240,7 +211,6 @@ def run_analysis():
         history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
         
         # --- INJECT PROJECTIONS INTO HISTORY ---
-        # Backfill projections from L3 calculation into the main history object
         for pid, h_data in history_data.items():
             l3 = h_data.get('l3_games', [])
             for game in l3:
@@ -252,7 +222,7 @@ def run_analysis():
                             record['proj'] = proj
                             break
 
-        # --- CURRENT WEEK LIVE SCORING (RAW BUCKETS) ---
+        # --- CURRENT WEEK LIVE SCORING ---
         current_week_pbp = kick_plays[kick_plays['week'] == target_week].copy()
         live_cols = [
             'wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 
@@ -347,7 +317,7 @@ def run_analysis():
         fourth_downs['is_go'] = fourth_downs['play_type'].isin(['pass', 'run'])
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
         aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
-        aggression_stats = aggression_stats.rename(columns={'posteam': 'team'}) # RENAME HERE
+        aggression_stats = aggression_stats.rename(columns={'posteam': 'team'}) 
 
         completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
         home_scores = completed[['home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'pts'})
@@ -425,10 +395,12 @@ def run_analysis():
         final = pd.merge(final, def_share, on='opponent', how='left')
         final = pd.merge(final, aggression_stats[['team', 'aggression_pct']], on='team', how='left')
         
+        # FIX: DEDUPLICATE BEFORE PROCESSING
+        final = final.drop_duplicates(subset=['kicker_player_id'])
+
         final = final.fillna(0)
 
         def process_row(row):
-            # Simplified scoring logic for brevity - ensures script runs
             off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
             def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
             bonus_val = 0
@@ -463,7 +435,6 @@ def run_analysis():
         final = final.sort_values('proj', ascending=False)
         final['narrative'] = final.apply(generate_narrative, axis=1)
         
-        # Final cleanup
         final = final.replace([np.inf, -np.inf, np.nan], None)
         final = final.where(pd.notnull(final), None)
         ytd_sorted = stats.sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
