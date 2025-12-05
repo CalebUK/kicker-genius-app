@@ -72,16 +72,13 @@ def run_analysis():
         if hasattr(players, "to_pandas"): players = players.to_pandas()
         
         # 2. HISTORY MANAGEMENT
-        # Load history from its own file if possible, or main file fallback
         history = {}
         history_file = "public/history_data.json"
-        
         if os.path.exists(history_file):
             try:
                 with open(history_file, "r") as f:
                     history = json.load(f).get("history", {})
-            except Exception as e:
-                print(f"⚠️ Could not load history file: {e}")
+            except: pass
         elif os.path.exists("public/kicker_data.json"):
             try:
                 with open("public/kicker_data.json", "r") as f:
@@ -89,25 +86,9 @@ def run_analysis():
                     history = existing_data.get("history", {})
             except: pass
 
-        # REBUILD FULL HISTORY (Weeks 1 to target_week)
-        print(f"📊 Updating History for Weeks 1 to {target_week}...")
-        for w in range(1, target_week + 1):
-            week_str = str(w)
-            actuals_df = get_kicker_scores_for_week(pbp, w)
-            
-            if not actuals_df.empty:
-                new_records = actuals_df.to_dict(orient='records')
-                if week_str in history:
-                    existing_records = history[week_str]
-                    proj_map = {r['id']: r.get('proj', 0) for r in existing_records}
-                    for record in new_records:
-                        pid = record['id']
-                        if pid in proj_map: record['proj'] = proj_map[pid]
-                        else: record['proj'] = 0 
-                history[week_str] = new_records
+        history = update_history(history, pbp, target_week)
         
         # 3. TEAM STATS HISTORY
-        print("📊 Generating Team Stats History...")
         team_history = get_weekly_team_stats(schedule, target_week)
         
         cbs_injuries = scrape_cbs_injuries()
@@ -211,8 +192,8 @@ def run_analysis():
         start_wk = max(1, max_wk - 3)
         recent_pbp = pbp[pbp['week'] >= start_wk].copy()
         
-        # Calculate Last 4 Weeks Stall Metrics
         off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
+        # Explicitly rename columns before merge
         off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team', 'off_stall_rate': 'off_stall_rate'})
         def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent', 'def_stall_rate': 'def_stall_rate'})
         
@@ -280,7 +261,39 @@ def run_analysis():
         model['wind'] = model['weather_data'].apply(lambda x: x[0])
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
+        # --- RESTORED CURRENT WEEK LIVE STATS AGGREGATION ---
+        current_week_pbp = kick_plays[kick_plays['week'] == target_week].copy()
+        live_cols = [
+            'wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 
+            'wk_fg_miss', 'wk_xp_made', 'wk_xp_miss',
+            'wk_fg_miss_0_19', 'wk_fg_miss_20_29', 'wk_fg_miss_30_39', 'wk_fg_miss_40_49',
+            'wk_fg_miss_50_59', 'wk_fg_miss_60_plus'
+        ]
+        
+        if not current_week_pbp.empty:
+            live_stats = current_week_pbp.groupby('kicker_player_id').agg(
+                wk_fg_0_19=('fg_0_19', 'sum'),
+                wk_fg_20_29=('fg_20_29', 'sum'),
+                wk_fg_30_39=('fg_30_39', 'sum'),
+                wk_fg_40_49=('fg_40_49', 'sum'),
+                wk_fg_50_59=('fg_50_59', 'sum'),
+                wk_fg_60_plus=('fg_60_plus', 'sum'),
+                wk_fg_miss=('fg_miss', 'sum'),
+                wk_xp_made=('xp_made', 'sum'),
+                wk_xp_miss=('xp_miss', 'sum'),
+                wk_fg_miss_0_19=('fg_miss_0_19', 'sum'),
+                wk_fg_miss_20_29=('fg_miss_20_29', 'sum'),
+                wk_fg_miss_30_39=('fg_miss_30_39', 'sum'),
+                wk_fg_miss_40_49=('fg_miss_40_49', 'sum'),
+                wk_fg_miss_50_59=('fg_miss_50_59', 'sum'),
+                wk_fg_miss_60_plus=('fg_miss_60_plus', 'sum')
+            ).reset_index()
+        else:
+            live_stats = pd.DataFrame(columns=['kicker_player_id'] + live_cols)
+
         final = pd.merge(stats, model, on='team', how='inner')
+        
+        # MERGE LIVE STATS (RESTORED)
         final = pd.merge(final, live_stats, on='kicker_player_id', how='left')
         
         final = pd.merge(final, off_stall_l4, on='team', how='left')
@@ -305,21 +318,6 @@ def run_analysis():
         final = final.drop_duplicates(subset=['kicker_player_id'])
         final = final.fillna(0)
 
-        # Define history_data before process_row
-        history_data = analyze_past_3_weeks_strict(target_week, pbp, schedule, stats)
-        
-        # --- INJECT PROJECTIONS INTO HISTORY ---
-        for pid, h_data in history_data.items():
-            l3 = h_data.get('l3_games', [])
-            for game in l3:
-                wk_str = str(game['week'])
-                proj = game['proj']
-                if wk_str in history:
-                    for record in history[wk_str]:
-                        if record['id'] == pid:
-                            record['proj'] = proj
-                            break
-
         def process_row(row):
             # Simplified scoring logic for brevity - ensures script runs
             off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
@@ -334,7 +332,7 @@ def run_analysis():
                 proj = 0.0
                 grade = 0.0
             
-            history_obj = history_data.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
+            history_obj = history.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
 
             # EXCLUDE LIVE COLS
             return pd.Series({
