@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock, Bot } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
 import { DEFAULT_SCORING } from './data/constants';
-import { calcFPts, calcProj } from './utils/scoring';
+import { calcFPts, calcProj, fetchSleeperScores } from './utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from './components/KickerComponents';
 import AccuracyTab from './components/AccuracyTab';
 import SettingsTab from './components/SettingsTab';
@@ -12,6 +12,7 @@ import GlossaryTab from './components/GlossaryTab';
 
 const App = () => {
   const [data, setData] = useState(null);
+  const [historyData, setHistoryData] = useState(null); // NEW STATE FOR HISTORY
   const [activeTab, setActiveTab] = useState('potential');
   const [expandedRow, setExpandedRow] = useState(null);
   const [scoring, setScoring] = useState(DEFAULT_SCORING);
@@ -25,11 +26,10 @@ const App = () => {
 
   // Sleeper State
   const [sleeperLeagueId, setSleeperLeagueId] = useState('');
-  // FIX: Restored missing state variable
   const [sleeperLeagueName, setSleeperLeagueName] = useState(''); 
   const [sleeperUser, setSleeperUser] = useState('');
   const [sleeperMyKickers, setSleeperMyKickers] = useState(new Set());
-  const [sleeperTakenKickers, setSleeperTakenKickers] = useState(new Set());
+  const [sleeperTakenKickers, setSleeperTakenKickers] = new Set());
   const [sleeperLoading, setSleeperLoading] = useState(false);
   const [sleeperFilter, setSleeperFilter] = useState(false);
   const [sleeperScoringUpdated, setSleeperScoringUpdated] = useState(false);
@@ -37,6 +37,31 @@ const App = () => {
   // LIVE SCORING STATE
   const [liveScores, setLiveScores] = useState({});
   const [sleeperIdMap, setSleeperIdMap] = useState({});
+
+  const fetchData = useCallback(async () => {
+      setLoading(true);
+      setError(null);
+      
+      const fetchJson = async (url) => {
+          const res = await fetch(`${url}?v=${new Date().getTime()}`);
+          if (!res.ok) throw new Error(`${url} not found (${res.status})`);
+          return res.json();
+      };
+      
+      try {
+          const [main, history] = await Promise.all([
+              fetchJson('/kicker_data.json'),
+              fetchJson('/history_data.json').catch(() => ({})) // Fail gracefully if history is missing
+          ]);
+          
+          setData(main);
+          setHistoryData(history);
+      } catch (err) {
+          setError(err.message);
+      } finally {
+          setLoading(false);
+      }
+  }, []);
 
   useEffect(() => {
     const savedScoring = localStorage.getItem('kicker_scoring');
@@ -57,17 +82,31 @@ const App = () => {
     if (savedTakenKickers) { try { setSleeperTakenKickers(new Set(JSON.parse(savedTakenKickers))); } catch (e) {} }
     if (savedIdMap) { try { setSleeperIdMap(JSON.parse(savedIdMap)); } catch (e) {} }
 
-    fetch('/kicker_data.json?v=' + new Date().getTime())
-      .then(res => { if(!res.ok) throw new Error(res.status); return res.json(); })
-      .then(json => { setData(json); setLoading(false); })
-      .catch(err => { setError(err.message); setLoading(false); });
-  }, []);
+    fetchData(); // Load data on mount
+  }, [fetchData]);
 
   // --- POLLING FOR LIVE SCORES ---
-  // (Currently placeholder/manual refresh until API strategy finalized)
   useEffect(() => {
-     // Placeholder for polling logic if we re-enable it
-  }, [sleeperLeagueId, data?.meta?.week]);
+      // Only poll if we have a league ID and a valid week
+      if (!sleeperLeagueId || !data?.meta?.week) return;
+      
+      const pollScores = async () => {
+          if (typeof fetchSleeperScores === 'function') {
+            console.log("🔄 Polling Sleeper for live scores...");
+            // Use current week from meta
+            const scores = await fetchSleeperScores(sleeperLeagueId, data.meta.week);
+            if (scores && Object.keys(scores).length > 0) {
+                setLiveScores(prev => ({ ...prev, ...scores })); // Merge to keep existing
+            }
+          }
+      };
+
+      if (!loading && sleeperLeagueId) {
+          pollScores(); // Initial call
+          const interval = setInterval(pollScores, 30000); // Every 30s
+          return () => clearInterval(interval);
+      }
+  }, [sleeperLeagueId, data?.meta?.week, loading]);
 
 
   const updateScoring = (key, val) => {
@@ -87,12 +126,10 @@ const App = () => {
       setSleeperLoading(true);
       setSleeperScoringUpdated(false);
       try {
-          // 1. Roster Check
           const rostersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/rosters`);
           if (!rostersRes.ok) throw new Error("League ID invalid or private.");
           const rosters = await rostersRes.json();
           
-          // 2. League Info
           const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
           const leagueData = await leagueRes.json();
           
@@ -124,7 +161,6 @@ const App = () => {
              setSleeperScoringUpdated(true);
           }
 
-          // 3. User ID Map
           let myUserId = null;
           if (sleeperUser) {
              const usersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/users`);
@@ -133,7 +169,6 @@ const App = () => {
              if (me) myUserId = me.user_id;
           }
 
-          // 4. Players DB for Mapping
           const playersRes = await fetch('https://api.sleeper.app/v1/players/nfl'); 
           const allPlayers = await playersRes.json();
 
@@ -184,8 +219,8 @@ const App = () => {
 
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
 
-  if (loading) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
-  if (error || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Not Found</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Check /public/kicker_data.json on GitHub.</p></div>;
+  if (loading || !data || !historyData) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
+  if (error) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Error</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Failed to load necessary JSON files.</p></div>;
 
   const { rankings, ytd, injuries, meta } = data;
   const leagueAvgs = meta?.league_avgs || {};
