@@ -22,7 +22,6 @@ from engine.team_stats import calculate_team_stats, get_weekly_team_stats
 
 # --- NARRATIVE ENGINE ---
 def generate_narrative(row):
-    # Safe access to injury_status with fallback
     injury_status = row.get('injury_status', 'Healthy')
     if injury_status != 'Healthy':
         return f"Monitor status closely as they are currently listed as {injury_status}. This significantly impacts their viability for Week {row.get('week', '')}."
@@ -83,8 +82,7 @@ def run_analysis():
             try:
                 with open(history_file, "r") as f:
                     history = json.load(f).get("history", {})
-            except Exception as e:
-                print(f"⚠️ Could not load history file: {e}")
+            except: pass
         elif os.path.exists("public/kicker_data.json"):
              try:
                 with open("public/kicker_data.json", "r") as f:
@@ -92,15 +90,13 @@ def run_analysis():
                     history = existing_data.get("history", {})
              except: pass
 
-        # FORCE REBUILD HISTORY (Weeks 1 to target_week)
+        # Rebuild Full History (W1 to Target)
         print(f"📊 Rebuilding History for Weeks 1 to {target_week}...")
         for w in range(1, target_week + 1):
             week_str = str(w)
             actuals_df = get_kicker_scores_for_week(pbp, w)
-            
             if not actuals_df.empty:
                 new_records = actuals_df.to_dict(orient='records')
-                # Preserve projections if they exist in old history
                 if week_str in history:
                     existing_records = history[week_str]
                     proj_map = {r['id']: r.get('proj', 0) for r in existing_records}
@@ -127,6 +123,7 @@ def run_analysis():
             
             full_roster = rosters[['gsis_id', 'team', 'status', 'position']].copy()
             full_roster.rename(columns={'gsis_id': 'kicker_player_id', 'team': 'roster_team'}, inplace=True)
+            # FIX: DEDUPLICATE ROSTERS
             full_roster = full_roster.drop_duplicates(subset=['kicker_player_id'], keep='first')
             
             inactive_codes = ['RES', 'NON', 'SUS', 'PUP', 'WAIVED', 'REL', 'CUT', 'RET', 'DEV']
@@ -155,7 +152,6 @@ def run_analysis():
         kick_plays['fg_60_plus'] = (kick_plays['is_fg']) & (kick_plays['made']) & (kick_plays['kick_distance'] >= 60)
         
         kick_plays['fg_miss'] = (kick_plays['is_fg']) & (~kick_plays['made']) 
-        # Granular Misses
         kick_plays['fg_miss_0_19'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'] < 20)
         kick_plays['fg_miss_20_29'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'].between(20, 29))
         kick_plays['fg_miss_30_39'] = (kick_plays['is_fg']) & (~kick_plays['made']) & (kick_plays['kick_distance'].between(30, 39))
@@ -241,7 +237,6 @@ def run_analysis():
             if roster_st in ['RES', 'NON', 'SUS', 'PUP']: return "IR", "red-700", f"Roster: {roster_st}"
             if roster_st in ['WAIVED', 'REL', 'CUT', 'RET']: return "CUT", "red-700", "Released"
             if roster_st == 'DEV': return "Practice Squad", "yellow-500", "Roster: Practice Squad"
-            
             cbs_st = str(row.get('cbs_status', '')).title()
             cbs_det = str(row.get('cbs_injury', ''))
             if "Out" in cbs_st or "Ir" in cbs_st or "Inactive" in cbs_st: return "OUT", "red-700", f"{cbs_st} ({cbs_det})"
@@ -265,6 +260,7 @@ def run_analysis():
         off_ppg, def_pa = calculate_team_stats(schedule, target_week)
         
         off_stall_l4, def_stall_l4 = calculate_stall_metrics(recent_pbp)
+        # RENAME BEFORE MERGE
         off_stall_l4 = off_stall_l4.rename(columns={'posteam': 'team', 'off_stall_rate': 'off_stall_rate'})
         def_stall_l4 = def_stall_l4.rename(columns={'defteam': 'opponent', 'def_stall_rate': 'def_stall_rate'})
         
@@ -319,7 +315,7 @@ def run_analysis():
         model['wind'] = model['weather_data'].apply(lambda x: x[0])
         model['weather_desc'] = model['weather_data'].apply(lambda x: x[1])
 
-        # --- CURRENT WEEK LIVE SCORING (RAW BUCKETS) ---
+        # --- CURRENT WEEK LIVE SCORING ---
         current_week_pbp = kick_plays[kick_plays['week'] == target_week].copy()
         live_cols = [
             'wk_fg_0_19', 'wk_fg_20_29', 'wk_fg_30_39', 'wk_fg_40_49', 'wk_fg_50_59', 'wk_fg_60_plus', 
@@ -393,31 +389,57 @@ def run_analysis():
             if injury_status in ['OUT', 'CUT', 'Practice Squad', 'IR', 'Inactive']:
                 proj = 0.0
                 grade = 0.0
+                off_score = 0.0
+                def_score = 0.0
+                off_cap = 0.0
+                def_cap = 0.0
+                w_team_score = 0.0
+                w_def_allowed = 0.0
+                bonuses = [f"⛔ {injury_status}"]
+                base_proj = 0.0
             else:
                 off_score = (row['off_stall_rate'] / lg_off_avg * 40) if lg_off_avg else 40
                 def_score = (row['def_stall_rate'] / lg_def_avg * 40) if lg_def_avg else 40
                 bonus_val = 0
-                if row['is_dome']: bonus_val += 10
+                bonuses = []
+                if row['is_dome']: 
+                    bonus_val += 10
+                    bonuses.append("+10 Dome")
+                    
                 grade = round(off_score + def_score + bonus_val, 1)
                 base_proj = row['avg_pts'] * (grade / 90)
-                proj = round(base_proj, 1)
+                
+                # RESTORED WEIGHTED MATH
+                w_team_score = (row['vegas_implied'] * 0.7) + (row['off_ppg'] * 0.3) if row['vegas_implied'] > 0 else row['off_ppg']
+                w_def_allowed = (row['vegas_implied'] * 0.7) + (row['def_pa'] * 0.3) if row['vegas_implied'] > 0 else row['def_pa']
+                
+                s_off_val = row.get('off_share', 0.45)
+                s_off = min(s_off_val if s_off_val > 0 else 0.45, 0.80)
+                off_cap = w_team_score * (s_off * 1.2)
+                
+                d_share_val = row.get('def_share', 0.45)
+                s_def = min(d_share_val if d_share_val > 0 else 0.45, 0.80)
+                def_cap = w_def_allowed * (s_def * 1.2)
+                
+                weighted_proj = (base_proj * 0.50) + (off_cap * 0.30) + (def_cap * 0.20)
+                proj = round(weighted_proj, 1) if weighted_proj > 1.0 else round(base_proj, 1)
             
             history_obj = history_data.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
 
-            # EXCLUDE LIVE COLS
             return pd.Series({
                 'grade': grade,
                 'proj': proj,
-                'grade_details': [],
-                'off_score_val': round(row.get('off_score_val', 0), 1), 
-                'def_score_val': round(row.get('def_score_val', 0), 1),
-                'w_team_score': 0,
-                'w_def_allowed': 0,
-                'off_cap_val': 0,
-                'def_cap_val': 0,
+                'grade_details': bonuses,
+                'off_score_val': round(off_score, 1),
+                'def_score_val': round(def_score, 1),
+                'w_team_score': round(w_team_score, 1), 
+                'w_def_allowed': round(w_def_allowed, 1),
+                'off_cap_val': round(off_cap, 1),
+                'def_cap_val': round(def_cap, 1),
                 'details_vegas_total': round(row['total_line'], 1),
                 'details_vegas_spread': row['spread_display'],
                 'history': history_obj,
+                # EXCLUDE live cols from return
             })
 
         final = final.join(final.apply(process_row, axis=1))
