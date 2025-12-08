@@ -3,22 +3,22 @@ import { PlayCircle, CheckCircle2, Clock, Calendar, Target, TrendingUp, Activity
 import { calculateLiveScore, getGameStatus } from '../utils/scoring';
 import { FootballIcon } from './KickerComponents';
 
-const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) => { // ADDED historyData prop
+const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) => {
   const [filter, setFilter] = useState('ALL');
   const [selectedWeek, setSelectedWeek] = useState(week);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Helper to safely format numbers
+  // Helper to safely format numbers (handles 0/NaN/undefined input)
   const safeFmt = (n) => {
-      if (typeof n !== 'number' || isNaN(n)) return "0";
-      return n > 0 ? `+${n.toFixed(0)}` : n.toFixed(0);
+      const num = Number(n);
+      if (typeof num !== 'number' || isNaN(num) || num === 0) return "0";
+      return num > 0 ? `+${num.toFixed(0)}` : num.toFixed(0);
   };
-  
+
   // --- DATA PREPARATION (Handles Current vs Historical Switch) ---
-  const { filteredPlayers, isHistorical, currentWeekHistory } = useMemo(() => {
+  const { activeGames, isHistorical } = useMemo(() => {
       const isHist = selectedWeek !== week;
       const history = historyData?.history || {};
-      const currentWeekHistory = history[String(week)] || []; // Current week's actuals/projections
       
       let games = [];
       
@@ -26,6 +26,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
           // CURRENT WEEK LOGIC: Use 'players' prop (processed list)
           games = players.map(p => ({
               ...p,
+              // Calculate live score (handles sleeper override)
               live_score: p.sleeper_live_score !== undefined && p.sleeper_live_score !== null ? p.sleeper_live_score : calculateLiveScore(p, scoring),
               status: getGameStatus(p.game_dt)
           }));
@@ -35,22 +36,23 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
           
           // Merge historical granular data with current player metadata (name, headshot, team)
           games = histRecords.map(histRec => {
+              // Find the current player in the full rankings list to get metadata (proj, team, headshot)
               const currentMeta = players.find(p => p.kicker_player_id === histRec.id);
-              if (!currentMeta) return null; // Skip if metadata is missing (very old player)
+              if (!currentMeta) return null;
               
-              // Reconstruct the player object using historical stats but current scoring
-              const score = calculateLiveScore(histRec, scoring); // Calculates score based on historical stats
+              // Recalculate score based on actual granular stats + user scoring
+              const score = calculateLiveScore(histRec, scoring); 
               
               return {
-                  ...currentMeta, // Base player metadata
+                  ...currentMeta, 
                   proj: histRec.proj || 0, // Use recorded projection
                   live_score: score,      // Score based on actual granular stats + user scoring
                   status: 'FINISHED',
-                  // Pass granular stats for badges
-                  wk_fg_0_19: histRec.fg_0_19, wk_fg_20_29: histRec.fg_20_29, wk_xp_made: histRec.xp_made,
+                  // Pass granular stats for historical badges
+                  wk_fg_50_59: histRec.fg_50_59, wk_fg_60_plus: histRec.fg_60_plus,
+                  wk_fg_40_49: histRec.fg_40_49, wk_xp_made: histRec.xp_made,
+                  wk_fg_0_19: histRec.fg_0_19, wk_fg_20_29: histRec.fg_20_29, wk_fg_30_39: histRec.fg_30_39,
                   wk_fg_miss: histRec.fg_miss, wk_xp_miss: histRec.xp_miss,
-                  wk_fg_miss_40_49: histRec.fg_miss_40_49, // Add all granular stats needed for badges
-                  // Note: The rest of the metadata (opponent, weather) is missing here unless saved in history
               };
           }).filter(Boolean);
       }
@@ -59,7 +61,6 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
       const finalFiltered = games.filter(p => {
           if (p.proj <= 0 && p.live_score <= 0) return false;
           
-          // Safety check for inactive players
           const statusVal = p.roster_status || p.status;
           if (statusVal === 'INA') return false;
           if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
@@ -68,13 +69,14 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
           return filter === p.status;
       });
 
-      return { activeGames: finalFiltered, isHistorical: isHist, currentWeekHistory };
+      return { activeGames: finalFiltered, isHistorical: isHist };
   }, [players, scoring, week, selectedWeek, historyData, filter]);
 
-  const totalKickers = activeGames.length;
-
   // --- STATS CALCULATION ---
+  const totalKickers = activeGames.length;
+  const getScore = (p) => p.live_score;
   const diffs = activeGames.map(p => getScore(p) - p.proj).sort((a, b) => a - b);
+  
   const totalActual = activeGames.reduce((acc, p) => acc + getScore(p), 0);
   const totalProj = activeGames.reduce((acc, p) => acc + p.proj, 0);
   const overallDiff = totalActual - totalProj;
@@ -91,9 +93,9 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
   const bustRate = totalKickers > 0 ? Math.round((busts / totalKickers) * 100) : 0;
   const metRate = totalKickers > 0 ? Math.round((met / totalKickers) * 100) : 0; 
 
-  // Kicker Quartile Data
+  // Metric 3: Kicker Quartile Character Lineup
   let minVal = 0, maxVal = 0, q1Val = 0, medianVal = 0, q3Val = 0;
-  let startHighlightIndex = 2; // Default center
+  let startHighlightIndex = 2; 
 
   const getPercentileValue = (pct) => {
       if (diffs.length === 0) return 0;
@@ -150,12 +152,19 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
       return { isMiddle, isMedian, isQ1, isQ3, isMin, isMax };
   });
 
+  // --- 2. SORT FOR DISPLAY ---
+  const displayPlayers = activeGames.sort((a, b) => {
+      const scoreA = getScore(a);
+      const scoreB = getScore(b);
+      return scoreB - scoreA; 
+  });
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
         
         {/* HEADER ROW: Week Selector & Sleeper Sync Note */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            {/* WEEK SELECTOR DROPDOWN */}
+            {/* WEEK SELECTOR */}
             <div className="relative">
                 <button 
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -207,7 +216,9 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
                     <span className="text-2xl font-black text-white">{totalActual}</span>
                     <span className="text-sm text-slate-400">vs {totalProj.toFixed(0)} Proj</span>
                  </div>
-                 <div className="text-[10px] text-slate-400">{overallDiffSign}{overallDiff.toFixed(1)} Diff</div>
+                 <div className={`text-[10px] font-bold ${overallDiff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {overallDiffSign}{overallDiff.toFixed(1)} Diff
+                 </div>
             </div>
 
             {/* Card 2: Accuracy Rate */}
@@ -235,7 +246,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
                  <div className="flex justify-between text-[8px] text-slate-600 mt-0.5 w-full"><span>&gt;+3</span><span className="text-center">+/-3</span><span>&lt;-3</span></div>
             </div>
 
-             {/* Card 4: Kicker Quartile (Character Lineup with Markers) */}
+             {/* Card 4: Kicker Quartile Character Lineup */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-1"><Users className="w-3 h-3 text-amber-500"/> Kicker Quartile</div>
                  
@@ -247,39 +258,19 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
                     {/* Character Icons with Markers */}
                     {quartileIcons.map((q, i) => (
                         <div key={i} className="relative flex flex-col items-center group">
-                            
-                            {/* Marker: Q3 */}
-                            {q.isQ3 && (
-                                <div className="absolute -top-5 bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
-                                    Q3: {safeFmt(q3Val)}
-                                </div>
-                            )}
-
-                            {/* Marker: Median */}
+                            {q.isQ3 && <div className="absolute -top-5 bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">Q3: {safeFmt(q3Val)}</div>}
                             {q.isMedian && (
                                 <div className="absolute -top-7 bg-amber-500 text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md whitespace-nowrap z-40 transform -translate-x-1/2 left-1/2">
                                     Med: {safeFmt(medianVal)}
                                     <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-amber-500"></div>
                                 </div>
                             )}
-                            
-                             {/* Marker: Q1 */}
-                            {q.isQ1 && (
-                                <div className="absolute -top-5 bg-red-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">
-                                    Q1: {safeFmt(q1Val)}
-                                </div>
-                            )}
-                            
-                            {/* Character Icon */}
-                            <User 
-                                className={`w-4 h-4 transition-colors ${q.isMiddle ? 'text-blue-400 scale-110' : 'text-slate-600 scale-90'} ${q.isMedian ? 'text-amber-400 scale-125 z-10' : ''}`} 
-                                strokeWidth={q.isMiddle ? 3 : 2}
-                            />
+                            {q.isQ1 && <div className="absolute -top-5 bg-red-600 text-white text-[8px] px-1 py-0.5 rounded shadow-md whitespace-nowrap z-30 transform -translate-x-1/2 left-1/2">Q1: {safeFmt(q1Val)}</div>}
+                            <User className={`w-4 h-4 transition-colors ${q.isMiddle ? 'text-blue-400 scale-110' : 'text-slate-600 scale-90'} ${q.isMedian ? 'text-amber-400 scale-125 z-10' : ''}`} strokeWidth={q.isMiddle ? 3 : 2}/>
                         </div>
                     ))}
                  </div>
                  
-                 {/* Legend/Labels */}
                  <div className="text-[8px] text-slate-500 text-center mt-1 w-full flex justify-center gap-3">
                      <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-red-400"></div> Q1 Outliers</span>
                      <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div> Middle 50%</span>
@@ -294,9 +285,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
             {displayPlayers.map((p, i) => {
                 const liveScore = getScore(p);
                 const proj = p.proj;
-                
                 const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
-
                 const isBeat = liveScore >= proj;
                 const isSmashed = liveScore >= proj + 3;
                 const status = isHistorical ? 'FINISHED' : getGameStatus(p.game_dt);
@@ -311,6 +300,8 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
                 const borderClass = isSpecial ? "border-blue-500 shadow-lg shadow-blue-900/20" : "border-slate-800";
                 const glowClass = isSmashed ? "shadow-[0_0_15px_rgba(59,130,246,0.5)] border-blue-400" : "";
                 const visualPct = Math.min(100, Math.max(5, performancePct));
+
+                const usingSleeperData = !isHistorical && p.sleeper_live_score !== undefined && p.sleeper_live_score !== null;
 
                 return (
                     <div key={i} className={`bg-slate-900 border rounded-xl p-4 relative overflow-hidden ${borderClass} ${glowClass}`}>
@@ -360,14 +351,20 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) =
                         </div>
 
                         <div className="flex flex-wrap gap-1.5 relative z-10">
-                            {/* PERFORMANCE % BADGE */}
+                            {/* SLEEPER BADGE */}
+                            {usingSleeperData && (
+                                <span className="text-[10px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded border border-purple-700 flex items-center gap-1">
+                                    <Bot className="w-3 h-3" /> Sleeper Data
+                                </span>
+                            )}
+                            
                             {proj > 0 && (
                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${performancePct >= 100 ? 'bg-emerald-900/50 text-emerald-400 border-emerald-700' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>
                                     {performancePct}% of Proj
                                 </span>
                             )}
                             
-                            {!isHistorical && (
+                            {!usingSleeperData && (
                                 <>
                                 {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
                                 {(p.wk_fg_40_49 > 0) && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{p.wk_fg_40_49}x 40-49</span>}
