@@ -22,6 +22,7 @@ from engine.team_stats import calculate_team_stats, get_weekly_team_stats
 
 # --- NARRATIVE ENGINE ---
 def generate_narrative(row):
+    # Safe access to injury_status with fallback
     injury_status = row.get('injury_status', 'Healthy')
     if injury_status != 'Healthy':
         return f"Monitor status closely as they are currently listed as {injury_status}. This significantly impacts their viability for Week {row.get('week', '')}."
@@ -82,7 +83,8 @@ def run_analysis():
             try:
                 with open(history_file, "r") as f:
                     history = json.load(f).get("history", {})
-            except: pass
+            except Exception as e:
+                print(f"⚠️ Could not load history file: {e}")
         elif os.path.exists("public/kicker_data.json"):
              try:
                 with open("public/kicker_data.json", "r") as f:
@@ -90,13 +92,15 @@ def run_analysis():
                     history = existing_data.get("history", {})
              except: pass
 
-        # FULL HISTORY REBUILD
+        # FORCE REBUILD HISTORY (Weeks 1 to target_week)
         print(f"📊 Rebuilding History for Weeks 1 to {target_week}...")
         for w in range(1, target_week + 1):
             week_str = str(w)
             actuals_df = get_kicker_scores_for_week(pbp, w)
+            
             if not actuals_df.empty:
                 new_records = actuals_df.to_dict(orient='records')
+                # Preserve projections if they exist in old history
                 if week_str in history:
                     existing_records = history[week_str]
                     proj_map = {r['id']: r.get('proj', 0) for r in existing_records}
@@ -231,7 +235,7 @@ def run_analysis():
             
         stats = pd.merge(stats, inactive_roster, on='kicker_player_id', how='left')
         
-        # --- INJURY META CALCULATION (CRITICAL: Before Final Merges) ---
+        # --- INJURY META CALCULATION ---
         def get_injury_meta(row):
             roster_st = str(row.get('roster_status', '')) if pd.notna(row.get('roster_status', '')) else ""
             if roster_st in ['RES', 'NON', 'SUS', 'PUP']: return "IR", "red-700", f"Roster: {roster_st}"
@@ -272,6 +276,21 @@ def run_analysis():
         aggression_stats = fourth_downs.groupby('posteam').agg(total_4th_opps=('play_id', 'count'), total_go_attempts=('is_go', 'sum')).reset_index()
         aggression_stats['aggression_pct'] = (aggression_stats['total_go_attempts'] / aggression_stats['total_4th_opps'] * 100).round(1)
         aggression_stats = aggression_stats.rename(columns={'posteam': 'team'})
+
+        completed = schedule[(schedule['week'] >= start_wk) & (schedule['home_score'].notnull())].copy()
+        l4_kick_plays = kick_plays[kick_plays['game_id'].isin(completed['game_id'])].copy()
+        kicker_game_pts = l4_kick_plays.groupby(['game_id', 'posteam'])['real_pts'].sum().reset_index()
+        kicker_game_pts.rename(columns={'real_pts': 'kicker_pts'}, inplace=True)
+        home_g = completed[['game_id', 'home_team', 'home_score']].rename(columns={'home_team': 'team', 'home_score': 'total'})
+        away_g = completed[['game_id', 'away_team', 'away_score']].rename(columns={'away_team': 'team', 'away_score': 'total'})
+        all_g = pd.concat([home_g, away_g])
+        share_df = pd.merge(all_g, kicker_game_pts, left_on=['game_id', 'team'], right_on=['game_id', 'posteam'], how='left').fillna(0)
+        share_df['share'] = share_df.apply(lambda x: x['kicker_pts'] / x['total'] if x['total'] > 0 else 0, axis=1)
+        off_share = share_df.groupby('team')['share'].mean().reset_index().rename(columns={'share': 'off_share'})
+        matchup_lookup = schedule[['game_id', 'home_team', 'away_team']]
+        share_df = pd.merge(share_df, matchup_lookup, on='game_id')
+        share_df['opponent'] = share_df.apply(lambda x: x['away_team'] if x['team'] == x['home_team'] else x['home_team'], axis=1)
+        def_share = share_df.groupby('opponent')['share'].mean().reset_index().rename(columns={'share': 'def_share'})
 
         matchups = schedule[schedule['week'] == target_week][['home_team', 'away_team', 'roof', 'gameday', 'gametime', 'spread_line', 'total_line']].copy()
         matchups['game_dt'] = matchups['gameday'] + ' ' + matchups['gametime']
@@ -385,7 +404,7 @@ def run_analysis():
             
             history_obj = history_data.get(row['kicker_player_id'], {'l3_actual': 0, 'l3_proj': 0, 'l3_games': []})
 
-            # EXCLUDE LIVE COLS (to prevent duplicate columns)
+            # EXCLUDE LIVE COLS
             return pd.Series({
                 'grade': grade,
                 'proj': proj,
@@ -412,7 +431,7 @@ def run_analysis():
         injuries_list = stats[stats['injury_status'] != 'Healthy'].sort_values('fpts', ascending=False).replace([np.inf, -np.inf, np.nan], None)
         injuries_list = injuries_list.where(pd.notnull(injuries_list), None)
 
-        # OUTPUT 1: Main Data (Current Week)
+        # OUTPUT 1: Main Data
         output_main = {
             "meta": {
                 "week": int(target_week),
