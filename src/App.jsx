@@ -12,7 +12,7 @@ import GlossaryTab from './components/GlossaryTab';
 
 const App = () => {
   const [data, setData] = useState(null);
-  const [historyData, setHistoryData] = useState(null); // HISTORY DATA STATE
+  const [historyData, setHistoryData] = useState(null); // NEW STATE FOR HISTORY
   const [activeTab, setActiveTab] = useState('potential');
   const [expandedRow, setExpandedRow] = useState(null);
   const [scoring, setScoring] = useState(DEFAULT_SCORING);
@@ -49,9 +49,10 @@ const App = () => {
       };
       
       try {
+          // Fetch both main data and history data
           const [main, history] = await Promise.all([
               fetchJson('/kicker_data.json'),
-              fetchJson('/history_data.json').catch(() => ({ history: {} })) // Ensure structure is handled
+              fetchJson('/history_data.json').catch(() => ({ history: {} })) // Fail gracefully if history is missing/empty
           ]);
           
           setData(main);
@@ -88,7 +89,7 @@ const App = () => {
 
   // --- POLLING FOR LIVE SCORES ---
   useEffect(() => {
-      if (!sleeperLeagueId || !data?.meta?.week || !fetchSleeperScores) return;
+      if (!sleeperLeagueId || !data?.meta?.week || typeof fetchSleeperScores !== 'function') return;
       
       const pollScores = async () => {
           console.log("🔄 Polling Sleeper for live scores...");
@@ -161,13 +162,13 @@ const App = () => {
           let myUserId = null;
           if (sleeperUser) {
              const usersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/users`);
-             const users = await usersRes.json();
+             const users = usersRes.json();
              const me = users.find(u => u.display_name.toLowerCase() === sleeperUser.toLowerCase());
              if (me) myUserId = me.user_id;
           }
 
           const playersRes = await fetch('https://api.sleeper.app/v1/players/nfl'); 
-          const allPlayers = await playersRes.json();
+          const allPlayers = playersRes.json();
 
           const mySet = new Set();
           const takenSet = new Set();
@@ -428,7 +429,7 @@ const App = () => {
           </div>
         )}
         
-        {activeTab === 'accuracy' && <AccuracyTab players={processed} scoring={scoring} week={meta.week} sleeperLeagueId={sleeperLeagueId} />}
+        {activeTab === 'accuracy' && <AccuracyTab players={processed} scoring={scoring} week={meta.week} sleeperLeagueId={sleeperLeagueId} historyData={historyData} />}
         
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">

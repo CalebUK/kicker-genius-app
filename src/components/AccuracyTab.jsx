@@ -3,66 +3,86 @@ import { PlayCircle, CheckCircle2, Clock, Calendar, Target, TrendingUp, Activity
 import { calculateLiveScore, getGameStatus } from '../utils/scoring';
 import { FootballIcon } from './KickerComponents';
 
-const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
+const AccuracyTab = ({ players, scoring, week, sleeperLeagueId, historyData }) => { // ADDED historyData prop
   const [filter, setFilter] = useState('ALL');
   const [selectedWeek, setSelectedWeek] = useState(week);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // --- DATA PREPARATION ---
-  // We need to unify "Current Week" data and "Historical" data into a common format for the charts
-  const { activeGames, isHistorical } = useMemo(() => {
-      if (selectedWeek === week) {
-          // CURRENT WEEK LOGIC
-          const games = players.filter(p => {
-              if (p.proj <= 0) return false;
-              
-              const statusVal = p.roster_status || p.status;
-              if (statusVal === 'INA') return false;
-              if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
-              
-              const status = getGameStatus(p.game_dt);
-              return status === 'LIVE' || status === 'FINISHED';
-          });
-          return { activeGames: games, isHistorical: false };
+  // Helper to safely format numbers
+  const safeFmt = (n) => {
+      if (typeof n !== 'number' || isNaN(n)) return "0";
+      return n > 0 ? `+${n.toFixed(0)}` : n.toFixed(0);
+  };
+  
+  // --- DATA PREPARATION (Handles Current vs Historical Switch) ---
+  const { filteredPlayers, isHistorical, currentWeekHistory } = useMemo(() => {
+      const isHist = selectedWeek !== week;
+      const history = historyData?.history || {};
+      const currentWeekHistory = history[String(week)] || []; // Current week's actuals/projections
+      
+      let games = [];
+      
+      if (!isHist) {
+          // CURRENT WEEK LOGIC: Use 'players' prop (processed list)
+          games = players.map(p => ({
+              ...p,
+              live_score: p.sleeper_live_score !== undefined && p.sleeper_live_score !== null ? p.sleeper_live_score : calculateLiveScore(p, scoring),
+              status: getGameStatus(p.game_dt)
+          }));
       } else {
-          // HISTORICAL WEEK LOGIC (From l3_games)
-          const games = players.map(p => {
-              const hist = p.history?.l3_games?.find(g => g.week === selectedWeek);
-              if (!hist || hist.status === 'BYE' || hist.status === 'DNS') return null;
+          // HISTORICAL WEEK LOGIC: Use historyData.history[selectedWeek]
+          const histRecords = history[String(selectedWeek)] || [];
+          
+          // Merge historical granular data with current player metadata (name, headshot, team)
+          games = histRecords.map(histRec => {
+              const currentMeta = players.find(p => p.kicker_player_id === histRec.id);
+              if (!currentMeta) return null; // Skip if metadata is missing (very old player)
               
-              // Normalize to match "player" object structure
+              // Reconstruct the player object using historical stats but current scoring
+              const score = calculateLiveScore(histRec, scoring); // Calculates score based on historical stats
+              
               return {
-                  ...p,
-                  proj: hist.proj,
-                  live_score_override: hist.act, // Use historical actual
-                  status_override: 'FINISHED'
+                  ...currentMeta, // Base player metadata
+                  proj: histRec.proj || 0, // Use recorded projection
+                  live_score: score,      // Score based on actual granular stats + user scoring
+                  status: 'FINISHED',
+                  // Pass granular stats for badges
+                  wk_fg_0_19: histRec.fg_0_19, wk_fg_20_29: histRec.fg_20_29, wk_xp_made: histRec.xp_made,
+                  wk_fg_miss: histRec.fg_miss, wk_xp_miss: histRec.xp_miss,
+                  wk_fg_miss_40_49: histRec.fg_miss_40_49, // Add all granular stats needed for badges
+                  // Note: The rest of the metadata (opponent, weather) is missing here unless saved in history
               };
           }).filter(Boolean);
-          return { activeGames: games, isHistorical: true };
       }
-  }, [players, week, selectedWeek]);
+      
+      // FINAL FILTERING (Applied to both current and historical data)
+      const finalFiltered = games.filter(p => {
+          if (p.proj <= 0 && p.live_score <= 0) return false;
+          
+          // Safety check for inactive players
+          const statusVal = p.roster_status || p.status;
+          if (statusVal === 'INA') return false;
+          if (['OUT', 'IR', 'Inactive', 'Doubtful'].includes(p.injury_status)) return false;
+          
+          if (filter === 'ALL') return true;
+          return filter === p.status;
+      });
 
-  // Helper to get score (handles live vs historical override)
-  const getScore = (p) => {
-      if (isHistorical && p.live_score_override !== undefined) return p.live_score_override;
-      return calculateLiveScore(p, scoring);
-  };
+      return { activeGames: finalFiltered, isHistorical: isHist, currentWeekHistory };
+  }, [players, scoring, week, selectedWeek, historyData, filter]);
 
   const totalKickers = activeGames.length;
 
-  // Calculate differentials (Actual - Projected)
+  // --- STATS CALCULATION ---
   const diffs = activeGames.map(p => getScore(p) - p.proj).sort((a, b) => a - b);
-  
   const totalActual = activeGames.reduce((acc, p) => acc + getScore(p), 0);
   const totalProj = activeGames.reduce((acc, p) => acc + p.proj, 0);
   const overallDiff = totalActual - totalProj;
   const overallDiffSign = overallDiff >= 0 ? '+' : '';
   
-  // Metric 1: Win Rate
   const wins = diffs.filter(d => Math.abs(d) <= 3).length;
   const winRate = totalKickers > 0 ? Math.round((wins / totalKickers) * 100) : 0;
 
-  // Metric 2: Smash vs Bust Rate
   const smashes = diffs.filter(d => d > 3).length;
   const busts = diffs.filter(d => d < -3).length;
   const met = diffs.filter(d => Math.abs(d) <= 3).length;
@@ -71,63 +91,63 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
   const bustRate = totalKickers > 0 ? Math.round((busts / totalKickers) * 100) : 0;
   const metRate = totalKickers > 0 ? Math.round((met / totalKickers) * 100) : 0; 
 
-  // Metric 3: Kicker Quartile Character Lineup
-  // Helper to safely format numbers
-  const safeFmt = (n) => {
-      if (typeof n !== 'number' || isNaN(n)) return "0";
-      return n > 0 ? `+${n.toFixed(0)}` : n.toFixed(0);
-  };
-
-  // Initialize with numeric defaults
+  // Kicker Quartile Data
   let minVal = 0, maxVal = 0, q1Val = 0, medianVal = 0, q3Val = 0;
-  let q1Range = "0 to 0", q2Range = "0 to 0", q3Range = "0 to 0", q4Range = "0 to 0";
-  let startHighlightIndex = 2; 
+  let startHighlightIndex = 2; // Default center
 
-  // Only calculate if we have enough data
+  const getPercentileValue = (pct) => {
+      if (diffs.length === 0) return 0;
+      const n = diffs.length;
+      const k = (n - 1) * pct / 100;
+      const f = Math.floor(k);
+      const c = Math.ceil(k);
+      if (f === c) return diffs[f];
+      return (diffs[f] * (c - k)) + (diffs[c] * (k - f));
+  };
+  
   if (diffs.length >= 4) {
       minVal = diffs[0];
       maxVal = diffs[diffs.length - 1];
       
-      const getPercentileValue = (pct) => {
-          const n = diffs.length;
-          const k = (n - 1) * pct / 100;
-          const f = Math.floor(k);
-          const c = Math.ceil(k);
-          if (f === c) return diffs[f];
-          return (diffs[f] * (c - k)) + (diffs[c] * (k - f));
-      };
-
       q1Val = getPercentileValue(25);
       medianVal = getPercentileValue(50);
       q3Val = getPercentileValue(75);
-      
-      q1Range = `${safeFmt(minVal)} to ${safeFmt(q1Val)}`;
-      q2Range = `${safeFmt(q1Val)} to ${safeFmt(medianVal)}`;
-      q3Range = `${safeFmt(medianVal)} to ${safeFmt(q3Val)}`;
-      q4Range = `${safeFmt(q3Val)} to ${safeFmt(maxVal)}`;
 
       if (maxVal !== minVal) {
-          const relativePos = (medianVal - minVal) / (maxVal - minVal);
-          const rawIndex = Math.floor(relativePos * 10) - 2; 
-          startHighlightIndex = Math.max(0, Math.min(5, rawIndex));
+          const q1Numeric = q1Val;
+          const minNumeric = minVal;
+          const maxNumeric = maxVal;
+          const totalRange = maxNumeric - minNumeric;
+          
+          if (totalRange > 0) {
+              const q1Position = ((q1Numeric - minNumeric) / totalRange) * 9;
+              startHighlightIndex = Math.round(q1Position);
+              startHighlightIndex = Math.max(0, Math.min(10 - 5, startHighlightIndex));
+          }
       }
   }
 
   const quartileIcons = Array(10).fill(null).map((_, i) => {
       const isMiddle = i >= startHighlightIndex && i < (startHighlightIndex + 5);
-      const isQ1 = i === startHighlightIndex;
-      const isMedian = i === startHighlightIndex + 2;
-      const isQ3 = i === startHighlightIndex + 4;
+      
+      const minN = getPercentileValue(0);
+      const maxN = getPercentileValue(100);
+      const getMapIndex = (val) => {
+          if (maxN === minN) return 5;
+          return Math.round(((val - minN) / (maxN - minN)) * 9);
+      };
+
+      const q1Idx = getMapIndex(q1Val);
+      const medIdx = getMapIndex(medianVal);
+      const q3Idx = getMapIndex(q3Val);
+
+      const isQ1 = i === q1Idx && i !== 0 && i !== 9; 
+      const isMedian = i === medIdx && i !== 0 && i !== 9;
+      const isQ3 = i === q3Idx && i !== 0 && i !== 9;
       const isMin = i === 0;
       const isMax = i === 9;
-      return { isMiddle, isMedian, isQ1, isQ3, isMin, isMax };
-  });
 
-  // --- 2. FILTER & SORT FOR DISPLAY ---
-  const displayPlayers = activeGames.sort((a, b) => {
-      const scoreA = getScore(a);
-      const scoreB = getScore(b);
-      return scoreB - scoreA; 
+      return { isMiddle, isMedian, isQ1, isQ3, isMin, isMax };
   });
 
   return (
@@ -135,7 +155,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
         
         {/* HEADER ROW: Week Selector & Sleeper Sync Note */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            {/* WEEK SELECTOR */}
+            {/* WEEK SELECTOR DROPDOWN */}
             <div className="relative">
                 <button 
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -150,7 +170,6 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                 
                 {isDropdownOpen && (
                     <div className="absolute top-full left-0 mt-2 w-32 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto">
-                        {/* Generate weeks 1 to current week in reverse */}
                         {Array.from({ length: week }, (_, i) => i + 1).reverse().map((w) => (
                             <button 
                                 key={w} 
@@ -188,9 +207,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                     <span className="text-2xl font-black text-white">{totalActual}</span>
                     <span className="text-sm text-slate-400">vs {totalProj.toFixed(0)} Proj</span>
                  </div>
-                 <div className={`text-[10px] font-bold ${overallDiff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {overallDiffSign}{overallDiff.toFixed(1)} Diff
-                 </div>
+                 <div className="text-[10px] text-slate-400">{overallDiffSign}{overallDiff.toFixed(1)} Diff</div>
             </div>
 
             {/* Card 2: Accuracy Rate */}
@@ -208,22 +225,17 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                     <div className="text-slate-200 flex flex-col items-center"><span>{met}</span><span className="text-[8px] text-slate-500 font-normal">MET</span></div>
                     <div className="text-red-400 flex flex-col items-center"><span>{busts}</span><span className="text-[8px] text-slate-500 font-normal">BUST</span></div>
                  </div>
-                 {/* Mini Bar Chart with Defined Ticks */}
                  <div className="w-full h-2 bg-slate-800 rounded-full mt-1 flex overflow-hidden relative">
                     <div className="bg-emerald-500 h-full" style={{width: `${smashRate}%`}}></div>
                     <div className="bg-slate-400 h-full" style={{width: `${metRate}%`}}></div>
                     <div className="bg-red-500 h-full" style={{width: `${bustRate}%`}}></div>
-                    
-                    {/* Tick Marks for Visual Clarity */}
                     {smashRate > 0 && metRate > 0 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate}%`}}></div>}
                     {(smashRate + metRate) < 100 && <div className="absolute top-0 bottom-0 w-0.5 bg-slate-950 z-10" style={{left: `${smashRate + metRate}%`}}></div>}
                  </div>
-                 <div className="flex justify-between text-[8px] text-slate-600 mt-0.5 w-full">
-                     <span>&gt;+3</span><span className="text-center">+/-3</span><span>&lt;-3</span>
-                 </div>
+                 <div className="flex justify-between text-[8px] text-slate-600 mt-0.5 w-full"><span>&gt;+3</span><span className="text-center">+/-3</span><span>&lt;-3</span></div>
             </div>
 
-             {/* Card 4: Kicker Quartile Character Lineup */}
+             {/* Card 4: Kicker Quartile (Character Lineup with Markers) */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg relative overflow-hidden">
                  <div className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-1"><Users className="w-3 h-3 text-amber-500"/> Kicker Quartile</div>
                  
@@ -280,18 +292,14 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
         {/* --- PLAYER CARDS --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {displayPlayers.map((p, i) => {
-                // Determine score to display (Live or Historical)
                 const liveScore = getScore(p);
                 const proj = p.proj;
                 
                 const performancePct = proj > 0 ? Math.round((liveScore / proj) * 100) : 0;
 
-                // Historical status override or live status
-                const status = isHistorical ? 'FINISHED' : getGameStatus(p.game_dt);
-                
-                // Visual States
-                const isSmashed = liveScore >= proj + 3;
                 const isBeat = liveScore >= proj;
+                const isSmashed = liveScore >= proj + 3;
+                const status = isHistorical ? 'FINISHED' : getGameStatus(p.game_dt);
                 
                 let statusColor = "bg-slate-800 text-slate-400";
                 let StatusIcon = Calendar;
@@ -358,8 +366,7 @@ const AccuracyTab = ({ players, scoring, week, sleeperLeagueId }) => {
                                     {performancePct}% of Proj
                                 </span>
                             )}
-
-                            {/* Only show live granular badges if NOT historical (since history only has totals) */}
+                            
                             {!isHistorical && (
                                 <>
                                 {(p.wk_fg_50_59 > 0 || p.wk_fg_60_plus > 0) && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{p.wk_fg_50_59 + p.wk_fg_60_plus}x 50+</span>}
