@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 15,
-    "updated": "2025-12-14 04:04",
+    "updated": "2025-12-14 05:29",
     "league_avgs": {
       "fpts": 81.6,
       "off_stall": 49.4,
@@ -64,11 +64,11 @@
       "spread_display": "-13.5",
       "is_dome": false,
       "weather_data": [
-        8.7,
-        "8mph \u2600\ufe0f"
+        9.7,
+        "9mph \u2600\ufe0f"
       ],
-      "wind": 8.7,
-      "weather_desc": "8mph \u2600\ufe0f",
+      "wind": 9.7,
+      "weather_desc": "9mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -132,7 +132,7 @@
           }
         ]
       },
-      "narrative": "Myers is a viable streaming option. The offense has a massive implied total of 27.5."
+      "narrative": "Myers is a risky option this week. Heavy winds (9.7 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -257,7 +257,7 @@
           }
         ]
       },
-      "narrative": "Consider Aubrey if you need a fill-in. Be cautious, as the team has a low implied total."
+      "narrative": "You can trust Aubrey in your lineup. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -382,7 +382,7 @@
           }
         ]
       },
-      "narrative": "Fairbairn is a locked-and-loaded RB1 of kickers this week. Heavy winds (0.0 mph) could limit opportunities."
+      "narrative": "Fairbairn is a risky option this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "A.Borregales",
@@ -437,10 +437,10 @@
       "spread_display": "+1.5",
       "is_dome": false,
       "weather_data": [
-        7.1,
+        7.3,
         "7mph \u2600\ufe0f"
       ],
-      "wind": 7.1,
+      "wind": 7.3,
       "weather_desc": "7mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -505,7 +505,7 @@
           }
         ]
       },
-      "narrative": "Borregales is a viable streaming option. The matchup is favorable against a porous defense."
+      "narrative": "Borregales is a strong play this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -628,7 +628,7 @@
           }
         ]
       },
-      "narrative": "You can trust McPherson in your lineup. Be cautious, as the team has a low implied total."
+      "narrative": "McPherson is a viable streaming option. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "C.Dicker",
@@ -751,7 +751,7 @@
           }
         ]
       },
-      "narrative": "Fire up Dicker with confidence. Be cautious, as the team has a low implied total."
+      "narrative": "Dicker is a viable streaming option. Heavy winds (1.8 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "R.Fitzgerald",
@@ -876,7 +876,7 @@
           }
         ]
       },
-      "narrative": "Fitzgerald is a risky option this week. The offense has a massive implied total of 21.5."
+      "narrative": "Fitzgerald is a viable streaming option. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -999,7 +999,7 @@
           }
         ]
       },
-      "narrative": "Loop is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
+      "narrative": "Loop is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 27.2."
     },
     {
       "kicker_player_name": "R.Patterson",
@@ -1122,7 +1122,7 @@
           }
         ]
       },
-      "narrative": "Patterson is a risky option this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "Fade Patterson if possible. The offense has a massive implied total of 19.8."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -1245,7 +1245,7 @@
           }
         ]
       },
-      "narrative": "Fade Butker if possible. The matchup is favorable against a porous defense."
+      "narrative": "Fire up Butker with confidence. Heavy winds (1.8 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -1300,11 +1300,11 @@
       "spread_display": "+11.5",
       "is_dome": false,
       "weather_data": [
-        2.5,
-        "2mph \u2600\ufe0f"
+        3.4,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 2.5,
-      "weather_desc": "2mph \u2600\ufe0f",
+      "wind": 3.4,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -1368,7 +1368,7 @@
           }
         ]
       },
-      "narrative": "Fade Slye if possible. The matchup is favorable against a porous defense."
+      "narrative": "Slye is a viable streaming option. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -1493,7 +1493,7 @@
           }
         ]
       },
-      "narrative": "Bates is a strong play this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "Consider Bates if you need a fill-in. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "E.Pineiro",
@@ -1548,11 +1548,11 @@
       "spread_display": "-11.5",
       "is_dome": false,
       "weather_data": [
-        2.5,
-        "2mph \u2600\ufe0f"
+        3.4,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 2.5,
-      "weather_desc": "2mph \u2600\ufe0f",
+      "wind": 3.4,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -1616,7 +1616,7 @@
           }
         ]
       },
-      "narrative": "Pineiro is a risky option this week. Be cautious, as the team has a low implied total."
+      "narrative": "Pineiro is a strong play this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -1739,7 +1739,7 @@
           }
         ]
       },
-      "narrative": "McLaughlin is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 24.8."
+      "narrative": "You can trust McLaughlin in your lineup. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -1864,7 +1864,7 @@
           }
         ]
       },
-      "narrative": "Mevis is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
+      "narrative": "Consider Mevis if you need a fill-in. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -1919,10 +1919,10 @@
       "spread_display": "+2.5",
       "is_dome": false,
       "weather_data": [
-        11.6,
+        11.4,
         "11mph \u2600\ufe0f"
       ],
-      "wind": 11.6,
+      "wind": 11.4,
       "weather_desc": "11mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -1987,7 +1987,7 @@
           }
         ]
       },
-      "narrative": "Moody is a locked-and-loaded RB1 of kickers this week. The matchup is favorable against a porous defense."
+      "narrative": "Fire up Moody with confidence. Heavy winds (11.4 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "N.Folk",
@@ -2042,10 +2042,10 @@
       "spread_display": "+13.5",
       "is_dome": false,
       "weather_data": [
-        14.9,
+        14.4,
         "14mph \u2600\ufe0f"
       ],
-      "wind": 14.9,
+      "wind": 14.4,
       "weather_desc": "14mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -2110,7 +2110,7 @@
           }
         ]
       },
-      "narrative": "Folk is a strong play this week. His offense has a high stall rate (40.0%)."
+      "narrative": "Fade Folk if possible. His offense has a high stall rate (40.0%)."
     },
     {
       "kicker_player_name": "M.Gay",
@@ -2165,11 +2165,11 @@
       "spread_display": "-11.5",
       "is_dome": false,
       "weather_data": [
-        2.5,
-        "2mph \u2600\ufe0f"
+        3.4,
+        "3mph \u2600\ufe0f"
       ],
-      "wind": 2.5,
-      "weather_desc": "2mph \u2600\ufe0f",
+      "wind": 3.4,
+      "weather_desc": "3mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -2233,7 +2233,7 @@
           }
         ]
       },
-      "narrative": "You can trust Gay in your lineup. Playing in a dome guarantees perfect conditions."
+      "narrative": "Gay is a strong play this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -2356,7 +2356,7 @@
           }
         ]
       },
-      "narrative": "Gonzalez is a strong play this week. The matchup is favorable against a porous defense."
+      "narrative": "Gonzalez is a locked-and-loaded RB1 of kickers this week. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -2411,10 +2411,10 @@
       "spread_display": "+1.5",
       "is_dome": false,
       "weather_data": [
-        2.9,
+        2.0,
         "2mph \u2600\ufe0f"
       ],
-      "wind": 2.9,
+      "wind": 2.0,
       "weather_desc": "2mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -2479,7 +2479,7 @@
           }
         ]
       },
-      "narrative": "Lutz is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 20.5."
+      "narrative": "Fade Lutz if possible. His offense has a high stall rate (37.5%)."
     },
     {
       "kicker_player_name": "C.Santos",
@@ -2534,11 +2534,11 @@
       "spread_display": "-7.5",
       "is_dome": false,
       "weather_data": [
-        9.4,
-        "9mph \u2600\ufe0f"
+        8.8,
+        "8mph \u2600\ufe0f"
       ],
-      "wind": 9.4,
-      "weather_desc": "9mph \u2600\ufe0f",
+      "wind": 8.8,
+      "weather_desc": "8mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -2602,7 +2602,7 @@
           }
         ]
       },
-      "narrative": "Santos is a risky option this week. The offense has a massive implied total of 23.0."
+      "narrative": "Santos is a risky option this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "C.Little",
@@ -2657,10 +2657,10 @@
       "spread_display": "-13.5",
       "is_dome": false,
       "weather_data": [
-        14.9,
+        14.4,
         "14mph \u2600\ufe0f"
       ],
-      "wind": 14.9,
+      "wind": 14.4,
       "weather_desc": "14mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -2725,7 +2725,7 @@
           }
         ]
       },
-      "narrative": "Consider Little if you need a fill-in. The offense has a massive implied total of 27.5."
+      "narrative": "Fade Little if possible. The offense has a massive implied total of 27.5."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -2850,7 +2850,7 @@
           }
         ]
       },
-      "narrative": "Fire up Ryland with confidence. The offense has a massive implied total of 16.0."
+      "narrative": "You can trust Ryland in your lineup. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "J.Elliott",
@@ -2905,11 +2905,11 @@
       "spread_display": "-12.5",
       "is_dome": false,
       "weather_data": [
-        15.2,
-        "15mph \ud83c\udf2c\ufe0f"
+        14.2,
+        "14mph \u2600\ufe0f"
       ],
-      "wind": 15.2,
-      "weather_desc": "15mph \ud83c\udf2c\ufe0f",
+      "wind": 14.2,
+      "weather_desc": "14mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -2973,7 +2973,7 @@
           }
         ]
       },
-      "narrative": "Consider Elliott if you need a fill-in. Heavy winds (15.2 mph) could limit opportunities."
+      "narrative": "Consider Elliott if you need a fill-in. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -3028,10 +3028,10 @@
       "spread_display": "-1.5",
       "is_dome": false,
       "weather_data": [
-        7.1,
+        7.3,
         "7mph \u2600\ufe0f"
       ],
-      "wind": 7.1,
+      "wind": 7.3,
       "weather_desc": "7mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -3096,7 +3096,7 @@
           }
         ]
       },
-      "narrative": "You can trust Prater in your lineup. The matchup is favorable against a porous defense."
+      "narrative": "You can trust Prater in your lineup. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -3151,11 +3151,11 @@
       "spread_display": "-1.5",
       "is_dome": false,
       "weather_data": [
-        2.9,
-        "2mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 2.9,
-      "weather_desc": "2mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -3219,7 +3219,7 @@
           }
         ]
       },
-      "narrative": "McManus is a risky option this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "McManus is a viable streaming option. His offense has a high stall rate (46.2%)."
     },
     {
       "kicker_player_name": "W.Reichard",
@@ -3344,7 +3344,7 @@
           }
         ]
       },
-      "narrative": "Reichard is a risky option this week. The matchup is favorable against a porous defense."
+      "narrative": "Reichard is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 21.0."
     },
     {
       "kicker_player_name": "B.Grupe",
@@ -3399,11 +3399,11 @@
       "spread_display": "+13.5",
       "is_dome": false,
       "weather_data": [
-        8.7,
-        "8mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 8.7,
-      "weather_desc": "8mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -3467,7 +3467,7 @@
           }
         ]
       },
-      "narrative": "You can trust Grupe in your lineup. Be cautious, as the team has a low implied total."
+      "narrative": "Consider Grupe if you need a fill-in. His offense has a high stall rate (50.0%)."
     },
     {
       "kicker_player_name": "Y.Koo",
@@ -3522,10 +3522,10 @@
       "spread_display": "-2.5",
       "is_dome": false,
       "weather_data": [
-        11.6,
+        11.4,
         "11mph \u2600\ufe0f"
       ],
-      "wind": 11.6,
+      "wind": 11.4,
       "weather_desc": "11mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -3590,7 +3590,7 @@
           }
         ]
       },
-      "narrative": "Koo is a risky option this week. The offense has a massive implied total of 24.5."
+      "narrative": "You can trust Koo in your lineup. The offense has a massive implied total of 24.5."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -3645,11 +3645,11 @@
       "spread_display": "-3.0",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        8.5,
+        "8mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 8.5,
+      "weather_desc": "8mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -3713,7 +3713,7 @@
           }
         ]
       },
-      "narrative": "Boswell is a locked-and-loaded RB1 of kickers this week. His offense has a high stall rate (40.0%)."
+      "narrative": "Boswell is a risky option this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -3768,11 +3768,11 @@
       "spread_display": "+12.5",
       "is_dome": false,
       "weather_data": [
-        15.2,
-        "15mph \ud83c\udf2c\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 15.2,
-      "weather_desc": "15mph \ud83c\udf2c\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -3836,7 +3836,7 @@
           }
         ]
       },
-      "narrative": "Carlson is a locked-and-loaded RB1 of kickers this week. The matchup is favorable against a porous defense."
+      "narrative": "Carlson is a risky option this week. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -3891,11 +3891,11 @@
       "spread_display": "+7.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        8.8,
+        "8mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 8.8,
+      "weather_desc": "8mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -3959,7 +3959,7 @@
           }
         ]
       },
-      "narrative": "Fire up Szmyt with confidence. Be cautious, as the team has a low implied total."
+      "narrative": "Szmyt is a viable streaming option. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "C.Smyth",
@@ -4264,10 +4264,10 @@
       "spread_display": "-2.5",
       "is_dome": false,
       "weather_data": [
-        11.6,
+        11.4,
         "11mph \u2600\ufe0f"
       ],
-      "wind": 11.6,
+      "wind": 11.4,
       "weather_desc": "11mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -4514,10 +4514,10 @@
       "spread_display": "-2.5",
       "is_dome": false,
       "weather_data": [
-        11.6,
+        11.4,
         "11mph \u2600\ufe0f"
       ],
-      "wind": 11.6,
+      "wind": 11.4,
       "weather_desc": "11mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -4764,11 +4764,11 @@
       "spread_display": "+13.5",
       "is_dome": false,
       "weather_data": [
-        8.7,
-        "8mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 8.7,
-      "weather_desc": "8mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -4889,11 +4889,11 @@
       "spread_display": "-1.5",
       "is_dome": false,
       "weather_data": [
-        2.9,
-        "2mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 2.9,
-      "weather_desc": "2mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -5014,11 +5014,11 @@
       "spread_display": "+13.5",
       "is_dome": false,
       "weather_data": [
-        8.7,
-        "8mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 8.7,
-      "weather_desc": "8mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
