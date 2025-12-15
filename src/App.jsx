@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock, Bot } from 'lucide-react';
-// import { Analytics } from '@vercel/analytics/react';
+// import { Analytics from '@vercel/analytics/react';
 
 import { DEFAULT_SCORING } from './data/constants';
 import { calcFPts, calcProj, fetchSleeperScores } from './utils/scoring';
@@ -12,7 +12,7 @@ import GlossaryTab from './components/GlossaryTab';
 
 const App = () => {
   const [data, setData] = useState(null);
-  const [historyData, setHistoryData] = useState(null); // NEW STATE FOR HISTORY
+  const [historyData, setHistoryData] = useState(null);
   const [activeTab, setActiveTab] = useState('potential');
   const [expandedRow, setExpandedRow] = useState(null);
   const [scoring, setScoring] = useState(DEFAULT_SCORING);
@@ -49,10 +49,9 @@ const App = () => {
       };
       
       try {
-          // Fetch both main data and history data
           const [main, history] = await Promise.all([
               fetchJson('/kicker_data.json'),
-              fetchJson('/history_data.json').catch(() => ({ history: {} })) // Fail gracefully if history is missing/empty
+              fetchJson('/history_data.json').catch(() => ({ history: {} }))
           ]);
           
           setData(main);
@@ -84,7 +83,7 @@ const App = () => {
     if (savedTakenKickers) { try { setSleeperTakenKickers(new Set(JSON.parse(savedTakenKickers))); } catch (e) {} }
     if (savedIdMap) { try { setSleeperIdMap(JSON.parse(savedIdMap)); } catch (e) {} }
 
-    fetchData(); // Load data on mount
+    fetchData(); 
   }, [fetchData]);
 
   // --- POLLING FOR LIVE SCORES ---
@@ -124,10 +123,12 @@ const App = () => {
       setSleeperLoading(true);
       setSleeperScoringUpdated(false);
       try {
+          // --- 1. Fetch Rosters ---
           const rostersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/rosters`);
           if (!rostersRes.ok) throw new Error("League ID invalid or private.");
           const rosters = await rostersRes.json();
           
+          // --- 2. Fetch League Data ---
           const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
           const leagueData = await leagueRes.json();
           
@@ -135,6 +136,7 @@ const App = () => {
           setSleeperLeagueName(leagueName);
           localStorage.setItem('sleeper_league_name', leagueName);
 
+          // --- 3. Sync Scoring Settings ---
           if (leagueData.scoring_settings) {
              const s = leagueData.scoring_settings;
              const genMiss = s.fgmiss || 0;
@@ -161,35 +163,52 @@ const App = () => {
 
           let myUserId = null;
           if (sleeperUser) {
+             // --- 4. Fetch Users (CRASH POINT) ---
              const usersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/users`);
-             const users = usersRes.json();
+             // Check response validity
+             if (!usersRes.ok) throw new Error("Could not retrieve user list from Sleeper.");
+
+             const users = await usersRes.json();
+             
+             // FIX: Robust check to ensure 'users' is an array before using .find()
+             if (!Array.isArray(users)) {
+                 console.error("Sleeper API returned non-array for users:", users);
+                 throw new Error("Sleeper user data is invalid or malformed.");
+             }
+
              const me = users.find(u => u.display_name.toLowerCase() === sleeperUser.toLowerCase());
              if (me) myUserId = me.user_id;
           }
 
+          // --- 5. Fetch Player Metadata ---
           const playersRes = await fetch('https://api.sleeper.app/v1/players/nfl'); 
-          const allPlayers = playersRes.json();
+          // Note: The player fetch should return an object/map, not an array.
+          // This part looks correct if 'allPlayers' is a map {id: player_object}
+          const allPlayers = await playersRes.json();
 
           const mySet = new Set();
           const takenSet = new Set();
           const newIdMap = {}; 
 
-          rosters.forEach(roster => {
-              const isMine = roster.owner_id === myUserId;
-              roster.players.forEach(playerId => {
-                  const player = allPlayers[playerId];
-                  if (player && player.position === 'K') {
-                      const first = player.first_name.charAt(0);
-                      const last = player.last_name;
-                      const joinName = `${first}.${last}`;
-                      
-                      newIdMap[joinName] = playerId; 
-
-                      if (isMine) mySet.add(joinName);
-                      else takenSet.add(joinName);
-                  }
+          // --- 6. Process Rosters ---
+          if (Array.isArray(rosters)) {
+              rosters.forEach(roster => {
+                  const isMine = roster.owner_id === myUserId;
+                  roster.players.forEach(playerId => {
+                      const player = allPlayers[playerId];
+                      if (player && player.position === 'K') {
+                          const first = player.first_name.charAt(0);
+                          const last = player.last_name;
+                          const joinName = `${first}.${last}`;
+                          
+                          newIdMap[joinName] = playerId; 
+    
+                          if (isMine) mySet.add(joinName);
+                          else takenSet.add(joinName);
+                      }
+                  });
               });
-          });
+          }
 
           setSleeperMyKickers(mySet);
           setSleeperTakenKickers(takenSet);
@@ -202,10 +221,11 @@ const App = () => {
           localStorage.setItem('sleeper_id_map', JSON.stringify(newIdMap));
           
           setSleeperLoading(false);
+          alert(`Sync Successful! League: ${leagueName}`);
       } catch (err) {
           console.error("Sleeper Sync Failed", err);
           setSleeperLoading(false);
-          alert(`Sync Failed: ${err.message}. Check League ID.`);
+          alert(`Sync Failed: ${err.message}. Please verify your League ID and Sleeper Username.`);
       }
   };
 
