@@ -10028,7 +10028,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 0,
         "xp_made": 2,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       },
       {
         "id": "00-0039059",
@@ -10047,7 +10048,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 0,
         "xp_made": 0,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       },
       {
         "id": "00-0039498",
@@ -10066,7 +10068,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 1,
         "xp_made": 4,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       }
     ]
   }
