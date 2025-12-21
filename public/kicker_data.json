@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 16,
-    "updated": "2025-12-21 06:41",
+    "updated": "2025-12-21 07:27",
     "league_avgs": {
       "fpts": 88.4,
       "off_stall": 46.2,
@@ -134,7 +134,7 @@
           }
         ]
       },
-      "narrative": "Fade Aubrey if possible. The matchup is favorable against a porous defense."
+      "narrative": "Aubrey is a viable streaming option. The offense has a massive implied total of 26.0."
     },
     {
       "kicker_player_name": "E.Pineiro",
@@ -259,7 +259,7 @@
           }
         ]
       },
-      "narrative": "Consider Pineiro if you need a fill-in. The offense has a massive implied total of 26.0."
+      "narrative": "Pineiro is a risky option this week. His offense has a high stall rate (41.7%)."
     },
     {
       "kicker_player_name": "J.Myers",
@@ -382,7 +382,7 @@
           }
         ]
       },
-      "narrative": "Myers is a viable streaming option. Playing in a dome guarantees perfect conditions."
+      "narrative": "Myers is a viable streaming option. His offense has a high stall rate (62.5%)."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -507,7 +507,7 @@
           }
         ]
       },
-      "narrative": "Consider Fairbairn if you need a fill-in. Playing in a dome guarantees perfect conditions."
+      "narrative": "Fire up Fairbairn with confidence. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -632,7 +632,7 @@
           }
         ]
       },
-      "narrative": "Fade Gonzalez if possible. Be cautious, as the team has a low implied total."
+      "narrative": "Gonzalez is a locked-and-loaded RB1 of kickers this week. His offense has a high stall rate (38.5%)."
     },
     {
       "kicker_player_name": "C.Dicker",
@@ -757,7 +757,7 @@
           }
         ]
       },
-      "narrative": "Dicker is a strong play this week. His offense has a high stall rate (50.0%)."
+      "narrative": "Fire up Dicker with confidence. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "M.Gay",
@@ -882,7 +882,7 @@
           }
         ]
       },
-      "narrative": "Gay is a strong play this week. The offense has a massive implied total of 26.0."
+      "narrative": "You can trust Gay in your lineup. The offense has a massive implied total of 26.0."
     },
     {
       "kicker_player_name": "A.Borregales",
@@ -1005,7 +1005,7 @@
           }
         ]
       },
-      "narrative": "Consider Borregales if you need a fill-in. His offense has a high stall rate (72.7%)."
+      "narrative": "Borregales is a risky option this week. Heavy winds (2.7 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -1060,11 +1060,11 @@
       "spread_display": "+3.0",
       "is_dome": false,
       "weather_data": [
-        11.1,
-        "11mph \u2600\ufe0f"
+        10.4,
+        "10mph \u2600\ufe0f"
       ],
-      "wind": 11.1,
-      "weather_desc": "11mph \u2600\ufe0f",
+      "wind": 10.4,
+      "weather_desc": "10mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -1128,7 +1128,7 @@
           }
         ]
       },
-      "narrative": "Fire up Slye with confidence. Playing in a dome guarantees perfect conditions."
+      "narrative": "Fade Slye if possible. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -1253,7 +1253,7 @@
           }
         ]
       },
-      "narrative": "Bates is a locked-and-loaded RB1 of kickers this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "Fade Bates if possible. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "N.Folk",
@@ -1378,7 +1378,7 @@
           }
         ]
       },
-      "narrative": "Folk is a strong play this week. The matchup is favorable against a porous defense."
+      "narrative": "Fade Folk if possible. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -1501,7 +1501,7 @@
           }
         ]
       },
-      "narrative": "Fire up Mevis with confidence. Be cautious, as the team has a low implied total."
+      "narrative": "You can trust Mevis in your lineup. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "W.Reichard",
@@ -1556,10 +1556,10 @@
       "spread_display": "-2.5",
       "is_dome": false,
       "weather_data": [
-        16.9,
+        16.8,
         "16mph \ud83c\udf2c\ufe0f"
       ],
-      "wind": 16.9,
+      "wind": 16.8,
       "weather_desc": "16mph \ud83c\udf2c\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -1624,7 +1624,7 @@
           }
         ]
       },
-      "narrative": "Fire up Reichard with confidence. Be cautious, as the team has a low implied total."
+      "narrative": "You can trust Reichard in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "R.Patterson",
@@ -1679,10 +1679,10 @@
       "spread_display": "+4.5",
       "is_dome": false,
       "weather_data": [
-        7.9,
+        7.1,
         "7mph \u2600\ufe0f"
       ],
-      "wind": 7.9,
+      "wind": 7.1,
       "weather_desc": "7mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -1747,7 +1747,7 @@
           }
         ]
       },
-      "narrative": "Patterson is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 22.0."
+      "narrative": "You can trust Patterson in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -1872,7 +1872,7 @@
           }
         ]
       },
-      "narrative": "Fire up Boswell with confidence. Heavy winds (0.0 mph) could limit opportunities."
+      "narrative": "Consider Boswell if you need a fill-in. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "B.Grupe",
@@ -1997,7 +1997,7 @@
           }
         ]
       },
-      "narrative": "Fire up Grupe with confidence. His offense has a high stall rate (50.0%)."
+      "narrative": "Grupe is a viable streaming option. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "C.Little",
@@ -2052,11 +2052,11 @@
       "spread_display": "+3.5",
       "is_dome": false,
       "weather_data": [
-        4.5,
-        "4mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 4.5,
-      "weather_desc": "4mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -2120,7 +2120,7 @@
           }
         ]
       },
-      "narrative": "Little is a strong play this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "You can trust Little in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -2243,7 +2243,7 @@
           }
         ]
       },
-      "narrative": "Moody is a risky option this week. The offense has a massive implied total of 18.2."
+      "narrative": "Moody is a risky option this week. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -2298,11 +2298,11 @@
       "spread_display": "-3.5",
       "is_dome": false,
       "weather_data": [
-        0,
-        "Outdoors \u2600\ufe0f"
+        2.8,
+        "2mph \u2600\ufe0f"
       ],
-      "wind": 0.0,
-      "weather_desc": "Outdoors \u2600\ufe0f",
+      "wind": 2.8,
+      "weather_desc": "2mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -2366,7 +2366,7 @@
           }
         ]
       },
-      "narrative": "You can trust Lutz in your lineup. The matchup is favorable against a porous defense."
+      "narrative": "Lutz is a strong play this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -2489,7 +2489,7 @@
           }
         ]
       },
-      "narrative": "McManus is a viable streaming option. Playing in a dome guarantees perfect conditions."
+      "narrative": "You can trust McManus in your lineup. Heavy winds (0.0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -2544,11 +2544,11 @@
       "spread_display": "-3.0",
       "is_dome": false,
       "weather_data": [
-        10.2,
-        "10mph \u2600\ufe0f"
+        8.4,
+        "8mph \u2600\ufe0f"
       ],
-      "wind": 10.2,
-      "weather_desc": "10mph \u2600\ufe0f",
+      "wind": 8.4,
+      "weather_desc": "8mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -2612,7 +2612,7 @@
           }
         ]
       },
-      "narrative": "McLaughlin is a risky option this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "McLaughlin is a strong play this week. The offense has a massive implied total of 24.2."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -2735,7 +2735,7 @@
           }
         ]
       },
-      "narrative": "Fire up Loop with confidence. His offense has a high stall rate (66.7%)."
+      "narrative": "Loop is a risky option this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "R.Fitzgerald",
@@ -2790,11 +2790,11 @@
       "spread_display": "+3.0",
       "is_dome": false,
       "weather_data": [
-        10.2,
-        "10mph \u2600\ufe0f"
+        8.4,
+        "8mph \u2600\ufe0f"
       ],
-      "wind": 10.2,
-      "weather_desc": "10mph \u2600\ufe0f",
+      "wind": 8.4,
+      "weather_desc": "8mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -2858,7 +2858,7 @@
           }
         ]
       },
-      "narrative": "Fade Fitzgerald if possible. His offense has a high stall rate (87.5%)."
+      "narrative": "Fitzgerald is a strong play this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -2913,10 +2913,10 @@
       "spread_display": "-4.5",
       "is_dome": false,
       "weather_data": [
-        7.9,
+        7.1,
         "7mph \u2600\ufe0f"
       ],
-      "wind": 7.9,
+      "wind": 7.1,
       "weather_desc": "7mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -2981,7 +2981,7 @@
           }
         ]
       },
-      "narrative": "McPherson is a strong play this week. Heavy winds (7.9 mph) could limit opportunities."
+      "narrative": "Fade McPherson if possible. His offense has a high stall rate (50.0%)."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -3036,11 +3036,11 @@
       "spread_display": "-3.0",
       "is_dome": false,
       "weather_data": [
-        11.1,
-        "11mph \u2600\ufe0f"
+        0,
+        "Outdoors \u2600\ufe0f"
       ],
-      "wind": 11.1,
-      "weather_desc": "11mph \u2600\ufe0f",
+      "wind": 0.0,
+      "weather_desc": "Outdoors \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -3104,7 +3104,7 @@
           }
         ]
       },
-      "narrative": "Butker is a risky option this week. The matchup is favorable against a porous defense."
+      "narrative": "Consider Butker if you need a fill-in. The offense has a massive implied total of 20.2."
     },
     {
       "kicker_player_name": "J.Elliott",
@@ -3227,7 +3227,7 @@
           }
         ]
       },
-      "narrative": "Fire up Elliott with confidence. Be cautious, as the team has a low implied total."
+      "narrative": "Elliott is a viable streaming option. His offense has a high stall rate (56.2%)."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -3352,7 +3352,7 @@
           }
         ]
       },
-      "narrative": "Ryland is a locked-and-loaded RB1 of kickers this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "Fire up Ryland with confidence. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "C.Smyth",
@@ -3600,7 +3600,7 @@
           }
         ]
       },
-      "narrative": "Santos is a strong play this week. The offense has a massive implied total of 23.5."
+      "narrative": "Santos is a viable streaming option. The offense has a massive implied total of 23.5."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -3655,11 +3655,11 @@
       "spread_display": "+10.5",
       "is_dome": false,
       "weather_data": [
-        15.4,
-        "15mph \ud83c\udf2c\ufe0f"
+        14.9,
+        "14mph \u2600\ufe0f"
       ],
-      "wind": 15.4,
-      "weather_desc": "15mph \ud83c\udf2c\ufe0f",
+      "wind": 14.9,
+      "weather_desc": "14mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -3723,7 +3723,130 @@
           }
         ]
       },
-      "narrative": "Szmyt is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
+      "narrative": "Szmyt is a viable streaming option. Be cautious, as the team has a low implied total."
+    },
+    {
+      "kicker_player_name": "Y.Koo",
+      "kicker_player_id": "00-0033702",
+      "team": "NYG",
+      "fg_made": 6,
+      "fg_att": 9,
+      "fg_0_19": 1,
+      "fg_20_29": 1,
+      "fg_30_39": 2,
+      "fg_40_49": 2,
+      "fg_50_59": 0,
+      "fg_60_plus": 0,
+      "fg_miss": 3,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 0,
+      "fg_miss_40_49": 1,
+      "fg_miss_50_59": 2,
+      "fg_miss_60_plus": 0,
+      "xp_made": 13,
+      "xp_miss": 1,
+      "real_pts": 31,
+      "dome_kicks": 10,
+      "total_kicks": 23,
+      "games": 6,
+      "status": "TRD",
+      "posteam": "NYG",
+      "rz_trips": 62,
+      "acc": 66.7,
+      "dome_pct": 43.0,
+      "fpts": 29,
+      "avg_pts": 4.8,
+      "join_name": "Y.Koo",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/d6k1yzhzj3mikcheisnm",
+      "match_name": "Y.Koo",
+      "own_pct": 20.2,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": 0,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active",
+      "opponent": "MIN",
+      "roof": "outdoors",
+      "game_dt": "2025-12-21 13:00",
+      "total_line": 43.5,
+      "spread_line": -2.5,
+      "home_field": "NYG",
+      "vegas_implied": 20.5,
+      "is_home": true,
+      "spread_display": "+2.5",
+      "is_dome": false,
+      "weather_data": [
+        16.8,
+        "16mph \ud83c\udf2c\ufe0f"
+      ],
+      "wind": 16.8,
+      "weather_desc": "16mph \ud83c\udf2c\ufe0f",
+      "wk_fg_0_19": 0.0,
+      "wk_fg_20_29": 0.0,
+      "wk_fg_30_39": 0.0,
+      "wk_fg_40_49": 0.0,
+      "wk_fg_50_59": 0.0,
+      "wk_fg_60_plus": 0.0,
+      "wk_fg_miss": 0.0,
+      "wk_xp_made": 0.0,
+      "wk_xp_miss": 0.0,
+      "wk_fg_miss_0_19": 0.0,
+      "wk_fg_miss_20_29": 0.0,
+      "wk_fg_miss_30_39": 0.0,
+      "wk_fg_miss_40_49": 0.0,
+      "wk_fg_miss_50_59": 0.0,
+      "wk_fg_miss_60_plus": 0.0,
+      "off_stall_rate": 42.9,
+      "off_ppg": 21.0,
+      "off_share": 0.10476190476190475,
+      "def_stall_rate": 58.3,
+      "def_pa": 18.8,
+      "def_share": 0.358974358974359,
+      "aggression_pct": 100.0,
+      "grade": 87.3,
+      "proj": 4.8,
+      "grade_details": [],
+      "off_score_val": 37.1,
+      "def_score_val": 50.1,
+      "w_team_score": 20.6,
+      "w_def_allowed": 20.0,
+      "off_cap_val": 2.6,
+      "def_cap_val": 8.6,
+      "details_vegas_total": 43.5,
+      "details_vegas_spread": "+2.5",
+      "history": {
+        "l3_actual": 2,
+        "l3_proj": 10.3,
+        "l3_games": [
+          {
+            "week": 15,
+            "status": "ACTIVE",
+            "proj": 5.5,
+            "act": 1,
+            "diff": -4.5,
+            "opp": "WAS"
+          },
+          {
+            "week": 14,
+            "status": "BYE",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "BYE"
+          },
+          {
+            "week": 13,
+            "status": "ACTIVE",
+            "proj": 4.8,
+            "act": 1,
+            "diff": -3.8,
+            "opp": "NE"
+          }
+        ]
+      },
+      "narrative": "Koo is a locked-and-loaded RB1 of kickers this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -3848,132 +3971,7 @@
           }
         ]
       },
-      "narrative": "Fire up Carlson with confidence. Heavy winds (0.0 mph) could limit opportunities."
-    },
-    {
-      "kicker_player_name": "J.Karty",
-      "kicker_player_id": "00-0039750",
-      "team": "LA",
-      "fg_made": 10,
-      "fg_att": 15,
-      "fg_0_19": 0,
-      "fg_20_29": 3,
-      "fg_30_39": 3,
-      "fg_40_49": 3,
-      "fg_50_59": 1,
-      "fg_60_plus": 0,
-      "fg_miss": 5,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 1,
-      "fg_miss_30_39": 2,
-      "fg_miss_40_49": 1,
-      "fg_miss_50_59": 1,
-      "fg_miss_60_plus": 0,
-      "xp_made": 23,
-      "xp_miss": 3,
-      "real_pts": 53,
-      "dome_kicks": 18,
-      "total_kicks": 41,
-      "games": 8,
-      "status": "DEV",
-      "posteam": "LA",
-      "rz_trips": 86,
-      "acc": 66.7,
-      "dome_pct": 44.0,
-      "fpts": 50,
-      "avg_pts": 6.2,
-      "join_name": "J.Karty",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/j51z79en8vs3qdgkvnn5",
-      "match_name": "J.Karty",
-      "own_pct": 3.9,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": "DEV",
-      "injury_status": "Practice Squad",
-      "injury_color": "yellow-500",
-      "injury_details": "Roster: Practice Squad",
-      "opponent": "SEA",
-      "roof": "outdoors",
-      "game_dt": "2025-12-18 20:15",
-      "total_line": 42.5,
-      "spread_line": 1.5,
-      "home_field": "SEA",
-      "vegas_implied": 20.5,
-      "is_home": false,
-      "spread_display": "+1.5",
-      "is_dome": false,
-      "weather_data": [
-        0,
-        "Game Finished"
-      ],
-      "wind": 0.0,
-      "weather_desc": "Game Finished",
-      "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 0.0,
-      "wk_fg_30_39": 0.0,
-      "wk_fg_40_49": 0.0,
-      "wk_fg_50_59": 0.0,
-      "wk_fg_60_plus": 0.0,
-      "wk_fg_miss": 0.0,
-      "wk_xp_made": 0.0,
-      "wk_xp_miss": 0.0,
-      "wk_fg_miss_0_19": 0.0,
-      "wk_fg_miss_20_29": 0.0,
-      "wk_fg_miss_30_39": 0.0,
-      "wk_fg_miss_40_49": 0.0,
-      "wk_fg_miss_50_59": 0.0,
-      "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 39.3,
-      "off_ppg": 37.0,
-      "off_share": 0.2406252942838309,
-      "def_stall_rate": 60.0,
-      "def_pa": 12.2,
-      "def_share": 0.49408783783783783,
-      "aggression_pct": 18.2,
-      "grade": 0.0,
-      "proj": 0.0,
-      "grade_details": [
-        "\u26d4 Practice Squad"
-      ],
-      "off_score_val": 0.0,
-      "def_score_val": 0.0,
-      "w_team_score": 0.0,
-      "w_def_allowed": 0.0,
-      "off_cap_val": 0.0,
-      "def_cap_val": 0.0,
-      "details_vegas_total": 42.5,
-      "details_vegas_spread": "+1.5",
-      "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
-        "l3_games": [
-          {
-            "week": 15,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "DET"
-          },
-          {
-            "week": 14,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "ARI"
-          },
-          {
-            "week": 13,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "CAR"
-          }
-        ]
-      },
-      "narrative": "Monitor status closely as they are currently listed as Practice Squad. This significantly impacts their viability for Week ."
+      "narrative": "Carlson is a strong play this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "G.Gano",
@@ -4028,10 +4026,10 @@
       "spread_display": "+2.5",
       "is_dome": false,
       "weather_data": [
-        16.9,
+        16.8,
         "16mph \ud83c\udf2c\ufe0f"
       ],
-      "wind": 16.9,
+      "wind": 16.8,
       "weather_desc": "16mph \ud83c\udf2c\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -4278,10 +4276,10 @@
       "spread_display": "+2.5",
       "is_dome": false,
       "weather_data": [
-        16.9,
+        16.8,
         "16mph \ud83c\udf2c\ufe0f"
       ],
-      "wind": 16.9,
+      "wind": 16.8,
       "weather_desc": "16mph \ud83c\udf2c\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
@@ -4351,54 +4349,54 @@
       "narrative": "Monitor status closely as they are currently listed as Practice Squad. This significantly impacts their viability for Week ."
     },
     {
-      "kicker_player_name": "L.Havrisik",
-      "kicker_player_id": "00-0038152",
-      "team": "GB",
-      "fg_made": 4,
-      "fg_att": 4,
+      "kicker_player_name": "J.Karty",
+      "kicker_player_id": "00-0039750",
+      "team": "LA",
+      "fg_made": 10,
+      "fg_att": 15,
       "fg_0_19": 0,
-      "fg_20_29": 0,
-      "fg_30_39": 2,
-      "fg_40_49": 1,
-      "fg_50_59": 0,
-      "fg_60_plus": 1,
-      "fg_miss": 0,
+      "fg_20_29": 3,
+      "fg_30_39": 3,
+      "fg_40_49": 3,
+      "fg_50_59": 1,
+      "fg_60_plus": 0,
+      "fg_miss": 5,
       "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 0,
-      "fg_miss_50_59": 0,
+      "fg_miss_20_29": 1,
+      "fg_miss_30_39": 2,
+      "fg_miss_40_49": 1,
+      "fg_miss_50_59": 1,
       "fg_miss_60_plus": 0,
-      "xp_made": 7,
-      "xp_miss": 2,
-      "real_pts": 19,
-      "dome_kicks": 5,
-      "total_kicks": 13,
-      "games": 3,
+      "xp_made": 23,
+      "xp_miss": 3,
+      "real_pts": 53,
+      "dome_kicks": 18,
+      "total_kicks": 41,
+      "games": 8,
       "status": "DEV",
-      "posteam": "GB",
-      "rz_trips": 63,
-      "acc": 100.0,
-      "dome_pct": 38.0,
-      "fpts": 20,
-      "avg_pts": 6.7,
-      "join_name": "L.Havrisik",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
-      "match_name": "L.Havrisik",
-      "own_pct": 0.8,
+      "posteam": "LA",
+      "rz_trips": 86,
+      "acc": 66.7,
+      "dome_pct": 44.0,
+      "fpts": 50,
+      "avg_pts": 6.2,
+      "join_name": "J.Karty",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/j51z79en8vs3qdgkvnn5",
+      "match_name": "J.Karty",
+      "own_pct": 3.9,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": "DEV",
       "injury_status": "Practice Squad",
       "injury_color": "yellow-500",
       "injury_details": "Roster: Practice Squad",
-      "opponent": "CHI",
+      "opponent": "SEA",
       "roof": "outdoors",
-      "game_dt": "2025-12-20 20:20",
-      "total_line": 45.5,
+      "game_dt": "2025-12-18 20:15",
+      "total_line": 42.5,
       "spread_line": 1.5,
-      "home_field": "CHI",
-      "vegas_implied": 22.0,
+      "home_field": "SEA",
+      "vegas_implied": 20.5,
       "is_home": false,
       "spread_display": "+1.5",
       "is_dome": false,
@@ -4423,13 +4421,13 @@
       "wk_fg_miss_40_49": 0.0,
       "wk_fg_miss_50_59": 0.0,
       "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 53.8,
-      "off_ppg": 27.0,
-      "off_share": 0.22678128323289612,
-      "def_stall_rate": 50.0,
-      "def_pa": 18.5,
-      "def_share": 0.33571428571428574,
-      "aggression_pct": 40.0,
+      "off_stall_rate": 39.3,
+      "off_ppg": 37.0,
+      "off_share": 0.2406252942838309,
+      "def_stall_rate": 60.0,
+      "def_pa": 12.2,
+      "def_share": 0.49408783783783783,
+      "aggression_pct": 18.2,
       "grade": 0.0,
       "proj": 0.0,
       "grade_details": [
@@ -4441,7 +4439,7 @@
       "w_def_allowed": 0.0,
       "off_cap_val": 0.0,
       "def_cap_val": 0.0,
-      "details_vegas_total": 45.5,
+      "details_vegas_total": 42.5,
       "details_vegas_spread": "+1.5",
       "history": {
         "l3_actual": 0,
@@ -4453,7 +4451,7 @@
             "proj": 0,
             "act": 0,
             "diff": 0,
-            "opp": "DEN"
+            "opp": "DET"
           },
           {
             "week": 14,
@@ -4461,7 +4459,7 @@
             "proj": 0,
             "act": 0,
             "diff": 0,
-            "opp": "CHI"
+            "opp": "ARI"
           },
           {
             "week": 13,
@@ -4469,7 +4467,7 @@
             "proj": 0,
             "act": 0,
             "diff": 0,
-            "opp": "DET"
+            "opp": "CAR"
           }
         ]
       },
@@ -4528,11 +4526,11 @@
       "spread_display": "-10.5",
       "is_dome": false,
       "weather_data": [
-        15.4,
-        "15mph \ud83c\udf2c\ufe0f"
+        14.9,
+        "14mph \u2600\ufe0f"
       ],
-      "wind": 15.4,
-      "weather_desc": "15mph \ud83c\udf2c\ufe0f",
+      "wind": 14.9,
+      "weather_desc": "14mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -4778,11 +4776,11 @@
       "spread_display": "-10.5",
       "is_dome": false,
       "weather_data": [
-        15.4,
-        "15mph \ud83c\udf2c\ufe0f"
+        14.9,
+        "14mph \u2600\ufe0f"
       ],
-      "wind": 15.4,
-      "weather_desc": "15mph \ud83c\udf2c\ufe0f",
+      "wind": 14.9,
+      "weather_desc": "14mph \u2600\ufe0f",
       "wk_fg_0_19": 0.0,
       "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 0.0,
@@ -4849,6 +4847,131 @@
         ]
       },
       "narrative": "Monitor status closely as they are currently listed as OUT. This significantly impacts their viability for Week ."
+    },
+    {
+      "kicker_player_name": "L.Havrisik",
+      "kicker_player_id": "00-0038152",
+      "team": "GB",
+      "fg_made": 4,
+      "fg_att": 4,
+      "fg_0_19": 0,
+      "fg_20_29": 0,
+      "fg_30_39": 2,
+      "fg_40_49": 1,
+      "fg_50_59": 0,
+      "fg_60_plus": 1,
+      "fg_miss": 0,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 0,
+      "fg_miss_40_49": 0,
+      "fg_miss_50_59": 0,
+      "fg_miss_60_plus": 0,
+      "xp_made": 7,
+      "xp_miss": 2,
+      "real_pts": 19,
+      "dome_kicks": 5,
+      "total_kicks": 13,
+      "games": 3,
+      "status": "DEV",
+      "posteam": "GB",
+      "rz_trips": 63,
+      "acc": 100.0,
+      "dome_pct": 38.0,
+      "fpts": 20,
+      "avg_pts": 6.7,
+      "join_name": "L.Havrisik",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
+      "match_name": "L.Havrisik",
+      "own_pct": 0.8,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": "DEV",
+      "injury_status": "Practice Squad",
+      "injury_color": "yellow-500",
+      "injury_details": "Roster: Practice Squad",
+      "opponent": "CHI",
+      "roof": "outdoors",
+      "game_dt": "2025-12-20 20:20",
+      "total_line": 45.5,
+      "spread_line": 1.5,
+      "home_field": "CHI",
+      "vegas_implied": 22.0,
+      "is_home": false,
+      "spread_display": "+1.5",
+      "is_dome": false,
+      "weather_data": [
+        0,
+        "Game Finished"
+      ],
+      "wind": 0.0,
+      "weather_desc": "Game Finished",
+      "wk_fg_0_19": 0.0,
+      "wk_fg_20_29": 0.0,
+      "wk_fg_30_39": 0.0,
+      "wk_fg_40_49": 0.0,
+      "wk_fg_50_59": 0.0,
+      "wk_fg_60_plus": 0.0,
+      "wk_fg_miss": 0.0,
+      "wk_xp_made": 0.0,
+      "wk_xp_miss": 0.0,
+      "wk_fg_miss_0_19": 0.0,
+      "wk_fg_miss_20_29": 0.0,
+      "wk_fg_miss_30_39": 0.0,
+      "wk_fg_miss_40_49": 0.0,
+      "wk_fg_miss_50_59": 0.0,
+      "wk_fg_miss_60_plus": 0.0,
+      "off_stall_rate": 53.8,
+      "off_ppg": 27.0,
+      "off_share": 0.22678128323289612,
+      "def_stall_rate": 50.0,
+      "def_pa": 18.5,
+      "def_share": 0.33571428571428574,
+      "aggression_pct": 40.0,
+      "grade": 0.0,
+      "proj": 0.0,
+      "grade_details": [
+        "\u26d4 Practice Squad"
+      ],
+      "off_score_val": 0.0,
+      "def_score_val": 0.0,
+      "w_team_score": 0.0,
+      "w_def_allowed": 0.0,
+      "off_cap_val": 0.0,
+      "def_cap_val": 0.0,
+      "details_vegas_total": 45.5,
+      "details_vegas_spread": "+1.5",
+      "history": {
+        "l3_actual": 0,
+        "l3_proj": 0.0,
+        "l3_games": [
+          {
+            "week": 15,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "DEN"
+          },
+          {
+            "week": 14,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "CHI"
+          },
+          {
+            "week": 13,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "DET"
+          }
+        ]
+      },
+      "narrative": "Monitor status closely as they are currently listed as Practice Squad. This significantly impacts their viability for Week ."
     },
     {
       "kicker_player_name": "S.Shrader",
@@ -4974,131 +5097,6 @@
         ]
       },
       "narrative": "Monitor status closely as they are currently listed as IR. This significantly impacts their viability for Week ."
-    },
-    {
-      "kicker_player_name": "Y.Koo",
-      "kicker_player_id": "00-0033702",
-      "team": "NYG",
-      "fg_made": 6,
-      "fg_att": 9,
-      "fg_0_19": 1,
-      "fg_20_29": 1,
-      "fg_30_39": 2,
-      "fg_40_49": 2,
-      "fg_50_59": 0,
-      "fg_60_plus": 0,
-      "fg_miss": 3,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 1,
-      "fg_miss_50_59": 2,
-      "fg_miss_60_plus": 0,
-      "xp_made": 13,
-      "xp_miss": 1,
-      "real_pts": 31,
-      "dome_kicks": 10,
-      "total_kicks": 23,
-      "games": 6,
-      "status": "CUT",
-      "posteam": "NYG",
-      "rz_trips": 62,
-      "acc": 66.7,
-      "dome_pct": 43.0,
-      "fpts": 29,
-      "avg_pts": 4.8,
-      "join_name": "Y.Koo",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/d6k1yzhzj3mikcheisnm",
-      "match_name": "Y.Koo",
-      "own_pct": 20.2,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": "CUT",
-      "injury_status": "CUT",
-      "injury_color": "red-700",
-      "injury_details": "Released",
-      "opponent": "MIN",
-      "roof": "outdoors",
-      "game_dt": "2025-12-21 13:00",
-      "total_line": 43.5,
-      "spread_line": -2.5,
-      "home_field": "NYG",
-      "vegas_implied": 20.5,
-      "is_home": true,
-      "spread_display": "+2.5",
-      "is_dome": false,
-      "weather_data": [
-        16.9,
-        "16mph \ud83c\udf2c\ufe0f"
-      ],
-      "wind": 16.9,
-      "weather_desc": "16mph \ud83c\udf2c\ufe0f",
-      "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 0.0,
-      "wk_fg_30_39": 0.0,
-      "wk_fg_40_49": 0.0,
-      "wk_fg_50_59": 0.0,
-      "wk_fg_60_plus": 0.0,
-      "wk_fg_miss": 0.0,
-      "wk_xp_made": 0.0,
-      "wk_xp_miss": 0.0,
-      "wk_fg_miss_0_19": 0.0,
-      "wk_fg_miss_20_29": 0.0,
-      "wk_fg_miss_30_39": 0.0,
-      "wk_fg_miss_40_49": 0.0,
-      "wk_fg_miss_50_59": 0.0,
-      "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 42.9,
-      "off_ppg": 21.0,
-      "off_share": 0.10476190476190475,
-      "def_stall_rate": 58.3,
-      "def_pa": 18.8,
-      "def_share": 0.358974358974359,
-      "aggression_pct": 100.0,
-      "grade": 0.0,
-      "proj": 0.0,
-      "grade_details": [
-        "\u26d4 CUT"
-      ],
-      "off_score_val": 0.0,
-      "def_score_val": 0.0,
-      "w_team_score": 0.0,
-      "w_def_allowed": 0.0,
-      "off_cap_val": 0.0,
-      "def_cap_val": 0.0,
-      "details_vegas_total": 43.5,
-      "details_vegas_spread": "+2.5",
-      "history": {
-        "l3_actual": 2,
-        "l3_proj": 10.3,
-        "l3_games": [
-          {
-            "week": 15,
-            "status": "ACTIVE",
-            "proj": 5.5,
-            "act": 1,
-            "diff": -4.5,
-            "opp": "WAS"
-          },
-          {
-            "week": 14,
-            "status": "BYE",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "BYE"
-          },
-          {
-            "week": 13,
-            "status": "ACTIVE",
-            "proj": 4.8,
-            "act": 1,
-            "diff": -3.8,
-            "opp": "NE"
-          }
-        ]
-      },
-      "narrative": "Monitor status closely as they are currently listed as CUT. This significantly impacts their viability for Week ."
     }
   ],
   "ytd": [
@@ -6675,7 +6673,7 @@
       "dome_kicks": 10,
       "total_kicks": 23,
       "games": 6,
-      "status": "CUT",
+      "status": "TRD",
       "posteam": "NYG",
       "rz_trips": 62,
       "acc": 66.7,
@@ -6688,10 +6686,10 @@
       "own_pct": 20.2,
       "cbs_status": null,
       "cbs_injury": null,
-      "roster_status": "CUT",
-      "injury_status": "CUT",
-      "injury_color": "red-700",
-      "injury_details": "Released"
+      "roster_status": null,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active"
     },
     {
       "kicker_player_name": "M.Wright",
@@ -7124,49 +7122,6 @@
       "injury_status": "IR",
       "injury_color": "red-700",
       "injury_details": "Roster: RES"
-    },
-    {
-      "kicker_player_name": "Y.Koo",
-      "kicker_player_id": "00-0033702",
-      "team": "NYG",
-      "fg_made": 6,
-      "fg_att": 9,
-      "fg_0_19": 1,
-      "fg_20_29": 1,
-      "fg_30_39": 2,
-      "fg_40_49": 2,
-      "fg_50_59": 0,
-      "fg_60_plus": 0,
-      "fg_miss": 3,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 1,
-      "fg_miss_50_59": 2,
-      "fg_miss_60_plus": 0,
-      "xp_made": 13,
-      "xp_miss": 1,
-      "real_pts": 31,
-      "dome_kicks": 10,
-      "total_kicks": 23,
-      "games": 6,
-      "status": "CUT",
-      "posteam": "NYG",
-      "rz_trips": 62,
-      "acc": 66.7,
-      "dome_pct": 43.0,
-      "fpts": 29,
-      "avg_pts": 4.8,
-      "join_name": "Y.Koo",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/d6k1yzhzj3mikcheisnm",
-      "match_name": "Y.Koo",
-      "own_pct": 20.2,
-      "cbs_status": null,
-      "cbs_injury": null,
-      "roster_status": "CUT",
-      "injury_status": "CUT",
-      "injury_color": "red-700",
-      "injury_details": "Released"
     },
     {
       "kicker_player_name": "M.Wright",
