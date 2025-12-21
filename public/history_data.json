@@ -39,7 +39,7 @@
         "fg_miss": 1,
         "xp_made": 3,
         "xp_miss": 0,
-        "proj": 7.1
+        "proj": 6.9
       },
       {
         "id": "00-0029822",
@@ -199,7 +199,7 @@
         "fg_miss": 0,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 8.5
+        "proj": 8.9
       },
       {
         "id": "00-0033702",
@@ -279,7 +279,7 @@
         "fg_miss": 0,
         "xp_made": 1,
         "xp_miss": 1,
-        "proj": 7.4
+        "proj": 7.1
       },
       {
         "id": "00-0034161",
@@ -319,7 +319,7 @@
         "fg_miss": 0,
         "xp_made": 0,
         "xp_miss": 0,
-        "proj": 7.9
+        "proj": 7.8
       },
       {
         "id": "00-0035269",
@@ -359,7 +359,7 @@
         "fg_miss": 0,
         "xp_made": 2,
         "xp_miss": 0,
-        "proj": 10.2
+        "proj": 10.3
       },
       {
         "id": "00-0036816",
@@ -379,7 +379,7 @@
         "fg_miss": 0,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 8.6
+        "proj": 8.2
       },
       {
         "id": "00-0036854",
@@ -399,7 +399,7 @@
         "fg_miss": 0,
         "xp_made": 2,
         "xp_miss": 0,
-        "proj": 8.8
+        "proj": 8.9
       },
       {
         "id": "00-0037224",
@@ -419,7 +419,7 @@
         "fg_miss": 0,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 12.4
+        "proj": 12.3
       },
       {
         "id": "00-0037692",
@@ -439,7 +439,7 @@
         "fg_miss": 0,
         "xp_made": 2,
         "xp_miss": 0,
-        "proj": 12.8
+        "proj": 12.3
       },
       {
         "id": "00-0038428",
@@ -459,7 +459,7 @@
         "fg_miss": 0,
         "xp_made": 0,
         "xp_miss": 0,
-        "proj": 5.3
+        "proj": 5.4
       },
       {
         "id": "00-0038562",
@@ -559,7 +559,7 @@
         "fg_miss": 0,
         "xp_made": 0,
         "xp_miss": 0,
-        "proj": 6.7
+        "proj": 9.8
       },
       {
         "id": "00-0039404",
@@ -579,7 +579,7 @@
         "fg_miss": 0,
         "xp_made": 0,
         "xp_miss": 0,
-        "proj": 7.8
+        "proj": 7.9
       },
       {
         "id": "00-0039409",
@@ -699,7 +699,7 @@
         "fg_miss": 0,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 5.2
+        "proj": 5.5
       }
     ],
     "1": [
@@ -8745,7 +8745,7 @@
         "fg_miss": 0,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 8.3
+        "proj": 8.1
       },
       {
         "id": "00-0029822",
@@ -8905,7 +8905,7 @@
         "fg_miss": 1,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 7.4
+        "proj": 7.7
       },
       {
         "id": "00-0033787",
@@ -8985,7 +8985,7 @@
         "fg_miss": 0,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 6.7
+        "proj": 6.6
       },
       {
         "id": "00-0035358",
@@ -9005,7 +9005,7 @@
         "fg_miss": 0,
         "xp_made": 2,
         "xp_miss": 0,
-        "proj": 10.2
+        "proj": 10.3
       },
       {
         "id": "00-0036816",
@@ -9025,7 +9025,7 @@
         "fg_miss": 0,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 8.6
+        "proj": 8.2
       },
       {
         "id": "00-0036854",
@@ -9045,7 +9045,7 @@
         "fg_miss": 0,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 10.1
+        "proj": 10.2
       },
       {
         "id": "00-0037224",
@@ -9065,7 +9065,7 @@
         "fg_miss": 0,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 10.8
+        "proj": 10.7
       },
       {
         "id": "00-0037692",
@@ -9085,7 +9085,7 @@
         "fg_miss": 0,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 12.8
+        "proj": 12.3
       },
       {
         "id": "00-0038428",
@@ -9105,7 +9105,7 @@
         "fg_miss": 0,
         "xp_made": 2,
         "xp_miss": 0,
-        "proj": 6.2
+        "proj": 6.4
       },
       {
         "id": "00-0038562",
@@ -9225,7 +9225,7 @@
         "fg_miss": 1,
         "xp_made": 3,
         "xp_miss": 0,
-        "proj": 5.7
+        "proj": 8.3
       },
       {
         "id": "00-0039404",
@@ -9245,7 +9245,7 @@
         "fg_miss": 0,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 9.2
+        "proj": 9.3
       },
       {
         "id": "00-0039409",
@@ -9367,7 +9367,7 @@
         "fg_miss": 0,
         "xp_made": 2,
         "xp_miss": 0,
-        "proj": 7.1
+        "proj": 6.9
       },
       {
         "id": "00-0029822",
@@ -9507,7 +9507,7 @@
         "fg_miss": 0,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 7.4
+        "proj": 7.7
       },
       {
         "id": "00-0033702",
@@ -9627,7 +9627,7 @@
         "fg_miss": 1,
         "xp_made": 3,
         "xp_miss": 0,
-        "proj": 6.7
+        "proj": 6.6
       },
       {
         "id": "00-0035358",
@@ -9647,7 +9647,7 @@
         "fg_miss": 0,
         "xp_made": 2,
         "xp_miss": 0,
-        "proj": 10.2
+        "proj": 10.3
       },
       {
         "id": "00-0036816",
@@ -9667,7 +9667,7 @@
         "fg_miss": 0,
         "xp_made": 0,
         "xp_miss": 0,
-        "proj": 8.6
+        "proj": 8.2
       },
       {
         "id": "00-0036854",
@@ -9687,7 +9687,7 @@
         "fg_miss": 0,
         "xp_made": 0,
         "xp_miss": 0,
-        "proj": 10.1
+        "proj": 10.2
       },
       {
         "id": "00-0037224",
@@ -9707,7 +9707,7 @@
         "fg_miss": 0,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 10.8
+        "proj": 10.7
       },
       {
         "id": "00-0037692",
@@ -9727,7 +9727,7 @@
         "fg_miss": 2,
         "xp_made": 2,
         "xp_miss": 0,
-        "proj": 12.8
+        "proj": 12.3
       },
       {
         "id": "00-0038428",
@@ -9747,7 +9747,7 @@
         "fg_miss": 0,
         "xp_made": 0,
         "xp_miss": 0,
-        "proj": 5.3
+        "proj": 5.4
       },
       {
         "id": "00-0038562",
@@ -9867,7 +9867,7 @@
         "fg_miss": 0,
         "xp_made": 2,
         "xp_miss": 0,
-        "proj": 6.7
+        "proj": 9.8
       },
       {
         "id": "00-0039404",
@@ -9887,7 +9887,7 @@
         "fg_miss": 0,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 9.2
+        "proj": 9.3
       },
       {
         "id": "00-0039409",
@@ -10007,10 +10007,30 @@
         "fg_miss": 0,
         "xp_made": 2,
         "xp_miss": 0,
-        "proj": 6.1
+        "proj": 6.5
       }
     ],
     "16": [
+      {
+        "id": "00-0025565",
+        "name": "N.Folk",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 1,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 0,
+        "xp_miss": 0,
+        "proj": 0
+      },
       {
         "id": "00-0029822",
         "name": "B.McManus",
@@ -10072,6 +10092,26 @@
         "proj": 0
       },
       {
+        "id": "00-0033303",
+        "name": "H.Butker",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 0,
+        "fg_40_49": 1,
+        "fg_50_59": 1,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 1,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 1,
+        "xp_made": 0,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
         "id": "00-0033787",
         "name": "J.Elliott",
         "fg_0_19": 0,
@@ -10088,6 +10128,166 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 2,
         "xp_made": 3,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0034084",
+        "name": "M.Badgley",
+        "fg_0_19": 0,
+        "fg_20_29": 0,
+        "fg_30_39": 0,
+        "fg_40_49": 1,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 2,
+        "xp_miss": 1,
+        "proj": 0
+      },
+      {
+        "id": "00-0035192",
+        "name": "J.Slye",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 0,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 3,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0035358",
+        "name": "C.McLaughlin",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 0,
+        "fg_40_49": 0,
+        "fg_50_59": 1,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 2,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0036816",
+        "name": "R.Patterson",
+        "fg_0_19": 0,
+        "fg_20_29": 0,
+        "fg_30_39": 0,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 3,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0036854",
+        "name": "E.McPherson",
+        "fg_0_19": 0,
+        "fg_20_29": 0,
+        "fg_30_39": 0,
+        "fg_40_49": 1,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 6,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0037224",
+        "name": "C.Dicker",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 1,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 4,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0037692",
+        "name": "B.Aubrey",
+        "fg_0_19": 0,
+        "fg_20_29": 0,
+        "fg_30_39": 1,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 2,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0038428",
+        "name": "A.Szmyt",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 0,
+        "fg_40_49": 1,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 2,
         "xp_miss": 0,
         "proj": 0
       },
@@ -10132,6 +10332,46 @@
         "proj": 0
       },
       {
+        "id": "00-0039229",
+        "name": "C.Smyth",
+        "fg_0_19": 0,
+        "fg_20_29": 0,
+        "fg_30_39": 3,
+        "fg_40_49": 1,
+        "fg_50_59": 1,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 1,
+        "fg_miss": 1,
+        "xp_made": 2,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0039404",
+        "name": "W.Reichard",
+        "fg_0_19": 0,
+        "fg_20_29": 0,
+        "fg_30_39": 2,
+        "fg_40_49": 1,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 1,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
         "id": "00-0039498",
         "name": "H.Mevis",
         "fg_0_19": 0,
@@ -10148,6 +10388,66 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 1,
         "xp_made": 4,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0039634",
+        "name": "A.McNamara",
+        "fg_0_19": 0,
+        "fg_20_29": 0,
+        "fg_30_39": 0,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 0,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0040279",
+        "name": "R.Fitzgerald",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 0,
+        "fg_40_49": 2,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 2,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0040530",
+        "name": "B.Sauls",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 1,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 1,
         "xp_miss": 0,
         "proj": 0
       }
