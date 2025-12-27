@@ -10710,7 +10710,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 0,
         "xp_made": 2,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       },
       {
         "id": "00-0033303",
@@ -10729,7 +10730,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 0,
         "xp_made": 1,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       },
       {
         "id": "00-0037692",
@@ -10748,7 +10750,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 1,
         "xp_made": 3,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       },
       {
         "id": "00-0038562",
@@ -10767,7 +10770,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 0,
         "xp_made": 2,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       },
       {
         "id": "00-0039172",
@@ -10786,7 +10790,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 0,
         "xp_made": 1,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       },
       {
         "id": "00-0039404",
@@ -10805,7 +10810,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 0,
         "xp_made": 2,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       }
     ]
   }
