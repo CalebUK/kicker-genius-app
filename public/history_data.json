@@ -8805,7 +8805,7 @@
         "fg_miss": 0,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 9.2
+        "proj": 9.1
       },
       {
         "id": "00-0031492",
@@ -8925,7 +8925,7 @@
         "fg_miss": 1,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 6.3
+        "proj": 6.4
       },
       {
         "id": "00-0033862",
@@ -9427,7 +9427,7 @@
         "fg_miss": 1,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 9.2
+        "proj": 9.1
       },
       {
         "id": "00-0031492",
@@ -9547,7 +9547,7 @@
         "fg_miss": 0,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 7.2
+        "proj": 7.4
       },
       {
         "id": "00-0033862",
@@ -9607,7 +9607,7 @@
         "fg_miss": 0,
         "xp_made": 4,
         "xp_miss": 0,
-        "proj": 12.0
+        "proj": 11.6
       },
       {
         "id": "00-0035192",
@@ -10089,7 +10089,7 @@
         "fg_miss": 0,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 9.2
+        "proj": 9.1
       },
       {
         "id": "00-0031492",
@@ -10189,7 +10189,7 @@
         "fg_miss": 2,
         "xp_made": 3,
         "xp_miss": 0,
-        "proj": 7.2
+        "proj": 7.4
       },
       {
         "id": "00-0033862",
@@ -10229,7 +10229,7 @@
         "fg_miss": 0,
         "xp_made": 2,
         "xp_miss": 1,
-        "proj": 8.2
+        "proj": 7.1
       },
       {
         "id": "00-0034161",
@@ -10269,7 +10269,7 @@
         "fg_miss": 1,
         "xp_made": 6,
         "xp_miss": 0,
-        "proj": 12.0
+        "proj": 11.6
       },
       {
         "id": "00-0035192",
@@ -10689,7 +10689,7 @@
         "fg_miss": 0,
         "xp_made": 1,
         "xp_miss": 0,
-        "proj": 7.0
+        "proj": 8.5
       }
     ],
     "17": [
@@ -10750,6 +10750,26 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 1,
         "xp_made": 0,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0031203",
+        "name": "C.Santos",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 0,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 5,
         "xp_miss": 0,
         "proj": 0
       },
@@ -10830,6 +10850,86 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 0,
         "xp_made": 1,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0033787",
+        "name": "J.Elliott",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 0,
+        "fg_40_49": 1,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 1,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0034084",
+        "name": "M.Badgley",
+        "fg_0_19": 0,
+        "fg_20_29": 0,
+        "fg_30_39": 0,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 0,
+        "xp_miss": 1,
+        "proj": 0
+      },
+      {
+        "id": "00-0034161",
+        "name": "D.Carlson",
+        "fg_0_19": 0,
+        "fg_20_29": 0,
+        "fg_30_39": 0,
+        "fg_40_49": 1,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 1,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0034173",
+        "name": "E.Pineiro",
+        "fg_0_19": 0,
+        "fg_20_29": 0,
+        "fg_30_39": 0,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 6,
         "xp_miss": 0,
         "proj": 0
       },
@@ -11190,6 +11290,26 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 0,
         "xp_made": 1,
+        "xp_miss": 0,
+        "proj": 0
+      },
+      {
+        "id": "00-0040530",
+        "name": "B.Sauls",
+        "fg_0_19": 0,
+        "fg_20_29": 1,
+        "fg_30_39": 1,
+        "fg_40_49": 0,
+        "fg_50_59": 0,
+        "fg_60_plus": 0,
+        "fg_miss_0_19": 0,
+        "fg_miss_20_29": 0,
+        "fg_miss_30_39": 0,
+        "fg_miss_40_49": 0,
+        "fg_miss_50_59": 0,
+        "fg_miss_60_plus": 0,
+        "fg_miss": 0,
+        "xp_made": 4,
         "xp_miss": 0,
         "proj": 0
       }
