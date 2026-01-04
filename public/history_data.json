@@ -11392,7 +11392,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 2,
         "xp_made": 1,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       },
       {
         "id": "00-0034173",
@@ -11411,7 +11412,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 0,
         "xp_made": 0,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       },
       {
         "id": "00-0035358",
@@ -11430,7 +11432,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 1,
         "xp_made": 1,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       },
       {
         "id": "00-0040279",
@@ -11449,7 +11452,8 @@
         "fg_miss_60_plus": 0,
         "fg_miss": 1,
         "xp_made": 2,
-        "xp_miss": 0
+        "xp_miss": 0,
+        "proj": 0
       }
     ]
   }
