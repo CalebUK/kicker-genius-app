@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 18,
-    "updated": "2026-01-25 22:28",
+    "updated": "2026-01-25 23:27",
     "league_avgs": {
       "fpts": 109.4,
       "off_stall": 53.9,
@@ -134,130 +134,7 @@
           }
         ]
       },
-      "narrative": "You can trust Butker in your lineup. His offense has a high stall rate (85.7%)."
-    },
-    {
-      "kicker_player_name": "W.Lutz",
-      "kicker_player_id": "00-0032569",
-      "team": "DEN",
-      "fg_made": 32,
-      "fg_att": 36,
-      "fg_0_19": 0,
-      "fg_20_29": 12,
-      "fg_30_39": 12,
-      "fg_40_49": 3,
-      "fg_50_59": 5,
-      "fg_60_plus": 0,
-      "fg_miss": 4,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 2,
-      "fg_miss_50_59": 2,
-      "fg_miss_60_plus": 0,
-      "xp_made": 42,
-      "xp_miss": 0,
-      "real_pts": 138,
-      "dome_kicks": 16,
-      "total_kicks": 78,
-      "games": 18,
-      "status": "ACT",
-      "posteam": "DEN",
-      "rz_trips": 79,
-      "acc": 88.9,
-      "dome_pct": 21.0,
-      "fpts": 147,
-      "avg_pts": 8.2,
-      "join_name": "W.Lutz",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/lcfurzhyjudmrwjxkgfs",
-      "match_name": "W.Lutz",
-      "own_pct": 31.2,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": 0,
-      "injury_status": "Healthy",
-      "injury_color": "green",
-      "injury_details": "Active",
-      "opponent": "LAC",
-      "roof": "outdoors",
-      "game_dt": "2026-01-04 16:25",
-      "total_line": 37.5,
-      "spread_line": 14.5,
-      "home_field": "DEN",
-      "vegas_implied": 26.0,
-      "is_home": true,
-      "spread_display": "-14.5",
-      "is_dome": false,
-      "weather_data": [
-        0,
-        "Game Finished"
-      ],
-      "wind": 0,
-      "weather_desc": "Game Finished",
-      "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 3.0,
-      "wk_fg_30_39": 0.0,
-      "wk_fg_40_49": 1.0,
-      "wk_fg_50_59": 0.0,
-      "wk_fg_60_plus": 0.0,
-      "wk_fg_miss": 0.0,
-      "wk_xp_made": 1.0,
-      "wk_xp_miss": 0.0,
-      "wk_fg_miss_0_19": 0.0,
-      "wk_fg_miss_20_29": 0.0,
-      "wk_fg_miss_30_39": 0.0,
-      "wk_fg_miss_40_49": 0.0,
-      "wk_fg_miss_50_59": 0.0,
-      "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 78.6,
-      "off_ppg": 24.5,
-      "off_share": 0.5129186602870813,
-      "def_stall_rate": 91.7,
-      "def_pa": 17.2,
-      "def_share": 0.5697368421052632,
-      "aggression_pct": 16.7,
-      "grade": 131.0,
-      "proj": 13.9,
-      "grade_details": [],
-      "off_score_val": 58.4,
-      "def_score_val": 72.6,
-      "w_team_score": 25.5,
-      "w_def_allowed": 23.4,
-      "off_cap_val": 15.7,
-      "def_cap_val": 16.0,
-      "details_vegas_total": 37.5,
-      "details_vegas_spread": "-14.5",
-      "history": {
-        "l3_actual": 21,
-        "l3_proj": 27.0,
-        "l3_games": [
-          {
-            "week": 17,
-            "status": "ACTIVE",
-            "proj": 9.4,
-            "act": 8,
-            "diff": -1.4,
-            "opp": "KC"
-          },
-          {
-            "week": 16,
-            "status": "ACTIVE",
-            "proj": 9.4,
-            "act": 9,
-            "diff": -0.4,
-            "opp": "JAX"
-          },
-          {
-            "week": 15,
-            "status": "ACTIVE",
-            "proj": 8.2,
-            "act": 4,
-            "diff": -4.2,
-            "opp": "GB"
-          }
-        ]
-      },
-      "narrative": "Consider Lutz if you need a fill-in. His offense has a high stall rate (78.6%)."
+      "narrative": "Butker is a viable streaming option. The offense has a massive implied total of 20.0."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -382,7 +259,7 @@
           }
         ]
       },
-      "narrative": "Fairbairn is a viable streaming option. Be cautious, as the team has a low implied total."
+      "narrative": "Fairbairn is a strong play this week. His offense has a high stall rate (58.8%)."
     },
     {
       "kicker_player_name": "E.Pineiro",
@@ -505,7 +382,7 @@
           }
         ]
       },
-      "narrative": "Consider Pineiro if you need a fill-in. Playing in a dome guarantees perfect conditions."
+      "narrative": "Pineiro is a strong play this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -630,7 +507,130 @@
           }
         ]
       },
-      "narrative": "Gonzalez is a risky option this week. The offense has a massive implied total of 24.0."
+      "narrative": "Fire up Gonzalez with confidence. Heavy winds (0 mph) could limit opportunities."
+    },
+    {
+      "kicker_player_name": "W.Lutz",
+      "kicker_player_id": "00-0032569",
+      "team": "DEN",
+      "fg_made": 32,
+      "fg_att": 36,
+      "fg_0_19": 0,
+      "fg_20_29": 12,
+      "fg_30_39": 12,
+      "fg_40_49": 3,
+      "fg_50_59": 5,
+      "fg_60_plus": 0,
+      "fg_miss": 4,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 0,
+      "fg_miss_40_49": 2,
+      "fg_miss_50_59": 2,
+      "fg_miss_60_plus": 0,
+      "xp_made": 42,
+      "xp_miss": 0,
+      "real_pts": 138,
+      "dome_kicks": 16,
+      "total_kicks": 78,
+      "games": 18,
+      "status": "ACT",
+      "posteam": "DEN",
+      "rz_trips": 79,
+      "acc": 88.9,
+      "dome_pct": 21.0,
+      "fpts": 147,
+      "avg_pts": 8.2,
+      "join_name": "W.Lutz",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/lcfurzhyjudmrwjxkgfs",
+      "match_name": "W.Lutz",
+      "own_pct": 31.2,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": 0,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active",
+      "opponent": "LAC",
+      "roof": "outdoors",
+      "game_dt": "2026-01-04 16:25",
+      "total_line": 37.5,
+      "spread_line": 14.5,
+      "home_field": "DEN",
+      "vegas_implied": 26.0,
+      "is_home": true,
+      "spread_display": "-14.5",
+      "is_dome": false,
+      "weather_data": [
+        0,
+        "Game Finished"
+      ],
+      "wind": 0,
+      "weather_desc": "Game Finished",
+      "wk_fg_0_19": 0.0,
+      "wk_fg_20_29": 3.0,
+      "wk_fg_30_39": 0.0,
+      "wk_fg_40_49": 1.0,
+      "wk_fg_50_59": 0.0,
+      "wk_fg_60_plus": 0.0,
+      "wk_fg_miss": 0.0,
+      "wk_xp_made": 1.0,
+      "wk_xp_miss": 0.0,
+      "wk_fg_miss_0_19": 0.0,
+      "wk_fg_miss_20_29": 0.0,
+      "wk_fg_miss_30_39": 0.0,
+      "wk_fg_miss_40_49": 0.0,
+      "wk_fg_miss_50_59": 0.0,
+      "wk_fg_miss_60_plus": 0.0,
+      "off_stall_rate": 78.6,
+      "off_ppg": 24.5,
+      "off_share": 0.384688995215311,
+      "def_stall_rate": 91.7,
+      "def_pa": 17.2,
+      "def_share": 0.5697368421052632,
+      "aggression_pct": 16.7,
+      "grade": 131.0,
+      "proj": 12.7,
+      "grade_details": [],
+      "off_score_val": 58.4,
+      "def_score_val": 72.6,
+      "w_team_score": 25.5,
+      "w_def_allowed": 23.4,
+      "off_cap_val": 11.8,
+      "def_cap_val": 16.0,
+      "details_vegas_total": 37.5,
+      "details_vegas_spread": "-14.5",
+      "history": {
+        "l3_actual": 21,
+        "l3_proj": 27.0,
+        "l3_games": [
+          {
+            "week": 17,
+            "status": "ACTIVE",
+            "proj": 9.4,
+            "act": 8,
+            "diff": -1.4,
+            "opp": "KC"
+          },
+          {
+            "week": 16,
+            "status": "ACTIVE",
+            "proj": 9.4,
+            "act": 9,
+            "diff": -0.4,
+            "opp": "JAX"
+          },
+          {
+            "week": 15,
+            "status": "ACTIVE",
+            "proj": 8.2,
+            "act": 4,
+            "diff": -4.2,
+            "opp": "GB"
+          }
+        ]
+      },
+      "narrative": "Lutz is a strong play this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "M.Gay",
@@ -753,7 +753,7 @@
           }
         ]
       },
-      "narrative": "Gay is a risky option this week. The offense has a massive implied total of 22.5."
+      "narrative": "Gay is a viable streaming option. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "W.Reichard",
@@ -878,7 +878,7 @@
           }
         ]
       },
-      "narrative": "Fade Reichard if possible. The matchup is favorable against a porous defense."
+      "narrative": "Reichard is a strong play this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "J.Myers",
@@ -1001,7 +1001,7 @@
           }
         ]
       },
-      "narrative": "Fire up Myers with confidence. The matchup is favorable against a porous defense."
+      "narrative": "Consider Myers if you need a fill-in. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -1124,7 +1124,7 @@
           }
         ]
       },
-      "narrative": "Fade Boswell if possible. His offense has a high stall rate (81.8%)."
+      "narrative": "Boswell is a strong play this week. The offense has a massive implied total of 18.5."
     },
     {
       "kicker_player_name": "B.Sauls",
@@ -1247,130 +1247,7 @@
           }
         ]
       },
-      "narrative": "Fire up Sauls with confidence. Playing in a dome guarantees perfect conditions."
-    },
-    {
-      "kicker_player_name": "C.Dicker",
-      "kicker_player_id": "00-0037224",
-      "team": "LAC",
-      "fg_made": 39,
-      "fg_att": 42,
-      "fg_0_19": 0,
-      "fg_20_29": 8,
-      "fg_30_39": 14,
-      "fg_40_49": 12,
-      "fg_50_59": 5,
-      "fg_60_plus": 0,
-      "fg_miss": 3,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 1,
-      "fg_miss_40_49": 1,
-      "fg_miss_50_59": 1,
-      "fg_miss_60_plus": 0,
-      "xp_made": 34,
-      "xp_miss": 1,
-      "real_pts": 151,
-      "dome_kicks": 55,
-      "total_kicks": 77,
-      "games": 18,
-      "status": "ACT",
-      "posteam": "LAC",
-      "rz_trips": 78,
-      "acc": 92.9,
-      "dome_pct": 71.0,
-      "fpts": 169,
-      "avg_pts": 9.4,
-      "join_name": "C.Dicker",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vd4nd1hoax82j7fi2bx0",
-      "match_name": "C.Dicker",
-      "own_pct": 92.0,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": 0,
-      "injury_status": "Healthy",
-      "injury_color": "green",
-      "injury_details": "Active",
-      "opponent": "DEN",
-      "roof": "outdoors",
-      "game_dt": "2026-01-04 16:25",
-      "total_line": 37.5,
-      "spread_line": 14.5,
-      "home_field": "DEN",
-      "vegas_implied": 11.5,
-      "is_home": false,
-      "spread_display": "+14.5",
-      "is_dome": false,
-      "weather_data": [
-        0,
-        "Game Finished"
-      ],
-      "wind": 0,
-      "weather_desc": "Game Finished",
-      "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 0.0,
-      "wk_fg_30_39": 1.0,
-      "wk_fg_40_49": 0.0,
-      "wk_fg_50_59": 0.0,
-      "wk_fg_60_plus": 0.0,
-      "wk_fg_miss": 0.0,
-      "wk_xp_made": 0.0,
-      "wk_xp_miss": 0.0,
-      "wk_fg_miss_0_19": 0.0,
-      "wk_fg_miss_20_29": 0.0,
-      "wk_fg_miss_30_39": 0.0,
-      "wk_fg_miss_40_49": 0.0,
-      "wk_fg_miss_50_59": 0.0,
-      "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 66.7,
-      "off_ppg": 22.0,
-      "off_share": 0.75,
-      "def_stall_rate": 60.0,
-      "def_pa": 22.5,
-      "def_share": 0.6461538461538462,
-      "aggression_pct": 40.0,
-      "grade": 97.1,
-      "proj": 11.3,
-      "grade_details": [],
-      "off_score_val": 49.5,
-      "def_score_val": 47.5,
-      "w_team_score": 14.6,
-      "w_def_allowed": 14.8,
-      "off_cap_val": 13.2,
-      "def_cap_val": 11.5,
-      "details_vegas_total": 37.5,
-      "details_vegas_spread": "+14.5",
-      "history": {
-        "l3_actual": 24,
-        "l3_proj": 29.6,
-        "l3_games": [
-          {
-            "week": 17,
-            "status": "ACTIVE",
-            "proj": 9.4,
-            "act": 2,
-            "diff": -7.4,
-            "opp": "HOU"
-          },
-          {
-            "week": 16,
-            "status": "ACTIVE",
-            "proj": 10.8,
-            "act": 10,
-            "diff": -0.8,
-            "opp": "DAL"
-          },
-          {
-            "week": 15,
-            "status": "ACTIVE",
-            "proj": 9.4,
-            "act": 12,
-            "diff": 2.6,
-            "opp": "KC"
-          }
-        ]
-      },
-      "narrative": "Fade Dicker if possible. His offense has a high stall rate (66.7%)."
+      "narrative": "You can trust Sauls in your lineup. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -1493,7 +1370,130 @@
           }
         ]
       },
-      "narrative": "Fire up Bates with confidence. The matchup is favorable against a porous defense."
+      "narrative": "You can trust Bates in your lineup. His offense has a high stall rate (71.4%)."
+    },
+    {
+      "kicker_player_name": "C.Dicker",
+      "kicker_player_id": "00-0037224",
+      "team": "LAC",
+      "fg_made": 39,
+      "fg_att": 42,
+      "fg_0_19": 0,
+      "fg_20_29": 8,
+      "fg_30_39": 14,
+      "fg_40_49": 12,
+      "fg_50_59": 5,
+      "fg_60_plus": 0,
+      "fg_miss": 3,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 1,
+      "fg_miss_40_49": 1,
+      "fg_miss_50_59": 1,
+      "fg_miss_60_plus": 0,
+      "xp_made": 34,
+      "xp_miss": 1,
+      "real_pts": 151,
+      "dome_kicks": 55,
+      "total_kicks": 77,
+      "games": 18,
+      "status": "ACT",
+      "posteam": "LAC",
+      "rz_trips": 78,
+      "acc": 92.9,
+      "dome_pct": 71.0,
+      "fpts": 169,
+      "avg_pts": 9.4,
+      "join_name": "C.Dicker",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vd4nd1hoax82j7fi2bx0",
+      "match_name": "C.Dicker",
+      "own_pct": 92.0,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": 0,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active",
+      "opponent": "DEN",
+      "roof": "outdoors",
+      "game_dt": "2026-01-04 16:25",
+      "total_line": 37.5,
+      "spread_line": 14.5,
+      "home_field": "DEN",
+      "vegas_implied": 11.5,
+      "is_home": false,
+      "spread_display": "+14.5",
+      "is_dome": false,
+      "weather_data": [
+        0,
+        "Game Finished"
+      ],
+      "wind": 0,
+      "weather_desc": "Game Finished",
+      "wk_fg_0_19": 0.0,
+      "wk_fg_20_29": 0.0,
+      "wk_fg_30_39": 1.0,
+      "wk_fg_40_49": 0.0,
+      "wk_fg_50_59": 0.0,
+      "wk_fg_60_plus": 0.0,
+      "wk_fg_miss": 0.0,
+      "wk_xp_made": 0.0,
+      "wk_xp_miss": 0.0,
+      "wk_fg_miss_0_19": 0.0,
+      "wk_fg_miss_20_29": 0.0,
+      "wk_fg_miss_30_39": 0.0,
+      "wk_fg_miss_40_49": 0.0,
+      "wk_fg_miss_50_59": 0.0,
+      "wk_fg_miss_60_plus": 0.0,
+      "off_stall_rate": 66.7,
+      "off_ppg": 22.0,
+      "off_share": 0.75,
+      "def_stall_rate": 60.0,
+      "def_pa": 22.5,
+      "def_share": 0.4846153846153846,
+      "aggression_pct": 40.0,
+      "grade": 97.1,
+      "proj": 10.7,
+      "grade_details": [],
+      "off_score_val": 49.5,
+      "def_score_val": 47.5,
+      "w_team_score": 14.6,
+      "w_def_allowed": 14.8,
+      "off_cap_val": 13.2,
+      "def_cap_val": 8.6,
+      "details_vegas_total": 37.5,
+      "details_vegas_spread": "+14.5",
+      "history": {
+        "l3_actual": 24,
+        "l3_proj": 29.6,
+        "l3_games": [
+          {
+            "week": 17,
+            "status": "ACTIVE",
+            "proj": 9.4,
+            "act": 2,
+            "diff": -7.4,
+            "opp": "HOU"
+          },
+          {
+            "week": 16,
+            "status": "ACTIVE",
+            "proj": 10.8,
+            "act": 10,
+            "diff": -0.8,
+            "opp": "DAL"
+          },
+          {
+            "week": 15,
+            "status": "ACTIVE",
+            "proj": 9.4,
+            "act": 12,
+            "diff": 2.6,
+            "opp": "KC"
+          }
+        ]
+      },
+      "narrative": "Dicker is a locked-and-loaded RB1 of kickers this week. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -1616,7 +1616,7 @@
           }
         ]
       },
-      "narrative": "You can trust McLaughlin in your lineup. Be cautious, as the team has a low implied total."
+      "narrative": "McLaughlin is a locked-and-loaded RB1 of kickers this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -1739,7 +1739,7 @@
           }
         ]
       },
-      "narrative": "Aubrey is a strong play this week. The offense has a massive implied total of 26.8."
+      "narrative": "Aubrey is a viable streaming option. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -1862,7 +1862,7 @@
           }
         ]
       },
-      "narrative": "Fire up Szmyt with confidence. Be cautious, as the team has a low implied total."
+      "narrative": "Szmyt is a risky option this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -1987,130 +1987,7 @@
           }
         ]
       },
-      "narrative": "Carlson is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 16.5."
-    },
-    {
-      "kicker_player_name": "R.Patterson",
-      "kicker_player_id": "00-0036816",
-      "team": "MIA",
-      "fg_made": 27,
-      "fg_att": 29,
-      "fg_0_19": 0,
-      "fg_20_29": 5,
-      "fg_30_39": 8,
-      "fg_40_49": 11,
-      "fg_50_59": 3,
-      "fg_60_plus": 0,
-      "fg_miss": 2,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 1,
-      "fg_miss_40_49": 0,
-      "fg_miss_50_59": 1,
-      "fg_miss_60_plus": 0,
-      "xp_made": 34,
-      "xp_miss": 1,
-      "real_pts": 115,
-      "dome_kicks": 6,
-      "total_kicks": 64,
-      "games": 16,
-      "status": "ACT",
-      "posteam": "MIA",
-      "rz_trips": 66,
-      "acc": 93.1,
-      "dome_pct": 9.0,
-      "fpts": 129,
-      "avg_pts": 8.1,
-      "join_name": "R.Patterson",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/gzvyb1u3dueikfy3otlq",
-      "match_name": "R.Patterson",
-      "own_pct": 3.5,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": 0,
-      "injury_status": "Healthy",
-      "injury_color": "green",
-      "injury_details": "Active",
-      "opponent": "NE",
-      "roof": "outdoors",
-      "game_dt": "2026-01-04 16:25",
-      "total_line": 44.5,
-      "spread_line": 14.0,
-      "home_field": "NE",
-      "vegas_implied": 15.25,
-      "is_home": false,
-      "spread_display": "+14.0",
-      "is_dome": false,
-      "weather_data": [
-        0,
-        "Game Finished"
-      ],
-      "wind": 0,
-      "weather_desc": "Game Finished",
-      "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 0.0,
-      "wk_fg_30_39": 0.0,
-      "wk_fg_40_49": 0.0,
-      "wk_fg_50_59": 1.0,
-      "wk_fg_60_plus": 0.0,
-      "wk_fg_miss": 0.0,
-      "wk_xp_made": 1.0,
-      "wk_xp_miss": 0.0,
-      "wk_fg_miss_0_19": 0.0,
-      "wk_fg_miss_20_29": 0.0,
-      "wk_fg_miss_30_39": 0.0,
-      "wk_fg_miss_40_49": 0.0,
-      "wk_fg_miss_50_59": 0.0,
-      "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 57.1,
-      "off_ppg": 22.5,
-      "off_share": 0.4,
-      "def_stall_rate": 69.2,
-      "def_pa": 23.0,
-      "def_share": 0.60625,
-      "aggression_pct": 33.3,
-      "grade": 97.2,
-      "proj": 9.4,
-      "grade_details": [],
-      "off_score_val": 42.4,
-      "def_score_val": 54.8,
-      "w_team_score": 17.4,
-      "w_def_allowed": 17.6,
-      "off_cap_val": 8.4,
-      "def_cap_val": 12.8,
-      "details_vegas_total": 44.5,
-      "details_vegas_spread": "+14.0",
-      "history": {
-        "l3_actual": 16,
-        "l3_proj": 24.3,
-        "l3_games": [
-          {
-            "week": 17,
-            "status": "ACTIVE",
-            "proj": 8.1,
-            "act": 8,
-            "diff": -0.1,
-            "opp": "TB"
-          },
-          {
-            "week": 16,
-            "status": "ACTIVE",
-            "proj": 8.1,
-            "act": 3,
-            "diff": -5.1,
-            "opp": "CIN"
-          },
-          {
-            "week": 15,
-            "status": "ACTIVE",
-            "proj": 8.1,
-            "act": 5,
-            "diff": -3.1,
-            "opp": "PIT"
-          }
-        ]
-      },
-      "narrative": "Fire up Patterson with confidence. Be cautious, as the team has a low implied total."
+      "narrative": "Carlson is a risky option this week. His offense has a high stall rate (50.0%)."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -2235,7 +2112,130 @@
           }
         ]
       },
-      "narrative": "Fade Mevis if possible. The offense has a massive implied total of 32.0."
+      "narrative": "Mevis is a risky option this week. The matchup is favorable against a porous defense."
+    },
+    {
+      "kicker_player_name": "R.Patterson",
+      "kicker_player_id": "00-0036816",
+      "team": "MIA",
+      "fg_made": 27,
+      "fg_att": 29,
+      "fg_0_19": 0,
+      "fg_20_29": 5,
+      "fg_30_39": 8,
+      "fg_40_49": 11,
+      "fg_50_59": 3,
+      "fg_60_plus": 0,
+      "fg_miss": 2,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 1,
+      "fg_miss_40_49": 0,
+      "fg_miss_50_59": 1,
+      "fg_miss_60_plus": 0,
+      "xp_made": 34,
+      "xp_miss": 1,
+      "real_pts": 115,
+      "dome_kicks": 6,
+      "total_kicks": 64,
+      "games": 16,
+      "status": "ACT",
+      "posteam": "MIA",
+      "rz_trips": 66,
+      "acc": 93.1,
+      "dome_pct": 9.0,
+      "fpts": 129,
+      "avg_pts": 8.1,
+      "join_name": "R.Patterson",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/gzvyb1u3dueikfy3otlq",
+      "match_name": "R.Patterson",
+      "own_pct": 3.5,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": 0,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active",
+      "opponent": "NE",
+      "roof": "outdoors",
+      "game_dt": "2026-01-04 16:25",
+      "total_line": 44.5,
+      "spread_line": 14.0,
+      "home_field": "NE",
+      "vegas_implied": 15.25,
+      "is_home": false,
+      "spread_display": "+14.0",
+      "is_dome": false,
+      "weather_data": [
+        0,
+        "Game Finished"
+      ],
+      "wind": 0,
+      "weather_desc": "Game Finished",
+      "wk_fg_0_19": 0.0,
+      "wk_fg_20_29": 0.0,
+      "wk_fg_30_39": 0.0,
+      "wk_fg_40_49": 0.0,
+      "wk_fg_50_59": 1.0,
+      "wk_fg_60_plus": 0.0,
+      "wk_fg_miss": 0.0,
+      "wk_xp_made": 1.0,
+      "wk_xp_miss": 0.0,
+      "wk_fg_miss_0_19": 0.0,
+      "wk_fg_miss_20_29": 0.0,
+      "wk_fg_miss_30_39": 0.0,
+      "wk_fg_miss_40_49": 0.0,
+      "wk_fg_miss_50_59": 0.0,
+      "wk_fg_miss_60_plus": 0.0,
+      "off_stall_rate": 57.1,
+      "off_ppg": 22.5,
+      "off_share": 0.4,
+      "def_stall_rate": 69.2,
+      "def_pa": 23.0,
+      "def_share": 0.485,
+      "aggression_pct": 33.3,
+      "grade": 97.2,
+      "proj": 8.9,
+      "grade_details": [],
+      "off_score_val": 42.4,
+      "def_score_val": 54.8,
+      "w_team_score": 17.4,
+      "w_def_allowed": 17.6,
+      "off_cap_val": 8.4,
+      "def_cap_val": 10.2,
+      "details_vegas_total": 44.5,
+      "details_vegas_spread": "+14.0",
+      "history": {
+        "l3_actual": 16,
+        "l3_proj": 24.3,
+        "l3_games": [
+          {
+            "week": 17,
+            "status": "ACTIVE",
+            "proj": 8.1,
+            "act": 8,
+            "diff": -0.1,
+            "opp": "TB"
+          },
+          {
+            "week": 16,
+            "status": "ACTIVE",
+            "proj": 8.1,
+            "act": 3,
+            "diff": -5.1,
+            "opp": "CIN"
+          },
+          {
+            "week": 15,
+            "status": "ACTIVE",
+            "proj": 8.1,
+            "act": 5,
+            "diff": -3.1,
+            "opp": "PIT"
+          }
+        ]
+      },
+      "narrative": "Fade Patterson if possible. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -2358,7 +2358,7 @@
           }
         ]
       },
-      "narrative": "Consider Loop if you need a fill-in. His offense has a high stall rate (58.3%)."
+      "narrative": "Loop is a strong play this week. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "Y.Koo",
@@ -2481,7 +2481,7 @@
           }
         ]
       },
-      "narrative": "Koo is a viable streaming option. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Fade Koo if possible. His offense has a high stall rate (54.5%)."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -2606,7 +2606,7 @@
           }
         ]
       },
-      "narrative": "McManus is a strong play this week. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "McManus is a viable streaming option. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "C.Little",
@@ -2729,130 +2729,7 @@
           }
         ]
       },
-      "narrative": "Consider Little if you need a fill-in. Be cautious, as the team has a low implied total."
-    },
-    {
-      "kicker_player_name": "A.Borregales",
-      "kicker_player_id": "00-0040200",
-      "team": "NE",
-      "fg_made": 30,
-      "fg_att": 35,
-      "fg_0_19": 2,
-      "fg_20_29": 7,
-      "fg_30_39": 10,
-      "fg_40_49": 7,
-      "fg_50_59": 4,
-      "fg_60_plus": 0,
-      "fg_miss": 5,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 1,
-      "fg_miss_40_49": 4,
-      "fg_miss_50_59": 0,
-      "fg_miss_60_plus": 0,
-      "xp_made": 58,
-      "xp_miss": 2,
-      "real_pts": 148,
-      "dome_kicks": 3,
-      "total_kicks": 95,
-      "games": 19,
-      "status": "ACT",
-      "posteam": "NE",
-      "rz_trips": 101,
-      "acc": 85.7,
-      "dome_pct": 3.0,
-      "fpts": 156,
-      "avg_pts": 8.2,
-      "join_name": "A.Borregales",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/jgxnjxhysqwqk4fgf1ke",
-      "match_name": "A.Borregales",
-      "own_pct": 29.5,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": 0,
-      "injury_status": "Healthy",
-      "injury_color": "green",
-      "injury_details": "Active",
-      "opponent": "MIA",
-      "roof": "outdoors",
-      "game_dt": "2026-01-04 16:25",
-      "total_line": 44.5,
-      "spread_line": 14.0,
-      "home_field": "NE",
-      "vegas_implied": 29.25,
-      "is_home": true,
-      "spread_display": "-14.0",
-      "is_dome": false,
-      "weather_data": [
-        0,
-        "Game Finished"
-      ],
-      "wind": 0,
-      "weather_desc": "Game Finished",
-      "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 0.0,
-      "wk_fg_30_39": 0.0,
-      "wk_fg_40_49": 0.0,
-      "wk_fg_50_59": 1.0,
-      "wk_fg_60_plus": 0.0,
-      "wk_fg_miss": 1.0,
-      "wk_xp_made": 5.0,
-      "wk_xp_miss": 0.0,
-      "wk_fg_miss_0_19": 0.0,
-      "wk_fg_miss_20_29": 0.0,
-      "wk_fg_miss_30_39": 1.0,
-      "wk_fg_miss_40_49": 0.0,
-      "wk_fg_miss_50_59": 0.0,
-      "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 45.5,
-      "off_ppg": 33.7,
-      "off_share": 0.28031015037593987,
-      "def_stall_rate": 40.0,
-      "def_pa": 25.0,
-      "def_share": 0.25232198142414863,
-      "aggression_pct": 50.0,
-      "grade": 65.5,
-      "proj": 7.8,
-      "grade_details": [],
-      "off_score_val": 33.8,
-      "def_score_val": 31.7,
-      "w_team_score": 30.6,
-      "w_def_allowed": 28.0,
-      "off_cap_val": 10.3,
-      "def_cap_val": 8.5,
-      "details_vegas_total": 44.5,
-      "details_vegas_spread": "-14.0",
-      "history": {
-        "l3_actual": 22,
-        "l3_proj": 25.8,
-        "l3_games": [
-          {
-            "week": 17,
-            "status": "ACTIVE",
-            "proj": 9.4,
-            "act": 5,
-            "diff": -4.4,
-            "opp": "NYJ"
-          },
-          {
-            "week": 16,
-            "status": "ACTIVE",
-            "proj": 8.2,
-            "act": 10,
-            "diff": 1.8,
-            "opp": "BAL"
-          },
-          {
-            "week": 15,
-            "status": "ACTIVE",
-            "proj": 8.2,
-            "act": 7,
-            "diff": -1.2,
-            "opp": "BUF"
-          }
-        ]
-      },
-      "narrative": "Borregales is a locked-and-loaded RB1 of kickers this week. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Little is a viable streaming option. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "C.Smyth",
@@ -2977,7 +2854,7 @@
           }
         ]
       },
-      "narrative": "You can trust Smyth in your lineup. Be cautious, as the team has a low implied total."
+      "narrative": "Fire up Smyth with confidence. His offense has a high stall rate (37.5%)."
     },
     {
       "kicker_player_name": "B.Grupe",
@@ -3102,7 +2979,7 @@
           }
         ]
       },
-      "narrative": "Fade Grupe if possible. The offense has a massive implied total of 14.0."
+      "narrative": "Consider Grupe if you need a fill-in. His offense has a high stall rate (50.0%)."
     },
     {
       "kicker_player_name": "J.Elliott",
@@ -3225,7 +3102,130 @@
           }
         ]
       },
-      "narrative": "Elliott is a risky option this week. The matchup is favorable against a porous defense."
+      "narrative": "Fade Elliott if possible. His offense has a high stall rate (50.0%)."
+    },
+    {
+      "kicker_player_name": "A.Borregales",
+      "kicker_player_id": "00-0040200",
+      "team": "NE",
+      "fg_made": 30,
+      "fg_att": 35,
+      "fg_0_19": 2,
+      "fg_20_29": 7,
+      "fg_30_39": 10,
+      "fg_40_49": 7,
+      "fg_50_59": 4,
+      "fg_60_plus": 0,
+      "fg_miss": 5,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 1,
+      "fg_miss_40_49": 4,
+      "fg_miss_50_59": 0,
+      "fg_miss_60_plus": 0,
+      "xp_made": 58,
+      "xp_miss": 2,
+      "real_pts": 148,
+      "dome_kicks": 3,
+      "total_kicks": 95,
+      "games": 19,
+      "status": "ACT",
+      "posteam": "NE",
+      "rz_trips": 101,
+      "acc": 85.7,
+      "dome_pct": 3.0,
+      "fpts": 156,
+      "avg_pts": 8.2,
+      "join_name": "A.Borregales",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/jgxnjxhysqwqk4fgf1ke",
+      "match_name": "A.Borregales",
+      "own_pct": 29.5,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": 0,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active",
+      "opponent": "MIA",
+      "roof": "outdoors",
+      "game_dt": "2026-01-04 16:25",
+      "total_line": 44.5,
+      "spread_line": 14.0,
+      "home_field": "NE",
+      "vegas_implied": 29.25,
+      "is_home": true,
+      "spread_display": "-14.0",
+      "is_dome": false,
+      "weather_data": [
+        0,
+        "Game Finished"
+      ],
+      "wind": 0,
+      "weather_desc": "Game Finished",
+      "wk_fg_0_19": 0.0,
+      "wk_fg_20_29": 0.0,
+      "wk_fg_30_39": 0.0,
+      "wk_fg_40_49": 0.0,
+      "wk_fg_50_59": 1.0,
+      "wk_fg_60_plus": 0.0,
+      "wk_fg_miss": 1.0,
+      "wk_xp_made": 5.0,
+      "wk_xp_miss": 0.0,
+      "wk_fg_miss_0_19": 0.0,
+      "wk_fg_miss_20_29": 0.0,
+      "wk_fg_miss_30_39": 1.0,
+      "wk_fg_miss_40_49": 0.0,
+      "wk_fg_miss_50_59": 0.0,
+      "wk_fg_miss_60_plus": 0.0,
+      "off_stall_rate": 45.5,
+      "off_ppg": 33.7,
+      "off_share": 0.2242481203007519,
+      "def_stall_rate": 40.0,
+      "def_pa": 25.0,
+      "def_share": 0.25232198142414863,
+      "aggression_pct": 50.0,
+      "grade": 65.5,
+      "proj": 7.1,
+      "grade_details": [],
+      "off_score_val": 33.8,
+      "def_score_val": 31.7,
+      "w_team_score": 30.6,
+      "w_def_allowed": 28.0,
+      "off_cap_val": 8.2,
+      "def_cap_val": 8.5,
+      "details_vegas_total": 44.5,
+      "details_vegas_spread": "-14.0",
+      "history": {
+        "l3_actual": 22,
+        "l3_proj": 25.8,
+        "l3_games": [
+          {
+            "week": 17,
+            "status": "ACTIVE",
+            "proj": 9.4,
+            "act": 5,
+            "diff": -4.4,
+            "opp": "NYJ"
+          },
+          {
+            "week": 16,
+            "status": "ACTIVE",
+            "proj": 8.2,
+            "act": 10,
+            "diff": 1.8,
+            "opp": "BAL"
+          },
+          {
+            "week": 15,
+            "status": "ACTIVE",
+            "proj": 8.2,
+            "act": 7,
+            "diff": -1.2,
+            "opp": "BUF"
+          }
+        ]
+      },
+      "narrative": "Borregales is a viable streaming option. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.Santos",
@@ -3348,7 +3348,7 @@
           }
         ]
       },
-      "narrative": "Fire up Santos with confidence. The matchup is favorable against a porous defense."
+      "narrative": "Fire up Santos with confidence. His offense has a high stall rate (42.1%)."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -3473,7 +3473,7 @@
           }
         ]
       },
-      "narrative": "Ryland is a strong play this week. His offense has a high stall rate (71.4%)."
+      "narrative": "Fade Ryland if possible. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "N.Folk",
@@ -3596,7 +3596,7 @@
           }
         ]
       },
-      "narrative": "Fade Folk if possible. His offense has a high stall rate (80.0%)."
+      "narrative": "Fade Folk if possible. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -3719,7 +3719,7 @@
           }
         ]
       },
-      "narrative": "Moody is a strong play this week. His offense has a high stall rate (55.6%)."
+      "narrative": "Fade Moody if possible. The offense has a massive implied total of 17.8."
     },
     {
       "kicker_player_name": "J.Karty",
@@ -3844,7 +3844,7 @@
           }
         ]
       },
-      "narrative": "Fade Karty if possible. The offense has a massive implied total of 17.5."
+      "narrative": "Fire up Karty with confidence. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -3967,7 +3967,7 @@
           }
         ]
       },
-      "narrative": "Fade Slye if possible. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Slye is a viable streaming option. His offense has a high stall rate (60.0%)."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -4090,7 +4090,7 @@
           }
         ]
       },
-      "narrative": "McPherson is a viable streaming option. His offense has a high stall rate (0.0%)."
+      "narrative": "Fire up McPherson with confidence. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "R.Fitzgerald",
@@ -4213,7 +4213,7 @@
           }
         ]
       },
-      "narrative": "Fitzgerald is a viable streaming option. Playing in a dome guarantees perfect conditions."
+      "narrative": "Fade Fitzgerald if possible. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -4336,7 +4336,7 @@
           }
         ]
       },
-      "narrative": "Prater is a viable streaming option. The matchup is favorable against a porous defense."
+      "narrative": "Fire up Prater with confidence. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "M.Badgley",
@@ -4459,7 +4459,7 @@
           }
         ]
       },
-      "narrative": "Badgley is a strong play this week. The matchup is favorable against a porous defense."
+      "narrative": "Fire up Badgley with confidence. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "G.Gano",
