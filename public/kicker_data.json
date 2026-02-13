@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 18,
-    "updated": "2026-02-12 20:25",
+    "updated": "2026-02-13 08:30",
     "league_avgs": {
       "fpts": 110.4,
       "off_stall": 51.6,
@@ -132,7 +132,7 @@
           }
         ]
       },
-      "narrative": "Pineiro is a locked-and-loaded RB1 of kickers this week. The matchup is favorable against a porous defense."
+      "narrative": "Consider Pineiro if you need a fill-in. The offense has a massive implied total of 22.5."
     },
     {
       "kicker_player_name": "M.Gay",
@@ -255,7 +255,7 @@
           }
         ]
       },
-      "narrative": "Gay is a locked-and-loaded RB1 of kickers this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "Gay is a locked-and-loaded RB1 of kickers this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -378,7 +378,7 @@
           }
         ]
       },
-      "narrative": "You can trust Lutz in your lineup. Playing in a dome guarantees perfect conditions."
+      "narrative": "Lutz is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "C.Dicker",
@@ -501,7 +501,7 @@
           }
         ]
       },
-      "narrative": "Dicker is a viable streaming option. The offense has a massive implied total of 11.5."
+      "narrative": "Fire up Dicker with confidence. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -624,7 +624,7 @@
           }
         ]
       },
-      "narrative": "Fade Boswell if possible. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Consider Boswell if you need a fill-in. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "J.Myers",
@@ -747,7 +747,7 @@
           }
         ]
       },
-      "narrative": "Myers is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 25.0."
+      "narrative": "Myers is a strong play this week. The offense has a massive implied total of 25.0."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -872,7 +872,7 @@
           }
         ]
       },
-      "narrative": "Consider Mevis if you need a fill-in. The matchup is favorable against a porous defense."
+      "narrative": "Mevis is a viable streaming option. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "W.Reichard",
@@ -997,7 +997,7 @@
           }
         ]
       },
-      "narrative": "Consider Reichard if you need a fill-in. The offense has a massive implied total of 25.0."
+      "narrative": "Reichard is a strong play this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "A.Borregales",
@@ -1120,7 +1120,7 @@
           }
         ]
       },
-      "narrative": "Borregales is a risky option this week. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Fade Borregales if possible. His offense has a high stall rate (66.7%)."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -1245,7 +1245,7 @@
           }
         ]
       },
-      "narrative": "You can trust Fairbairn in your lineup. His offense has a high stall rate (28.6%)."
+      "narrative": "Fairbairn is a strong play this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "R.Patterson",
@@ -1368,7 +1368,7 @@
           }
         ]
       },
-      "narrative": "Consider Patterson if you need a fill-in. The offense has a massive implied total of 15.2."
+      "narrative": "Fade Patterson if possible. The offense has a massive implied total of 15.2."
     },
     {
       "kicker_player_name": "B.Grupe",
@@ -1493,7 +1493,7 @@
           }
         ]
       },
-      "narrative": "Grupe is a risky option this week. The matchup is favorable against a porous defense."
+      "narrative": "Grupe is a strong play this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "C.Santos",
@@ -1616,7 +1616,7 @@
           }
         ]
       },
-      "narrative": "Fire up Santos with confidence. The matchup is favorable against a porous defense."
+      "narrative": "Consider Santos if you need a fill-in. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -1739,7 +1739,7 @@
           }
         ]
       },
-      "narrative": "McPherson is a strong play this week. The offense has a massive implied total of 28.5."
+      "narrative": "McPherson is a viable streaming option. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -1862,7 +1862,7 @@
           }
         ]
       },
-      "narrative": "Prater is a risky option this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "Prater is a viable streaming option. His offense has a high stall rate (25.0%)."
     },
     {
       "kicker_player_name": "C.Little",
@@ -1985,7 +1985,7 @@
           }
         ]
       },
-      "narrative": "Little is a viable streaming option. Be cautious, as the team has a low implied total."
+      "narrative": "You can trust Little in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "M.Badgley",
@@ -2108,7 +2108,7 @@
           }
         ]
       },
-      "narrative": "Consider Badgley if you need a fill-in. His offense has a high stall rate (25.0%)."
+      "narrative": "Consider Badgley if you need a fill-in. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -2231,7 +2231,7 @@
           }
         ]
       },
-      "narrative": "Bates is a strong play this week. The offense has a massive implied total of 24.0."
+      "narrative": "Bates is a strong play this week. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "J.Elliott",
@@ -2354,7 +2354,7 @@
           }
         ]
       },
-      "narrative": "Elliott is a viable streaming option. Playing in a dome guarantees perfect conditions."
+      "narrative": "Elliott is a strong play this week. The offense has a massive implied total of 20.8."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -2477,7 +2477,7 @@
           }
         ]
       },
-      "narrative": "Aubrey is a strong play this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "Aubrey is a risky option this week. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "Z.Gonzalez",
@@ -2602,7 +2602,7 @@
           }
         ]
       },
-      "narrative": "You can trust Gonzalez in your lineup. The offense has a massive implied total of 24.0."
+      "narrative": "Consider Gonzalez if you need a fill-in. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -2725,7 +2725,7 @@
           }
         ]
       },
-      "narrative": "You can trust McLaughlin in your lineup. The matchup is favorable against a porous defense."
+      "narrative": "McLaughlin is a viable streaming option. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "B.Sauls",
@@ -2848,7 +2848,7 @@
           }
         ]
       },
-      "narrative": "Fade Sauls if possible. The offense has a massive implied total of 23.8."
+      "narrative": "Sauls is a locked-and-loaded RB1 of kickers this week. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "Y.Koo",
@@ -2971,7 +2971,7 @@
           }
         ]
       },
-      "narrative": "Koo is a risky option this week. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Fade Koo if possible. The offense has a massive implied total of 23.8."
     },
     {
       "kicker_player_name": "C.Smyth",
@@ -3096,7 +3096,7 @@
           }
         ]
       },
-      "narrative": "Smyth is a strong play this week. The matchup is favorable against a porous defense."
+      "narrative": "Consider Smyth if you need a fill-in. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -3219,7 +3219,7 @@
           }
         ]
       },
-      "narrative": "Moody is a strong play this week. His offense has a high stall rate (0.0%)."
+      "narrative": "Moody is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "N.Folk",
@@ -3342,7 +3342,7 @@
           }
         ]
       },
-      "narrative": "Consider Folk if you need a fill-in. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Folk is a viable streaming option. The offense has a massive implied total of 13.5."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -3467,7 +3467,7 @@
           }
         ]
       },
-      "narrative": "Butker is a risky option this week. Be cautious, as the team has a low implied total."
+      "narrative": "Fade Butker if possible. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -3590,7 +3590,7 @@
           }
         ]
       },
-      "narrative": "Fade Szmyt if possible. Be cautious, as the team has a low implied total."
+      "narrative": "Szmyt is a viable streaming option. The offense has a massive implied total of 19.0."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -3713,7 +3713,7 @@
           }
         ]
       },
-      "narrative": "Loop is a viable streaming option. The offense has a massive implied total of 23.0."
+      "narrative": "Consider Loop if you need a fill-in. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -3838,7 +3838,7 @@
           }
         ]
       },
-      "narrative": "Fire up Ryland with confidence. His offense has a high stall rate (0.0%)."
+      "narrative": "Ryland is a strong play this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "J.Karty",
@@ -3963,7 +3963,7 @@
           }
         ]
       },
-      "narrative": "Consider Karty if you need a fill-in. The matchup is favorable against a porous defense."
+      "narrative": "Fire up Karty with confidence. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -4088,7 +4088,7 @@
           }
         ]
       },
-      "narrative": "Carlson is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 16.5."
+      "narrative": "Fire up Carlson with confidence. The offense has a massive implied total of 16.5."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -4211,7 +4211,7 @@
           }
         ]
       },
-      "narrative": "Consider Slye if you need a fill-in. His offense has a high stall rate (0.0%)."
+      "narrative": "Slye is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 17.0."
     },
     {
       "kicker_player_name": "R.Fitzgerald",
@@ -4334,7 +4334,7 @@
           }
         ]
       },
-      "narrative": "You can trust Fitzgerald in your lineup. The offense has a massive implied total of 20.2."
+      "narrative": "Fitzgerald is a strong play this week. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -4459,7 +4459,7 @@
           }
         ]
       },
-      "narrative": "Fire up McManus with confidence. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "You can trust McManus in your lineup. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "G.Gano",
@@ -4497,7 +4497,7 @@
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wp5wochy7uuqcgyjcrrd",
       "match_name": "G.Gano",
       "own_pct": 0.7,
-      "cbs_status": "IR. Injured Reserve",
+      "cbs_status": "Questionable for start of Training Camp",
       "cbs_injury": "Neck",
       "roster_status": "RES",
       "injury_status": "IR",
@@ -6797,7 +6797,7 @@
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wp5wochy7uuqcgyjcrrd",
       "match_name": "G.Gano",
       "own_pct": 0.7,
-      "cbs_status": "IR. Injured Reserve",
+      "cbs_status": "Questionable for start of Training Camp",
       "cbs_injury": "Neck",
       "roster_status": "RES",
       "injury_status": "IR",
@@ -7143,7 +7143,7 @@
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wp5wochy7uuqcgyjcrrd",
       "match_name": "G.Gano",
       "own_pct": 0.7,
-      "cbs_status": "IR. Injured Reserve",
+      "cbs_status": "Questionable for start of Training Camp",
       "cbs_injury": "Neck",
       "roster_status": "RES",
       "injury_status": "IR",
