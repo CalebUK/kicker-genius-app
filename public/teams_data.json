@@ -1,143 +1,5 @@
 {
   "team_history": {
-    "MIN": [
-      {
-        "week": 1,
-        "pts": 27,
-        "pa": 24,
-        "vegas_implied": 21.0,
-        "opponent": "CHI",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 6,
-        "pa": 22,
-        "vegas_implied": 20.5,
-        "opponent": "ATL",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 48,
-        "pa": 10,
-        "vegas_implied": 19.2,
-        "opponent": "CIN",
-        "is_home": true
-      },
-      {
-        "week": 4,
-        "pts": 21,
-        "pa": 24,
-        "vegas_implied": 19.5,
-        "opponent": "PIT",
-        "is_home": false
-      },
-      {
-        "week": 5,
-        "pts": 21,
-        "pa": 17,
-        "vegas_implied": 16.0,
-        "opponent": "CLE",
-        "is_home": false
-      },
-      {
-        "week": 7,
-        "pts": 22,
-        "pa": 28,
-        "vegas_implied": 23.0,
-        "opponent": "PHI",
-        "is_home": true
-      },
-      {
-        "week": 8,
-        "pts": 10,
-        "pa": 37,
-        "vegas_implied": 24.2,
-        "opponent": "LAC",
-        "is_home": false
-      },
-      {
-        "week": 9,
-        "pts": 27,
-        "pa": 24,
-        "vegas_implied": 28.5,
-        "opponent": "DET",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 19,
-        "pa": 27,
-        "vegas_implied": 26.5,
-        "opponent": "BAL",
-        "is_home": true
-      },
-      {
-        "week": 11,
-        "pts": 17,
-        "pa": 19,
-        "vegas_implied": 22.2,
-        "opponent": "CHI",
-        "is_home": true
-      },
-      {
-        "week": 12,
-        "pts": 6,
-        "pa": 23,
-        "vegas_implied": 24.0,
-        "opponent": "GB",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 0,
-        "pa": 26,
-        "vegas_implied": 27.5,
-        "opponent": "SEA",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 31,
-        "pa": 0,
-        "vegas_implied": 22.5,
-        "opponent": "WAS",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 34,
-        "pa": 26,
-        "vegas_implied": 26.5,
-        "opponent": "DAL",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 16,
-        "pa": 13,
-        "vegas_implied": 19.5,
-        "opponent": "NYG",
-        "is_home": false
-      },
-      {
-        "week": 17,
-        "pts": 23,
-        "pa": 10,
-        "vegas_implied": 26.2,
-        "opponent": "DET",
-        "is_home": true
-      },
-      {
-        "week": 18,
-        "pts": 16,
-        "pa": 3,
-        "vegas_implied": 12.5,
-        "opponent": "GB",
-        "is_home": true
-      }
-    ],
     "CLE": [
       {
         "week": 1,
@@ -273,6 +135,420 @@
         "pa": 18,
         "vegas_implied": 28.5,
         "opponent": "CIN",
+        "is_home": false
+      }
+    ],
+    "NO": [
+      {
+        "week": 1,
+        "pts": 13,
+        "pa": 20,
+        "vegas_implied": 25.2,
+        "opponent": "ARI",
+        "is_home": true
+      },
+      {
+        "week": 2,
+        "pts": 21,
+        "pa": 26,
+        "vegas_implied": 21.8,
+        "opponent": "SF",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 13,
+        "pa": 44,
+        "vegas_implied": 24.5,
+        "opponent": "SEA",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 19,
+        "pa": 31,
+        "vegas_implied": 32.0,
+        "opponent": "BUF",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 26,
+        "pa": 14,
+        "vegas_implied": 20.0,
+        "opponent": "NYG",
+        "is_home": true
+      },
+      {
+        "week": 6,
+        "pts": 19,
+        "pa": 25,
+        "vegas_implied": 25.0,
+        "opponent": "NE",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 14,
+        "pa": 26,
+        "vegas_implied": 24.0,
+        "opponent": "CHI",
+        "is_home": false
+      },
+      {
+        "week": 8,
+        "pts": 3,
+        "pa": 23,
+        "vegas_implied": 25.5,
+        "opponent": "TB",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 10,
+        "pa": 34,
+        "vegas_implied": 29.2,
+        "opponent": "LA",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 17,
+        "pa": 7,
+        "vegas_implied": 22.0,
+        "opponent": "CAR",
+        "is_home": false
+      },
+      {
+        "week": 12,
+        "pts": 10,
+        "pa": 24,
+        "vegas_implied": 20.0,
+        "opponent": "ATL",
+        "is_home": true
+      },
+      {
+        "week": 13,
+        "pts": 17,
+        "pa": 21,
+        "vegas_implied": 23.5,
+        "opponent": "MIA",
+        "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 24,
+        "pa": 20,
+        "vegas_implied": 24.5,
+        "opponent": "TB",
+        "is_home": false
+      },
+      {
+        "week": 15,
+        "pts": 20,
+        "pa": 17,
+        "vegas_implied": 22.0,
+        "opponent": "CAR",
+        "is_home": true
+      },
+      {
+        "week": 16,
+        "pts": 29,
+        "pa": 6,
+        "vegas_implied": 16.5,
+        "opponent": "NYJ",
+        "is_home": true
+      },
+      {
+        "week": 17,
+        "pts": 34,
+        "pa": 26,
+        "vegas_implied": 19.0,
+        "opponent": "TEN",
+        "is_home": false
+      },
+      {
+        "week": 18,
+        "pts": 17,
+        "pa": 19,
+        "vegas_implied": 24.0,
+        "opponent": "ATL",
+        "is_home": false
+      }
+    ],
+    "ARI": [
+      {
+        "week": 1,
+        "pts": 20,
+        "pa": 13,
+        "vegas_implied": 19.2,
+        "opponent": "NO",
+        "is_home": false
+      },
+      {
+        "week": 2,
+        "pts": 27,
+        "pa": 22,
+        "vegas_implied": 19.2,
+        "opponent": "CAR",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 15,
+        "pa": 16,
+        "vegas_implied": 23.0,
+        "opponent": "SF",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 20,
+        "pa": 23,
+        "vegas_implied": 22.5,
+        "opponent": "SEA",
+        "is_home": true
+      },
+      {
+        "week": 5,
+        "pts": 21,
+        "pa": 22,
+        "vegas_implied": 17.0,
+        "opponent": "TEN",
+        "is_home": true
+      },
+      {
+        "week": 6,
+        "pts": 27,
+        "pa": 31,
+        "vegas_implied": 27.5,
+        "opponent": "IND",
+        "is_home": false
+      },
+      {
+        "week": 7,
+        "pts": 23,
+        "pa": 27,
+        "vegas_implied": 25.8,
+        "opponent": "GB",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 27,
+        "pa": 17,
+        "vegas_implied": 28.5,
+        "opponent": "DAL",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 22,
+        "pa": 44,
+        "vegas_implied": 25.8,
+        "opponent": "SEA",
+        "is_home": false
+      },
+      {
+        "week": 11,
+        "pts": 22,
+        "pa": 41,
+        "vegas_implied": 26.0,
+        "opponent": "SF",
+        "is_home": true
+      },
+      {
+        "week": 12,
+        "pts": 24,
+        "pa": 27,
+        "vegas_implied": 25.0,
+        "opponent": "JAX",
+        "is_home": true
+      },
+      {
+        "week": 13,
+        "pts": 17,
+        "pa": 20,
+        "vegas_implied": 24.5,
+        "opponent": "TB",
+        "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 17,
+        "pa": 45,
+        "vegas_implied": 29.5,
+        "opponent": "LA",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 20,
+        "pa": 40,
+        "vegas_implied": 26.5,
+        "opponent": "HOU",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 19,
+        "pa": 26,
+        "vegas_implied": 25.5,
+        "opponent": "ATL",
+        "is_home": true
+      },
+      {
+        "week": 17,
+        "pts": 14,
+        "pa": 37,
+        "vegas_implied": 29.8,
+        "opponent": "CIN",
+        "is_home": false
+      },
+      {
+        "week": 18,
+        "pts": 20,
+        "pa": 37,
+        "vegas_implied": 32.0,
+        "opponent": "LA",
+        "is_home": false
+      }
+    ],
+    "DET": [
+      {
+        "week": 1,
+        "pts": 13,
+        "pa": 27,
+        "vegas_implied": 25.0,
+        "opponent": "GB",
+        "is_home": false
+      },
+      {
+        "week": 2,
+        "pts": 52,
+        "pa": 21,
+        "vegas_implied": 20.2,
+        "opponent": "CHI",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 38,
+        "pa": 30,
+        "vegas_implied": 29.0,
+        "opponent": "BAL",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 34,
+        "pa": 10,
+        "vegas_implied": 17.2,
+        "opponent": "CLE",
+        "is_home": true
+      },
+      {
+        "week": 5,
+        "pts": 37,
+        "pa": 24,
+        "vegas_implied": 19.5,
+        "opponent": "CIN",
+        "is_home": false
+      },
+      {
+        "week": 6,
+        "pts": 17,
+        "pa": 30,
+        "vegas_implied": 27.0,
+        "opponent": "KC",
+        "is_home": false
+      },
+      {
+        "week": 7,
+        "pts": 24,
+        "pa": 9,
+        "vegas_implied": 24.2,
+        "opponent": "TB",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 24,
+        "pa": 27,
+        "vegas_implied": 19.0,
+        "opponent": "MIN",
+        "is_home": true
+      },
+      {
+        "week": 10,
+        "pts": 44,
+        "pa": 22,
+        "vegas_implied": 20.5,
+        "opponent": "WAS",
+        "is_home": false
+      },
+      {
+        "week": 11,
+        "pts": 9,
+        "pa": 16,
+        "vegas_implied": 24.5,
+        "opponent": "PHI",
+        "is_home": false
+      },
+      {
+        "week": 12,
+        "pts": 34,
+        "pa": 27,
+        "vegas_implied": 18.2,
+        "opponent": "NYG",
+        "is_home": true
+      },
+      {
+        "week": 13,
+        "pts": 24,
+        "pa": 31,
+        "vegas_implied": 23.0,
+        "opponent": "GB",
+        "is_home": true
+      },
+      {
+        "week": 14,
+        "pts": 44,
+        "pa": 30,
+        "vegas_implied": 26.0,
+        "opponent": "DAL",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 34,
+        "pa": 41,
+        "vegas_implied": 30.0,
+        "opponent": "LA",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 24,
+        "pa": 29,
+        "vegas_implied": 22.5,
+        "opponent": "PIT",
+        "is_home": true
+      },
+      {
+        "week": 17,
+        "pts": 10,
+        "pa": 23,
+        "vegas_implied": 19.2,
+        "opponent": "MIN",
+        "is_home": false
+      },
+      {
+        "week": 18,
+        "pts": 19,
+        "pa": 16,
+        "vegas_implied": 27.5,
+        "opponent": "CHI",
         "is_home": false
       }
     ],
@@ -414,6 +690,282 @@
         "is_home": true
       }
     ],
+    "GB": [
+      {
+        "week": 1,
+        "pts": 27,
+        "pa": 13,
+        "vegas_implied": 23.5,
+        "opponent": "DET",
+        "is_home": true
+      },
+      {
+        "week": 2,
+        "pts": 27,
+        "pa": 18,
+        "vegas_implied": 22.5,
+        "opponent": "WAS",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 10,
+        "pa": 13,
+        "vegas_implied": 16.5,
+        "opponent": "CLE",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 40,
+        "pa": 40,
+        "vegas_implied": 20.2,
+        "opponent": "DAL",
+        "is_home": false
+      },
+      {
+        "week": 6,
+        "pts": 27,
+        "pa": 18,
+        "vegas_implied": 15.2,
+        "opponent": "CIN",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 27,
+        "pa": 23,
+        "vegas_implied": 18.8,
+        "opponent": "ARI",
+        "is_home": false
+      },
+      {
+        "week": 8,
+        "pts": 35,
+        "pa": 25,
+        "vegas_implied": 21.8,
+        "opponent": "PIT",
+        "is_home": false
+      },
+      {
+        "week": 9,
+        "pts": 13,
+        "pa": 16,
+        "vegas_implied": 15.5,
+        "opponent": "CAR",
+        "is_home": true
+      },
+      {
+        "week": 10,
+        "pts": 7,
+        "pa": 10,
+        "vegas_implied": 22.0,
+        "opponent": "PHI",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 27,
+        "pa": 20,
+        "vegas_implied": 17.0,
+        "opponent": "NYG",
+        "is_home": false
+      },
+      {
+        "week": 12,
+        "pts": 23,
+        "pa": 6,
+        "vegas_implied": 17.5,
+        "opponent": "MIN",
+        "is_home": true
+      },
+      {
+        "week": 13,
+        "pts": 31,
+        "pa": 24,
+        "vegas_implied": 25.5,
+        "opponent": "DET",
+        "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 28,
+        "pa": 21,
+        "vegas_implied": 19.0,
+        "opponent": "CHI",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 26,
+        "pa": 34,
+        "vegas_implied": 20.5,
+        "opponent": "DEN",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 16,
+        "pa": 22,
+        "vegas_implied": 23.5,
+        "opponent": "CHI",
+        "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 24,
+        "pa": 41,
+        "vegas_implied": 18.0,
+        "opponent": "BAL",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 3,
+        "pa": 16,
+        "vegas_implied": 25.0,
+        "opponent": "MIN",
+        "is_home": false
+      }
+    ],
+    "KC": [
+      {
+        "week": 1,
+        "pts": 21,
+        "pa": 27,
+        "vegas_implied": 22.2,
+        "opponent": "LAC",
+        "is_home": false
+      },
+      {
+        "week": 2,
+        "pts": 17,
+        "pa": 20,
+        "vegas_implied": 24.0,
+        "opponent": "PHI",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 22,
+        "pa": 9,
+        "vegas_implied": 19.2,
+        "opponent": "NYG",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 37,
+        "pa": 20,
+        "vegas_implied": 25.5,
+        "opponent": "BAL",
+        "is_home": true
+      },
+      {
+        "week": 5,
+        "pts": 28,
+        "pa": 31,
+        "vegas_implied": 21.0,
+        "opponent": "JAX",
+        "is_home": false
+      },
+      {
+        "week": 6,
+        "pts": 30,
+        "pa": 17,
+        "vegas_implied": 24.5,
+        "opponent": "DET",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 31,
+        "pa": 0,
+        "vegas_implied": 15.5,
+        "opponent": "LV",
+        "is_home": true
+      },
+      {
+        "week": 8,
+        "pts": 28,
+        "pa": 7,
+        "vegas_implied": 19.0,
+        "opponent": "WAS",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 21,
+        "pa": 28,
+        "vegas_implied": 25.5,
+        "opponent": "BUF",
+        "is_home": false
+      },
+      {
+        "week": 11,
+        "pts": 19,
+        "pa": 22,
+        "vegas_implied": 20.5,
+        "opponent": "DEN",
+        "is_home": false
+      },
+      {
+        "week": 12,
+        "pts": 23,
+        "pa": 20,
+        "vegas_implied": 23.5,
+        "opponent": "IND",
+        "is_home": true
+      },
+      {
+        "week": 13,
+        "pts": 28,
+        "pa": 31,
+        "vegas_implied": 25.0,
+        "opponent": "DAL",
+        "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 10,
+        "pa": 20,
+        "vegas_implied": 18.5,
+        "opponent": "HOU",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 13,
+        "pa": 16,
+        "vegas_implied": 18.0,
+        "opponent": "LAC",
+        "is_home": true
+      },
+      {
+        "week": 16,
+        "pts": 9,
+        "pa": 26,
+        "vegas_implied": 17.0,
+        "opponent": "TEN",
+        "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 13,
+        "pa": 20,
+        "vegas_implied": 25.5,
+        "opponent": "DEN",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 12,
+        "pa": 14,
+        "vegas_implied": 16.5,
+        "opponent": "LV",
+        "is_home": false
+      }
+    ],
     "SEA": [
       {
         "week": 1,
@@ -552,693 +1104,141 @@
         "is_home": false
       }
     ],
-    "PHI": [
+    "BAL": [
       {
         "week": 1,
-        "pts": 24,
-        "pa": 20,
-        "vegas_implied": 19.5,
-        "opponent": "DAL",
-        "is_home": true
-      },
-      {
-        "week": 2,
-        "pts": 20,
-        "pa": 17,
-        "vegas_implied": 22.5,
-        "opponent": "KC",
+        "pts": 40,
+        "pa": 41,
+        "vegas_implied": 24.5,
+        "opponent": "BUF",
         "is_home": false
       },
       {
+        "week": 2,
+        "pts": 41,
+        "pa": 17,
+        "vegas_implied": 17.0,
+        "opponent": "CLE",
+        "is_home": true
+      },
+      {
         "week": 3,
-        "pts": 33,
-        "pa": 26,
-        "vegas_implied": 21.0,
-        "opponent": "LA",
+        "pts": 30,
+        "pa": 38,
+        "vegas_implied": 24.5,
+        "opponent": "DET",
         "is_home": true
       },
       {
         "week": 4,
-        "pts": 31,
-        "pa": 25,
-        "vegas_implied": 20.5,
-        "opponent": "TB",
+        "pts": 20,
+        "pa": 37,
+        "vegas_implied": 23.0,
+        "opponent": "KC",
         "is_home": false
       },
       {
         "week": 5,
-        "pts": 17,
-        "pa": 21,
-        "vegas_implied": 20.5,
-        "opponent": "DEN",
+        "pts": 10,
+        "pa": 44,
+        "vegas_implied": 22.0,
+        "opponent": "HOU",
         "is_home": true
       },
       {
         "week": 6,
-        "pts": 17,
-        "pa": 34,
-        "vegas_implied": 16.8,
-        "opponent": "NYG",
+        "pts": 3,
+        "pa": 17,
+        "vegas_implied": 25.2,
+        "opponent": "LA",
+        "is_home": true
+      },
+      {
+        "week": 8,
+        "pts": 30,
+        "pa": 16,
+        "vegas_implied": 21.5,
+        "opponent": "CHI",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 28,
+        "pa": 6,
+        "vegas_implied": 22.0,
+        "opponent": "MIA",
         "is_home": false
       },
       {
-        "week": 7,
-        "pts": 28,
-        "pa": 22,
-        "vegas_implied": 20.5,
+        "week": 10,
+        "pts": 27,
+        "pa": 19,
+        "vegas_implied": 22.0,
         "opponent": "MIN",
         "is_home": false
       },
       {
-        "week": 8,
-        "pts": 38,
-        "pa": 20,
-        "vegas_implied": 18.2,
-        "opponent": "NYG",
+        "week": 11,
+        "pts": 23,
+        "pa": 16,
+        "vegas_implied": 15.0,
+        "opponent": "CLE",
+        "is_home": false
+      },
+      {
+        "week": 12,
+        "pts": 23,
+        "pa": 10,
+        "vegas_implied": 15.2,
+        "opponent": "NYJ",
         "is_home": true
       },
       {
-        "week": 10,
-        "pts": 10,
-        "pa": 7,
-        "vegas_implied": 23.5,
+        "week": 13,
+        "pts": 14,
+        "pa": 32,
+        "vegas_implied": 22.8,
+        "opponent": "CIN",
+        "is_home": true
+      },
+      {
+        "week": 14,
+        "pts": 22,
+        "pa": 27,
+        "vegas_implied": 19.0,
+        "opponent": "PIT",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 24,
+        "pa": 0,
+        "vegas_implied": 24.5,
+        "opponent": "CIN",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 24,
+        "pa": 28,
+        "vegas_implied": 22.5,
+        "opponent": "NE",
+        "is_home": true
+      },
+      {
+        "week": 17,
+        "pts": 41,
+        "pa": 24,
+        "vegas_implied": 20.5,
         "opponent": "GB",
         "is_home": false
       },
       {
-        "week": 11,
-        "pts": 16,
-        "pa": 9,
-        "vegas_implied": 22.0,
-        "opponent": "DET",
-        "is_home": true
-      },
-      {
-        "week": 12,
-        "pts": 21,
-        "pa": 24,
-        "vegas_implied": 22.2,
-        "opponent": "DAL",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 15,
-        "pa": 24,
-        "vegas_implied": 18.2,
-        "opponent": "CHI",
-        "is_home": true
-      },
-      {
-        "week": 14,
-        "pts": 19,
-        "pa": 22,
-        "vegas_implied": 20.0,
-        "opponent": "LAC",
-        "is_home": false
-      },
-      {
-        "week": 15,
-        "pts": 31,
-        "pa": 0,
-        "vegas_implied": 12.5,
-        "opponent": "LV",
-        "is_home": true
-      },
-      {
-        "week": 16,
-        "pts": 29,
-        "pa": 18,
-        "vegas_implied": 18.2,
-        "opponent": "WAS",
-        "is_home": false
-      },
-      {
-        "week": 17,
-        "pts": 13,
-        "pa": 12,
-        "vegas_implied": 24.2,
-        "opponent": "BUF",
-        "is_home": false
-      },
-      {
         "week": 18,
-        "pts": 17,
-        "pa": 24,
-        "vegas_implied": 17.8,
-        "opponent": "WAS",
-        "is_home": true
-      }
-    ],
-    "ATL": [
-      {
-        "week": 1,
-        "pts": 20,
-        "pa": 23,
-        "vegas_implied": 24.5,
-        "opponent": "TB",
-        "is_home": true
-      },
-      {
-        "week": 2,
-        "pts": 22,
-        "pa": 6,
-        "vegas_implied": 24.0,
-        "opponent": "MIN",
-        "is_home": false
-      },
-      {
-        "week": 3,
-        "pts": 0,
-        "pa": 30,
-        "vegas_implied": 19.5,
-        "opponent": "CAR",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 34,
-        "pa": 27,
-        "vegas_implied": 20.5,
-        "opponent": "WAS",
-        "is_home": true
-      },
-      {
-        "week": 6,
         "pts": 24,
-        "pa": 14,
-        "vegas_implied": 26.5,
-        "opponent": "BUF",
-        "is_home": true
-      },
-      {
-        "week": 7,
-        "pts": 10,
-        "pa": 20,
-        "vegas_implied": 24.0,
-        "opponent": "SF",
-        "is_home": false
-      },
-      {
-        "week": 8,
-        "pts": 10,
-        "pa": 34,
-        "vegas_implied": 18.8,
-        "opponent": "MIA",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 23,
-        "pa": 24,
-        "vegas_implied": 25.5,
-        "opponent": "NE",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 25,
-        "pa": 31,
-        "vegas_implied": 27.5,
-        "opponent": "IND",
-        "is_home": false
-      },
-      {
-        "week": 11,
-        "pts": 27,
-        "pa": 30,
-        "vegas_implied": 19.0,
-        "opponent": "CAR",
-        "is_home": true
-      },
-      {
-        "week": 12,
-        "pts": 24,
-        "pa": 10,
-        "vegas_implied": 21.5,
-        "opponent": "NO",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 24,
-        "pa": 27,
-        "vegas_implied": 17.8,
-        "opponent": "NYJ",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 9,
-        "pa": 37,
-        "vegas_implied": 25.8,
-        "opponent": "SEA",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 29,
-        "pa": 28,
-        "vegas_implied": 24.8,
-        "opponent": "TB",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 26,
-        "pa": 19,
-        "vegas_implied": 23.0,
-        "opponent": "ARI",
-        "is_home": false
-      },
-      {
-        "week": 17,
-        "pts": 27,
-        "pa": 24,
-        "vegas_implied": 28.0,
-        "opponent": "LA",
-        "is_home": true
-      },
-      {
-        "week": 18,
-        "pts": 19,
-        "pa": 17,
-        "vegas_implied": 19.5,
-        "opponent": "NO",
-        "is_home": true
-      }
-    ],
-    "IND": [
-      {
-        "week": 1,
-        "pts": 33,
-        "pa": 8,
-        "vegas_implied": 23.0,
-        "opponent": "MIA",
-        "is_home": true
-      },
-      {
-        "week": 2,
-        "pts": 29,
-        "pa": 28,
-        "vegas_implied": 23.0,
-        "opponent": "DEN",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 41,
-        "pa": 20,
-        "vegas_implied": 18.8,
-        "opponent": "TEN",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 20,
-        "pa": 27,
-        "vegas_implied": 26.5,
-        "opponent": "LA",
-        "is_home": false
-      },
-      {
-        "week": 5,
-        "pts": 40,
-        "pa": 6,
-        "vegas_implied": 19.8,
-        "opponent": "LV",
-        "is_home": true
-      },
-      {
-        "week": 6,
-        "pts": 31,
-        "pa": 27,
-        "vegas_implied": 19.0,
-        "opponent": "ARI",
-        "is_home": true
-      },
-      {
-        "week": 7,
-        "pts": 38,
-        "pa": 24,
-        "vegas_implied": 25.5,
-        "opponent": "LAC",
-        "is_home": false
-      },
-      {
-        "week": 8,
-        "pts": 38,
-        "pa": 14,
-        "vegas_implied": 16.0,
-        "opponent": "TEN",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 20,
-        "pa": 27,
-        "vegas_implied": 24.0,
-        "opponent": "PIT",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 31,
-        "pa": 25,
-        "vegas_implied": 21.0,
-        "opponent": "ATL",
-        "is_home": true
-      },
-      {
-        "week": 12,
-        "pts": 20,
-        "pa": 23,
-        "vegas_implied": 27.0,
-        "opponent": "KC",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 16,
-        "pa": 20,
-        "vegas_implied": 20.8,
-        "opponent": "HOU",
-        "is_home": true
-      },
-      {
-        "week": 14,
-        "pts": 19,
-        "pa": 36,
-        "vegas_implied": 21.0,
-        "opponent": "JAX",
-        "is_home": false
-      },
-      {
-        "week": 15,
-        "pts": 16,
-        "pa": 18,
-        "vegas_implied": 27.5,
-        "opponent": "SEA",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 27,
-        "pa": 48,
-        "vegas_implied": 25.5,
-        "opponent": "SF",
-        "is_home": true
-      },
-      {
-        "week": 17,
-        "pts": 17,
-        "pa": 23,
-        "vegas_implied": 26.0,
-        "opponent": "JAX",
-        "is_home": true
-      },
-      {
-        "week": 18,
-        "pts": 30,
-        "pa": 38,
-        "vegas_implied": 23.5,
-        "opponent": "HOU",
-        "is_home": false
-      }
-    ],
-    "TB": [
-      {
-        "week": 1,
-        "pts": 23,
-        "pa": 20,
-        "vegas_implied": 23.0,
-        "opponent": "ATL",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 20,
-        "pa": 19,
-        "vegas_implied": 22.5,
-        "opponent": "HOU",
-        "is_home": false
-      },
-      {
-        "week": 3,
-        "pts": 29,
-        "pa": 27,
+        "pa": 26,
         "vegas_implied": 18.5,
-        "opponent": "NYJ",
-        "is_home": true
-      },
-      {
-        "week": 4,
-        "pts": 25,
-        "pa": 31,
-        "vegas_implied": 24.0,
-        "opponent": "PHI",
-        "is_home": true
-      },
-      {
-        "week": 5,
-        "pts": 38,
-        "pa": 35,
-        "vegas_implied": 24.0,
-        "opponent": "SEA",
-        "is_home": false
-      },
-      {
-        "week": 6,
-        "pts": 30,
-        "pa": 19,
-        "vegas_implied": 21.5,
-        "opponent": "SF",
-        "is_home": true
-      },
-      {
-        "week": 7,
-        "pts": 9,
-        "pa": 24,
-        "vegas_implied": 30.2,
-        "opponent": "DET",
-        "is_home": false
-      },
-      {
-        "week": 8,
-        "pts": 23,
-        "pa": 3,
-        "vegas_implied": 21.0,
-        "opponent": "NO",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 23,
-        "pa": 28,
-        "vegas_implied": 23.0,
-        "opponent": "NE",
-        "is_home": true
-      },
-      {
-        "week": 11,
-        "pts": 32,
-        "pa": 44,
-        "vegas_implied": 26.2,
-        "opponent": "BUF",
-        "is_home": false
-      },
-      {
-        "week": 12,
-        "pts": 7,
-        "pa": 34,
-        "vegas_implied": 28.2,
-        "opponent": "LA",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 20,
-        "pa": 17,
-        "vegas_implied": 20.0,
-        "opponent": "ARI",
-        "is_home": true
-      },
-      {
-        "week": 14,
-        "pts": 20,
-        "pa": 24,
-        "vegas_implied": 17.0,
-        "opponent": "NO",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 28,
-        "pa": 29,
-        "vegas_implied": 18.8,
-        "opponent": "ATL",
-        "is_home": true
-      },
-      {
-        "week": 16,
-        "pts": 20,
-        "pa": 23,
-        "vegas_implied": 20.8,
-        "opponent": "CAR",
-        "is_home": false
-      },
-      {
-        "week": 17,
-        "pts": 17,
-        "pa": 20,
-        "vegas_implied": 19.5,
-        "opponent": "MIA",
-        "is_home": false
-      },
-      {
-        "week": 18,
-        "pts": 16,
-        "pa": 14,
-        "vegas_implied": 20.2,
-        "opponent": "CAR",
-        "is_home": true
-      }
-    ],
-    "NO": [
-      {
-        "week": 1,
-        "pts": 13,
-        "pa": 20,
-        "vegas_implied": 25.2,
-        "opponent": "ARI",
-        "is_home": true
-      },
-      {
-        "week": 2,
-        "pts": 21,
-        "pa": 26,
-        "vegas_implied": 21.8,
-        "opponent": "SF",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 13,
-        "pa": 44,
-        "vegas_implied": 24.5,
-        "opponent": "SEA",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 19,
-        "pa": 31,
-        "vegas_implied": 32.0,
-        "opponent": "BUF",
-        "is_home": false
-      },
-      {
-        "week": 5,
-        "pts": 26,
-        "pa": 14,
-        "vegas_implied": 20.0,
-        "opponent": "NYG",
-        "is_home": true
-      },
-      {
-        "week": 6,
-        "pts": 19,
-        "pa": 25,
-        "vegas_implied": 25.0,
-        "opponent": "NE",
-        "is_home": true
-      },
-      {
-        "week": 7,
-        "pts": 14,
-        "pa": 26,
-        "vegas_implied": 24.0,
-        "opponent": "CHI",
-        "is_home": false
-      },
-      {
-        "week": 8,
-        "pts": 3,
-        "pa": 23,
-        "vegas_implied": 25.5,
-        "opponent": "TB",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 10,
-        "pa": 34,
-        "vegas_implied": 29.2,
-        "opponent": "LA",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 17,
-        "pa": 7,
-        "vegas_implied": 22.0,
-        "opponent": "CAR",
-        "is_home": false
-      },
-      {
-        "week": 12,
-        "pts": 10,
-        "pa": 24,
-        "vegas_implied": 20.0,
-        "opponent": "ATL",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 17,
-        "pa": 21,
-        "vegas_implied": 23.5,
-        "opponent": "MIA",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 24,
-        "pa": 20,
-        "vegas_implied": 24.5,
-        "opponent": "TB",
-        "is_home": false
-      },
-      {
-        "week": 15,
-        "pts": 20,
-        "pa": 17,
-        "vegas_implied": 22.0,
-        "opponent": "CAR",
-        "is_home": true
-      },
-      {
-        "week": 16,
-        "pts": 29,
-        "pa": 6,
-        "vegas_implied": 16.5,
-        "opponent": "NYJ",
-        "is_home": true
-      },
-      {
-        "week": 17,
-        "pts": 34,
-        "pa": 26,
-        "vegas_implied": 19.0,
-        "opponent": "TEN",
-        "is_home": false
-      },
-      {
-        "week": 18,
-        "pts": 17,
-        "pa": 19,
-        "vegas_implied": 24.0,
-        "opponent": "ATL",
+        "opponent": "PIT",
         "is_home": false
       }
     ],
@@ -1518,142 +1518,142 @@
         "is_home": true
       }
     ],
-    "CAR": [
+    "HOU": [
       {
         "week": 1,
-        "pts": 10,
-        "pa": 26,
-        "vegas_implied": 25.0,
-        "opponent": "JAX",
+        "pts": 9,
+        "pa": 14,
+        "vegas_implied": 23.5,
+        "opponent": "LA",
         "is_home": false
       },
       {
         "week": 2,
-        "pts": 22,
-        "pa": 27,
-        "vegas_implied": 26.2,
-        "opponent": "ARI",
-        "is_home": false
+        "pts": 19,
+        "pa": 20,
+        "vegas_implied": 20.0,
+        "opponent": "TB",
+        "is_home": true
       },
       {
         "week": 3,
-        "pts": 30,
-        "pa": 0,
-        "vegas_implied": 25.0,
-        "opponent": "ATL",
-        "is_home": true
-      },
-      {
-        "week": 4,
-        "pts": 13,
-        "pa": 42,
-        "vegas_implied": 24.0,
-        "opponent": "NE",
+        "pts": 10,
+        "pa": 17,
+        "vegas_implied": 22.5,
+        "opponent": "JAX",
         "is_home": false
       },
       {
-        "week": 5,
-        "pts": 27,
-        "pa": 24,
-        "vegas_implied": 23.0,
-        "opponent": "MIA",
+        "week": 4,
+        "pts": 26,
+        "pa": 0,
+        "vegas_implied": 16.0,
+        "opponent": "TEN",
         "is_home": true
       },
       {
-        "week": 6,
-        "pts": 30,
-        "pa": 27,
-        "vegas_implied": 25.2,
-        "opponent": "DAL",
-        "is_home": true
+        "week": 5,
+        "pts": 44,
+        "pa": 10,
+        "vegas_implied": 19.5,
+        "opponent": "BAL",
+        "is_home": false
       },
       {
         "week": 7,
-        "pts": 13,
-        "pa": 6,
-        "vegas_implied": 20.5,
-        "opponent": "NYJ",
+        "pts": 19,
+        "pa": 27,
+        "vegas_implied": 22.2,
+        "opponent": "SEA",
         "is_home": false
       },
       {
         "week": 8,
-        "pts": 9,
-        "pa": 40,
-        "vegas_implied": 27.2,
-        "opponent": "BUF",
+        "pts": 26,
+        "pa": 15,
+        "vegas_implied": 19.5,
+        "opponent": "SF",
         "is_home": true
       },
       {
         "week": 9,
-        "pts": 16,
-        "pa": 13,
-        "vegas_implied": 28.0,
-        "opponent": "GB",
-        "is_home": false
+        "pts": 15,
+        "pa": 18,
+        "vegas_implied": 19.5,
+        "opponent": "DEN",
+        "is_home": true
       },
       {
         "week": 10,
-        "pts": 7,
-        "pa": 17,
-        "vegas_implied": 16.5,
-        "opponent": "NO",
+        "pts": 36,
+        "pa": 29,
+        "vegas_implied": 19.5,
+        "opponent": "JAX",
         "is_home": true
       },
       {
         "week": 11,
-        "pts": 30,
-        "pa": 27,
-        "vegas_implied": 23.5,
-        "opponent": "ATL",
+        "pts": 16,
+        "pa": 13,
+        "vegas_implied": 16.0,
+        "opponent": "TEN",
         "is_home": false
       },
       {
         "week": 12,
-        "pts": 9,
-        "pa": 20,
-        "vegas_implied": 28.0,
-        "opponent": "SF",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 31,
-        "pa": 28,
-        "vegas_implied": 27.2,
-        "opponent": "LA",
+        "pts": 23,
+        "pa": 19,
+        "vegas_implied": 24.5,
+        "opponent": "BUF",
         "is_home": true
       },
       {
-        "week": 15,
-        "pts": 17,
-        "pa": 20,
-        "vegas_implied": 19.5,
-        "opponent": "NO",
+        "week": 13,
+        "pts": 20,
+        "pa": 16,
+        "vegas_implied": 23.8,
+        "opponent": "IND",
         "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 20,
+        "pa": 10,
+        "vegas_implied": 23.0,
+        "opponent": "KC",
+        "is_home": false
+      },
+      {
+        "week": 15,
+        "pts": 40,
+        "pa": 20,
+        "vegas_implied": 16.0,
+        "opponent": "ARI",
+        "is_home": true
       },
       {
         "week": 16,
         "pts": 23,
-        "pa": 20,
-        "vegas_implied": 23.8,
-        "opponent": "TB",
+        "pa": 21,
+        "vegas_implied": 12.5,
+        "opponent": "LV",
         "is_home": true
       },
       {
         "week": 17,
-        "pts": 10,
-        "pa": 27,
-        "vegas_implied": 24.5,
-        "opponent": "SEA",
-        "is_home": true
+        "pts": 20,
+        "pa": 16,
+        "vegas_implied": 21.0,
+        "opponent": "LAC",
+        "is_home": false
       },
       {
         "week": 18,
-        "pts": 14,
-        "pa": 16,
-        "vegas_implied": 23.2,
-        "opponent": "TB",
-        "is_home": false
+        "pts": 38,
+        "pa": 30,
+        "vegas_implied": 14.0,
+        "opponent": "IND",
+        "is_home": true
       }
     ],
     "SF": [
@@ -1794,1935 +1794,141 @@
         "is_home": true
       }
     ],
-    "NE": [
+    "NYJ": [
       {
         "week": 1,
-        "pts": 13,
-        "pa": 20,
-        "vegas_implied": 21.0,
-        "opponent": "LV",
-        "is_home": true
-      },
-      {
-        "week": 2,
-        "pts": 33,
-        "pa": 27,
-        "vegas_implied": 22.5,
-        "opponent": "MIA",
-        "is_home": false
-      },
-      {
-        "week": 3,
-        "pts": 14,
-        "pa": 21,
-        "vegas_implied": 23.0,
-        "opponent": "PIT",
-        "is_home": true
-      },
-      {
-        "week": 4,
-        "pts": 42,
-        "pa": 13,
-        "vegas_implied": 18.5,
-        "opponent": "CAR",
-        "is_home": true
-      },
-      {
-        "week": 5,
-        "pts": 23,
-        "pa": 20,
-        "vegas_implied": 28.5,
-        "opponent": "BUF",
-        "is_home": false
-      },
-      {
-        "week": 6,
-        "pts": 25,
-        "pa": 19,
-        "vegas_implied": 21.5,
-        "opponent": "NO",
-        "is_home": false
-      },
-      {
-        "week": 7,
-        "pts": 31,
-        "pa": 13,
-        "vegas_implied": 17.0,
-        "opponent": "TEN",
-        "is_home": false
-      },
-      {
-        "week": 8,
         "pts": 32,
-        "pa": 13,
-        "vegas_implied": 16.8,
-        "opponent": "CLE",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 24,
-        "pa": 23,
-        "vegas_implied": 20.0,
-        "opponent": "ATL",
-        "is_home": true
-      },
-      {
-        "week": 10,
-        "pts": 28,
-        "pa": 23,
-        "vegas_implied": 25.5,
-        "opponent": "TB",
-        "is_home": false
-      },
-      {
-        "week": 11,
-        "pts": 27,
-        "pa": 14,
-        "vegas_implied": 15.5,
-        "opponent": "NYJ",
-        "is_home": true
-      },
-      {
-        "week": 12,
-        "pts": 26,
-        "pa": 20,
-        "vegas_implied": 21.5,
-        "opponent": "CIN",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 33,
-        "pa": 15,
-        "vegas_implied": 19.8,
-        "opponent": "NYG",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 31,
-        "pa": 35,
-        "vegas_implied": 26.0,
-        "opponent": "BUF",
-        "is_home": true
-      },
-      {
-        "week": 16,
-        "pts": 28,
-        "pa": 24,
-        "vegas_implied": 26.0,
-        "opponent": "BAL",
-        "is_home": false
-      },
-      {
-        "week": 17,
-        "pts": 42,
-        "pa": 10,
-        "vegas_implied": 15.0,
-        "opponent": "NYJ",
-        "is_home": false
-      },
-      {
-        "week": 18,
-        "pts": 38,
-        "pa": 10,
-        "vegas_implied": 15.2,
-        "opponent": "MIA",
-        "is_home": true
-      }
-    ],
-    "KC": [
-      {
-        "week": 1,
-        "pts": 21,
-        "pa": 27,
-        "vegas_implied": 22.2,
-        "opponent": "LAC",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 17,
-        "pa": 20,
-        "vegas_implied": 24.0,
-        "opponent": "PHI",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 22,
-        "pa": 9,
-        "vegas_implied": 19.2,
-        "opponent": "NYG",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 37,
-        "pa": 20,
-        "vegas_implied": 25.5,
-        "opponent": "BAL",
-        "is_home": true
-      },
-      {
-        "week": 5,
-        "pts": 28,
-        "pa": 31,
-        "vegas_implied": 21.0,
-        "opponent": "JAX",
-        "is_home": false
-      },
-      {
-        "week": 6,
-        "pts": 30,
-        "pa": 17,
-        "vegas_implied": 24.5,
-        "opponent": "DET",
-        "is_home": true
-      },
-      {
-        "week": 7,
-        "pts": 31,
-        "pa": 0,
-        "vegas_implied": 15.5,
-        "opponent": "LV",
-        "is_home": true
-      },
-      {
-        "week": 8,
-        "pts": 28,
-        "pa": 7,
-        "vegas_implied": 19.0,
-        "opponent": "WAS",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 21,
-        "pa": 28,
-        "vegas_implied": 25.5,
-        "opponent": "BUF",
-        "is_home": false
-      },
-      {
-        "week": 11,
-        "pts": 19,
-        "pa": 22,
-        "vegas_implied": 20.5,
-        "opponent": "DEN",
-        "is_home": false
-      },
-      {
-        "week": 12,
-        "pts": 23,
-        "pa": 20,
-        "vegas_implied": 23.5,
-        "opponent": "IND",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 28,
-        "pa": 31,
-        "vegas_implied": 25.0,
-        "opponent": "DAL",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 10,
-        "pa": 20,
-        "vegas_implied": 18.5,
-        "opponent": "HOU",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 13,
-        "pa": 16,
-        "vegas_implied": 18.0,
-        "opponent": "LAC",
-        "is_home": true
-      },
-      {
-        "week": 16,
-        "pts": 9,
-        "pa": 26,
-        "vegas_implied": 17.0,
-        "opponent": "TEN",
-        "is_home": false
-      },
-      {
-        "week": 17,
-        "pts": 13,
-        "pa": 20,
-        "vegas_implied": 25.5,
-        "opponent": "DEN",
-        "is_home": true
-      },
-      {
-        "week": 18,
-        "pts": 12,
-        "pa": 14,
-        "vegas_implied": 16.5,
-        "opponent": "LV",
-        "is_home": false
-      }
-    ],
-    "DET": [
-      {
-        "week": 1,
-        "pts": 13,
-        "pa": 27,
-        "vegas_implied": 25.0,
-        "opponent": "GB",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 52,
-        "pa": 21,
+        "pa": 34,
         "vegas_implied": 20.2,
-        "opponent": "CHI",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 38,
-        "pa": 30,
-        "vegas_implied": 29.0,
-        "opponent": "BAL",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 34,
-        "pa": 10,
-        "vegas_implied": 17.2,
-        "opponent": "CLE",
-        "is_home": true
-      },
-      {
-        "week": 5,
-        "pts": 37,
-        "pa": 24,
-        "vegas_implied": 19.5,
-        "opponent": "CIN",
-        "is_home": false
-      },
-      {
-        "week": 6,
-        "pts": 17,
-        "pa": 30,
-        "vegas_implied": 27.0,
-        "opponent": "KC",
-        "is_home": false
-      },
-      {
-        "week": 7,
-        "pts": 24,
-        "pa": 9,
-        "vegas_implied": 24.2,
-        "opponent": "TB",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 24,
-        "pa": 27,
-        "vegas_implied": 19.0,
-        "opponent": "MIN",
-        "is_home": true
-      },
-      {
-        "week": 10,
-        "pts": 44,
-        "pa": 22,
-        "vegas_implied": 20.5,
-        "opponent": "WAS",
-        "is_home": false
-      },
-      {
-        "week": 11,
-        "pts": 9,
-        "pa": 16,
-        "vegas_implied": 24.5,
-        "opponent": "PHI",
-        "is_home": false
-      },
-      {
-        "week": 12,
-        "pts": 34,
-        "pa": 27,
-        "vegas_implied": 18.2,
-        "opponent": "NYG",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 24,
-        "pa": 31,
-        "vegas_implied": 23.0,
-        "opponent": "GB",
-        "is_home": true
-      },
-      {
-        "week": 14,
-        "pts": 44,
-        "pa": 30,
-        "vegas_implied": 26.0,
-        "opponent": "DAL",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 34,
-        "pa": 41,
-        "vegas_implied": 30.0,
-        "opponent": "LA",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 24,
-        "pa": 29,
-        "vegas_implied": 22.5,
         "opponent": "PIT",
         "is_home": true
       },
       {
-        "week": 17,
+        "week": 2,
         "pts": 10,
-        "pa": 23,
-        "vegas_implied": 19.2,
-        "opponent": "MIN",
-        "is_home": false
-      },
-      {
-        "week": 18,
-        "pts": 19,
-        "pa": 16,
-        "vegas_implied": 27.5,
-        "opponent": "CHI",
-        "is_home": false
-      }
-    ],
-    "CIN": [
-      {
-        "week": 1,
-        "pts": 17,
-        "pa": 16,
-        "vegas_implied": 21.0,
-        "opponent": "CLE",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 31,
-        "pa": 27,
-        "vegas_implied": 23.0,
-        "opponent": "JAX",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 10,
-        "pa": 48,
-        "vegas_implied": 22.2,
-        "opponent": "MIN",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 3,
-        "pa": 28,
-        "vegas_implied": 26.0,
-        "opponent": "DEN",
-        "is_home": false
-      },
-      {
-        "week": 5,
-        "pts": 24,
-        "pa": 37,
-        "vegas_implied": 30.0,
-        "opponent": "DET",
-        "is_home": true
-      },
-      {
-        "week": 6,
-        "pts": 18,
-        "pa": 27,
-        "vegas_implied": 29.2,
-        "opponent": "GB",
-        "is_home": false
-      },
-      {
-        "week": 7,
-        "pts": 33,
-        "pa": 31,
-        "vegas_implied": 25.5,
-        "opponent": "PIT",
-        "is_home": true
-      },
-      {
-        "week": 8,
-        "pts": 38,
-        "pa": 39,
-        "vegas_implied": 19.0,
-        "opponent": "NYJ",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 42,
-        "pa": 47,
-        "vegas_implied": 27.2,
-        "opponent": "CHI",
-        "is_home": true
-      },
-      {
-        "week": 11,
-        "pts": 12,
-        "pa": 34,
-        "vegas_implied": 27.0,
-        "opponent": "PIT",
-        "is_home": false
-      },
-      {
-        "week": 12,
-        "pts": 20,
-        "pa": 26,
-        "vegas_implied": 29.0,
-        "opponent": "NE",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 32,
-        "pa": 14,
-        "vegas_implied": 29.8,
-        "opponent": "BAL",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 34,
-        "pa": 39,
-        "vegas_implied": 30.2,
-        "opponent": "BUF",
-        "is_home": false
-      },
-      {
-        "week": 15,
-        "pts": 0,
-        "pa": 24,
-        "vegas_implied": 27.0,
-        "opponent": "BAL",
-        "is_home": true
-      },
-      {
-        "week": 16,
-        "pts": 45,
-        "pa": 21,
-        "vegas_implied": 22.5,
-        "opponent": "MIA",
-        "is_home": false
-      },
-      {
-        "week": 17,
-        "pts": 37,
-        "pa": 14,
-        "vegas_implied": 22.8,
-        "opponent": "ARI",
-        "is_home": true
-      },
-      {
-        "week": 18,
-        "pts": 18,
-        "pa": 20,
-        "vegas_implied": 19.0,
-        "opponent": "CLE",
-        "is_home": true
-      }
-    ],
-    "WAS": [
-      {
-        "week": 1,
-        "pts": 21,
-        "pa": 6,
-        "vegas_implied": 19.8,
-        "opponent": "NYG",
-        "is_home": true
-      },
-      {
-        "week": 2,
-        "pts": 18,
-        "pa": 27,
-        "vegas_implied": 26.0,
-        "opponent": "GB",
-        "is_home": false
-      },
-      {
-        "week": 3,
-        "pts": 41,
-        "pa": 24,
-        "vegas_implied": 20.5,
-        "opponent": "LV",
-        "is_home": true
-      },
-      {
-        "week": 4,
-        "pts": 27,
-        "pa": 34,
-        "vegas_implied": 23.0,
-        "opponent": "ATL",
-        "is_home": false
-      },
-      {
-        "week": 5,
-        "pts": 27,
-        "pa": 10,
-        "vegas_implied": 25.0,
-        "opponent": "LAC",
-        "is_home": false
-      },
-      {
-        "week": 6,
-        "pts": 24,
-        "pa": 25,
-        "vegas_implied": 22.0,
-        "opponent": "CHI",
-        "is_home": true
-      },
-      {
-        "week": 7,
-        "pts": 22,
-        "pa": 44,
-        "vegas_implied": 28.0,
-        "opponent": "DAL",
-        "is_home": false
-      },
-      {
-        "week": 8,
-        "pts": 7,
-        "pa": 28,
-        "vegas_implied": 29.5,
-        "opponent": "KC",
-        "is_home": false
-      },
-      {
-        "week": 9,
-        "pts": 14,
-        "pa": 38,
-        "vegas_implied": 25.0,
-        "opponent": "SEA",
-        "is_home": true
-      },
-      {
-        "week": 10,
-        "pts": 22,
-        "pa": 44,
-        "vegas_implied": 29.0,
-        "opponent": "DET",
-        "is_home": true
-      },
-      {
-        "week": 11,
-        "pts": 13,
-        "pa": 16,
-        "vegas_implied": 25.0,
-        "opponent": "MIA",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 26,
-        "pa": 27,
-        "vegas_implied": 25.0,
-        "opponent": "DEN",
-        "is_home": true
-      },
-      {
-        "week": 14,
-        "pts": 0,
-        "pa": 31,
-        "vegas_implied": 21.0,
-        "opponent": "MIN",
-        "is_home": false
-      },
-      {
-        "week": 15,
-        "pts": 29,
-        "pa": 21,
-        "vegas_implied": 24.5,
-        "opponent": "NYG",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 18,
-        "pa": 29,
-        "vegas_implied": 25.2,
-        "opponent": "PHI",
-        "is_home": true
-      },
-      {
-        "week": 17,
-        "pts": 23,
         "pa": 30,
-        "vegas_implied": 29.5,
-        "opponent": "DAL",
-        "is_home": true
-      },
-      {
-        "week": 18,
-        "pts": 24,
-        "pa": 17,
-        "vegas_implied": 20.8,
-        "opponent": "PHI",
-        "is_home": false
-      }
-    ],
-    "CHI": [
-      {
-        "week": 1,
-        "pts": 24,
-        "pa": 27,
-        "vegas_implied": 22.5,
-        "opponent": "MIN",
-        "is_home": true
-      },
-      {
-        "week": 2,
-        "pts": 21,
-        "pa": 52,
-        "vegas_implied": 26.2,
-        "opponent": "DET",
-        "is_home": false
-      },
-      {
-        "week": 3,
-        "pts": 31,
-        "pa": 14,
-        "vegas_implied": 25.5,
-        "opponent": "DAL",
-        "is_home": true
-      },
-      {
-        "week": 4,
-        "pts": 25,
-        "pa": 24,
-        "vegas_implied": 24.5,
-        "opponent": "LV",
-        "is_home": false
-      },
-      {
-        "week": 6,
-        "pts": 25,
-        "pa": 24,
-        "vegas_implied": 27.5,
-        "opponent": "WAS",
-        "is_home": false
-      },
-      {
-        "week": 7,
-        "pts": 26,
-        "pa": 14,
-        "vegas_implied": 19.5,
-        "opponent": "NO",
-        "is_home": true
-      },
-      {
-        "week": 8,
-        "pts": 16,
-        "pa": 30,
-        "vegas_implied": 24.0,
-        "opponent": "BAL",
-        "is_home": false
-      },
-      {
-        "week": 9,
-        "pts": 47,
-        "pa": 42,
-        "vegas_implied": 24.2,
-        "opponent": "CIN",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 24,
-        "pa": 20,
-        "vegas_implied": 20.5,
-        "opponent": "NYG",
-        "is_home": true
-      },
-      {
-        "week": 11,
-        "pts": 19,
-        "pa": 17,
-        "vegas_implied": 25.2,
-        "opponent": "MIN",
-        "is_home": false
-      },
-      {
-        "week": 12,
-        "pts": 31,
-        "pa": 28,
-        "vegas_implied": 21.8,
-        "opponent": "PIT",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 24,
-        "pa": 15,
-        "vegas_implied": 25.2,
-        "opponent": "PHI",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 21,
-        "pa": 28,
-        "vegas_implied": 25.5,
-        "opponent": "GB",
-        "is_home": false
-      },
-      {
-        "week": 15,
-        "pts": 31,
-        "pa": 3,
-        "vegas_implied": 15.5,
-        "opponent": "CLE",
-        "is_home": true
-      },
-      {
-        "week": 16,
-        "pts": 22,
-        "pa": 16,
-        "vegas_implied": 22.0,
-        "opponent": "GB",
-        "is_home": true
-      },
-      {
-        "week": 17,
-        "pts": 38,
-        "pa": 42,
-        "vegas_implied": 27.5,
-        "opponent": "SF",
-        "is_home": false
-      },
-      {
-        "week": 18,
-        "pts": 16,
-        "pa": 19,
-        "vegas_implied": 24.0,
-        "opponent": "DET",
-        "is_home": true
-      }
-    ],
-    "ARI": [
-      {
-        "week": 1,
-        "pts": 20,
-        "pa": 13,
-        "vegas_implied": 19.2,
-        "opponent": "NO",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 27,
-        "pa": 22,
-        "vegas_implied": 19.2,
-        "opponent": "CAR",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 15,
-        "pa": 16,
-        "vegas_implied": 23.0,
-        "opponent": "SF",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 20,
-        "pa": 23,
-        "vegas_implied": 22.5,
-        "opponent": "SEA",
-        "is_home": true
-      },
-      {
-        "week": 5,
-        "pts": 21,
-        "pa": 22,
-        "vegas_implied": 17.0,
-        "opponent": "TEN",
-        "is_home": true
-      },
-      {
-        "week": 6,
-        "pts": 27,
-        "pa": 31,
-        "vegas_implied": 27.5,
-        "opponent": "IND",
-        "is_home": false
-      },
-      {
-        "week": 7,
-        "pts": 23,
-        "pa": 27,
-        "vegas_implied": 25.8,
-        "opponent": "GB",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 27,
-        "pa": 17,
-        "vegas_implied": 28.5,
-        "opponent": "DAL",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 22,
-        "pa": 44,
-        "vegas_implied": 25.8,
-        "opponent": "SEA",
-        "is_home": false
-      },
-      {
-        "week": 11,
-        "pts": 22,
-        "pa": 41,
-        "vegas_implied": 26.0,
-        "opponent": "SF",
-        "is_home": true
-      },
-      {
-        "week": 12,
-        "pts": 24,
-        "pa": 27,
-        "vegas_implied": 25.0,
-        "opponent": "JAX",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 17,
-        "pa": 20,
-        "vegas_implied": 24.5,
-        "opponent": "TB",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 17,
-        "pa": 45,
-        "vegas_implied": 29.5,
-        "opponent": "LA",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 20,
-        "pa": 40,
-        "vegas_implied": 26.5,
-        "opponent": "HOU",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 19,
-        "pa": 26,
-        "vegas_implied": 25.5,
-        "opponent": "ATL",
-        "is_home": true
-      },
-      {
-        "week": 17,
-        "pts": 14,
-        "pa": 37,
-        "vegas_implied": 29.8,
-        "opponent": "CIN",
-        "is_home": false
-      },
-      {
-        "week": 18,
-        "pts": 20,
-        "pa": 37,
-        "vegas_implied": 32.0,
-        "opponent": "LA",
-        "is_home": false
-      }
-    ],
-    "HOU": [
-      {
-        "week": 1,
-        "pts": 9,
-        "pa": 14,
-        "vegas_implied": 23.5,
-        "opponent": "LA",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 19,
-        "pa": 20,
-        "vegas_implied": 20.0,
-        "opponent": "TB",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 10,
-        "pa": 17,
-        "vegas_implied": 22.5,
-        "opponent": "JAX",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 26,
-        "pa": 0,
-        "vegas_implied": 16.0,
-        "opponent": "TEN",
-        "is_home": true
-      },
-      {
-        "week": 5,
-        "pts": 44,
-        "pa": 10,
-        "vegas_implied": 19.5,
-        "opponent": "BAL",
-        "is_home": false
-      },
-      {
-        "week": 7,
-        "pts": 19,
-        "pa": 27,
-        "vegas_implied": 22.2,
-        "opponent": "SEA",
-        "is_home": false
-      },
-      {
-        "week": 8,
-        "pts": 26,
-        "pa": 15,
-        "vegas_implied": 19.5,
-        "opponent": "SF",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 15,
-        "pa": 18,
-        "vegas_implied": 19.5,
-        "opponent": "DEN",
-        "is_home": true
-      },
-      {
-        "week": 10,
-        "pts": 36,
-        "pa": 29,
-        "vegas_implied": 19.5,
-        "opponent": "JAX",
-        "is_home": true
-      },
-      {
-        "week": 11,
-        "pts": 16,
-        "pa": 13,
-        "vegas_implied": 16.0,
-        "opponent": "TEN",
-        "is_home": false
-      },
-      {
-        "week": 12,
-        "pts": 23,
-        "pa": 19,
-        "vegas_implied": 24.5,
-        "opponent": "BUF",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 20,
-        "pa": 16,
-        "vegas_implied": 23.8,
-        "opponent": "IND",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 20,
-        "pa": 10,
-        "vegas_implied": 23.0,
-        "opponent": "KC",
-        "is_home": false
-      },
-      {
-        "week": 15,
-        "pts": 40,
-        "pa": 20,
-        "vegas_implied": 16.0,
-        "opponent": "ARI",
-        "is_home": true
-      },
-      {
-        "week": 16,
-        "pts": 23,
-        "pa": 21,
-        "vegas_implied": 12.5,
-        "opponent": "LV",
-        "is_home": true
-      },
-      {
-        "week": 17,
-        "pts": 20,
-        "pa": 16,
-        "vegas_implied": 21.0,
-        "opponent": "LAC",
-        "is_home": false
-      },
-      {
-        "week": 18,
-        "pts": 38,
-        "pa": 30,
-        "vegas_implied": 14.0,
-        "opponent": "IND",
-        "is_home": true
-      }
-    ],
-    "LV": [
-      {
-        "week": 1,
-        "pts": 20,
-        "pa": 13,
-        "vegas_implied": 23.5,
-        "opponent": "NE",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 9,
-        "pa": 20,
-        "vegas_implied": 25.0,
-        "opponent": "LAC",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 24,
-        "pa": 41,
-        "vegas_implied": 23.0,
-        "opponent": "WAS",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 24,
-        "pa": 25,
-        "vegas_implied": 23.0,
-        "opponent": "CHI",
-        "is_home": true
-      },
-      {
-        "week": 5,
-        "pts": 6,
-        "pa": 40,
         "vegas_implied": 26.8,
-        "opponent": "IND",
-        "is_home": false
-      },
-      {
-        "week": 6,
-        "pts": 20,
-        "pa": 10,
-        "vegas_implied": 19.0,
-        "opponent": "TEN",
-        "is_home": true
-      },
-      {
-        "week": 7,
-        "pts": 0,
-        "pa": 31,
-        "vegas_implied": 29.0,
-        "opponent": "KC",
-        "is_home": false
-      },
-      {
-        "week": 9,
-        "pts": 29,
-        "pa": 30,
-        "vegas_implied": 23.0,
-        "opponent": "JAX",
-        "is_home": true
-      },
-      {
-        "week": 10,
-        "pts": 7,
-        "pa": 10,
-        "vegas_implied": 26.0,
-        "opponent": "DEN",
-        "is_home": false
-      },
-      {
-        "week": 11,
-        "pts": 16,
-        "pa": 33,
-        "vegas_implied": 26.0,
-        "opponent": "DAL",
-        "is_home": true
-      },
-      {
-        "week": 12,
-        "pts": 10,
-        "pa": 24,
-        "vegas_implied": 16.2,
-        "opponent": "CLE",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 14,
-        "pa": 31,
-        "vegas_implied": 25.2,
-        "opponent": "LAC",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 17,
-        "pa": 24,
-        "vegas_implied": 24.5,
-        "opponent": "DEN",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 0,
-        "pa": 31,
-        "vegas_implied": 25.0,
-        "opponent": "PHI",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 21,
-        "pa": 23,
-        "vegas_implied": 27.0,
-        "opponent": "HOU",
-        "is_home": false
-      },
-      {
-        "week": 17,
-        "pts": 10,
-        "pa": 34,
-        "vegas_implied": 21.8,
-        "opponent": "NYG",
-        "is_home": true
-      },
-      {
-        "week": 18,
-        "pts": 14,
-        "pa": 12,
-        "vegas_implied": 20.0,
-        "opponent": "KC",
-        "is_home": true
-      }
-    ],
-    "TEN": [
-      {
-        "week": 1,
-        "pts": 12,
-        "pa": 20,
-        "vegas_implied": 25.5,
-        "opponent": "DEN",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 19,
-        "pa": 33,
-        "vegas_implied": 23.5,
-        "opponent": "LA",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 20,
-        "pa": 41,
-        "vegas_implied": 24.8,
-        "opponent": "IND",
-        "is_home": true
-      },
-      {
-        "week": 4,
-        "pts": 0,
-        "pa": 26,
-        "vegas_implied": 23.5,
-        "opponent": "HOU",
-        "is_home": false
-      },
-      {
-        "week": 5,
-        "pts": 22,
-        "pa": 21,
-        "vegas_implied": 24.5,
-        "opponent": "ARI",
-        "is_home": false
-      },
-      {
-        "week": 6,
-        "pts": 10,
-        "pa": 20,
-        "vegas_implied": 22.5,
-        "opponent": "LV",
-        "is_home": false
-      },
-      {
-        "week": 7,
-        "pts": 13,
-        "pa": 31,
-        "vegas_implied": 23.5,
-        "opponent": "NE",
-        "is_home": true
-      },
-      {
-        "week": 8,
-        "pts": 14,
-        "pa": 38,
-        "vegas_implied": 31.5,
-        "opponent": "IND",
-        "is_home": false
-      },
-      {
-        "week": 9,
-        "pts": 20,
-        "pa": 27,
-        "vegas_implied": 27.2,
-        "opponent": "LAC",
-        "is_home": true
-      },
-      {
-        "week": 11,
-        "pts": 13,
-        "pa": 16,
-        "vegas_implied": 21.5,
-        "opponent": "HOU",
-        "is_home": true
-      },
-      {
-        "week": 12,
-        "pts": 24,
-        "pa": 30,
-        "vegas_implied": 27.0,
-        "opponent": "SEA",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 3,
-        "pa": 25,
-        "vegas_implied": 24.2,
-        "opponent": "JAX",
-        "is_home": true
-      },
-      {
-        "week": 14,
-        "pts": 31,
-        "pa": 29,
-        "vegas_implied": 19.0,
-        "opponent": "CLE",
-        "is_home": false
-      },
-      {
-        "week": 15,
-        "pts": 24,
-        "pa": 37,
-        "vegas_implied": 28.5,
-        "opponent": "SF",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 26,
-        "pa": 9,
-        "vegas_implied": 20.5,
-        "opponent": "KC",
-        "is_home": true
-      },
-      {
-        "week": 17,
-        "pts": 26,
-        "pa": 34,
-        "vegas_implied": 20.5,
-        "opponent": "NO",
-        "is_home": true
-      },
-      {
-        "week": 18,
-        "pts": 7,
-        "pa": 41,
-        "vegas_implied": 29.5,
-        "opponent": "JAX",
-        "is_home": false
-      }
-    ],
-    "BAL": [
-      {
-        "week": 1,
-        "pts": 40,
-        "pa": 41,
-        "vegas_implied": 24.5,
-        "opponent": "BUF",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 41,
-        "pa": 17,
-        "vegas_implied": 17.0,
-        "opponent": "CLE",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 30,
-        "pa": 38,
-        "vegas_implied": 24.5,
-        "opponent": "DET",
-        "is_home": true
-      },
-      {
-        "week": 4,
-        "pts": 20,
-        "pa": 37,
-        "vegas_implied": 23.0,
-        "opponent": "KC",
-        "is_home": false
-      },
-      {
-        "week": 5,
-        "pts": 10,
-        "pa": 44,
-        "vegas_implied": 22.0,
-        "opponent": "HOU",
-        "is_home": true
-      },
-      {
-        "week": 6,
-        "pts": 3,
-        "pa": 17,
-        "vegas_implied": 25.2,
-        "opponent": "LA",
-        "is_home": true
-      },
-      {
-        "week": 8,
-        "pts": 30,
-        "pa": 16,
-        "vegas_implied": 21.5,
-        "opponent": "CHI",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 28,
-        "pa": 6,
-        "vegas_implied": 22.0,
-        "opponent": "MIA",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 27,
-        "pa": 19,
-        "vegas_implied": 22.0,
-        "opponent": "MIN",
-        "is_home": false
-      },
-      {
-        "week": 11,
-        "pts": 23,
-        "pa": 16,
-        "vegas_implied": 15.0,
-        "opponent": "CLE",
-        "is_home": false
-      },
-      {
-        "week": 12,
-        "pts": 23,
-        "pa": 10,
-        "vegas_implied": 15.2,
-        "opponent": "NYJ",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 14,
-        "pa": 32,
-        "vegas_implied": 22.8,
-        "opponent": "CIN",
-        "is_home": true
-      },
-      {
-        "week": 14,
-        "pts": 22,
-        "pa": 27,
-        "vegas_implied": 19.0,
-        "opponent": "PIT",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 24,
-        "pa": 0,
-        "vegas_implied": 24.5,
-        "opponent": "CIN",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 24,
-        "pa": 28,
-        "vegas_implied": 22.5,
-        "opponent": "NE",
-        "is_home": true
-      },
-      {
-        "week": 17,
-        "pts": 41,
-        "pa": 24,
-        "vegas_implied": 20.5,
-        "opponent": "GB",
-        "is_home": false
-      },
-      {
-        "week": 18,
-        "pts": 24,
-        "pa": 26,
-        "vegas_implied": 18.5,
-        "opponent": "PIT",
-        "is_home": false
-      }
-    ],
-    "LAC": [
-      {
-        "week": 1,
-        "pts": 27,
-        "pa": 21,
-        "vegas_implied": 25.2,
-        "opponent": "KC",
-        "is_home": true
-      },
-      {
-        "week": 2,
-        "pts": 20,
-        "pa": 9,
-        "vegas_implied": 21.5,
-        "opponent": "LV",
-        "is_home": false
-      },
-      {
-        "week": 3,
-        "pts": 23,
-        "pa": 20,
-        "vegas_implied": 21.5,
-        "opponent": "DEN",
-        "is_home": true
-      },
-      {
-        "week": 4,
-        "pts": 18,
-        "pa": 21,
-        "vegas_implied": 18.8,
-        "opponent": "NYG",
-        "is_home": false
-      },
-      {
-        "week": 5,
-        "pts": 10,
-        "pa": 27,
-        "vegas_implied": 22.5,
-        "opponent": "WAS",
-        "is_home": true
-      },
-      {
-        "week": 6,
-        "pts": 29,
-        "pa": 27,
-        "vegas_implied": 21.0,
-        "opponent": "MIA",
-        "is_home": false
-      },
-      {
-        "week": 7,
-        "pts": 24,
-        "pa": 38,
-        "vegas_implied": 23.0,
-        "opponent": "IND",
-        "is_home": true
-      },
-      {
-        "week": 8,
-        "pts": 37,
-        "pa": 10,
-        "vegas_implied": 21.2,
-        "opponent": "MIN",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 27,
-        "pa": 20,
-        "vegas_implied": 17.2,
-        "opponent": "TEN",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 25,
-        "pa": 10,
-        "vegas_implied": 21.2,
-        "opponent": "PIT",
-        "is_home": true
-      },
-      {
-        "week": 11,
-        "pts": 6,
-        "pa": 35,
-        "vegas_implied": 20.2,
-        "opponent": "JAX",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 31,
-        "pa": 14,
-        "vegas_implied": 15.2,
-        "opponent": "LV",
-        "is_home": true
-      },
-      {
-        "week": 14,
-        "pts": 22,
-        "pa": 19,
-        "vegas_implied": 21.5,
-        "opponent": "PHI",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 16,
-        "pa": 13,
-        "vegas_implied": 23.5,
-        "opponent": "KC",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 34,
-        "pa": 17,
-        "vegas_implied": 26.0,
-        "opponent": "DAL",
-        "is_home": false
-      },
-      {
-        "week": 17,
-        "pts": 16,
-        "pa": 20,
-        "vegas_implied": 19.5,
-        "opponent": "HOU",
-        "is_home": true
-      },
-      {
-        "week": 18,
-        "pts": 3,
-        "pa": 19,
-        "vegas_implied": 26.0,
-        "opponent": "DEN",
-        "is_home": false
-      }
-    ],
-    "JAX": [
-      {
-        "week": 1,
-        "pts": 26,
-        "pa": 10,
-        "vegas_implied": 20.5,
-        "opponent": "CAR",
-        "is_home": true
-      },
-      {
-        "week": 2,
-        "pts": 27,
-        "pa": 31,
-        "vegas_implied": 26.5,
-        "opponent": "CIN",
-        "is_home": false
-      },
-      {
-        "week": 3,
-        "pts": 17,
-        "pa": 10,
-        "vegas_implied": 21.0,
-        "opponent": "HOU",
-        "is_home": true
-      },
-      {
-        "week": 4,
-        "pts": 26,
-        "pa": 21,
-        "vegas_implied": 24.5,
-        "opponent": "SF",
-        "is_home": false
-      },
-      {
-        "week": 5,
-        "pts": 31,
-        "pa": 28,
-        "vegas_implied": 24.5,
-        "opponent": "KC",
-        "is_home": true
-      },
-      {
-        "week": 6,
-        "pts": 12,
-        "pa": 20,
-        "vegas_implied": 24.5,
-        "opponent": "SEA",
-        "is_home": true
-      },
-      {
-        "week": 7,
-        "pts": 7,
-        "pa": 35,
-        "vegas_implied": 23.8,
-        "opponent": "LA",
-        "is_home": true
-      },
-      {
-        "week": 9,
-        "pts": 30,
-        "pa": 29,
-        "vegas_implied": 20.5,
-        "opponent": "LV",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 29,
-        "pa": 36,
-        "vegas_implied": 18.0,
-        "opponent": "HOU",
-        "is_home": false
-      },
-      {
-        "week": 11,
-        "pts": 35,
-        "pa": 6,
-        "vegas_implied": 23.2,
-        "opponent": "LAC",
-        "is_home": true
-      },
-      {
-        "week": 12,
-        "pts": 27,
-        "pa": 24,
-        "vegas_implied": 22.5,
-        "opponent": "ARI",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 25,
-        "pa": 3,
-        "vegas_implied": 18.2,
-        "opponent": "TEN",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 36,
-        "pa": 19,
-        "vegas_implied": 23.5,
-        "opponent": "IND",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 48,
-        "pa": 20,
-        "vegas_implied": 13.5,
-        "opponent": "NYJ",
-        "is_home": true
-      },
-      {
-        "week": 16,
-        "pts": 34,
-        "pa": 20,
-        "vegas_implied": 25.0,
-        "opponent": "DEN",
-        "is_home": false
-      },
-      {
-        "week": 17,
-        "pts": 23,
-        "pa": 17,
-        "vegas_implied": 22.5,
-        "opponent": "IND",
-        "is_home": false
-      },
-      {
-        "week": 18,
-        "pts": 41,
-        "pa": 7,
-        "vegas_implied": 17.0,
-        "opponent": "TEN",
-        "is_home": true
-      }
-    ],
-    "MIA": [
-      {
-        "week": 1,
-        "pts": 8,
-        "pa": 33,
-        "vegas_implied": 24.5,
-        "opponent": "IND",
-        "is_home": false
-      },
-      {
-        "week": 2,
-        "pts": 27,
-        "pa": 33,
-        "vegas_implied": 21.0,
-        "opponent": "NE",
-        "is_home": true
-      },
-      {
-        "week": 3,
-        "pts": 21,
-        "pa": 31,
-        "vegas_implied": 31.5,
-        "opponent": "BUF",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 27,
-        "pa": 21,
-        "vegas_implied": 21.0,
-        "opponent": "NYJ",
-        "is_home": true
-      },
-      {
-        "week": 5,
-        "pts": 24,
-        "pa": 27,
-        "vegas_implied": 21.5,
-        "opponent": "CAR",
-        "is_home": false
-      },
-      {
-        "week": 6,
-        "pts": 27,
-        "pa": 29,
-        "vegas_implied": 24.5,
-        "opponent": "LAC",
-        "is_home": true
-      },
-      {
-        "week": 7,
-        "pts": 6,
-        "pa": 31,
-        "vegas_implied": 18.5,
-        "opponent": "CLE",
-        "is_home": false
-      },
-      {
-        "week": 8,
-        "pts": 34,
-        "pa": 10,
-        "vegas_implied": 25.8,
-        "opponent": "ATL",
-        "is_home": false
-      },
-      {
-        "week": 9,
-        "pts": 6,
-        "pa": 28,
-        "vegas_implied": 29.5,
-        "opponent": "BAL",
-        "is_home": true
-      },
-      {
-        "week": 10,
-        "pts": 30,
-        "pa": 13,
-        "vegas_implied": 29.5,
         "opponent": "BUF",
         "is_home": true
       },
       {
-        "week": 11,
-        "pts": 16,
-        "pa": 13,
-        "vegas_implied": 22.5,
-        "opponent": "WAS",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 21,
-        "pa": 17,
-        "vegas_implied": 18.0,
-        "opponent": "NO",
-        "is_home": true
-      },
-      {
-        "week": 14,
-        "pts": 34,
-        "pa": 10,
-        "vegas_implied": 19.5,
-        "opponent": "NYJ",
-        "is_home": false
-      },
-      {
-        "week": 15,
-        "pts": 15,
-        "pa": 28,
-        "vegas_implied": 22.8,
-        "opponent": "PIT",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 21,
-        "pa": 45,
-        "vegas_implied": 26.0,
-        "opponent": "CIN",
-        "is_home": true
-      },
-      {
-        "week": 17,
-        "pts": 20,
-        "pa": 17,
+        "week": 3,
+        "pts": 27,
+        "pa": 29,
         "vegas_implied": 25.0,
         "opponent": "TB",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 21,
+        "pa": 27,
+        "vegas_implied": 23.5,
+        "opponent": "MIA",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 22,
+        "pa": 37,
+        "vegas_implied": 23.5,
+        "opponent": "DAL",
+        "is_home": true
+      },
+      {
+        "week": 6,
+        "pts": 11,
+        "pa": 13,
+        "vegas_implied": 25.5,
+        "opponent": "DEN",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 6,
+        "pa": 13,
+        "vegas_implied": 19.0,
+        "opponent": "CAR",
+        "is_home": true
+      },
+      {
+        "week": 8,
+        "pts": 39,
+        "pa": 38,
+        "vegas_implied": 24.5,
+        "opponent": "CIN",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 27,
+        "pa": 20,
+        "vegas_implied": 19.5,
+        "opponent": "CLE",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 14,
+        "pa": 27,
+        "vegas_implied": 28.0,
+        "opponent": "NE",
+        "is_home": false
+      },
+      {
+        "week": 12,
+        "pts": 10,
+        "pa": 23,
+        "vegas_implied": 29.2,
+        "opponent": "BAL",
+        "is_home": false
+      },
+      {
+        "week": 13,
+        "pts": 27,
+        "pa": 24,
+        "vegas_implied": 20.8,
+        "opponent": "ATL",
+        "is_home": true
+      },
+      {
+        "week": 14,
+        "pts": 10,
+        "pa": 34,
+        "vegas_implied": 22.0,
+        "opponent": "MIA",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 20,
+        "pa": 48,
+        "vegas_implied": 27.0,
+        "opponent": "JAX",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 6,
+        "pa": 29,
+        "vegas_implied": 23.0,
+        "opponent": "NO",
+        "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 10,
+        "pa": 42,
+        "vegas_implied": 27.5,
+        "opponent": "NE",
         "is_home": true
       },
       {
         "week": 18,
-        "pts": 10,
-        "pa": 38,
-        "vegas_implied": 29.2,
-        "opponent": "NE",
+        "pts": 8,
+        "pa": 35,
+        "vegas_implied": 26.0,
+        "opponent": "BUF",
         "is_home": false
       }
     ],
@@ -3864,280 +2070,418 @@
         "is_home": false
       }
     ],
-    "GB": [
+    "ATL": [
       {
         "week": 1,
-        "pts": 27,
-        "pa": 13,
-        "vegas_implied": 23.5,
-        "opponent": "DET",
+        "pts": 20,
+        "pa": 23,
+        "vegas_implied": 24.5,
+        "opponent": "TB",
         "is_home": true
       },
       {
         "week": 2,
-        "pts": 27,
-        "pa": 18,
-        "vegas_implied": 22.5,
+        "pts": 22,
+        "pa": 6,
+        "vegas_implied": 24.0,
+        "opponent": "MIN",
+        "is_home": false
+      },
+      {
+        "week": 3,
+        "pts": 0,
+        "pa": 30,
+        "vegas_implied": 19.5,
+        "opponent": "CAR",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 34,
+        "pa": 27,
+        "vegas_implied": 20.5,
         "opponent": "WAS",
         "is_home": true
       },
       {
-        "week": 3,
-        "pts": 10,
-        "pa": 13,
-        "vegas_implied": 16.5,
-        "opponent": "CLE",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 40,
-        "pa": 40,
-        "vegas_implied": 20.2,
-        "opponent": "DAL",
-        "is_home": false
-      },
-      {
         "week": 6,
-        "pts": 27,
-        "pa": 18,
-        "vegas_implied": 15.2,
-        "opponent": "CIN",
-        "is_home": true
-      },
-      {
-        "week": 7,
-        "pts": 27,
-        "pa": 23,
-        "vegas_implied": 18.8,
-        "opponent": "ARI",
-        "is_home": false
-      },
-      {
-        "week": 8,
-        "pts": 35,
-        "pa": 25,
-        "vegas_implied": 21.8,
-        "opponent": "PIT",
-        "is_home": false
-      },
-      {
-        "week": 9,
-        "pts": 13,
-        "pa": 16,
-        "vegas_implied": 15.5,
-        "opponent": "CAR",
-        "is_home": true
-      },
-      {
-        "week": 10,
-        "pts": 7,
-        "pa": 10,
-        "vegas_implied": 22.0,
-        "opponent": "PHI",
-        "is_home": true
-      },
-      {
-        "week": 11,
-        "pts": 27,
-        "pa": 20,
-        "vegas_implied": 17.0,
-        "opponent": "NYG",
-        "is_home": false
-      },
-      {
-        "week": 12,
-        "pts": 23,
-        "pa": 6,
-        "vegas_implied": 17.5,
-        "opponent": "MIN",
-        "is_home": true
-      },
-      {
-        "week": 13,
-        "pts": 31,
-        "pa": 24,
-        "vegas_implied": 25.5,
-        "opponent": "DET",
-        "is_home": false
-      },
-      {
-        "week": 14,
-        "pts": 28,
-        "pa": 21,
-        "vegas_implied": 19.0,
-        "opponent": "CHI",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 26,
-        "pa": 34,
-        "vegas_implied": 20.5,
-        "opponent": "DEN",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 16,
-        "pa": 22,
-        "vegas_implied": 23.5,
-        "opponent": "CHI",
-        "is_home": false
-      },
-      {
-        "week": 17,
         "pts": 24,
-        "pa": 41,
-        "vegas_implied": 18.0,
-        "opponent": "BAL",
-        "is_home": true
-      },
-      {
-        "week": 18,
-        "pts": 3,
-        "pa": 16,
-        "vegas_implied": 25.0,
-        "opponent": "MIN",
-        "is_home": false
-      }
-    ],
-    "NYJ": [
-      {
-        "week": 1,
-        "pts": 32,
-        "pa": 34,
-        "vegas_implied": 20.2,
-        "opponent": "PIT",
-        "is_home": true
-      },
-      {
-        "week": 2,
-        "pts": 10,
-        "pa": 30,
-        "vegas_implied": 26.8,
+        "pa": 14,
+        "vegas_implied": 26.5,
         "opponent": "BUF",
         "is_home": true
       },
       {
-        "week": 3,
-        "pts": 27,
-        "pa": 29,
-        "vegas_implied": 25.0,
-        "opponent": "TB",
-        "is_home": false
-      },
-      {
-        "week": 4,
-        "pts": 21,
-        "pa": 27,
-        "vegas_implied": 23.5,
-        "opponent": "MIA",
-        "is_home": false
-      },
-      {
-        "week": 5,
-        "pts": 22,
-        "pa": 37,
-        "vegas_implied": 23.5,
-        "opponent": "DAL",
-        "is_home": true
-      },
-      {
-        "week": 6,
-        "pts": 11,
-        "pa": 13,
-        "vegas_implied": 25.5,
-        "opponent": "DEN",
-        "is_home": true
-      },
-      {
         "week": 7,
-        "pts": 6,
-        "pa": 13,
+        "pts": 10,
+        "pa": 20,
+        "vegas_implied": 24.0,
+        "opponent": "SF",
+        "is_home": false
+      },
+      {
+        "week": 8,
+        "pts": 10,
+        "pa": 34,
+        "vegas_implied": 18.8,
+        "opponent": "MIA",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 23,
+        "pa": 24,
+        "vegas_implied": 25.5,
+        "opponent": "NE",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 25,
+        "pa": 31,
+        "vegas_implied": 27.5,
+        "opponent": "IND",
+        "is_home": false
+      },
+      {
+        "week": 11,
+        "pts": 27,
+        "pa": 30,
         "vegas_implied": 19.0,
         "opponent": "CAR",
         "is_home": true
       },
       {
-        "week": 8,
-        "pts": 39,
-        "pa": 38,
-        "vegas_implied": 24.5,
-        "opponent": "CIN",
-        "is_home": false
-      },
-      {
-        "week": 10,
-        "pts": 27,
-        "pa": 20,
-        "vegas_implied": 19.5,
-        "opponent": "CLE",
-        "is_home": true
-      },
-      {
-        "week": 11,
-        "pts": 14,
-        "pa": 27,
-        "vegas_implied": 28.0,
-        "opponent": "NE",
-        "is_home": false
-      },
-      {
         "week": 12,
-        "pts": 10,
-        "pa": 23,
-        "vegas_implied": 29.2,
-        "opponent": "BAL",
-        "is_home": false
-      },
-      {
-        "week": 13,
-        "pts": 27,
-        "pa": 24,
-        "vegas_implied": 20.8,
-        "opponent": "ATL",
-        "is_home": true
-      },
-      {
-        "week": 14,
-        "pts": 10,
-        "pa": 34,
-        "vegas_implied": 22.0,
-        "opponent": "MIA",
-        "is_home": true
-      },
-      {
-        "week": 15,
-        "pts": 20,
-        "pa": 48,
-        "vegas_implied": 27.0,
-        "opponent": "JAX",
-        "is_home": false
-      },
-      {
-        "week": 16,
-        "pts": 6,
-        "pa": 29,
-        "vegas_implied": 23.0,
+        "pts": 24,
+        "pa": 10,
+        "vegas_implied": 21.5,
         "opponent": "NO",
         "is_home": false
       },
       {
+        "week": 13,
+        "pts": 24,
+        "pa": 27,
+        "vegas_implied": 17.8,
+        "opponent": "NYJ",
+        "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 9,
+        "pa": 37,
+        "vegas_implied": 25.8,
+        "opponent": "SEA",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 29,
+        "pa": 28,
+        "vegas_implied": 24.8,
+        "opponent": "TB",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 26,
+        "pa": 19,
+        "vegas_implied": 23.0,
+        "opponent": "ARI",
+        "is_home": false
+      },
+      {
         "week": 17,
-        "pts": 10,
-        "pa": 42,
-        "vegas_implied": 27.5,
-        "opponent": "NE",
+        "pts": 27,
+        "pa": 24,
+        "vegas_implied": 28.0,
+        "opponent": "LA",
         "is_home": true
       },
       {
         "week": 18,
-        "pts": 8,
+        "pts": 19,
+        "pa": 17,
+        "vegas_implied": 19.5,
+        "opponent": "NO",
+        "is_home": true
+      }
+    ],
+    "CHI": [
+      {
+        "week": 1,
+        "pts": 24,
+        "pa": 27,
+        "vegas_implied": 22.5,
+        "opponent": "MIN",
+        "is_home": true
+      },
+      {
+        "week": 2,
+        "pts": 21,
+        "pa": 52,
+        "vegas_implied": 26.2,
+        "opponent": "DET",
+        "is_home": false
+      },
+      {
+        "week": 3,
+        "pts": 31,
+        "pa": 14,
+        "vegas_implied": 25.5,
+        "opponent": "DAL",
+        "is_home": true
+      },
+      {
+        "week": 4,
+        "pts": 25,
+        "pa": 24,
+        "vegas_implied": 24.5,
+        "opponent": "LV",
+        "is_home": false
+      },
+      {
+        "week": 6,
+        "pts": 25,
+        "pa": 24,
+        "vegas_implied": 27.5,
+        "opponent": "WAS",
+        "is_home": false
+      },
+      {
+        "week": 7,
+        "pts": 26,
+        "pa": 14,
+        "vegas_implied": 19.5,
+        "opponent": "NO",
+        "is_home": true
+      },
+      {
+        "week": 8,
+        "pts": 16,
+        "pa": 30,
+        "vegas_implied": 24.0,
+        "opponent": "BAL",
+        "is_home": false
+      },
+      {
+        "week": 9,
+        "pts": 47,
+        "pa": 42,
+        "vegas_implied": 24.2,
+        "opponent": "CIN",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 24,
+        "pa": 20,
+        "vegas_implied": 20.5,
+        "opponent": "NYG",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 19,
+        "pa": 17,
+        "vegas_implied": 25.2,
+        "opponent": "MIN",
+        "is_home": false
+      },
+      {
+        "week": 12,
+        "pts": 31,
+        "pa": 28,
+        "vegas_implied": 21.8,
+        "opponent": "PIT",
+        "is_home": true
+      },
+      {
+        "week": 13,
+        "pts": 24,
+        "pa": 15,
+        "vegas_implied": 25.2,
+        "opponent": "PHI",
+        "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 21,
+        "pa": 28,
+        "vegas_implied": 25.5,
+        "opponent": "GB",
+        "is_home": false
+      },
+      {
+        "week": 15,
+        "pts": 31,
+        "pa": 3,
+        "vegas_implied": 15.5,
+        "opponent": "CLE",
+        "is_home": true
+      },
+      {
+        "week": 16,
+        "pts": 22,
+        "pa": 16,
+        "vegas_implied": 22.0,
+        "opponent": "GB",
+        "is_home": true
+      },
+      {
+        "week": 17,
+        "pts": 38,
+        "pa": 42,
+        "vegas_implied": 27.5,
+        "opponent": "SF",
+        "is_home": false
+      },
+      {
+        "week": 18,
+        "pts": 16,
+        "pa": 19,
+        "vegas_implied": 24.0,
+        "opponent": "DET",
+        "is_home": true
+      }
+    ],
+    "NE": [
+      {
+        "week": 1,
+        "pts": 13,
+        "pa": 20,
+        "vegas_implied": 21.0,
+        "opponent": "LV",
+        "is_home": true
+      },
+      {
+        "week": 2,
+        "pts": 33,
+        "pa": 27,
+        "vegas_implied": 22.5,
+        "opponent": "MIA",
+        "is_home": false
+      },
+      {
+        "week": 3,
+        "pts": 14,
+        "pa": 21,
+        "vegas_implied": 23.0,
+        "opponent": "PIT",
+        "is_home": true
+      },
+      {
+        "week": 4,
+        "pts": 42,
+        "pa": 13,
+        "vegas_implied": 18.5,
+        "opponent": "CAR",
+        "is_home": true
+      },
+      {
+        "week": 5,
+        "pts": 23,
+        "pa": 20,
+        "vegas_implied": 28.5,
+        "opponent": "BUF",
+        "is_home": false
+      },
+      {
+        "week": 6,
+        "pts": 25,
+        "pa": 19,
+        "vegas_implied": 21.5,
+        "opponent": "NO",
+        "is_home": false
+      },
+      {
+        "week": 7,
+        "pts": 31,
+        "pa": 13,
+        "vegas_implied": 17.0,
+        "opponent": "TEN",
+        "is_home": false
+      },
+      {
+        "week": 8,
+        "pts": 32,
+        "pa": 13,
+        "vegas_implied": 16.8,
+        "opponent": "CLE",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 24,
+        "pa": 23,
+        "vegas_implied": 20.0,
+        "opponent": "ATL",
+        "is_home": true
+      },
+      {
+        "week": 10,
+        "pts": 28,
+        "pa": 23,
+        "vegas_implied": 25.5,
+        "opponent": "TB",
+        "is_home": false
+      },
+      {
+        "week": 11,
+        "pts": 27,
+        "pa": 14,
+        "vegas_implied": 15.5,
+        "opponent": "NYJ",
+        "is_home": true
+      },
+      {
+        "week": 12,
+        "pts": 26,
+        "pa": 20,
+        "vegas_implied": 21.5,
+        "opponent": "CIN",
+        "is_home": false
+      },
+      {
+        "week": 13,
+        "pts": 33,
+        "pa": 15,
+        "vegas_implied": 19.8,
+        "opponent": "NYG",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 31,
         "pa": 35,
         "vegas_implied": 26.0,
         "opponent": "BUF",
+        "is_home": true
+      },
+      {
+        "week": 16,
+        "pts": 28,
+        "pa": 24,
+        "vegas_implied": 26.0,
+        "opponent": "BAL",
         "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 42,
+        "pa": 10,
+        "vegas_implied": 15.0,
+        "opponent": "NYJ",
+        "is_home": false
+      },
+      {
+        "week": 18,
+        "pts": 38,
+        "pa": 10,
+        "vegas_implied": 15.2,
+        "opponent": "MIA",
+        "is_home": true
       }
     ],
     "PIT": [
@@ -4414,6 +2758,1662 @@
         "vegas_implied": 11.5,
         "opponent": "LAC",
         "is_home": true
+      }
+    ],
+    "MIA": [
+      {
+        "week": 1,
+        "pts": 8,
+        "pa": 33,
+        "vegas_implied": 24.5,
+        "opponent": "IND",
+        "is_home": false
+      },
+      {
+        "week": 2,
+        "pts": 27,
+        "pa": 33,
+        "vegas_implied": 21.0,
+        "opponent": "NE",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 21,
+        "pa": 31,
+        "vegas_implied": 31.5,
+        "opponent": "BUF",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 27,
+        "pa": 21,
+        "vegas_implied": 21.0,
+        "opponent": "NYJ",
+        "is_home": true
+      },
+      {
+        "week": 5,
+        "pts": 24,
+        "pa": 27,
+        "vegas_implied": 21.5,
+        "opponent": "CAR",
+        "is_home": false
+      },
+      {
+        "week": 6,
+        "pts": 27,
+        "pa": 29,
+        "vegas_implied": 24.5,
+        "opponent": "LAC",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 6,
+        "pa": 31,
+        "vegas_implied": 18.5,
+        "opponent": "CLE",
+        "is_home": false
+      },
+      {
+        "week": 8,
+        "pts": 34,
+        "pa": 10,
+        "vegas_implied": 25.8,
+        "opponent": "ATL",
+        "is_home": false
+      },
+      {
+        "week": 9,
+        "pts": 6,
+        "pa": 28,
+        "vegas_implied": 29.5,
+        "opponent": "BAL",
+        "is_home": true
+      },
+      {
+        "week": 10,
+        "pts": 30,
+        "pa": 13,
+        "vegas_implied": 29.5,
+        "opponent": "BUF",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 16,
+        "pa": 13,
+        "vegas_implied": 22.5,
+        "opponent": "WAS",
+        "is_home": true
+      },
+      {
+        "week": 13,
+        "pts": 21,
+        "pa": 17,
+        "vegas_implied": 18.0,
+        "opponent": "NO",
+        "is_home": true
+      },
+      {
+        "week": 14,
+        "pts": 34,
+        "pa": 10,
+        "vegas_implied": 19.5,
+        "opponent": "NYJ",
+        "is_home": false
+      },
+      {
+        "week": 15,
+        "pts": 15,
+        "pa": 28,
+        "vegas_implied": 22.8,
+        "opponent": "PIT",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 21,
+        "pa": 45,
+        "vegas_implied": 26.0,
+        "opponent": "CIN",
+        "is_home": true
+      },
+      {
+        "week": 17,
+        "pts": 20,
+        "pa": 17,
+        "vegas_implied": 25.0,
+        "opponent": "TB",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 10,
+        "pa": 38,
+        "vegas_implied": 29.2,
+        "opponent": "NE",
+        "is_home": false
+      }
+    ],
+    "CAR": [
+      {
+        "week": 1,
+        "pts": 10,
+        "pa": 26,
+        "vegas_implied": 25.0,
+        "opponent": "JAX",
+        "is_home": false
+      },
+      {
+        "week": 2,
+        "pts": 22,
+        "pa": 27,
+        "vegas_implied": 26.2,
+        "opponent": "ARI",
+        "is_home": false
+      },
+      {
+        "week": 3,
+        "pts": 30,
+        "pa": 0,
+        "vegas_implied": 25.0,
+        "opponent": "ATL",
+        "is_home": true
+      },
+      {
+        "week": 4,
+        "pts": 13,
+        "pa": 42,
+        "vegas_implied": 24.0,
+        "opponent": "NE",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 27,
+        "pa": 24,
+        "vegas_implied": 23.0,
+        "opponent": "MIA",
+        "is_home": true
+      },
+      {
+        "week": 6,
+        "pts": 30,
+        "pa": 27,
+        "vegas_implied": 25.2,
+        "opponent": "DAL",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 13,
+        "pa": 6,
+        "vegas_implied": 20.5,
+        "opponent": "NYJ",
+        "is_home": false
+      },
+      {
+        "week": 8,
+        "pts": 9,
+        "pa": 40,
+        "vegas_implied": 27.2,
+        "opponent": "BUF",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 16,
+        "pa": 13,
+        "vegas_implied": 28.0,
+        "opponent": "GB",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 7,
+        "pa": 17,
+        "vegas_implied": 16.5,
+        "opponent": "NO",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 30,
+        "pa": 27,
+        "vegas_implied": 23.5,
+        "opponent": "ATL",
+        "is_home": false
+      },
+      {
+        "week": 12,
+        "pts": 9,
+        "pa": 20,
+        "vegas_implied": 28.0,
+        "opponent": "SF",
+        "is_home": false
+      },
+      {
+        "week": 13,
+        "pts": 31,
+        "pa": 28,
+        "vegas_implied": 27.2,
+        "opponent": "LA",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 17,
+        "pa": 20,
+        "vegas_implied": 19.5,
+        "opponent": "NO",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 23,
+        "pa": 20,
+        "vegas_implied": 23.8,
+        "opponent": "TB",
+        "is_home": true
+      },
+      {
+        "week": 17,
+        "pts": 10,
+        "pa": 27,
+        "vegas_implied": 24.5,
+        "opponent": "SEA",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 14,
+        "pa": 16,
+        "vegas_implied": 23.2,
+        "opponent": "TB",
+        "is_home": false
+      }
+    ],
+    "JAX": [
+      {
+        "week": 1,
+        "pts": 26,
+        "pa": 10,
+        "vegas_implied": 20.5,
+        "opponent": "CAR",
+        "is_home": true
+      },
+      {
+        "week": 2,
+        "pts": 27,
+        "pa": 31,
+        "vegas_implied": 26.5,
+        "opponent": "CIN",
+        "is_home": false
+      },
+      {
+        "week": 3,
+        "pts": 17,
+        "pa": 10,
+        "vegas_implied": 21.0,
+        "opponent": "HOU",
+        "is_home": true
+      },
+      {
+        "week": 4,
+        "pts": 26,
+        "pa": 21,
+        "vegas_implied": 24.5,
+        "opponent": "SF",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 31,
+        "pa": 28,
+        "vegas_implied": 24.5,
+        "opponent": "KC",
+        "is_home": true
+      },
+      {
+        "week": 6,
+        "pts": 12,
+        "pa": 20,
+        "vegas_implied": 24.5,
+        "opponent": "SEA",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 7,
+        "pa": 35,
+        "vegas_implied": 23.8,
+        "opponent": "LA",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 30,
+        "pa": 29,
+        "vegas_implied": 20.5,
+        "opponent": "LV",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 29,
+        "pa": 36,
+        "vegas_implied": 18.0,
+        "opponent": "HOU",
+        "is_home": false
+      },
+      {
+        "week": 11,
+        "pts": 35,
+        "pa": 6,
+        "vegas_implied": 23.2,
+        "opponent": "LAC",
+        "is_home": true
+      },
+      {
+        "week": 12,
+        "pts": 27,
+        "pa": 24,
+        "vegas_implied": 22.5,
+        "opponent": "ARI",
+        "is_home": false
+      },
+      {
+        "week": 13,
+        "pts": 25,
+        "pa": 3,
+        "vegas_implied": 18.2,
+        "opponent": "TEN",
+        "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 36,
+        "pa": 19,
+        "vegas_implied": 23.5,
+        "opponent": "IND",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 48,
+        "pa": 20,
+        "vegas_implied": 13.5,
+        "opponent": "NYJ",
+        "is_home": true
+      },
+      {
+        "week": 16,
+        "pts": 34,
+        "pa": 20,
+        "vegas_implied": 25.0,
+        "opponent": "DEN",
+        "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 23,
+        "pa": 17,
+        "vegas_implied": 22.5,
+        "opponent": "IND",
+        "is_home": false
+      },
+      {
+        "week": 18,
+        "pts": 41,
+        "pa": 7,
+        "vegas_implied": 17.0,
+        "opponent": "TEN",
+        "is_home": true
+      }
+    ],
+    "TB": [
+      {
+        "week": 1,
+        "pts": 23,
+        "pa": 20,
+        "vegas_implied": 23.0,
+        "opponent": "ATL",
+        "is_home": false
+      },
+      {
+        "week": 2,
+        "pts": 20,
+        "pa": 19,
+        "vegas_implied": 22.5,
+        "opponent": "HOU",
+        "is_home": false
+      },
+      {
+        "week": 3,
+        "pts": 29,
+        "pa": 27,
+        "vegas_implied": 18.5,
+        "opponent": "NYJ",
+        "is_home": true
+      },
+      {
+        "week": 4,
+        "pts": 25,
+        "pa": 31,
+        "vegas_implied": 24.0,
+        "opponent": "PHI",
+        "is_home": true
+      },
+      {
+        "week": 5,
+        "pts": 38,
+        "pa": 35,
+        "vegas_implied": 24.0,
+        "opponent": "SEA",
+        "is_home": false
+      },
+      {
+        "week": 6,
+        "pts": 30,
+        "pa": 19,
+        "vegas_implied": 21.5,
+        "opponent": "SF",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 9,
+        "pa": 24,
+        "vegas_implied": 30.2,
+        "opponent": "DET",
+        "is_home": false
+      },
+      {
+        "week": 8,
+        "pts": 23,
+        "pa": 3,
+        "vegas_implied": 21.0,
+        "opponent": "NO",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 23,
+        "pa": 28,
+        "vegas_implied": 23.0,
+        "opponent": "NE",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 32,
+        "pa": 44,
+        "vegas_implied": 26.2,
+        "opponent": "BUF",
+        "is_home": false
+      },
+      {
+        "week": 12,
+        "pts": 7,
+        "pa": 34,
+        "vegas_implied": 28.2,
+        "opponent": "LA",
+        "is_home": false
+      },
+      {
+        "week": 13,
+        "pts": 20,
+        "pa": 17,
+        "vegas_implied": 20.0,
+        "opponent": "ARI",
+        "is_home": true
+      },
+      {
+        "week": 14,
+        "pts": 20,
+        "pa": 24,
+        "vegas_implied": 17.0,
+        "opponent": "NO",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 28,
+        "pa": 29,
+        "vegas_implied": 18.8,
+        "opponent": "ATL",
+        "is_home": true
+      },
+      {
+        "week": 16,
+        "pts": 20,
+        "pa": 23,
+        "vegas_implied": 20.8,
+        "opponent": "CAR",
+        "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 17,
+        "pa": 20,
+        "vegas_implied": 19.5,
+        "opponent": "MIA",
+        "is_home": false
+      },
+      {
+        "week": 18,
+        "pts": 16,
+        "pa": 14,
+        "vegas_implied": 20.2,
+        "opponent": "CAR",
+        "is_home": true
+      }
+    ],
+    "CIN": [
+      {
+        "week": 1,
+        "pts": 17,
+        "pa": 16,
+        "vegas_implied": 21.0,
+        "opponent": "CLE",
+        "is_home": false
+      },
+      {
+        "week": 2,
+        "pts": 31,
+        "pa": 27,
+        "vegas_implied": 23.0,
+        "opponent": "JAX",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 10,
+        "pa": 48,
+        "vegas_implied": 22.2,
+        "opponent": "MIN",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 3,
+        "pa": 28,
+        "vegas_implied": 26.0,
+        "opponent": "DEN",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 24,
+        "pa": 37,
+        "vegas_implied": 30.0,
+        "opponent": "DET",
+        "is_home": true
+      },
+      {
+        "week": 6,
+        "pts": 18,
+        "pa": 27,
+        "vegas_implied": 29.2,
+        "opponent": "GB",
+        "is_home": false
+      },
+      {
+        "week": 7,
+        "pts": 33,
+        "pa": 31,
+        "vegas_implied": 25.5,
+        "opponent": "PIT",
+        "is_home": true
+      },
+      {
+        "week": 8,
+        "pts": 38,
+        "pa": 39,
+        "vegas_implied": 19.0,
+        "opponent": "NYJ",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 42,
+        "pa": 47,
+        "vegas_implied": 27.2,
+        "opponent": "CHI",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 12,
+        "pa": 34,
+        "vegas_implied": 27.0,
+        "opponent": "PIT",
+        "is_home": false
+      },
+      {
+        "week": 12,
+        "pts": 20,
+        "pa": 26,
+        "vegas_implied": 29.0,
+        "opponent": "NE",
+        "is_home": true
+      },
+      {
+        "week": 13,
+        "pts": 32,
+        "pa": 14,
+        "vegas_implied": 29.8,
+        "opponent": "BAL",
+        "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 34,
+        "pa": 39,
+        "vegas_implied": 30.2,
+        "opponent": "BUF",
+        "is_home": false
+      },
+      {
+        "week": 15,
+        "pts": 0,
+        "pa": 24,
+        "vegas_implied": 27.0,
+        "opponent": "BAL",
+        "is_home": true
+      },
+      {
+        "week": 16,
+        "pts": 45,
+        "pa": 21,
+        "vegas_implied": 22.5,
+        "opponent": "MIA",
+        "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 37,
+        "pa": 14,
+        "vegas_implied": 22.8,
+        "opponent": "ARI",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 18,
+        "pa": 20,
+        "vegas_implied": 19.0,
+        "opponent": "CLE",
+        "is_home": true
+      }
+    ],
+    "PHI": [
+      {
+        "week": 1,
+        "pts": 24,
+        "pa": 20,
+        "vegas_implied": 19.5,
+        "opponent": "DAL",
+        "is_home": true
+      },
+      {
+        "week": 2,
+        "pts": 20,
+        "pa": 17,
+        "vegas_implied": 22.5,
+        "opponent": "KC",
+        "is_home": false
+      },
+      {
+        "week": 3,
+        "pts": 33,
+        "pa": 26,
+        "vegas_implied": 21.0,
+        "opponent": "LA",
+        "is_home": true
+      },
+      {
+        "week": 4,
+        "pts": 31,
+        "pa": 25,
+        "vegas_implied": 20.5,
+        "opponent": "TB",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 17,
+        "pa": 21,
+        "vegas_implied": 20.5,
+        "opponent": "DEN",
+        "is_home": true
+      },
+      {
+        "week": 6,
+        "pts": 17,
+        "pa": 34,
+        "vegas_implied": 16.8,
+        "opponent": "NYG",
+        "is_home": false
+      },
+      {
+        "week": 7,
+        "pts": 28,
+        "pa": 22,
+        "vegas_implied": 20.5,
+        "opponent": "MIN",
+        "is_home": false
+      },
+      {
+        "week": 8,
+        "pts": 38,
+        "pa": 20,
+        "vegas_implied": 18.2,
+        "opponent": "NYG",
+        "is_home": true
+      },
+      {
+        "week": 10,
+        "pts": 10,
+        "pa": 7,
+        "vegas_implied": 23.5,
+        "opponent": "GB",
+        "is_home": false
+      },
+      {
+        "week": 11,
+        "pts": 16,
+        "pa": 9,
+        "vegas_implied": 22.0,
+        "opponent": "DET",
+        "is_home": true
+      },
+      {
+        "week": 12,
+        "pts": 21,
+        "pa": 24,
+        "vegas_implied": 22.2,
+        "opponent": "DAL",
+        "is_home": false
+      },
+      {
+        "week": 13,
+        "pts": 15,
+        "pa": 24,
+        "vegas_implied": 18.2,
+        "opponent": "CHI",
+        "is_home": true
+      },
+      {
+        "week": 14,
+        "pts": 19,
+        "pa": 22,
+        "vegas_implied": 20.0,
+        "opponent": "LAC",
+        "is_home": false
+      },
+      {
+        "week": 15,
+        "pts": 31,
+        "pa": 0,
+        "vegas_implied": 12.5,
+        "opponent": "LV",
+        "is_home": true
+      },
+      {
+        "week": 16,
+        "pts": 29,
+        "pa": 18,
+        "vegas_implied": 18.2,
+        "opponent": "WAS",
+        "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 13,
+        "pa": 12,
+        "vegas_implied": 24.2,
+        "opponent": "BUF",
+        "is_home": false
+      },
+      {
+        "week": 18,
+        "pts": 17,
+        "pa": 24,
+        "vegas_implied": 17.8,
+        "opponent": "WAS",
+        "is_home": true
+      }
+    ],
+    "MIN": [
+      {
+        "week": 1,
+        "pts": 27,
+        "pa": 24,
+        "vegas_implied": 21.0,
+        "opponent": "CHI",
+        "is_home": false
+      },
+      {
+        "week": 2,
+        "pts": 6,
+        "pa": 22,
+        "vegas_implied": 20.5,
+        "opponent": "ATL",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 48,
+        "pa": 10,
+        "vegas_implied": 19.2,
+        "opponent": "CIN",
+        "is_home": true
+      },
+      {
+        "week": 4,
+        "pts": 21,
+        "pa": 24,
+        "vegas_implied": 19.5,
+        "opponent": "PIT",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 21,
+        "pa": 17,
+        "vegas_implied": 16.0,
+        "opponent": "CLE",
+        "is_home": false
+      },
+      {
+        "week": 7,
+        "pts": 22,
+        "pa": 28,
+        "vegas_implied": 23.0,
+        "opponent": "PHI",
+        "is_home": true
+      },
+      {
+        "week": 8,
+        "pts": 10,
+        "pa": 37,
+        "vegas_implied": 24.2,
+        "opponent": "LAC",
+        "is_home": false
+      },
+      {
+        "week": 9,
+        "pts": 27,
+        "pa": 24,
+        "vegas_implied": 28.5,
+        "opponent": "DET",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 19,
+        "pa": 27,
+        "vegas_implied": 26.5,
+        "opponent": "BAL",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 17,
+        "pa": 19,
+        "vegas_implied": 22.2,
+        "opponent": "CHI",
+        "is_home": true
+      },
+      {
+        "week": 12,
+        "pts": 6,
+        "pa": 23,
+        "vegas_implied": 24.0,
+        "opponent": "GB",
+        "is_home": false
+      },
+      {
+        "week": 13,
+        "pts": 0,
+        "pa": 26,
+        "vegas_implied": 27.5,
+        "opponent": "SEA",
+        "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 31,
+        "pa": 0,
+        "vegas_implied": 22.5,
+        "opponent": "WAS",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 34,
+        "pa": 26,
+        "vegas_implied": 26.5,
+        "opponent": "DAL",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 16,
+        "pa": 13,
+        "vegas_implied": 19.5,
+        "opponent": "NYG",
+        "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 23,
+        "pa": 10,
+        "vegas_implied": 26.2,
+        "opponent": "DET",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 16,
+        "pa": 3,
+        "vegas_implied": 12.5,
+        "opponent": "GB",
+        "is_home": true
+      }
+    ],
+    "LV": [
+      {
+        "week": 1,
+        "pts": 20,
+        "pa": 13,
+        "vegas_implied": 23.5,
+        "opponent": "NE",
+        "is_home": false
+      },
+      {
+        "week": 2,
+        "pts": 9,
+        "pa": 20,
+        "vegas_implied": 25.0,
+        "opponent": "LAC",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 24,
+        "pa": 41,
+        "vegas_implied": 23.0,
+        "opponent": "WAS",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 24,
+        "pa": 25,
+        "vegas_implied": 23.0,
+        "opponent": "CHI",
+        "is_home": true
+      },
+      {
+        "week": 5,
+        "pts": 6,
+        "pa": 40,
+        "vegas_implied": 26.8,
+        "opponent": "IND",
+        "is_home": false
+      },
+      {
+        "week": 6,
+        "pts": 20,
+        "pa": 10,
+        "vegas_implied": 19.0,
+        "opponent": "TEN",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 0,
+        "pa": 31,
+        "vegas_implied": 29.0,
+        "opponent": "KC",
+        "is_home": false
+      },
+      {
+        "week": 9,
+        "pts": 29,
+        "pa": 30,
+        "vegas_implied": 23.0,
+        "opponent": "JAX",
+        "is_home": true
+      },
+      {
+        "week": 10,
+        "pts": 7,
+        "pa": 10,
+        "vegas_implied": 26.0,
+        "opponent": "DEN",
+        "is_home": false
+      },
+      {
+        "week": 11,
+        "pts": 16,
+        "pa": 33,
+        "vegas_implied": 26.0,
+        "opponent": "DAL",
+        "is_home": true
+      },
+      {
+        "week": 12,
+        "pts": 10,
+        "pa": 24,
+        "vegas_implied": 16.2,
+        "opponent": "CLE",
+        "is_home": true
+      },
+      {
+        "week": 13,
+        "pts": 14,
+        "pa": 31,
+        "vegas_implied": 25.2,
+        "opponent": "LAC",
+        "is_home": false
+      },
+      {
+        "week": 14,
+        "pts": 17,
+        "pa": 24,
+        "vegas_implied": 24.5,
+        "opponent": "DEN",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 0,
+        "pa": 31,
+        "vegas_implied": 25.0,
+        "opponent": "PHI",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 21,
+        "pa": 23,
+        "vegas_implied": 27.0,
+        "opponent": "HOU",
+        "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 10,
+        "pa": 34,
+        "vegas_implied": 21.8,
+        "opponent": "NYG",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 14,
+        "pa": 12,
+        "vegas_implied": 20.0,
+        "opponent": "KC",
+        "is_home": true
+      }
+    ],
+    "IND": [
+      {
+        "week": 1,
+        "pts": 33,
+        "pa": 8,
+        "vegas_implied": 23.0,
+        "opponent": "MIA",
+        "is_home": true
+      },
+      {
+        "week": 2,
+        "pts": 29,
+        "pa": 28,
+        "vegas_implied": 23.0,
+        "opponent": "DEN",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 41,
+        "pa": 20,
+        "vegas_implied": 18.8,
+        "opponent": "TEN",
+        "is_home": false
+      },
+      {
+        "week": 4,
+        "pts": 20,
+        "pa": 27,
+        "vegas_implied": 26.5,
+        "opponent": "LA",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 40,
+        "pa": 6,
+        "vegas_implied": 19.8,
+        "opponent": "LV",
+        "is_home": true
+      },
+      {
+        "week": 6,
+        "pts": 31,
+        "pa": 27,
+        "vegas_implied": 19.0,
+        "opponent": "ARI",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 38,
+        "pa": 24,
+        "vegas_implied": 25.5,
+        "opponent": "LAC",
+        "is_home": false
+      },
+      {
+        "week": 8,
+        "pts": 38,
+        "pa": 14,
+        "vegas_implied": 16.0,
+        "opponent": "TEN",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 20,
+        "pa": 27,
+        "vegas_implied": 24.0,
+        "opponent": "PIT",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 31,
+        "pa": 25,
+        "vegas_implied": 21.0,
+        "opponent": "ATL",
+        "is_home": true
+      },
+      {
+        "week": 12,
+        "pts": 20,
+        "pa": 23,
+        "vegas_implied": 27.0,
+        "opponent": "KC",
+        "is_home": false
+      },
+      {
+        "week": 13,
+        "pts": 16,
+        "pa": 20,
+        "vegas_implied": 20.8,
+        "opponent": "HOU",
+        "is_home": true
+      },
+      {
+        "week": 14,
+        "pts": 19,
+        "pa": 36,
+        "vegas_implied": 21.0,
+        "opponent": "JAX",
+        "is_home": false
+      },
+      {
+        "week": 15,
+        "pts": 16,
+        "pa": 18,
+        "vegas_implied": 27.5,
+        "opponent": "SEA",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 27,
+        "pa": 48,
+        "vegas_implied": 25.5,
+        "opponent": "SF",
+        "is_home": true
+      },
+      {
+        "week": 17,
+        "pts": 17,
+        "pa": 23,
+        "vegas_implied": 26.0,
+        "opponent": "JAX",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 30,
+        "pa": 38,
+        "vegas_implied": 23.5,
+        "opponent": "HOU",
+        "is_home": false
+      }
+    ],
+    "LAC": [
+      {
+        "week": 1,
+        "pts": 27,
+        "pa": 21,
+        "vegas_implied": 25.2,
+        "opponent": "KC",
+        "is_home": true
+      },
+      {
+        "week": 2,
+        "pts": 20,
+        "pa": 9,
+        "vegas_implied": 21.5,
+        "opponent": "LV",
+        "is_home": false
+      },
+      {
+        "week": 3,
+        "pts": 23,
+        "pa": 20,
+        "vegas_implied": 21.5,
+        "opponent": "DEN",
+        "is_home": true
+      },
+      {
+        "week": 4,
+        "pts": 18,
+        "pa": 21,
+        "vegas_implied": 18.8,
+        "opponent": "NYG",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 10,
+        "pa": 27,
+        "vegas_implied": 22.5,
+        "opponent": "WAS",
+        "is_home": true
+      },
+      {
+        "week": 6,
+        "pts": 29,
+        "pa": 27,
+        "vegas_implied": 21.0,
+        "opponent": "MIA",
+        "is_home": false
+      },
+      {
+        "week": 7,
+        "pts": 24,
+        "pa": 38,
+        "vegas_implied": 23.0,
+        "opponent": "IND",
+        "is_home": true
+      },
+      {
+        "week": 8,
+        "pts": 37,
+        "pa": 10,
+        "vegas_implied": 21.2,
+        "opponent": "MIN",
+        "is_home": true
+      },
+      {
+        "week": 9,
+        "pts": 27,
+        "pa": 20,
+        "vegas_implied": 17.2,
+        "opponent": "TEN",
+        "is_home": false
+      },
+      {
+        "week": 10,
+        "pts": 25,
+        "pa": 10,
+        "vegas_implied": 21.2,
+        "opponent": "PIT",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 6,
+        "pa": 35,
+        "vegas_implied": 20.2,
+        "opponent": "JAX",
+        "is_home": false
+      },
+      {
+        "week": 13,
+        "pts": 31,
+        "pa": 14,
+        "vegas_implied": 15.2,
+        "opponent": "LV",
+        "is_home": true
+      },
+      {
+        "week": 14,
+        "pts": 22,
+        "pa": 19,
+        "vegas_implied": 21.5,
+        "opponent": "PHI",
+        "is_home": true
+      },
+      {
+        "week": 15,
+        "pts": 16,
+        "pa": 13,
+        "vegas_implied": 23.5,
+        "opponent": "KC",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 34,
+        "pa": 17,
+        "vegas_implied": 26.0,
+        "opponent": "DAL",
+        "is_home": false
+      },
+      {
+        "week": 17,
+        "pts": 16,
+        "pa": 20,
+        "vegas_implied": 19.5,
+        "opponent": "HOU",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 3,
+        "pa": 19,
+        "vegas_implied": 26.0,
+        "opponent": "DEN",
+        "is_home": false
+      }
+    ],
+    "TEN": [
+      {
+        "week": 1,
+        "pts": 12,
+        "pa": 20,
+        "vegas_implied": 25.5,
+        "opponent": "DEN",
+        "is_home": false
+      },
+      {
+        "week": 2,
+        "pts": 19,
+        "pa": 33,
+        "vegas_implied": 23.5,
+        "opponent": "LA",
+        "is_home": true
+      },
+      {
+        "week": 3,
+        "pts": 20,
+        "pa": 41,
+        "vegas_implied": 24.8,
+        "opponent": "IND",
+        "is_home": true
+      },
+      {
+        "week": 4,
+        "pts": 0,
+        "pa": 26,
+        "vegas_implied": 23.5,
+        "opponent": "HOU",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 22,
+        "pa": 21,
+        "vegas_implied": 24.5,
+        "opponent": "ARI",
+        "is_home": false
+      },
+      {
+        "week": 6,
+        "pts": 10,
+        "pa": 20,
+        "vegas_implied": 22.5,
+        "opponent": "LV",
+        "is_home": false
+      },
+      {
+        "week": 7,
+        "pts": 13,
+        "pa": 31,
+        "vegas_implied": 23.5,
+        "opponent": "NE",
+        "is_home": true
+      },
+      {
+        "week": 8,
+        "pts": 14,
+        "pa": 38,
+        "vegas_implied": 31.5,
+        "opponent": "IND",
+        "is_home": false
+      },
+      {
+        "week": 9,
+        "pts": 20,
+        "pa": 27,
+        "vegas_implied": 27.2,
+        "opponent": "LAC",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 13,
+        "pa": 16,
+        "vegas_implied": 21.5,
+        "opponent": "HOU",
+        "is_home": true
+      },
+      {
+        "week": 12,
+        "pts": 24,
+        "pa": 30,
+        "vegas_implied": 27.0,
+        "opponent": "SEA",
+        "is_home": true
+      },
+      {
+        "week": 13,
+        "pts": 3,
+        "pa": 25,
+        "vegas_implied": 24.2,
+        "opponent": "JAX",
+        "is_home": true
+      },
+      {
+        "week": 14,
+        "pts": 31,
+        "pa": 29,
+        "vegas_implied": 19.0,
+        "opponent": "CLE",
+        "is_home": false
+      },
+      {
+        "week": 15,
+        "pts": 24,
+        "pa": 37,
+        "vegas_implied": 28.5,
+        "opponent": "SF",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 26,
+        "pa": 9,
+        "vegas_implied": 20.5,
+        "opponent": "KC",
+        "is_home": true
+      },
+      {
+        "week": 17,
+        "pts": 26,
+        "pa": 34,
+        "vegas_implied": 20.5,
+        "opponent": "NO",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 7,
+        "pa": 41,
+        "vegas_implied": 29.5,
+        "opponent": "JAX",
+        "is_home": false
+      }
+    ],
+    "WAS": [
+      {
+        "week": 1,
+        "pts": 21,
+        "pa": 6,
+        "vegas_implied": 19.8,
+        "opponent": "NYG",
+        "is_home": true
+      },
+      {
+        "week": 2,
+        "pts": 18,
+        "pa": 27,
+        "vegas_implied": 26.0,
+        "opponent": "GB",
+        "is_home": false
+      },
+      {
+        "week": 3,
+        "pts": 41,
+        "pa": 24,
+        "vegas_implied": 20.5,
+        "opponent": "LV",
+        "is_home": true
+      },
+      {
+        "week": 4,
+        "pts": 27,
+        "pa": 34,
+        "vegas_implied": 23.0,
+        "opponent": "ATL",
+        "is_home": false
+      },
+      {
+        "week": 5,
+        "pts": 27,
+        "pa": 10,
+        "vegas_implied": 25.0,
+        "opponent": "LAC",
+        "is_home": false
+      },
+      {
+        "week": 6,
+        "pts": 24,
+        "pa": 25,
+        "vegas_implied": 22.0,
+        "opponent": "CHI",
+        "is_home": true
+      },
+      {
+        "week": 7,
+        "pts": 22,
+        "pa": 44,
+        "vegas_implied": 28.0,
+        "opponent": "DAL",
+        "is_home": false
+      },
+      {
+        "week": 8,
+        "pts": 7,
+        "pa": 28,
+        "vegas_implied": 29.5,
+        "opponent": "KC",
+        "is_home": false
+      },
+      {
+        "week": 9,
+        "pts": 14,
+        "pa": 38,
+        "vegas_implied": 25.0,
+        "opponent": "SEA",
+        "is_home": true
+      },
+      {
+        "week": 10,
+        "pts": 22,
+        "pa": 44,
+        "vegas_implied": 29.0,
+        "opponent": "DET",
+        "is_home": true
+      },
+      {
+        "week": 11,
+        "pts": 13,
+        "pa": 16,
+        "vegas_implied": 25.0,
+        "opponent": "MIA",
+        "is_home": false
+      },
+      {
+        "week": 13,
+        "pts": 26,
+        "pa": 27,
+        "vegas_implied": 25.0,
+        "opponent": "DEN",
+        "is_home": true
+      },
+      {
+        "week": 14,
+        "pts": 0,
+        "pa": 31,
+        "vegas_implied": 21.0,
+        "opponent": "MIN",
+        "is_home": false
+      },
+      {
+        "week": 15,
+        "pts": 29,
+        "pa": 21,
+        "vegas_implied": 24.5,
+        "opponent": "NYG",
+        "is_home": false
+      },
+      {
+        "week": 16,
+        "pts": 18,
+        "pa": 29,
+        "vegas_implied": 25.2,
+        "opponent": "PHI",
+        "is_home": true
+      },
+      {
+        "week": 17,
+        "pts": 23,
+        "pa": 30,
+        "vegas_implied": 29.5,
+        "opponent": "DAL",
+        "is_home": true
+      },
+      {
+        "week": 18,
+        "pts": 24,
+        "pa": 17,
+        "vegas_implied": 20.8,
+        "opponent": "PHI",
+        "is_home": false
       }
     ]
   }
