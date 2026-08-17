@@ -1,9 +1,9 @@
 {
   "meta": {
     "week": 18,
-    "updated": "2026-08-17 08:28",
+    "updated": "2026-08-17 20:15",
     "league_avgs": {
-      "fpts": 111.1,
+      "fpts": 110.4,
       "off_stall": 51.6,
       "def_stall": 45.1,
       "l4_off_ppg": 24.3,
@@ -46,7 +46,7 @@
       "join_name": "E.Pineiro",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/v3vtl2t4dfzkueanjfwc",
       "match_name": "E.Pineiro",
-      "own_pct": 61.0,
+      "own_pct": 62.3,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -132,7 +132,7 @@
           }
         ]
       },
-      "narrative": "You can trust Pineiro in your lineup. Be cautious, as the team has a low implied total."
+      "narrative": "Pineiro is a strong play this week. The offense has a massive implied total of 22.5."
     },
     {
       "kicker_player_name": "M.Gay",
@@ -255,7 +255,7 @@
           }
         ]
       },
-      "narrative": "Consider Gay if you need a fill-in. Be cautious, as the team has a low implied total."
+      "narrative": "Gay is a viable streaming option. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -292,7 +292,7 @@
       "join_name": "W.Lutz",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vcglg5vsgbiyggwibgy0",
       "match_name": "W.Lutz",
-      "own_pct": 7.3,
+      "own_pct": 8.0,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -378,7 +378,7 @@
           }
         ]
       },
-      "narrative": "Lutz is a viable streaming option. The offense has a massive implied total of 26.0."
+      "narrative": "Lutz is a viable streaming option. His offense has a high stall rate (75.0%)."
     },
     {
       "kicker_player_name": "C.Dicker",
@@ -501,7 +501,7 @@
           }
         ]
       },
-      "narrative": "You can trust Dicker in your lineup. Be cautious, as the team has a low implied total."
+      "narrative": "Dicker is a risky option this week. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -538,7 +538,7 @@
       "join_name": "C.Boswell",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/rxbnhvnfjmheuryvdmuf",
       "match_name": "C.Boswell",
-      "own_pct": 33.8,
+      "own_pct": 33.4,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -624,7 +624,7 @@
           }
         ]
       },
-      "narrative": "Fire up Boswell with confidence. The matchup is favorable against a porous defense."
+      "narrative": "Boswell is a strong play this week. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Myers",
@@ -661,7 +661,7 @@
       "join_name": "J.Myers",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/zcd7q9loflr0t5bsvzig",
       "match_name": "J.Myers",
-      "own_pct": 94.1,
+      "own_pct": 94.9,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -747,7 +747,7 @@
           }
         ]
       },
-      "narrative": "Myers is a strong play this week. The matchup is favorable against a porous defense."
+      "narrative": "Myers is a locked-and-loaded RB1 of kickers this week. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -784,7 +784,7 @@
       "join_name": "H.Mevis",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/yjmtai1e4eqbsw2yk6mh",
       "match_name": "H.Mevis",
-      "own_pct": 68.9,
+      "own_pct": 69.6,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -872,7 +872,7 @@
           }
         ]
       },
-      "narrative": "Mevis is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 32.0."
+      "narrative": "Mevis is a viable streaming option. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "W.Reichard",
@@ -909,7 +909,7 @@
       "join_name": "W.Reichard",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wv1h4umuddkfss96uutw",
       "match_name": "W.Reichard",
-      "own_pct": 31.4,
+      "own_pct": 34.2,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -997,7 +997,7 @@
           }
         ]
       },
-      "narrative": "Reichard is a risky option this week. Be cautious, as the team has a low implied total."
+      "narrative": "Reichard is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "A.Borregales",
@@ -1034,7 +1034,7 @@
       "join_name": "A.Borregales",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/x2fxn5qf6zkgmvedjpys",
       "match_name": "A.Borregales",
-      "own_pct": 27.5,
+      "own_pct": 27.1,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -1120,7 +1120,7 @@
           }
         ]
       },
-      "narrative": "Borregales is a viable streaming option. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Fade Borregales if possible. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -1245,7 +1245,7 @@
           }
         ]
       },
-      "narrative": "Fairbairn is a strong play this week. The offense has a massive implied total of 23.5."
+      "narrative": "Fade Fairbairn if possible. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "R.Patterson",
@@ -1368,7 +1368,7 @@
           }
         ]
       },
-      "narrative": "Fade Patterson if possible. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Patterson is a viable streaming option. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "B.Grupe",
@@ -1405,7 +1405,7 @@
       "join_name": "B.Grupe",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/de3vz6xjjo9paba6encd",
       "match_name": "B.Grupe",
-      "own_pct": 1.4,
+      "own_pct": 1.3,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -1493,7 +1493,7 @@
           }
         ]
       },
-      "narrative": "Fade Grupe if possible. Be cautious, as the team has a low implied total."
+      "narrative": "Grupe is a viable streaming option. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "C.Santos",
@@ -1530,7 +1530,7 @@
       "join_name": "C.Santos",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tz5ecjri52gwpoo9s7be",
       "match_name": "C.Santos",
-      "own_pct": 26.5,
+      "own_pct": 26.8,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -1616,7 +1616,7 @@
           }
         ]
       },
-      "narrative": "Fade Santos if possible. The offense has a massive implied total of 27.5."
+      "narrative": "You can trust Santos in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -1653,7 +1653,7 @@
       "join_name": "E.McPherson",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/t6fs7i54i4n7xjiayoz0",
       "match_name": "E.McPherson",
-      "own_pct": 41.1,
+      "own_pct": 40.6,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -1739,7 +1739,7 @@
           }
         ]
       },
-      "narrative": "Fade McPherson if possible. The matchup is favorable against a porous defense."
+      "narrative": "McPherson is a viable streaming option. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -1862,7 +1862,7 @@
           }
         ]
       },
-      "narrative": "Prater is a strong play this week. The matchup is favorable against a porous defense."
+      "narrative": "Prater is a viable streaming option. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "C.Little",
@@ -1899,7 +1899,7 @@
       "join_name": "C.Little",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/mc9goepr7mglrx6ek1fi",
       "match_name": "C.Little",
-      "own_pct": 89.5,
+      "own_pct": 89.7,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -1985,7 +1985,7 @@
           }
         ]
       },
-      "narrative": "Little is a locked-and-loaded RB1 of kickers this week. His offense has a high stall rate (40.0%)."
+      "narrative": "Fade Little if possible. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "M.Badgley",
@@ -2108,7 +2108,7 @@
           }
         ]
       },
-      "narrative": "Fire up Badgley with confidence. The offense has a massive implied total of 26.0."
+      "narrative": "You can trust Badgley in your lineup. The offense has a massive implied total of 26.0."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -2145,13 +2145,13 @@
       "join_name": "J.Bates",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/umhfee7ax7r8gjdt8okb",
       "match_name": "J.Bates",
-      "own_pct": 65.0,
-      "cbs_status": "Questionable for Week 1 at Pittsburgh",
-      "cbs_injury": "Back",
+      "own_pct": 64.1,
+      "cbs_status": "Questionable for Week 1 at Philadelphia",
+      "cbs_injury": "Hamstring",
       "roster_status": 0,
       "injury_status": "Questionable",
       "injury_color": "yellow-500",
-      "injury_details": "Questionable For Week 1 At Pittsburgh (Back)",
+      "injury_details": "Questionable For Week 1 At Philadelphia (Hamstring)",
       "opponent": "CHI",
       "roof": "outdoors",
       "game_dt": "2026-01-04 16:25",
@@ -2268,7 +2268,7 @@
       "join_name": "J.Elliott",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/gxy1mhbnz1p2nufkg8qz",
       "match_name": "J.Elliott",
-      "own_pct": 8.6,
+      "own_pct": 8.7,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -2354,7 +2354,7 @@
           }
         ]
       },
-      "narrative": "Consider Elliott if you need a fill-in. Playing in a dome guarantees perfect conditions."
+      "narrative": "Elliott is a strong play this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -2391,7 +2391,7 @@
       "join_name": "B.Aubrey",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/bgwg06zmyohjxvzznbf6",
       "match_name": "B.Aubrey",
-      "own_pct": 99.1,
+      "own_pct": 99.2,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -2477,7 +2477,7 @@
           }
         ]
       },
-      "narrative": "Fire up Aubrey with confidence. The offense has a massive implied total of 26.8."
+      "narrative": "Aubrey is a viable streaming option. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "B.Sauls",
@@ -2723,7 +2723,7 @@
           }
         ]
       },
-      "narrative": "McLaughlin is a locked-and-loaded RB1 of kickers this week. His offense has a high stall rate (0.0%)."
+      "narrative": "McLaughlin is a risky option this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "Y.Koo",
@@ -2846,7 +2846,7 @@
           }
         ]
       },
-      "narrative": "Fire up Koo with confidence. The offense has a massive implied total of 23.8."
+      "narrative": "Koo is a locked-and-loaded RB1 of kickers this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "C.Smyth",
@@ -2883,7 +2883,7 @@
       "join_name": "C.Smyth",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/yv9x4ywdfecxioletyol",
       "match_name": "C.Smyth",
-      "own_pct": 2.8,
+      "own_pct": 2.7,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -2971,7 +2971,7 @@
           }
         ]
       },
-      "narrative": "Fire up Smyth with confidence. The matchup is favorable against a porous defense."
+      "narrative": "You can trust Smyth in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -3094,7 +3094,7 @@
           }
         ]
       },
-      "narrative": "Moody is a risky option this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "Fire up Moody with confidence. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "N.Folk",
@@ -3217,7 +3217,7 @@
           }
         ]
       },
-      "narrative": "Fire up Folk with confidence. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Folk is a risky option this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -3254,7 +3254,7 @@
       "join_name": "H.Butker",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/yphf8avl8ji0ncdohabz",
       "match_name": "H.Butker",
-      "own_pct": 40.9,
+      "own_pct": 41.4,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -3342,7 +3342,7 @@
           }
         ]
       },
-      "narrative": "Fade Butker if possible. The matchup is favorable against a porous defense."
+      "narrative": "Butker is a strong play this week. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -3379,7 +3379,7 @@
       "join_name": "A.Szmyt",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tkah6glpysuyq2a54gts",
       "match_name": "A.Szmyt",
-      "own_pct": 1.1,
+      "own_pct": 0.9,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -3465,7 +3465,7 @@
           }
         ]
       },
-      "narrative": "Szmyt is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
+      "narrative": "Szmyt is a viable streaming option. The offense has a massive implied total of 19.0."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -3590,7 +3590,7 @@
           }
         ]
       },
-      "narrative": "Fade Ryland if possible. The offense has a massive implied total of 17.5."
+      "narrative": "Fire up Ryland with confidence. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "T.Loop",
@@ -3627,7 +3627,7 @@
       "join_name": "T.Loop",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/kbwixtntqevptepedhll",
       "match_name": "T.Loop",
-      "own_pct": 52.7,
+      "own_pct": 53.5,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -3713,7 +3713,7 @@
           }
         ]
       },
-      "narrative": "Fire up Loop with confidence. His offense has a high stall rate (0.0%)."
+      "narrative": "Loop is a risky option this week. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Karty",
@@ -3838,7 +3838,7 @@
           }
         ]
       },
-      "narrative": "Karty is a risky option this week. His offense has a high stall rate (0.0%)."
+      "narrative": "Karty is a strong play this week. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -3963,7 +3963,7 @@
           }
         ]
       },
-      "narrative": "Consider Carlson if you need a fill-in. His offense has a high stall rate (0.0%)."
+      "narrative": "Carlson is a viable streaming option. The offense has a massive implied total of 16.5."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -4086,7 +4086,7 @@
           }
         ]
       },
-      "narrative": "Slye is a strong play this week. The matchup is favorable against a porous defense."
+      "narrative": "Slye is a risky option this week. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "R.Fitzgerald",
@@ -4209,7 +4209,7 @@
           }
         ]
       },
-      "narrative": "You can trust Fitzgerald in your lineup. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Consider Fitzgerald if you need a fill-in. The offense has a massive implied total of 20.2."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -4334,7 +4334,7 @@
           }
         ]
       },
-      "narrative": "McManus is a viable streaming option. The offense has a massive implied total of 12.5."
+      "narrative": "Consider McManus if you need a fill-in. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Romo",
@@ -4871,7 +4871,7 @@
       "join_name": "L.Havrisik",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
       "match_name": "L.Havrisik",
-      "own_pct": 1.8,
+      "own_pct": 1.7,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": "DEV",
@@ -5121,7 +5121,7 @@
       "join_name": "Z.Gonzalez",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hrbmt2hunsrov39rqjzj",
       "match_name": "Z.Gonzalez",
-      "own_pct": 1.7,
+      "own_pct": 1.6,
       "cbs_status": "IR. Injured Reserve",
       "cbs_injury": "Undisclosed",
       "roster_status": 0,
@@ -5248,7 +5248,7 @@
       "join_name": "J.Myers",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/zcd7q9loflr0t5bsvzig",
       "match_name": "J.Myers",
-      "own_pct": 94.1,
+      "own_pct": 94.9,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5334,7 +5334,7 @@
       "join_name": "B.Aubrey",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/bgwg06zmyohjxvzznbf6",
       "match_name": "B.Aubrey",
-      "own_pct": 99.1,
+      "own_pct": 99.2,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5420,7 +5420,7 @@
       "join_name": "C.Little",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/mc9goepr7mglrx6ek1fi",
       "match_name": "C.Little",
-      "own_pct": 89.5,
+      "own_pct": 89.7,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5463,7 +5463,7 @@
       "join_name": "A.Borregales",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/x2fxn5qf6zkgmvedjpys",
       "match_name": "A.Borregales",
-      "own_pct": 27.5,
+      "own_pct": 27.1,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5506,7 +5506,7 @@
       "join_name": "W.Reichard",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wv1h4umuddkfss96uutw",
       "match_name": "W.Reichard",
-      "own_pct": 31.4,
+      "own_pct": 34.2,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5549,7 +5549,7 @@
       "join_name": "C.Boswell",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/rxbnhvnfjmheuryvdmuf",
       "match_name": "C.Boswell",
-      "own_pct": 33.8,
+      "own_pct": 33.4,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5635,7 +5635,7 @@
       "join_name": "E.Pineiro",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/v3vtl2t4dfzkueanjfwc",
       "match_name": "E.Pineiro",
-      "own_pct": 61.0,
+      "own_pct": 62.3,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5678,7 +5678,7 @@
       "join_name": "C.Santos",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tz5ecjri52gwpoo9s7be",
       "match_name": "C.Santos",
-      "own_pct": 26.5,
+      "own_pct": 26.8,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5721,7 +5721,7 @@
       "join_name": "W.Lutz",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vcglg5vsgbiyggwibgy0",
       "match_name": "W.Lutz",
-      "own_pct": 7.3,
+      "own_pct": 8.0,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5764,56 +5764,13 @@
       "join_name": "J.Bates",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/umhfee7ax7r8gjdt8okb",
       "match_name": "J.Bates",
-      "own_pct": 65.0,
+      "own_pct": 64.1,
       "cbs_status": "Questionable for Week 1 at Philadelphia",
       "cbs_injury": "Hamstring",
       "roster_status": null,
       "injury_status": "Questionable",
       "injury_color": "yellow-500",
       "injury_details": "Questionable For Week 1 At Philadelphia (Hamstring)"
-    },
-    {
-      "kicker_player_name": "J.Bates",
-      "kicker_player_id": "00-0039172",
-      "team": "DET",
-      "fg_made": 27,
-      "fg_att": 34,
-      "fg_0_19": 0,
-      "fg_20_29": 6,
-      "fg_30_39": 8,
-      "fg_40_49": 9,
-      "fg_50_59": 4,
-      "fg_60_plus": 0,
-      "fg_miss": 7,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 2,
-      "fg_miss_50_59": 4,
-      "fg_miss_60_plus": 1,
-      "xp_made": 54,
-      "xp_miss": 2,
-      "real_pts": 135,
-      "dome_kicks": 57,
-      "total_kicks": 90,
-      "games": 17,
-      "status": "ACT",
-      "posteam": "DET",
-      "rz_trips": 85,
-      "acc": 79.4,
-      "dome_pct": 63.0,
-      "fpts": 143,
-      "avg_pts": 8.4,
-      "join_name": "J.Bates",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/umhfee7ax7r8gjdt8okb",
-      "match_name": "J.Bates",
-      "own_pct": 65.0,
-      "cbs_status": "Questionable for Week 1 at Pittsburgh",
-      "cbs_injury": "Back",
-      "roster_status": null,
-      "injury_status": "Questionable",
-      "injury_color": "yellow-500",
-      "injury_details": "Questionable For Week 1 At Pittsburgh (Back)"
     },
     {
       "kicker_player_name": "H.Butker",
@@ -5850,7 +5807,7 @@
       "join_name": "H.Butker",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/yphf8avl8ji0ncdohabz",
       "match_name": "H.Butker",
-      "own_pct": 40.9,
+      "own_pct": 41.4,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5893,7 +5850,7 @@
       "join_name": "T.Loop",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/kbwixtntqevptepedhll",
       "match_name": "T.Loop",
-      "own_pct": 52.7,
+      "own_pct": 53.5,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5936,7 +5893,7 @@
       "join_name": "E.McPherson",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/t6fs7i54i4n7xjiayoz0",
       "match_name": "E.McPherson",
-      "own_pct": 41.1,
+      "own_pct": 40.6,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -6194,7 +6151,7 @@
       "join_name": "B.Grupe",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/de3vz6xjjo9paba6encd",
       "match_name": "B.Grupe",
-      "own_pct": 1.4,
+      "own_pct": 1.3,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -6237,7 +6194,7 @@
       "join_name": "J.Elliott",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/gxy1mhbnz1p2nufkg8qz",
       "match_name": "J.Elliott",
-      "own_pct": 8.6,
+      "own_pct": 8.7,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -6280,7 +6237,7 @@
       "join_name": "H.Mevis",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/yjmtai1e4eqbsw2yk6mh",
       "match_name": "H.Mevis",
-      "own_pct": 68.9,
+      "own_pct": 69.6,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -6366,7 +6323,7 @@
       "join_name": "A.Szmyt",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/tkah6glpysuyq2a54gts",
       "match_name": "A.Szmyt",
-      "own_pct": 1.1,
+      "own_pct": 0.9,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -6495,7 +6452,7 @@
       "join_name": "Z.Gonzalez",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hrbmt2hunsrov39rqjzj",
       "match_name": "Z.Gonzalez",
-      "own_pct": 1.7,
+      "own_pct": 1.6,
       "cbs_status": "IR. Injured Reserve",
       "cbs_injury": "Undisclosed",
       "roster_status": null,
@@ -6667,7 +6624,7 @@
       "join_name": "C.Smyth",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/yv9x4ywdfecxioletyol",
       "match_name": "C.Smyth",
-      "own_pct": 2.8,
+      "own_pct": 2.7,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -7011,7 +6968,7 @@
       "join_name": "L.Havrisik",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
       "match_name": "L.Havrisik",
-      "own_pct": 1.8,
+      "own_pct": 1.7,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": "DEV",
@@ -7099,50 +7056,7 @@
       "join_name": "J.Bates",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/umhfee7ax7r8gjdt8okb",
       "match_name": "J.Bates",
-      "own_pct": 65.0,
-      "cbs_status": "Questionable for Week 1 at Pittsburgh",
-      "cbs_injury": "Back",
-      "roster_status": null,
-      "injury_status": "Questionable",
-      "injury_color": "yellow-500",
-      "injury_details": "Questionable For Week 1 At Pittsburgh (Back)"
-    },
-    {
-      "kicker_player_name": "J.Bates",
-      "kicker_player_id": "00-0039172",
-      "team": "DET",
-      "fg_made": 27,
-      "fg_att": 34,
-      "fg_0_19": 0,
-      "fg_20_29": 6,
-      "fg_30_39": 8,
-      "fg_40_49": 9,
-      "fg_50_59": 4,
-      "fg_60_plus": 0,
-      "fg_miss": 7,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 2,
-      "fg_miss_50_59": 4,
-      "fg_miss_60_plus": 1,
-      "xp_made": 54,
-      "xp_miss": 2,
-      "real_pts": 135,
-      "dome_kicks": 57,
-      "total_kicks": 90,
-      "games": 17,
-      "status": "ACT",
-      "posteam": "DET",
-      "rz_trips": 85,
-      "acc": 79.4,
-      "dome_pct": 63.0,
-      "fpts": 143,
-      "avg_pts": 8.4,
-      "join_name": "J.Bates",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/umhfee7ax7r8gjdt8okb",
-      "match_name": "J.Bates",
-      "own_pct": 65.0,
+      "own_pct": 64.1,
       "cbs_status": "Questionable for Week 1 at Philadelphia",
       "cbs_injury": "Hamstring",
       "roster_status": null,
@@ -7185,7 +7099,7 @@
       "join_name": "Z.Gonzalez",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hrbmt2hunsrov39rqjzj",
       "match_name": "Z.Gonzalez",
-      "own_pct": 1.7,
+      "own_pct": 1.6,
       "cbs_status": "IR. Injured Reserve",
       "cbs_injury": "Undisclosed",
       "roster_status": null,
@@ -7400,7 +7314,7 @@
       "join_name": "L.Havrisik",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
       "match_name": "L.Havrisik",
-      "own_pct": 1.8,
+      "own_pct": 1.7,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": "DEV",
