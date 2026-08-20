@@ -1,7 +1,7 @@
 {
   "meta": {
     "week": 18,
-    "updated": "2026-08-19 08:21",
+    "updated": "2026-08-20 08:22",
     "league_avgs": {
       "fpts": 110.4,
       "off_stall": 51.6,
@@ -132,7 +132,7 @@
           }
         ]
       },
-      "narrative": "You can trust Pineiro in your lineup. Be cautious, as the team has a low implied total."
+      "narrative": "Pineiro is a viable streaming option. The offense has a massive implied total of 22.5."
     },
     {
       "kicker_player_name": "M.Gay",
@@ -255,7 +255,7 @@
           }
         ]
       },
-      "narrative": "Fire up Gay with confidence. His offense has a high stall rate (60.0%)."
+      "narrative": "Gay is a strong play this week. The offense has a massive implied total of 22.5."
     },
     {
       "kicker_player_name": "W.Lutz",
@@ -292,7 +292,7 @@
       "join_name": "W.Lutz",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vcglg5vsgbiyggwibgy0",
       "match_name": "W.Lutz",
-      "own_pct": 7.8,
+      "own_pct": 8.1,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -378,7 +378,7 @@
           }
         ]
       },
-      "narrative": "Lutz is a viable streaming option. The offense has a massive implied total of 26.0."
+      "narrative": "Lutz is a viable streaming option. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "C.Dicker",
@@ -501,7 +501,7 @@
           }
         ]
       },
-      "narrative": "Consider Dicker if you need a fill-in. The offense has a massive implied total of 11.5."
+      "narrative": "Dicker is a viable streaming option. Playing in a dome guarantees perfect conditions."
     },
     {
       "kicker_player_name": "C.Boswell",
@@ -538,7 +538,7 @@
       "join_name": "C.Boswell",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/rxbnhvnfjmheuryvdmuf",
       "match_name": "C.Boswell",
-      "own_pct": 33.4,
+      "own_pct": 33.5,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -624,7 +624,7 @@
           }
         ]
       },
-      "narrative": "Consider Boswell if you need a fill-in. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Boswell is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "J.Myers",
@@ -747,7 +747,7 @@
           }
         ]
       },
-      "narrative": "Fade Myers if possible. The matchup is favorable against a porous defense."
+      "narrative": "Fire up Myers with confidence. His offense has a high stall rate (50.0%)."
     },
     {
       "kicker_player_name": "H.Mevis",
@@ -784,7 +784,7 @@
       "join_name": "H.Mevis",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/yjmtai1e4eqbsw2yk6mh",
       "match_name": "H.Mevis",
-      "own_pct": 69.6,
+      "own_pct": 69.9,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -872,7 +872,7 @@
           }
         ]
       },
-      "narrative": "You can trust Mevis in your lineup. The matchup is favorable against a porous defense."
+      "narrative": "Mevis is a viable streaming option. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "W.Reichard",
@@ -909,7 +909,7 @@
       "join_name": "W.Reichard",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wv1h4umuddkfss96uutw",
       "match_name": "W.Reichard",
-      "own_pct": 35.2,
+      "own_pct": 35.6,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -997,7 +997,7 @@
           }
         ]
       },
-      "narrative": "Reichard is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
+      "narrative": "Fade Reichard if possible. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "A.Borregales",
@@ -1034,7 +1034,7 @@
       "join_name": "A.Borregales",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/x2fxn5qf6zkgmvedjpys",
       "match_name": "A.Borregales",
-      "own_pct": 26.7,
+      "own_pct": 26.4,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
@@ -1120,7 +1120,7 @@
           }
         ]
       },
-      "narrative": "Fade Borregales if possible. Be cautious, as the team has a low implied total."
+      "narrative": "Consider Borregales if you need a fill-in. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "K.Fairbairn",
@@ -1245,7 +1245,7 @@
           }
         ]
       },
-      "narrative": "Fairbairn is a risky option this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "Fairbairn is a risky option this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "R.Patterson",
@@ -1368,7 +1368,7 @@
           }
         ]
       },
-      "narrative": "Patterson is a risky option this week. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Fade Patterson if possible. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "B.Grupe",
@@ -1493,7 +1493,7 @@
           }
         ]
       },
-      "narrative": "Grupe is a viable streaming option. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Grupe is a viable streaming option. The offense has a massive implied total of 14.0."
     },
     {
       "kicker_player_name": "C.Santos",
@@ -1616,7 +1616,7 @@
           }
         ]
       },
-      "narrative": "Santos is a viable streaming option. His offense has a high stall rate (36.4%)."
+      "narrative": "You can trust Santos in your lineup. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "E.McPherson",
@@ -1739,7 +1739,7 @@
           }
         ]
       },
-      "narrative": "You can trust McPherson in your lineup. The offense has a massive implied total of 28.5."
+      "narrative": "You can trust McPherson in your lineup. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "M.Prater",
@@ -1862,7 +1862,7 @@
           }
         ]
       },
-      "narrative": "Prater is a risky option this week. Playing in a dome guarantees perfect conditions."
+      "narrative": "Prater is a risky option this week. His offense has a high stall rate (25.0%)."
     },
     {
       "kicker_player_name": "C.Little",
@@ -1985,7 +1985,7 @@
           }
         ]
       },
-      "narrative": "Little is a risky option this week. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Little is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "M.Badgley",
@@ -2108,7 +2108,7 @@
           }
         ]
       },
-      "narrative": "Fire up Badgley with confidence. His offense has a high stall rate (25.0%)."
+      "narrative": "Badgley is a viable streaming option. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "J.Bates",
@@ -2354,7 +2354,7 @@
           }
         ]
       },
-      "narrative": "Consider Elliott if you need a fill-in. The offense has a massive implied total of 20.8."
+      "narrative": "Elliott is a locked-and-loaded RB1 of kickers this week. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "B.Aubrey",
@@ -2477,60 +2477,60 @@
           }
         ]
       },
-      "narrative": "You can trust Aubrey in your lineup. Playing in a dome guarantees perfect conditions."
+      "narrative": "Consider Aubrey if you need a fill-in. His offense has a high stall rate (0.0%)."
     },
     {
-      "kicker_player_name": "B.Sauls",
-      "kicker_player_id": "00-0040530",
-      "team": "NYG",
-      "fg_made": 8,
-      "fg_att": 8,
+      "kicker_player_name": "Z.Gonzalez",
+      "kicker_player_id": "00-0033862",
+      "team": "ATL",
+      "fg_made": 19,
+      "fg_att": 22,
       "fg_0_19": 0,
-      "fg_20_29": 3,
-      "fg_30_39": 4,
-      "fg_40_49": 1,
-      "fg_50_59": 0,
+      "fg_20_29": 1,
+      "fg_30_39": 3,
+      "fg_40_49": 8,
+      "fg_50_59": 7,
       "fg_60_plus": 0,
-      "fg_miss": 0,
+      "fg_miss": 3,
       "fg_miss_0_19": 0,
       "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
+      "fg_miss_30_39": 1,
       "fg_miss_40_49": 0,
-      "fg_miss_50_59": 0,
+      "fg_miss_50_59": 2,
       "fg_miss_60_plus": 0,
-      "xp_made": 7,
-      "xp_miss": 0,
-      "real_pts": 31,
-      "dome_kicks": 6,
-      "total_kicks": 15,
-      "games": 3,
+      "xp_made": 17,
+      "xp_miss": 1,
+      "real_pts": 74,
+      "dome_kicks": 32,
+      "total_kicks": 40,
+      "games": 9,
       "status": "ACT",
-      "posteam": "NYG",
-      "rz_trips": 77,
-      "acc": 100.0,
-      "dome_pct": 40.0,
-      "fpts": 32,
-      "avg_pts": 10.7,
-      "join_name": "B.Sauls",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/xtbztjfp9xzrfn5ajkrw",
-      "match_name": "B.Sauls",
-      "own_pct": 0.8,
+      "posteam": "ATL",
+      "rz_trips": 67,
+      "acc": 86.4,
+      "dome_pct": 80.0,
+      "fpts": 92,
+      "avg_pts": 10.2,
+      "join_name": "Z.Gonzalez",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hrbmt2hunsrov39rqjzj",
+      "match_name": "Z.Gonzalez",
+      "own_pct": 1.6,
       "cbs_status": 0,
       "cbs_injury": 0,
       "roster_status": 0,
       "injury_status": "Healthy",
       "injury_color": "green",
       "injury_details": "Active",
-      "opponent": "DAL",
-      "roof": "outdoors",
+      "opponent": "NO",
+      "roof": "closed",
       "game_dt": "2026-01-04 13:00",
-      "total_line": 50.5,
-      "spread_line": -3.0,
-      "home_field": "NYG",
-      "vegas_implied": 23.75,
+      "total_line": 43.5,
+      "spread_line": 4.5,
+      "home_field": "ATL",
+      "vegas_implied": 24.0,
       "is_home": true,
-      "spread_display": "+3.0",
-      "is_dome": false,
+      "spread_display": "-4.5",
+      "is_dome": true,
       "weather_data": [
         0,
         "Game Finished"
@@ -2538,13 +2538,13 @@
       "wind": 0,
       "weather_desc": "Game Finished",
       "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 1.0,
+      "wk_fg_20_29": 0.0,
       "wk_fg_30_39": 2.0,
       "wk_fg_40_49": 1.0,
-      "wk_fg_50_59": 0.0,
+      "wk_fg_50_59": 1.0,
       "wk_fg_60_plus": 0.0,
       "wk_fg_miss": 0.0,
-      "wk_xp_made": 2.0,
+      "wk_xp_made": 1.0,
       "wk_xp_miss": 0.0,
       "wk_fg_miss_0_19": 0.0,
       "wk_fg_miss_20_29": 0.0,
@@ -2553,54 +2553,56 @@
       "wk_fg_miss_50_59": 0.0,
       "wk_fg_miss_60_plus": 0.0,
       "off_stall_rate": 0.0,
-      "off_ppg": 22.7,
+      "off_ppg": 22.8,
       "off_share": 0.0,
       "def_stall_rate": 0.0,
-      "def_pa": 33.8,
+      "def_pa": 17.2,
       "def_share": 0.0,
       "aggression_pct": 0.0,
-      "grade": 0.0,
-      "proj": 6.7,
-      "grade_details": [],
+      "grade": 10.0,
+      "proj": 6.8,
+      "grade_details": [
+        "+10 Dome"
+      ],
       "off_score_val": 0.0,
       "def_score_val": 0.0,
-      "w_team_score": 23.4,
-      "w_def_allowed": 26.8,
-      "off_cap_val": 12.7,
-      "def_cap_val": 14.5,
-      "details_vegas_total": 50.5,
-      "details_vegas_spread": "+3.0",
+      "w_team_score": 23.6,
+      "w_def_allowed": 22.0,
+      "off_cap_val": 12.8,
+      "def_cap_val": 11.9,
+      "details_vegas_total": 43.5,
+      "details_vegas_spread": "-4.5",
       "history": {
-        "l3_actual": 17,
-        "l3_proj": 21.4,
+        "l3_actual": 27,
+        "l3_proj": 32.1,
         "l3_games": [
           {
             "week": 17,
             "status": "ACTIVE",
-            "proj": 10.7,
-            "act": 10,
-            "diff": -0.7,
-            "opp": "LV"
+            "proj": 10.2,
+            "act": 12,
+            "diff": 1.8,
+            "opp": "LA"
           },
           {
             "week": 16,
             "status": "ACTIVE",
-            "proj": 10.7,
-            "act": 7,
-            "diff": -3.7,
-            "opp": "MIN"
+            "proj": 11.7,
+            "act": 9,
+            "diff": -2.7,
+            "opp": "ARI"
           },
           {
             "week": 15,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "WAS"
+            "status": "ACTIVE",
+            "proj": 10.2,
+            "act": 6,
+            "diff": -4.2,
+            "opp": "TB"
           }
         ]
       },
-      "narrative": "Consider Sauls if you need a fill-in. His offense has a high stall rate (0.0%)."
+      "narrative": "Gonzalez is a strong play this week. The offense has a massive implied total of 24.0."
     },
     {
       "kicker_player_name": "C.McLaughlin",
@@ -2723,7 +2725,130 @@
           }
         ]
       },
-      "narrative": "Consider McLaughlin if you need a fill-in. The matchup is favorable against a porous defense."
+      "narrative": "You can trust McLaughlin in your lineup. Be cautious, as the team has a low implied total."
+    },
+    {
+      "kicker_player_name": "B.Sauls",
+      "kicker_player_id": "00-0040530",
+      "team": "NYG",
+      "fg_made": 8,
+      "fg_att": 8,
+      "fg_0_19": 0,
+      "fg_20_29": 3,
+      "fg_30_39": 4,
+      "fg_40_49": 1,
+      "fg_50_59": 0,
+      "fg_60_plus": 0,
+      "fg_miss": 0,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 0,
+      "fg_miss_40_49": 0,
+      "fg_miss_50_59": 0,
+      "fg_miss_60_plus": 0,
+      "xp_made": 7,
+      "xp_miss": 0,
+      "real_pts": 31,
+      "dome_kicks": 6,
+      "total_kicks": 15,
+      "games": 3,
+      "status": "ACT",
+      "posteam": "NYG",
+      "rz_trips": 77,
+      "acc": 100.0,
+      "dome_pct": 40.0,
+      "fpts": 32,
+      "avg_pts": 10.7,
+      "join_name": "B.Sauls",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/xtbztjfp9xzrfn5ajkrw",
+      "match_name": "B.Sauls",
+      "own_pct": 0.8,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": 0,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active",
+      "opponent": "DAL",
+      "roof": "outdoors",
+      "game_dt": "2026-01-04 13:00",
+      "total_line": 50.5,
+      "spread_line": -3.0,
+      "home_field": "NYG",
+      "vegas_implied": 23.75,
+      "is_home": true,
+      "spread_display": "+3.0",
+      "is_dome": false,
+      "weather_data": [
+        0,
+        "Game Finished"
+      ],
+      "wind": 0,
+      "weather_desc": "Game Finished",
+      "wk_fg_0_19": 0.0,
+      "wk_fg_20_29": 1.0,
+      "wk_fg_30_39": 2.0,
+      "wk_fg_40_49": 1.0,
+      "wk_fg_50_59": 0.0,
+      "wk_fg_60_plus": 0.0,
+      "wk_fg_miss": 0.0,
+      "wk_xp_made": 2.0,
+      "wk_xp_miss": 0.0,
+      "wk_fg_miss_0_19": 0.0,
+      "wk_fg_miss_20_29": 0.0,
+      "wk_fg_miss_30_39": 0.0,
+      "wk_fg_miss_40_49": 0.0,
+      "wk_fg_miss_50_59": 0.0,
+      "wk_fg_miss_60_plus": 0.0,
+      "off_stall_rate": 0.0,
+      "off_ppg": 22.7,
+      "off_share": 0.0,
+      "def_stall_rate": 0.0,
+      "def_pa": 33.8,
+      "def_share": 0.0,
+      "aggression_pct": 0.0,
+      "grade": 0.0,
+      "proj": 6.7,
+      "grade_details": [],
+      "off_score_val": 0.0,
+      "def_score_val": 0.0,
+      "w_team_score": 23.4,
+      "w_def_allowed": 26.8,
+      "off_cap_val": 12.7,
+      "def_cap_val": 14.5,
+      "details_vegas_total": 50.5,
+      "details_vegas_spread": "+3.0",
+      "history": {
+        "l3_actual": 17,
+        "l3_proj": 21.4,
+        "l3_games": [
+          {
+            "week": 17,
+            "status": "ACTIVE",
+            "proj": 10.7,
+            "act": 10,
+            "diff": -0.7,
+            "opp": "LV"
+          },
+          {
+            "week": 16,
+            "status": "ACTIVE",
+            "proj": 10.7,
+            "act": 7,
+            "diff": -3.7,
+            "opp": "MIN"
+          },
+          {
+            "week": 15,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "WAS"
+          }
+        ]
+      },
+      "narrative": "Sauls is a strong play this week. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "Y.Koo",
@@ -2846,7 +2971,7 @@
           }
         ]
       },
-      "narrative": "Koo is a risky option this week. His offense has a high stall rate (0.0%)."
+      "narrative": "Koo is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "C.Smyth",
@@ -2971,7 +3096,7 @@
           }
         ]
       },
-      "narrative": "Smyth is a locked-and-loaded RB1 of kickers this week. Be cautious, as the team has a low implied total."
+      "narrative": "Smyth is a strong play this week. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "J.Moody",
@@ -3094,7 +3219,7 @@
           }
         ]
       },
-      "narrative": "Consider Moody if you need a fill-in. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Moody is a risky option this week. The offense has a massive implied total of 17.8."
     },
     {
       "kicker_player_name": "N.Folk",
@@ -3217,7 +3342,7 @@
           }
         ]
       },
-      "narrative": "Consider Folk if you need a fill-in. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Folk is a strong play this week. Heavy winds (0 mph) could limit opportunities."
     },
     {
       "kicker_player_name": "H.Butker",
@@ -3342,7 +3467,7 @@
           }
         ]
       },
-      "narrative": "Fade Butker if possible. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Fire up Butker with confidence. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "A.Szmyt",
@@ -3465,7 +3590,130 @@
           }
         ]
       },
-      "narrative": "Consider Szmyt if you need a fill-in. The offense has a massive implied total of 19.0."
+      "narrative": "You can trust Szmyt in your lineup. Playing in a dome guarantees perfect conditions."
+    },
+    {
+      "kicker_player_name": "T.Loop",
+      "kicker_player_id": "00-0040074",
+      "team": "BAL",
+      "fg_made": 30,
+      "fg_att": 34,
+      "fg_0_19": 0,
+      "fg_20_29": 10,
+      "fg_30_39": 11,
+      "fg_40_49": 8,
+      "fg_50_59": 1,
+      "fg_60_plus": 0,
+      "fg_miss": 4,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 0,
+      "fg_miss_40_49": 1,
+      "fg_miss_50_59": 3,
+      "fg_miss_60_plus": 0,
+      "xp_made": 44,
+      "xp_miss": 2,
+      "real_pts": 134,
+      "dome_kicks": 6,
+      "total_kicks": 80,
+      "games": 17,
+      "status": "ACT",
+      "posteam": "BAL",
+      "rz_trips": 84,
+      "acc": 88.2,
+      "dome_pct": 8.0,
+      "fpts": 138,
+      "avg_pts": 8.1,
+      "join_name": "T.Loop",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/kbwixtntqevptepedhll",
+      "match_name": "T.Loop",
+      "own_pct": 53.6,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": 0,
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active",
+      "opponent": "PIT",
+      "roof": "outdoors",
+      "game_dt": "2026-01-04 20:20",
+      "total_line": 41.5,
+      "spread_line": -4.5,
+      "home_field": "PIT",
+      "vegas_implied": 23.0,
+      "is_home": false,
+      "spread_display": "-4.5",
+      "is_dome": false,
+      "weather_data": [
+        0,
+        "Game Finished"
+      ],
+      "wind": 0,
+      "weather_desc": "Game Finished",
+      "wk_fg_0_19": 0.0,
+      "wk_fg_20_29": 0.0,
+      "wk_fg_30_39": 0.0,
+      "wk_fg_40_49": 1.0,
+      "wk_fg_50_59": 0.0,
+      "wk_fg_60_plus": 0.0,
+      "wk_fg_miss": 1.0,
+      "wk_xp_made": 3.0,
+      "wk_xp_miss": 0.0,
+      "wk_fg_miss_0_19": 0.0,
+      "wk_fg_miss_20_29": 0.0,
+      "wk_fg_miss_30_39": 0.0,
+      "wk_fg_miss_40_49": 1.0,
+      "wk_fg_miss_50_59": 0.0,
+      "wk_fg_miss_60_plus": 0.0,
+      "off_stall_rate": 0.0,
+      "off_ppg": 27.8,
+      "off_share": 0.0,
+      "def_stall_rate": 0.0,
+      "def_pa": 18.5,
+      "def_share": 0.2,
+      "aggression_pct": 0.0,
+      "grade": 0.0,
+      "proj": 5.0,
+      "grade_details": [],
+      "off_score_val": 0.0,
+      "def_score_val": 0.0,
+      "w_team_score": 24.4,
+      "w_def_allowed": 21.6,
+      "off_cap_val": 13.2,
+      "def_cap_val": 5.2,
+      "details_vegas_total": 41.5,
+      "details_vegas_spread": "-4.5",
+      "history": {
+        "l3_actual": 22,
+        "l3_proj": 26.7,
+        "l3_games": [
+          {
+            "week": 17,
+            "status": "ACTIVE",
+            "proj": 8.1,
+            "act": 11,
+            "diff": 2.9,
+            "opp": "GB"
+          },
+          {
+            "week": 16,
+            "status": "ACTIVE",
+            "proj": 9.3,
+            "act": 5,
+            "diff": -4.3,
+            "opp": "NE"
+          },
+          {
+            "week": 15,
+            "status": "ACTIVE",
+            "proj": 9.3,
+            "act": 6,
+            "diff": -3.3,
+            "opp": "CIN"
+          }
+        ]
+      },
+      "narrative": "Loop is a risky option this week. His offense has a high stall rate (0.0%)."
     },
     {
       "kicker_player_name": "C.Ryland",
@@ -3590,130 +3838,7 @@
           }
         ]
       },
-      "narrative": "Ryland is a strong play this week. His offense has a high stall rate (0.0%)."
-    },
-    {
-      "kicker_player_name": "T.Loop",
-      "kicker_player_id": "00-0040074",
-      "team": "BAL",
-      "fg_made": 30,
-      "fg_att": 34,
-      "fg_0_19": 0,
-      "fg_20_29": 10,
-      "fg_30_39": 11,
-      "fg_40_49": 8,
-      "fg_50_59": 1,
-      "fg_60_plus": 0,
-      "fg_miss": 4,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 1,
-      "fg_miss_50_59": 3,
-      "fg_miss_60_plus": 0,
-      "xp_made": 44,
-      "xp_miss": 2,
-      "real_pts": 134,
-      "dome_kicks": 6,
-      "total_kicks": 80,
-      "games": 17,
-      "status": "ACT",
-      "posteam": "BAL",
-      "rz_trips": 84,
-      "acc": 88.2,
-      "dome_pct": 8.0,
-      "fpts": 138,
-      "avg_pts": 8.1,
-      "join_name": "T.Loop",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/kbwixtntqevptepedhll",
-      "match_name": "T.Loop",
-      "own_pct": 53.6,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": 0,
-      "injury_status": "Healthy",
-      "injury_color": "green",
-      "injury_details": "Active",
-      "opponent": "PIT",
-      "roof": "outdoors",
-      "game_dt": "2026-01-04 20:20",
-      "total_line": 41.5,
-      "spread_line": -4.5,
-      "home_field": "PIT",
-      "vegas_implied": 23.0,
-      "is_home": false,
-      "spread_display": "-4.5",
-      "is_dome": false,
-      "weather_data": [
-        0,
-        "Game Finished"
-      ],
-      "wind": 0,
-      "weather_desc": "Game Finished",
-      "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 0.0,
-      "wk_fg_30_39": 0.0,
-      "wk_fg_40_49": 1.0,
-      "wk_fg_50_59": 0.0,
-      "wk_fg_60_plus": 0.0,
-      "wk_fg_miss": 1.0,
-      "wk_xp_made": 3.0,
-      "wk_xp_miss": 0.0,
-      "wk_fg_miss_0_19": 0.0,
-      "wk_fg_miss_20_29": 0.0,
-      "wk_fg_miss_30_39": 0.0,
-      "wk_fg_miss_40_49": 1.0,
-      "wk_fg_miss_50_59": 0.0,
-      "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 0.0,
-      "off_ppg": 27.8,
-      "off_share": 0.0,
-      "def_stall_rate": 0.0,
-      "def_pa": 18.5,
-      "def_share": 0.2,
-      "aggression_pct": 0.0,
-      "grade": 0.0,
-      "proj": 5.0,
-      "grade_details": [],
-      "off_score_val": 0.0,
-      "def_score_val": 0.0,
-      "w_team_score": 24.4,
-      "w_def_allowed": 21.6,
-      "off_cap_val": 13.2,
-      "def_cap_val": 5.2,
-      "details_vegas_total": 41.5,
-      "details_vegas_spread": "-4.5",
-      "history": {
-        "l3_actual": 22,
-        "l3_proj": 26.7,
-        "l3_games": [
-          {
-            "week": 17,
-            "status": "ACTIVE",
-            "proj": 8.1,
-            "act": 11,
-            "diff": 2.9,
-            "opp": "GB"
-          },
-          {
-            "week": 16,
-            "status": "ACTIVE",
-            "proj": 9.3,
-            "act": 5,
-            "diff": -4.3,
-            "opp": "NE"
-          },
-          {
-            "week": 15,
-            "status": "ACTIVE",
-            "proj": 9.3,
-            "act": 6,
-            "diff": -3.3,
-            "opp": "CIN"
-          }
-        ]
-      },
-      "narrative": "Fade Loop if possible. The offense has a massive implied total of 23.0."
+      "narrative": "You can trust Ryland in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "J.Karty",
@@ -3838,7 +3963,7 @@
           }
         ]
       },
-      "narrative": "Karty is a viable streaming option. His offense has a high stall rate (0.0%)."
+      "narrative": "You can trust Karty in your lineup. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "D.Carlson",
@@ -3963,7 +4088,7 @@
           }
         ]
       },
-      "narrative": "Carlson is a locked-and-loaded RB1 of kickers this week. Heavy winds (0 mph) could limit opportunities."
+      "narrative": "Carlson is a risky option this week. The offense has a massive implied total of 16.5."
     },
     {
       "kicker_player_name": "J.Slye",
@@ -4086,7 +4211,7 @@
           }
         ]
       },
-      "narrative": "Fire up Slye with confidence. The offense has a massive implied total of 17.0."
+      "narrative": "Fire up Slye with confidence. The matchup is favorable against a porous defense."
     },
     {
       "kicker_player_name": "R.Fitzgerald",
@@ -4209,7 +4334,7 @@
           }
         ]
       },
-      "narrative": "Fire up Fitzgerald with confidence. His offense has a high stall rate (0.0%)."
+      "narrative": "Fitzgerald is a locked-and-loaded RB1 of kickers this week. The offense has a massive implied total of 20.2."
     },
     {
       "kicker_player_name": "B.McManus",
@@ -4334,132 +4459,7 @@
           }
         ]
       },
-      "narrative": "McManus is a strong play this week. Heavy winds (0 mph) could limit opportunities."
-    },
-    {
-      "kicker_player_name": "J.Romo",
-      "kicker_player_id": "00-0037542",
-      "team": "ATL",
-      "fg_made": 11,
-      "fg_att": 14,
-      "fg_0_19": 0,
-      "fg_20_29": 2,
-      "fg_30_39": 7,
-      "fg_40_49": 1,
-      "fg_50_59": 1,
-      "fg_60_plus": 0,
-      "fg_miss": 3,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 1,
-      "fg_miss_40_49": 1,
-      "fg_miss_50_59": 1,
-      "fg_miss_60_plus": 0,
-      "xp_made": 12,
-      "xp_miss": 1,
-      "real_pts": 45,
-      "dome_kicks": 19,
-      "total_kicks": 27,
-      "games": 7,
-      "status": "CUT",
-      "posteam": "ATL",
-      "rz_trips": 67,
-      "acc": 78.6,
-      "dome_pct": 70.0,
-      "fpts": 44,
-      "avg_pts": 6.3,
-      "join_name": "J.Romo",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pgbqca2tf4hcq4vxv13m",
-      "match_name": 0,
-      "own_pct": 0.0,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": "CUT",
-      "injury_status": "CUT",
-      "injury_color": "red-700",
-      "injury_details": "Released",
-      "opponent": "NO",
-      "roof": "closed",
-      "game_dt": "2026-01-04 13:00",
-      "total_line": 43.5,
-      "spread_line": 4.5,
-      "home_field": "ATL",
-      "vegas_implied": 24.0,
-      "is_home": true,
-      "spread_display": "-4.5",
-      "is_dome": true,
-      "weather_data": [
-        0,
-        "Game Finished"
-      ],
-      "wind": 0,
-      "weather_desc": "Game Finished",
-      "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 0.0,
-      "wk_fg_30_39": 0.0,
-      "wk_fg_40_49": 0.0,
-      "wk_fg_50_59": 0.0,
-      "wk_fg_60_plus": 0.0,
-      "wk_fg_miss": 0.0,
-      "wk_xp_made": 0.0,
-      "wk_xp_miss": 0.0,
-      "wk_fg_miss_0_19": 0.0,
-      "wk_fg_miss_20_29": 0.0,
-      "wk_fg_miss_30_39": 0.0,
-      "wk_fg_miss_40_49": 0.0,
-      "wk_fg_miss_50_59": 0.0,
-      "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 0.0,
-      "off_ppg": 22.8,
-      "off_share": 0.0,
-      "def_stall_rate": 0.0,
-      "def_pa": 17.2,
-      "def_share": 0.0,
-      "aggression_pct": 0.0,
-      "grade": 0.0,
-      "proj": 0.0,
-      "grade_details": [
-        "\u26d4 CUT"
-      ],
-      "off_score_val": 0.0,
-      "def_score_val": 0.0,
-      "w_team_score": 0.0,
-      "w_def_allowed": 0.0,
-      "off_cap_val": 0.0,
-      "def_cap_val": 0.0,
-      "details_vegas_total": 43.5,
-      "details_vegas_spread": "-4.5",
-      "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
-        "l3_games": [
-          {
-            "week": 17,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "LA"
-          },
-          {
-            "week": 16,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "ARI"
-          },
-          {
-            "week": 15,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "TB"
-          }
-        ]
-      },
-      "narrative": "Monitor status closely as they are currently listed as CUT. This significantly impacts their viability for Week ."
+      "narrative": "McManus is a risky option this week. Be cautious, as the team has a low implied total."
     },
     {
       "kicker_player_name": "G.Gano",
@@ -4712,6 +4712,256 @@
       "narrative": "Monitor status closely as they are currently listed as Practice Squad. This significantly impacts their viability for Week ."
     },
     {
+      "kicker_player_name": "J.Romo",
+      "kicker_player_id": "00-0037542",
+      "team": "ATL",
+      "fg_made": 11,
+      "fg_att": 14,
+      "fg_0_19": 0,
+      "fg_20_29": 2,
+      "fg_30_39": 7,
+      "fg_40_49": 1,
+      "fg_50_59": 1,
+      "fg_60_plus": 0,
+      "fg_miss": 3,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 1,
+      "fg_miss_40_49": 1,
+      "fg_miss_50_59": 1,
+      "fg_miss_60_plus": 0,
+      "xp_made": 12,
+      "xp_miss": 1,
+      "real_pts": 45,
+      "dome_kicks": 19,
+      "total_kicks": 27,
+      "games": 7,
+      "status": "CUT",
+      "posteam": "ATL",
+      "rz_trips": 67,
+      "acc": 78.6,
+      "dome_pct": 70.0,
+      "fpts": 44,
+      "avg_pts": 6.3,
+      "join_name": "J.Romo",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/pgbqca2tf4hcq4vxv13m",
+      "match_name": 0,
+      "own_pct": 0.0,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": "CUT",
+      "injury_status": "CUT",
+      "injury_color": "red-700",
+      "injury_details": "Released",
+      "opponent": "NO",
+      "roof": "closed",
+      "game_dt": "2026-01-04 13:00",
+      "total_line": 43.5,
+      "spread_line": 4.5,
+      "home_field": "ATL",
+      "vegas_implied": 24.0,
+      "is_home": true,
+      "spread_display": "-4.5",
+      "is_dome": true,
+      "weather_data": [
+        0,
+        "Game Finished"
+      ],
+      "wind": 0,
+      "weather_desc": "Game Finished",
+      "wk_fg_0_19": 0.0,
+      "wk_fg_20_29": 0.0,
+      "wk_fg_30_39": 0.0,
+      "wk_fg_40_49": 0.0,
+      "wk_fg_50_59": 0.0,
+      "wk_fg_60_plus": 0.0,
+      "wk_fg_miss": 0.0,
+      "wk_xp_made": 0.0,
+      "wk_xp_miss": 0.0,
+      "wk_fg_miss_0_19": 0.0,
+      "wk_fg_miss_20_29": 0.0,
+      "wk_fg_miss_30_39": 0.0,
+      "wk_fg_miss_40_49": 0.0,
+      "wk_fg_miss_50_59": 0.0,
+      "wk_fg_miss_60_plus": 0.0,
+      "off_stall_rate": 0.0,
+      "off_ppg": 22.8,
+      "off_share": 0.0,
+      "def_stall_rate": 0.0,
+      "def_pa": 17.2,
+      "def_share": 0.0,
+      "aggression_pct": 0.0,
+      "grade": 0.0,
+      "proj": 0.0,
+      "grade_details": [
+        "\u26d4 CUT"
+      ],
+      "off_score_val": 0.0,
+      "def_score_val": 0.0,
+      "w_team_score": 0.0,
+      "w_def_allowed": 0.0,
+      "off_cap_val": 0.0,
+      "def_cap_val": 0.0,
+      "details_vegas_total": 43.5,
+      "details_vegas_spread": "-4.5",
+      "history": {
+        "l3_actual": 0,
+        "l3_proj": 0.0,
+        "l3_games": [
+          {
+            "week": 17,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "LA"
+          },
+          {
+            "week": 16,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "ARI"
+          },
+          {
+            "week": 15,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "TB"
+          }
+        ]
+      },
+      "narrative": "Monitor status closely as they are currently listed as CUT. This significantly impacts their viability for Week ."
+    },
+    {
+      "kicker_player_name": "L.Havrisik",
+      "kicker_player_id": "00-0038152",
+      "team": "GB",
+      "fg_made": 4,
+      "fg_att": 4,
+      "fg_0_19": 0,
+      "fg_20_29": 0,
+      "fg_30_39": 2,
+      "fg_40_49": 1,
+      "fg_50_59": 0,
+      "fg_60_plus": 1,
+      "fg_miss": 0,
+      "fg_miss_0_19": 0,
+      "fg_miss_20_29": 0,
+      "fg_miss_30_39": 0,
+      "fg_miss_40_49": 0,
+      "fg_miss_50_59": 0,
+      "fg_miss_60_plus": 0,
+      "xp_made": 7,
+      "xp_miss": 2,
+      "real_pts": 19,
+      "dome_kicks": 5,
+      "total_kicks": 13,
+      "games": 3,
+      "status": "DEV",
+      "posteam": "GB",
+      "rz_trips": 79,
+      "acc": 100.0,
+      "dome_pct": 38.0,
+      "fpts": 20,
+      "avg_pts": 6.7,
+      "join_name": "L.Havrisik",
+      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
+      "match_name": "L.Havrisik",
+      "own_pct": 2.2,
+      "cbs_status": 0,
+      "cbs_injury": 0,
+      "roster_status": "DEV",
+      "injury_status": "Practice Squad",
+      "injury_color": "yellow-500",
+      "injury_details": "Roster: Practice Squad",
+      "opponent": "MIN",
+      "roof": "dome",
+      "game_dt": "2026-01-04 13:00",
+      "total_line": 37.5,
+      "spread_line": 12.5,
+      "home_field": "MIN",
+      "vegas_implied": 12.5,
+      "is_home": false,
+      "spread_display": "+12.5",
+      "is_dome": true,
+      "weather_data": [
+        0,
+        "Game Finished"
+      ],
+      "wind": 0,
+      "weather_desc": "Game Finished",
+      "wk_fg_0_19": 0.0,
+      "wk_fg_20_29": 0.0,
+      "wk_fg_30_39": 0.0,
+      "wk_fg_40_49": 0.0,
+      "wk_fg_50_59": 0.0,
+      "wk_fg_60_plus": 0.0,
+      "wk_fg_miss": 0.0,
+      "wk_xp_made": 0.0,
+      "wk_xp_miss": 0.0,
+      "wk_fg_miss_0_19": 0.0,
+      "wk_fg_miss_20_29": 0.0,
+      "wk_fg_miss_30_39": 0.0,
+      "wk_fg_miss_40_49": 0.0,
+      "wk_fg_miss_50_59": 0.0,
+      "wk_fg_miss_60_plus": 0.0,
+      "off_stall_rate": 33.3,
+      "off_ppg": 23.5,
+      "off_share": 0.1111111111111111,
+      "def_stall_rate": 0.0,
+      "def_pa": 12.2,
+      "def_share": 0.0,
+      "aggression_pct": 66.7,
+      "grade": 0.0,
+      "proj": 0.0,
+      "grade_details": [
+        "\u26d4 Practice Squad"
+      ],
+      "off_score_val": 0.0,
+      "def_score_val": 0.0,
+      "w_team_score": 0.0,
+      "w_def_allowed": 0.0,
+      "off_cap_val": 0.0,
+      "def_cap_val": 0.0,
+      "details_vegas_total": 37.5,
+      "details_vegas_spread": "+12.5",
+      "history": {
+        "l3_actual": 0,
+        "l3_proj": 0.0,
+        "l3_games": [
+          {
+            "week": 17,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "BAL"
+          },
+          {
+            "week": 16,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "CHI"
+          },
+          {
+            "week": 15,
+            "status": "DNS",
+            "proj": 0,
+            "act": 0,
+            "diff": 0,
+            "opp": "DEN"
+          }
+        ]
+      },
+      "narrative": "Monitor status closely as they are currently listed as Practice Squad. This significantly impacts their viability for Week ."
+    },
+    {
       "kicker_player_name": "M.Wright",
       "kicker_player_id": "00-0035189",
       "team": "BUF",
@@ -4831,131 +5081,6 @@
             "act": 0,
             "diff": 0,
             "opp": "NE"
-          }
-        ]
-      },
-      "narrative": "Monitor status closely as they are currently listed as Practice Squad. This significantly impacts their viability for Week ."
-    },
-    {
-      "kicker_player_name": "L.Havrisik",
-      "kicker_player_id": "00-0038152",
-      "team": "GB",
-      "fg_made": 4,
-      "fg_att": 4,
-      "fg_0_19": 0,
-      "fg_20_29": 0,
-      "fg_30_39": 2,
-      "fg_40_49": 1,
-      "fg_50_59": 0,
-      "fg_60_plus": 1,
-      "fg_miss": 0,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 0,
-      "fg_miss_40_49": 0,
-      "fg_miss_50_59": 0,
-      "fg_miss_60_plus": 0,
-      "xp_made": 7,
-      "xp_miss": 2,
-      "real_pts": 19,
-      "dome_kicks": 5,
-      "total_kicks": 13,
-      "games": 3,
-      "status": "DEV",
-      "posteam": "GB",
-      "rz_trips": 79,
-      "acc": 100.0,
-      "dome_pct": 38.0,
-      "fpts": 20,
-      "avg_pts": 6.7,
-      "join_name": "L.Havrisik",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
-      "match_name": "L.Havrisik",
-      "own_pct": 1.2,
-      "cbs_status": 0,
-      "cbs_injury": 0,
-      "roster_status": "DEV",
-      "injury_status": "Practice Squad",
-      "injury_color": "yellow-500",
-      "injury_details": "Roster: Practice Squad",
-      "opponent": "MIN",
-      "roof": "dome",
-      "game_dt": "2026-01-04 13:00",
-      "total_line": 37.5,
-      "spread_line": 12.5,
-      "home_field": "MIN",
-      "vegas_implied": 12.5,
-      "is_home": false,
-      "spread_display": "+12.5",
-      "is_dome": true,
-      "weather_data": [
-        0,
-        "Game Finished"
-      ],
-      "wind": 0,
-      "weather_desc": "Game Finished",
-      "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 0.0,
-      "wk_fg_30_39": 0.0,
-      "wk_fg_40_49": 0.0,
-      "wk_fg_50_59": 0.0,
-      "wk_fg_60_plus": 0.0,
-      "wk_fg_miss": 0.0,
-      "wk_xp_made": 0.0,
-      "wk_xp_miss": 0.0,
-      "wk_fg_miss_0_19": 0.0,
-      "wk_fg_miss_20_29": 0.0,
-      "wk_fg_miss_30_39": 0.0,
-      "wk_fg_miss_40_49": 0.0,
-      "wk_fg_miss_50_59": 0.0,
-      "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 33.3,
-      "off_ppg": 23.5,
-      "off_share": 0.1111111111111111,
-      "def_stall_rate": 0.0,
-      "def_pa": 12.2,
-      "def_share": 0.0,
-      "aggression_pct": 66.7,
-      "grade": 0.0,
-      "proj": 0.0,
-      "grade_details": [
-        "\u26d4 Practice Squad"
-      ],
-      "off_score_val": 0.0,
-      "def_score_val": 0.0,
-      "w_team_score": 0.0,
-      "w_def_allowed": 0.0,
-      "off_cap_val": 0.0,
-      "def_cap_val": 0.0,
-      "details_vegas_total": 37.5,
-      "details_vegas_spread": "+12.5",
-      "history": {
-        "l3_actual": 0,
-        "l3_proj": 0.0,
-        "l3_games": [
-          {
-            "week": 17,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "BAL"
-          },
-          {
-            "week": 16,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "CHI"
-          },
-          {
-            "week": 15,
-            "status": "DNS",
-            "proj": 0,
-            "act": 0,
-            "diff": 0,
-            "opp": "DEN"
           }
         ]
       },
@@ -5085,131 +5210,6 @@
         ]
       },
       "narrative": "Monitor status closely as they are currently listed as IR. This significantly impacts their viability for Week ."
-    },
-    {
-      "kicker_player_name": "Z.Gonzalez",
-      "kicker_player_id": "00-0033862",
-      "team": "ATL",
-      "fg_made": 19,
-      "fg_att": 22,
-      "fg_0_19": 0,
-      "fg_20_29": 1,
-      "fg_30_39": 3,
-      "fg_40_49": 8,
-      "fg_50_59": 7,
-      "fg_60_plus": 0,
-      "fg_miss": 3,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 1,
-      "fg_miss_40_49": 0,
-      "fg_miss_50_59": 2,
-      "fg_miss_60_plus": 0,
-      "xp_made": 17,
-      "xp_miss": 1,
-      "real_pts": 74,
-      "dome_kicks": 32,
-      "total_kicks": 40,
-      "games": 9,
-      "status": "ACT",
-      "posteam": "ATL",
-      "rz_trips": 67,
-      "acc": 86.4,
-      "dome_pct": 80.0,
-      "fpts": 92,
-      "avg_pts": 10.2,
-      "join_name": "Z.Gonzalez",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hrbmt2hunsrov39rqjzj",
-      "match_name": "Z.Gonzalez",
-      "own_pct": 1.6,
-      "cbs_status": "IR. Injured Reserve",
-      "cbs_injury": "Undisclosed",
-      "roster_status": 0,
-      "injury_status": "OUT",
-      "injury_color": "red-700",
-      "injury_details": "Ir. Injured Reserve (Undisclosed)",
-      "opponent": "NO",
-      "roof": "closed",
-      "game_dt": "2026-01-04 13:00",
-      "total_line": 43.5,
-      "spread_line": 4.5,
-      "home_field": "ATL",
-      "vegas_implied": 24.0,
-      "is_home": true,
-      "spread_display": "-4.5",
-      "is_dome": true,
-      "weather_data": [
-        0,
-        "Game Finished"
-      ],
-      "wind": 0,
-      "weather_desc": "Game Finished",
-      "wk_fg_0_19": 0.0,
-      "wk_fg_20_29": 0.0,
-      "wk_fg_30_39": 2.0,
-      "wk_fg_40_49": 1.0,
-      "wk_fg_50_59": 1.0,
-      "wk_fg_60_plus": 0.0,
-      "wk_fg_miss": 0.0,
-      "wk_xp_made": 1.0,
-      "wk_xp_miss": 0.0,
-      "wk_fg_miss_0_19": 0.0,
-      "wk_fg_miss_20_29": 0.0,
-      "wk_fg_miss_30_39": 0.0,
-      "wk_fg_miss_40_49": 0.0,
-      "wk_fg_miss_50_59": 0.0,
-      "wk_fg_miss_60_plus": 0.0,
-      "off_stall_rate": 0.0,
-      "off_ppg": 22.8,
-      "off_share": 0.0,
-      "def_stall_rate": 0.0,
-      "def_pa": 17.2,
-      "def_share": 0.0,
-      "aggression_pct": 0.0,
-      "grade": 0.0,
-      "proj": 0.0,
-      "grade_details": [
-        "\u26d4 OUT"
-      ],
-      "off_score_val": 0.0,
-      "def_score_val": 0.0,
-      "w_team_score": 0.0,
-      "w_def_allowed": 0.0,
-      "off_cap_val": 0.0,
-      "def_cap_val": 0.0,
-      "details_vegas_total": 43.5,
-      "details_vegas_spread": "-4.5",
-      "history": {
-        "l3_actual": 27,
-        "l3_proj": 32.1,
-        "l3_games": [
-          {
-            "week": 17,
-            "status": "ACTIVE",
-            "proj": 10.2,
-            "act": 12,
-            "diff": 1.8,
-            "opp": "LA"
-          },
-          {
-            "week": 16,
-            "status": "ACTIVE",
-            "proj": 11.7,
-            "act": 9,
-            "diff": -2.7,
-            "opp": "ARI"
-          },
-          {
-            "week": 15,
-            "status": "ACTIVE",
-            "proj": 10.2,
-            "act": 6,
-            "diff": -4.2,
-            "opp": "TB"
-          }
-        ]
-      },
-      "narrative": "Monitor status closely as they are currently listed as OUT. This significantly impacts their viability for Week ."
     }
   ],
   "ytd": [
@@ -5463,7 +5463,7 @@
       "join_name": "A.Borregales",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/x2fxn5qf6zkgmvedjpys",
       "match_name": "A.Borregales",
-      "own_pct": 26.7,
+      "own_pct": 26.4,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5506,7 +5506,7 @@
       "join_name": "W.Reichard",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/wv1h4umuddkfss96uutw",
       "match_name": "W.Reichard",
-      "own_pct": 35.2,
+      "own_pct": 35.6,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5549,7 +5549,7 @@
       "join_name": "C.Boswell",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/rxbnhvnfjmheuryvdmuf",
       "match_name": "C.Boswell",
-      "own_pct": 33.4,
+      "own_pct": 33.5,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -5721,7 +5721,7 @@
       "join_name": "W.Lutz",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/vcglg5vsgbiyggwibgy0",
       "match_name": "W.Lutz",
-      "own_pct": 7.8,
+      "own_pct": 8.1,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -6237,7 +6237,7 @@
       "join_name": "H.Mevis",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/yjmtai1e4eqbsw2yk6mh",
       "match_name": "H.Mevis",
-      "own_pct": 69.6,
+      "own_pct": 69.9,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": null,
@@ -6453,12 +6453,12 @@
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hrbmt2hunsrov39rqjzj",
       "match_name": "Z.Gonzalez",
       "own_pct": 1.6,
-      "cbs_status": "IR. Injured Reserve",
-      "cbs_injury": "Undisclosed",
+      "cbs_status": null,
+      "cbs_injury": null,
       "roster_status": null,
-      "injury_status": "OUT",
-      "injury_color": "red-700",
-      "injury_details": "Ir. Injured Reserve (Undisclosed)"
+      "injury_status": "Healthy",
+      "injury_color": "green",
+      "injury_details": "Active"
     },
     {
       "kicker_player_name": "M.Gay",
@@ -6968,7 +6968,7 @@
       "join_name": "L.Havrisik",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
       "match_name": "L.Havrisik",
-      "own_pct": 1.2,
+      "own_pct": 2.2,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": "DEV",
@@ -7063,49 +7063,6 @@
       "injury_status": "Questionable",
       "injury_color": "yellow-500",
       "injury_details": "Questionable For Week 1 At Philadelphia (Hamstring)"
-    },
-    {
-      "kicker_player_name": "Z.Gonzalez",
-      "kicker_player_id": "00-0033862",
-      "team": "ATL",
-      "fg_made": 19,
-      "fg_att": 22,
-      "fg_0_19": 0,
-      "fg_20_29": 1,
-      "fg_30_39": 3,
-      "fg_40_49": 8,
-      "fg_50_59": 7,
-      "fg_60_plus": 0,
-      "fg_miss": 3,
-      "fg_miss_0_19": 0,
-      "fg_miss_20_29": 0,
-      "fg_miss_30_39": 1,
-      "fg_miss_40_49": 0,
-      "fg_miss_50_59": 2,
-      "fg_miss_60_plus": 0,
-      "xp_made": 17,
-      "xp_miss": 1,
-      "real_pts": 74,
-      "dome_kicks": 32,
-      "total_kicks": 40,
-      "games": 9,
-      "status": "ACT",
-      "posteam": "ATL",
-      "rz_trips": 67,
-      "acc": 86.4,
-      "dome_pct": 80.0,
-      "fpts": 92,
-      "avg_pts": 10.2,
-      "join_name": "Z.Gonzalez",
-      "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/hrbmt2hunsrov39rqjzj",
-      "match_name": "Z.Gonzalez",
-      "own_pct": 1.6,
-      "cbs_status": "IR. Injured Reserve",
-      "cbs_injury": "Undisclosed",
-      "roster_status": null,
-      "injury_status": "OUT",
-      "injury_color": "red-700",
-      "injury_details": "Ir. Injured Reserve (Undisclosed)"
     },
     {
       "kicker_player_name": "S.Shrader",
@@ -7314,7 +7271,7 @@
       "join_name": "L.Havrisik",
       "headshot_url": "https://static.www.nfl.com/image/upload/f_auto,q_auto/league/dpkfsna78iqtafg1fpdm",
       "match_name": "L.Havrisik",
-      "own_pct": 1.2,
+      "own_pct": 2.2,
       "cbs_status": null,
       "cbs_injury": null,
       "roster_status": "DEV",
