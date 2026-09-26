@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query, CACHE_HEADERS, safeErrorCode } from '../../../../lib/db';
-import { franchiseSql, TEAM_CODES } from '../../../../lib/franchise';
+import { franchiseSql, kickerNameSql, TEAM_CODES } from '../../../../lib/franchise';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
             ),
             kicks AS (   -- one row per team-game (a kicker's games, or all of a team's kickers summed)
                 SELECT k.season, k.week, k.team,
-                    STRING_AGG(DISTINCT k.name, ', ') AS kickers,
+                    STRING_AGG(DISTINCT ${kickerNameSql('k.name')}, ', ') AS kickers,
                     SUM(k.fg_att) AS fg_att, SUM(k.fg_made) AS fg_made, SUM(k.fg_miss) AS fg_miss,
                     SUM(k.xp_att) AS xp_att, SUM(k.xp_made) AS xp_made, SUM(k.xp_miss) AS xp_miss,
                     SUM(k.fg_make_0_19) AS fg_0_19,   SUM(k.fg_make_20_29) AS fg_20_29, SUM(k.fg_make_30_39) AS fg_30_39,

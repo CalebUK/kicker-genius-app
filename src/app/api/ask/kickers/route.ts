@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query, CACHE_HEADERS, safeErrorCode } from '../../../../lib/db';
-import { franchiseSql } from '../../../../lib/franchise';
+import { franchiseSql, kickerNameSql } from '../../../../lib/franchise';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +17,7 @@ export async function GET() {
                 SELECT * FROM kicker_stats_weekly WHERE fg_att + xp_att > 0
             ),
             latest AS (
-                SELECT DISTINCT ON (gsis_id) gsis_id, name, team, season
+                SELECT DISTINCT ON (gsis_id) gsis_id, ${kickerNameSql('name')} AS name, team, season
                 FROM games ORDER BY gsis_id, season DESC, week DESC
             ),
             totals AS (

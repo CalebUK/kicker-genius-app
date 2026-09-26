@@ -17,6 +17,11 @@ export const TEAM_CODES = new Set([
     'LV', 'LAC', 'LA', 'MIA', 'MIN', 'NE', 'NO', 'NYG', 'NYJ', 'PHI', 'PIT', 'SF', 'SEA', 'TB', 'TEN', 'WAS',
 ]);
 
+/** Kicker names as "F.Last": 2001-2003 play-by-play has "S. Janikowski" (space). */
+export function kickerNameSql(column: string): string {
+    return `REGEXP_REPLACE(${column}, '\\.\\s+', '.')`;
+}
+
 /** `franchiseSql('k.team')` -> CASE k.team WHEN 'OAK' THEN 'LV' ... ELSE k.team END */
 export function franchiseSql(column: string): string {
     const whens = Object.entries(FRANCHISE_CODES).map(([from, to]) => `WHEN '${from}' THEN '${to}'`).join(' ');

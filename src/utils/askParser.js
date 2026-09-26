@@ -70,7 +70,10 @@ function findTeams(raw) {
       let m;
       while ((m = re.exec(text)) !== null) {
         const before = text.slice(Math.max(0, m.index - 14), m.index);
-        const role = OPP_WORDS.test(before) ? 'opponent' : AT_WORDS.test(before) ? 'stadium' : 'plain';
+        // "Broncos stadium" / "Bills' field" = where the game was played
+        const after = text.slice(m.index + name.length, m.index + name.length + 12);
+        const role = OPP_WORDS.test(before) ? 'opponent'
+          : AT_WORDS.test(before) || /^(?:'s|')?\s+(stadium|field)\b/.test(after) ? 'stadium' : 'plain';
         found.push({ abbr: t.abbr, role, index: m.index, length: name.length });
       }
     }
@@ -105,7 +108,10 @@ function editDistance(a, b) {
 const NOT_NAMES = new Set(('when what with does play plays played playing against versus home road away game games ' +
   'snow snowy rain rainy cold colder wind windy dome domes indoor outdoor outdoors weather season seasons year years ' +
   'since this last kick kicks kicker field goal goals points point week weeks good well look looks their there ' +
-  'have been does doing warm hard easy mile miles yard yards long short ever from into over under').split(' '));
+  'have been does doing warm hard easy mile miles yard yards long short ever from into over under ' +
+  'stadium field league average record history snowing raining scenario every').split(' '));
+// plurals too ("kickers" is 2 letters from "Rackers")
+const isEverydayWord = (w) => NOT_NAMES.has(w) || (w.endsWith('s') && NOT_NAMES.has(w.slice(0, -1)));
 
 const newestFirst = (a, b) => b.last_season - a.last_season || b.games - a.games;
 
@@ -123,7 +129,7 @@ function findKicker(raw, kickers) {
   const teamWords = new Set(TEAMS.flatMap((t) => t.names));
   const words = (raw.toLowerCase().match(/[a-z']+/g) || [])
     .map((w) => w.replace(/'s$/, '').replace(/'/g, ''))
-    .filter((w) => w.length >= 4 && !NOT_NAMES.has(w) && !teamWords.has(w));
+    .filter((w) => w.length >= 4 && !isEverydayWord(w) && !teamWords.has(w));
   let best = null;
   for (const k of kickers) {
     const surname = lastName(k.name).toLowerCase();
@@ -138,10 +144,12 @@ function findKicker(raw, kickers) {
 }
 
 /**
- * -> { kicker, team, filters, notes }
+ * -> { kicker, team, allKickers, filters, notes }
  *   kicker: a row from /api/ask/kickers, or null
  *   team:   a team abbr for TEAM mode (all of that franchise's kickers), or ''
  *           -- set when a team is named but no kicker ("Titans vs the Jaguars")
+ *   allKickers: true for ALL KICKERS mode (league-wide scenario) -- "all kickers
+ *           at the Broncos' stadium", or a scenario with no kicker/team named
  *   filters: EMPTY_FILTERS shape
  *   notes: things worth telling the user (e.g. "used the Cowboys' current kicker")
  */
@@ -150,7 +158,9 @@ export function parseQuestion(raw, kickers, currentSeason) {
   const filters = { ...EMPTY_FILTERS };
   const notes = [];
 
-  const found = findKicker(raw, kickers);
+  // "all kickers ...", "any kicker ...", "league-wide" -> every kicker (scenario mode)
+  const wantsAll = /\b(all|any|every)\s+(the\s+)?kickers?\b|\bleague[- ]?wide\b/.test(text);
+  const found = wantsAll ? { kicker: null, fuzzy: false } : findKicker(raw, kickers);
   let kicker = found.kicker;
   let team = '';
   if (found.fuzzy) notes.push(`Assumed you meant ${kicker.name}.`);
@@ -161,7 +171,11 @@ export function parseQuestion(raw, kickers, currentSeason) {
     else if (t.role === 'stadium') filters.stadium = t.abbr;
   }
   const plain = teams.filter((t) => t.role === 'plain');
-  if (!kicker && plain.length) {
+  if (wantsAll && plain.length && !filters.opponent) {
+    // "all kickers Bills" -> against that team
+    filters.opponent = plain.shift().abbr;
+  }
+  if (!kicker && !wantsAll && plain.length) {
     const first = plain.shift();
     const nick = TEAM_BY_ABBR[first.abbr].nick;
     // "Cowboys kicker" / "Bills' kicker" (singular) -> that team's current kicker;
@@ -212,7 +226,12 @@ export function parseQuestion(raw, kickers, currentSeason) {
 
   if (/\bplayoffs?\b|\bpostseason\b/.test(text)) notes.push('Playoff games are not in the data yet: showing regular season.');
 
-  return { kicker, team, filters, notes };
+  // no kicker or team named but a scenario was ("kickers in the snow in
+  // Buffalo", "how do kickers do at Lambeau") -> every kicker
+  const allKickers = wantsAll || (!kicker && !team && hasAnyFilter(filters));
+  if (allKickers) notes.push('All kickers: every kicker\'s games in this scenario.');
+
+  return { kicker, team, allKickers, filters, notes };
 }
 
 /** Does one game (a row from /api/ask/games) match the filters? */
