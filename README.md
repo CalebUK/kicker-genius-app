@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kicker Genius
 
-## Getting Started
+Fantasy football kicker projections at [kickergenius.com](https://www.kickergenius.com), built by 16BitHill.
 
-First, run the development server:
+Every kicker gets a weekly matchup grade (his offense's red-zone stall rate vs. the league, plus the opponent's defense) and a 50/30/20 projection that blends his season average, Vegas-implied team totals and his share of team scoring. Projections are scored in **your** league's settings, and you can link a Sleeper league.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## How it fits together
+
+```
+NAS (private, home network)                     Cloud
+┌──────────────────────────────┐   push   ┌──────────────┐   read-only   ┌──────────────┐
+│ Python engine + scrapers     │ ───────▶ │ Neon Postgres│ ◀──────────── │ This Next.js │
+│ Postgres: stats, model views,│ outbound │ (plain table │               │ site (Vercel)│
+│ weekly projection snapshots  │   only   │  copies)     │               │              │
+└──────────────────────────────┘          └──────────────┘               └──────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- The NAS runs all the model logic and pushes finished results out after every scheduled run. Nothing connects in to it.
+- This site only reads the cloud copy, using a SELECT-only database login.
+- The browser applies the user's scoring to raw kick counts, so one set of data serves every league's settings.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tabs
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Tab | What it shows |
+|---|---|
+| Week Model | This week's projections, grades, Vegas lines and weather, with a worksheet per kicker |
+| Accuracy | Projected vs. actual for every kicker and week, in your scoring, compared with a season-average baseline |
+| Historical YTD | Season totals: fantasy points, FG %, 50+ makes, dome games, red-zone trips |
+| Injury Report | Kicker injury designations and practice status |
+| Stats Legend | How every number is calculated |
 
-## Learn More
+## Running locally
 
-To learn more about Next.js, take a look at the following resources:
+Needs Node 24 and a `.env.local` with the read-only database URL:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+NEON_READONLY_URL=postgresql://kg_reader:<password>@<host>/neondb?sslmode=verify-full
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The API routes (`/api/dashboard`, `/api/projections`, `/api/ytd`) run server-side; the database URL never reaches the browser.
