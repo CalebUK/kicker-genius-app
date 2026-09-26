@@ -1,3 +1,5 @@
+export const BUY_ME_A_COFFEE_URL = "https://buymeacoffee.com/calebhill";
+
 export const GLOSSARY_DATA = [
   { header: "Grade", title: "Matchup Grade", desc: "Composite score (Baseline 90) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },

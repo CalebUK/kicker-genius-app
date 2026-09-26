@@ -159,16 +159,28 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   );
 };
 
-export const MathCard = ({ player, leagueAvgs, week }) => {
+// The projection worksheet (MODEL_SPEC.md): grade on the left, 50/30/20 on the right.
+// Numbers come from player.calc (calcProjection) + the database's ingredients.
+export const MathCard = ({ player, leagueAvgs, week, settings }) => {
   if (!player) return null;
-  const l3_proj = player.l3_proj_sum !== undefined ? player.l3_proj_sum : Math.round(player.history?.l3_proj || 0);
-  const l3_act = player.l3_act_sum !== undefined ? player.l3_act_sum : (player.history?.l3_actual || 0);
+  const l3_proj = player.l3_proj_sum ?? 0;
+  const l3_act = player.l3_act_sum ?? 0;
   const l3_diff = l3_act - l3_proj;
   let trendColor = "text-slate-500"; let trendSign = "";
   if (l3_diff > 2.5) { trendColor = "text-green-400"; trendSign = "+"; } else if (l3_diff < -2.5) { trendColor = "text-red-400"; }
-  const lgOffStall = leagueAvgs?.off_stall || 40; const lgDefStall = leagueAvgs?.def_stall || 40;
-  const baseRaw = (player.avg_pts * (player.grade / 90)); const baseMult = (player.grade / 90).toFixed(2);
-  const offRaw = player.off_cap_val; const offShare = ((player.off_share || 0.35)*100).toFixed(0); const defRaw = player.def_cap_val; 
+
+  const c = player.calc || {};
+  const scale = settings?.grade_scale ?? 40;
+  const divisor = settings?.grade_divisor ?? 90;
+  const f1 = (x) => (Number(x) || 0).toFixed(1);
+  const f2 = (x) => (Number(x) || 0).toFixed(2);
+  const pctOf = (x) => `${((Number(x) || 0) * 100).toFixed(0)}%`;
+  const wLabel = (x) => `${Math.round((Number(x) || 0) * 100)}%`;
+  const lgOffStall = player.lg_off_stall ?? leagueAvgs?.off_stall;
+  const lgDefStall = player.lg_def_stall ?? leagueAvgs?.def_stall;
+  const bonuses = Object.entries(player.bonuses || {});
+  const hasVegas = player.vegas_implied != null;
+  const win = player.win_label || 'L5';
 
   return (
     <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
@@ -176,30 +188,42 @@ export const MathCard = ({ player, leagueAvgs, week }) => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Offense Score</span><span className="font-mono text-white">{player.off_score_val}</span></div><div className="text-[9px] text-slate-500">({player.off_stall_rate}% / {lgOffStall}%) × 40</div></div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Defense Score</span><span className="font-mono text-white">{player.def_score_val}</span></div><div className="text-[9px] text-slate-500">({player.def_stall_rate}% / {lgDefStall}%) × 40</div></div>
-            <div className="border-t border-slate-800 pt-1"><div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div><div className="text-emerald-400 text-[10px] space-y-0.5">{player.grade_details && player.grade_details.length > 0 ? player.grade_details.map((d, i) => <div key={i} className="flex justify-between"><span>{d}</span></div>) : <div className="text-slate-600 italic">None</div>}</div></div>
-            <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white"><span>Total Grade</span><span>{player.grade}</span></div><div className="flex justify-between text-[10px] text-blue-400 mt-1"><span>Week {week} Multiplier (÷90)</span><span className="font-mono font-bold">{(player.grade / 90).toFixed(2)}x</span></div></div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Offense Score</span><span className="font-mono text-white">{f1(player.off_score_val)}</span></div><div className="text-[9px] text-slate-500">({f1(player.off_stall_rate)}% / {f1(lgOffStall)}% lg) × {scale}</div></div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Defense Score</span><span className="font-mono text-white">{f1(player.def_score_val)}</span></div><div className="text-[9px] text-slate-500">({f1(player.def_stall_rate)}% / {f1(lgDefStall)}% lg) × {scale}</div></div>
+            <div className="border-t border-slate-800 pt-1"><div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div><div className="text-emerald-400 text-[10px] space-y-0.5">{bonuses.length > 0 ? bonuses.map(([name, val]) => <div key={name} className="flex justify-between"><span className="capitalize">{name}</span><span className="font-mono">{val > 0 ? '+' : ''}{val}</span></div>) : <div className="text-slate-600 italic">None</div>}</div></div>
+            <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white"><span>Total Grade</span><span>{f1(player.grade)}</span></div><div className="flex justify-between text-[10px] text-blue-400 mt-1"><span>Week {week} Multiplier (÷{divisor})</span><span className="font-mono font-bold">{f2(c.mult)}x</span></div></div>
           </div>
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">WEIGHTED PROJECTION</div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Base (50%)</span><span className="font-mono text-white">{(baseRaw * 0.5).toFixed(1)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{player.avg_pts} (Avg) × {baseMult} (Grd) = {baseRaw.toFixed(1)}</div></div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Offense (30%)</span><span className="font-mono text-white">{(offRaw * 0.3).toFixed(1)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{player.w_team_score} (Exp) × {offShare}% (Share) × 1.2 = {offRaw}</div></div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Defense (20%)</span><span className="font-mono text-white">{(defRaw * 0.2).toFixed(1)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{player.w_def_allowed} (Allow) × 35% (Share) × 1.2 = {defRaw}</div></div>
-            <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white text-[11px]"><span>Week {week} Projection</span><span className="text-emerald-400 text-lg">{player.proj}</span></div><div className="text-[9px] text-right text-slate-500">(Rounded)</div></div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Base ({wLabel(c.wb)})</span><span className="font-mono text-white">{f1(c.base * c.wb)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(c.avg)} (Season Avg) × {f2(c.mult)} (Mult) = {f1(c.base)}</div></div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Offense ({wLabel(c.wo)})</span><span className="font-mono text-white">{f1(c.off * c.wo)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(player.exp_team_pts)} (Exp Pts) × {pctOf(player.off_share)} (Share) × {f2(c.ratio)} (Fan/Real) = {f1(c.off)}</div></div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Defense ({wLabel(c.wd)})</span><span className="font-mono text-white">{f1(c.def * c.wd)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(player.exp_opp_allowed)} (Exp Allowed) × {pctOf(player.def_share)} (Share) × {f2(c.ratio)} (Fan/Real) = {f1(c.def)}</div></div>
+            <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white text-[11px]"><span>Week {week} Projection</span><span className="text-emerald-400 text-lg">{player.proj}</span></div><div className="text-[9px] text-right text-slate-500">({f2(c.raw)} rounded)</div></div>
           </div>
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50"><div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between"><div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> Last 3 Trend</div><span className={`text-[10px] font-mono ${trendColor}`}>{trendSign}{l3_diff.toFixed(1)}</span></div><HistoryBars games={player.history?.l3_games} /></div>
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col"><div className="text-emerald-400 font-bold mb-2 pb-1 border-b border-slate-800 flex items-center gap-2"><BrainCircuit className="w-3 h-3" /> KICKERGENIUS INSIGHT</div><div className="text-xs text-slate-300 leading-relaxed h-full flex items-center">{player.narrative || "No specific analysis available for this player yet."}</div></div>
         </div>
-        <div className="mt-3 bg-slate-800/40 p-2 rounded border border-slate-800 text-[10px] text-slate-400 flex gap-6 justify-center"><span><strong className="text-slate-200">Vegas:</strong> {player.details_vegas_spread} / {player.details_vegas_total} Total</span><span><strong className="text-slate-200">Implied Score:</strong> {player.vegas ? Number(player.vegas).toFixed(1) : '--'} pts</span><span><strong className="text-slate-200">L4 Team PF:</strong> {player.off_ppg ? Number(player.off_ppg).toFixed(1) : '--'} pts</span><span><strong className="text-slate-200">L4 Opp PA:</strong> {player.def_pa ? Number(player.def_pa).toFixed(1) : '--'} pts</span></div>
+        <div className="mt-3 bg-slate-800/40 p-2 rounded border border-slate-800 text-[10px] text-slate-400 flex flex-wrap gap-x-6 gap-y-1 justify-center">
+          {hasVegas
+            ? <><span><strong className="text-slate-200">Vegas:</strong> {player.details_vegas_spread} / {f1(player.details_vegas_total)} Total</span><span><strong className="text-slate-200">Implied Score:</strong> {f1(player.vegas)} pts</span></>
+            : <span className="text-amber-400/80">No Vegas line yet: expected points use {win} averages only</span>}
+          <span><strong className="text-slate-200">{win} Team PF:</strong> {player.off_ppg != null ? f1(player.off_ppg) : '--'} pts</span>
+          <span><strong className="text-slate-200">{win} Opp PA:</strong> {player.def_pa != null ? f1(player.def_pa) : '--'} pts</span>
+        </div>
+        {(player.prior_games_used > 0 || player.team_prior_games > 0 || player.opp_prior_games > 0) && (
+          <div className="mt-2 text-[10px] text-sky-300/80 text-center">
+            Early season: uses last season to fill in. Kicker avg includes {player.prior_games_used || 0} of {player.games_played} games from last season;
+            {' '}{win} team form {player.team_prior_games}, opponent {player.opp_prior_games}.
+          </div>
+        )}
     </div>
   );
 };
 
-export const DeepDiveRow = ({ player, leagueAvgs, week, sleeperStatus }) => (
+export const DeepDiveRow = ({ player, leagueAvgs, week, settings, sleeperStatus }) => (
   <tr className="bg-slate-900/50 border-b border-slate-800">
     <td colSpan="11" className="p-4">
-      <MathCard player={player} leagueAvgs={leagueAvgs} week={week} />
+      <MathCard player={player} leagueAvgs={leagueAvgs} week={week} settings={settings} />
     </td>
   </tr>
 );

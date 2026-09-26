@@ -1,16 +1,38 @@
 import React from 'react';
-import { Settings, RotateCcw, Gamepad2, Loader2, RefreshCw, Check, Save } from 'lucide-react';
+import { Settings, RotateCcw, Gamepad2, Loader2, RefreshCw, Check, Save, History } from 'lucide-react';
 import { SCORING_CONFIG } from '../data/constants';
 
-const SettingsTab = ({ 
-    scoring, updateScoring, resetScoring, 
-    sleeperLeagueId, setSleeperLeagueId, 
-    sleeperUser, setSleeperUser, 
+const SettingsTab = ({
+    scoring, updateScoring, resetScoring,
+    sleeperLeagueId, setSleeperLeagueId,
+    sleeperUser, setSleeperUser,
     syncSleeper, sleeperLoading, sleeperScoringUpdated, sleeperMyKickers,
-    sleeperLeagueName // NEW: Accept the league name prop
+    sleeperLeagueName, // NEW: Accept the league name prop
+    windowMode, setWindowMode // NEW: L3/L5 model window toggle
 }) => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+        {/* MODEL WINDOW */}
+        <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-1"><History className="w-5 h-5 text-emerald-400"/> Model Window</h2>
+            <p className="text-xs text-slate-400 mb-4">Base matchup grades &amp; projections on recent form — the last 3 or last 5 games.</p>
+            <div className="grid grid-cols-2 gap-3 max-w-md">
+                {[{ key: 'l3', label: 'Last 3 Games', sub: 'More reactive to hot/cold streaks' }, { key: 'l5', label: 'Last 5 Games', sub: 'Smoother, more stable · recommended' }].map((opt) => (
+                    <button
+                        key={opt.key}
+                        onClick={() => setWindowMode(opt.key)}
+                        className={`text-left p-3 rounded-lg border transition-all ${windowMode === opt.key ? 'bg-emerald-600/20 border-emerald-500 text-white' : 'bg-slate-950/50 border-slate-700 text-slate-400 hover:border-slate-600'}`}
+                    >
+                        <div className="flex items-center gap-2 font-bold text-sm">
+                            {windowMode === opt.key && <Check className="w-4 h-4 text-emerald-400"/>}
+                            {opt.label} <span className="text-[10px] font-mono opacity-70">({opt.key.toUpperCase()})</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-1">{opt.sub}</div>
+                    </button>
+                ))}
+            </div>
+        </div>
+
         {/* SCORING */}
         <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
             <div className="flex justify-between items-center mb-6">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calculator, Database, BrainCircuit } from 'lucide-react';
-import { GLOSSARY_DATA } from '../data/constants';
+import { GLOSSARY_DATA, BUY_ME_A_COFFEE_URL } from '../data/constants';
 import { MathCard } from './KickerComponents';
 
 const GlossaryTab = ({ processed, leagueAvgs, meta }) => {
@@ -15,12 +15,13 @@ const GlossaryTab = ({ processed, leagueAvgs, meta }) => {
                     <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
                         <Calculator className="w-4 h-4 text-emerald-400" /> How It Works: Live Example
                     </h3>
-                    <MathCard player={aubreyExample} leagueAvgs={leagueAvgs} week={meta.week} />
+                    <MathCard player={aubreyExample} leagueAvgs={leagueAvgs} week={meta.week} settings={meta.model_settings} />
                 </div>
             )}
 
             <div className="p-4 border-b border-slate-800 bg-slate-900/30 text-center text-xs text-slate-500">
-                This website was created by Caleb Hill. If you have any suggestions please <a href="mailto:calebthill@gmail.com" className="text-blue-400 hover:underline">email me</a>.
+                This website was created by 16BitHill. If you have any suggestions please <a href="mailto:calebthill@gmail.com" className="text-blue-400 hover:underline">email me</a>.
+                {' '}Enjoying it? <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Buy me a coffee ☕</a>
             </div>
 
             {/* GLOSSARY GRID LAYOUT */}

@@ -38,16 +38,43 @@ export const calcFPts = (p, scoring) => {
   );
 };
 
-export const calcProj = (p, grade) => {
-  if (grade === 0) return 0;
-  const avgPts = p.fpts_ytd / (p.games || 1);
-  const base = avgPts * (grade / 90);
-  const scaleFactor = (p.avg_pts && p.avg_pts > 0) ? (avgPts / p.avg_pts) : 1.0;
-  const off_cap_scaled = (p.off_cap_val || 0) * scaleFactor;
-  const def_cap_scaled = (p.def_cap_val || 0) * scaleFactor;
-  const weighted_proj = (base * 0.50) + (off_cap_scaled * 0.30) + (def_cap_scaled * 0.20);
-  const proj = weighted_proj > 1.0 ? weighted_proj : base;
-  return Math.round(proj); 
+// Real NFL points from a kick-bucket row: 3 per FG made + 1 per XP made.
+export const calcRealPts = (p) => 3 * (p.fg_made || 0) + (p.xp_made || 0);
+
+// A projection_results_weekly row's actual kicks that week (wk_*) as a plain
+// bucket row, so calcFPts can score it.
+export const weekKicks = (r) => ({
+  fg_made: r.wk_fg_made, fg_miss: r.wk_fg_miss, xp_made: r.wk_xp_made, xp_miss: r.wk_xp_miss,
+  fg_0_19: r.wk_fg_0_19, fg_20_29: r.wk_fg_20_29, fg_30_39: r.wk_fg_30_39,
+  fg_40_49: r.wk_fg_40_49, fg_50_59: r.wk_fg_50_59, fg_60_plus: r.wk_fg_60_plus,
+  fg_miss_0_19: r.wk_fg_miss_0_19, fg_miss_20_29: r.wk_fg_miss_20_29, fg_miss_30_39: r.wk_fg_miss_30_39,
+  fg_miss_40_49: r.wk_fg_miss_40_49, fg_miss_50_59: r.wk_fg_miss_50_59, fg_miss_60_plus: r.wk_fg_miss_60_plus,
+});
+
+/**
+ * The 50/30/20 projection in the USER's scoring -- MODEL_SPEC.md §2.
+ * `p` is a matchup_inputs_weekly or historical_projections row: the database's
+ * scoring-independent ingredients (multiplier, real-point offense/defense) plus
+ * season-to-date kick buckets. `w` is 'l3' | 'l5'. `settings` = model_settings.
+ *   Base    = season avg fantasy pts x multiplier
+ *   Offense = expected team pts x real-point share x fantasy/real ratio
+ *   Defense = expected opp pts allowed x real-point share x fantasy/real ratio
+ */
+export const calcProjection = (p, w, scoring, settings) => {
+  const fptsSeason = calcFPts(p, scoring);
+  const realSeason = calcRealPts(p);
+  const games = Number(p.games_played) || 0;
+  const avg = games > 0 ? fptsSeason / games : 0;
+  const ratio = realSeason > 0 ? fptsSeason / realSeason : 1;   // replaces the old flat x1.2
+  const mult = Number(p[`multiplier_${w}`]) || 0;
+  const base = avg * mult;
+  const off = (Number(p[`off_real_pts_${w}`]) || 0) * ratio;
+  const def = (Number(p[`def_real_pts_${w}`]) || 0) * ratio;
+  const wb = Number(settings?.weight_base ?? 0.5);
+  const wo = Number(settings?.weight_offense ?? 0.3);
+  const wd = Number(settings?.weight_defense ?? 0.2);
+  const raw = wb * base + wo * off + wd * def;
+  return { proj: Math.round(raw), raw, avg, ratio, mult, base, off, def, fptsSeason, wb, wo, wd };
 };
 
 export const calculateLiveScore = (p, scoring) => {
