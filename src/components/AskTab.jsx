@@ -15,6 +15,7 @@ const EXAMPLES = [
   'Aubrey in domes',
   'Folk in cold games',
   'McPherson on the road since 2024',
+  'Titans vs the Jaguars',
 ];
 
 const sum = (games, keys) => games.reduce((acc, g) => acc + keys.reduce((a, k) => a + (Number(g[k]) || 0), 0), 0);
@@ -85,12 +86,16 @@ const AskTab = ({ scoring, currentSeason }) => {
   const [kickers, setKickers] = useState(null);
   const [loadError, setLoadError] = useState(null);
   const [question, setQuestion] = useState('');
+  // The subject is ONE of: a kicker (gsis id) or a team (all its kickers).
   const [kickerId, setKickerId] = useState('');
+  const [teamAbbr, setTeamAbbr] = useState('');
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [notes, setNotes] = useState([]);
-  const [gamesById, setGamesById] = useState({});
-  const [errorById, setErrorById] = useState({});
+  const [gamesByKey, setGamesByKey] = useState({});
+  const [errorByKey, setErrorByKey] = useState({});
   const [showAll, setShowAll] = useState(false);
+
+  const subjectKey = kickerId ? `gsis_id=${encodeURIComponent(kickerId)}` : teamAbbr ? `team=${teamAbbr}` : '';
 
   useEffect(() => {
     fetch('/api/ask/kickers')
@@ -100,14 +105,17 @@ const AskTab = ({ scoring, currentSeason }) => {
   }, []);
 
   useEffect(() => {
-    if (!kickerId || gamesById[kickerId]) return;
+    if (!subjectKey || gamesByKey[subjectKey]) return;
     let cancelled = false;
-    fetch(`/api/ask/games?gsis_id=${encodeURIComponent(kickerId)}`)
+    fetch(`/api/ask/games?${subjectKey}`)
       .then((r) => (r.ok ? r.json() : r.json().then((j) => Promise.reject(new Error(j.code || r.status)))))
-      .then((j) => { if (!cancelled) setGamesById((m) => ({ ...m, [kickerId]: j.games || [] })); })
-      .catch((e) => { if (!cancelled) setErrorById((m) => ({ ...m, [kickerId]: e.message })); });
+      .then((j) => { if (!cancelled) setGamesByKey((m) => ({ ...m, [subjectKey]: j.games || [] })); })
+      .catch((e) => { if (!cancelled) setErrorByKey((m) => ({ ...m, [subjectKey]: e.message })); });
     return () => { cancelled = true; };
-  }, [kickerId, gamesById]);
+  }, [subjectKey, gamesByKey]);
+
+  const chooseKicker = (id) => { setKickerId(id); setTeamAbbr(''); setShowAll(false); };
+  const chooseTeam = (abbr) => { setTeamAbbr(abbr); setKickerId(''); setShowAll(false); };
 
   const ask = (text) => {
     const q = (text ?? question).trim();
@@ -117,15 +125,18 @@ const AskTab = ({ scoring, currentSeason }) => {
     setFilters(parsed.filters);
     setNotes(parsed.notes);
     setShowAll(false);
-    if (parsed.kicker) setKickerId(parsed.kicker.gsis_id);
-    else setNotes([...parsed.notes, "Couldn't spot a kicker's name in that: pick one below."]);
+    if (parsed.kicker) chooseKicker(parsed.kicker.gsis_id);
+    else if (parsed.team) chooseTeam(parsed.team);
+    else setNotes([...parsed.notes, "Couldn't spot a kicker or team in that: pick one below."]);
   };
 
   const setFilter = (key) => (value) => { setFilters((f) => ({ ...f, [key]: value })); setShowAll(false); };
 
   const kicker = kickers?.find((k) => k.gsis_id === kickerId) || null;
-  const games = gamesById[kickerId];
-  const gamesError = errorById[kickerId];
+  const teamMode = !kickerId && !!teamAbbr;
+  const subject = kicker ? kicker.name : teamMode ? `${TEAM_BY_ABBR[teamAbbr].nick} kickers` : '';
+  const games = gamesByKey[subjectKey];
+  const gamesError = errorByKey[subjectKey];
   const seasons = useMemo(() => {
     const first = kickers?.length ? Math.min(...kickers.map((k) => k.first_season)) : currentSeason;
     return Array.from({ length: currentSeason - first + 1 }, (_, i) => String(currentSeason - i));
@@ -141,25 +152,28 @@ const AskTab = ({ scoring, currentSeason }) => {
   const filtered = hasAnyFilter(filters);
   const phrase = describeFilters(filters);
   const teamOptions = [['', 'Any'], ...[...TEAMS].sort((a, b) => a.nick.localeCompare(b.nick)).map((t) => [t.abbr, t.nick])];
-  const kickerOptions = useMemo(() => {
-    if (!kickers) return [['', 'Loading…']];
+  const { currentOptions, pastOptions } = useMemo(() => {
+    if (!kickers) return { currentOptions: [['', 'Loading…']], pastOptions: [['', 'Loading…']] };
     const byName = [...kickers].sort((a, b) => a.name.localeCompare(b.name));
-    const label = (k) => `${k.name} (${k.team}${k.last_season < currentSeason ? `, to ${k.last_season}` : ''})`;
-    return [['', 'Pick a kicker…'],
-      ...byName.filter((k) => k.last_season >= currentSeason).map((k) => [k.gsis_id, label(k)]),
-      ...byName.filter((k) => k.last_season < currentSeason).map((k) => [k.gsis_id, label(k)])];
+    return {
+      currentOptions: [['', 'Pick…'], ...byName.filter((k) => k.last_season >= currentSeason).map((k) => [k.gsis_id, `${k.name} (${k.team})`])],
+      pastOptions: [['', 'Pick…'], ...byName.filter((k) => k.last_season < currentSeason)
+        .map((k) => [k.gsis_id, `${k.name} (${k.team_code || k.team}, ${k.first_season}–${k.last_season})`])],
+    };
   }, [kickers, currentSeason]);
+  const isCurrent = kicker ? kicker.last_season >= currentSeason : false;
 
   const verdict = () => {
-    if (!kicker || !games) return null;
-    const name = kicker.name;
-    if (!filtered) return `${name} averages ${one(all.ptsPerGame)} pts per game across ${all.n} games since ${seasons[seasons.length - 1]}. Add a condition to compare, like snow, domes or an opponent.`;
-    if (split.n === 0) return `${name} has no games ${phrase} in the data (regular season, ${seasons[seasons.length - 1]} on).`;
-    const base = `${name} averages ${one(split.ptsPerGame)} pts per game ${phrase} (${split.n} game${split.n === 1 ? '' : 's'})`;
-    if (rest.n === 0) return `${base}, which covers every game he's played.`;
+    if (!subject || !games) return null;
+    const his = teamMode ? 'their' : 'his';
+    const since = seasons[seasons.length - 1];
+    if (!filtered) return `${subject} average${teamMode ? '' : 's'} ${one(all.ptsPerGame)} pts per game across ${all.n} games since ${since}. Add a condition to compare, like snow, domes or an opponent.`;
+    if (split.n === 0) return `${subject} ${teamMode ? 'have' : 'has'} no games ${phrase} in the data (regular season, ${since} on).`;
+    const base = `${subject} average${teamMode ? '' : 's'} ${one(split.ptsPerGame)} pts per game ${phrase} (${split.n} game${split.n === 1 ? '' : 's'})`;
+    if (rest.n === 0) return `${base}, which covers every game ${teamMode ? "they've" : "he's"} played.`;
     const diff = split.ptsPerGame - rest.ptsPerGame;
-    if (Math.abs(diff) < 0.5) return `${base}: about the same as his ${one(rest.ptsPerGame)} in his other games.`;
-    return `${base}: ${one(Math.abs(diff))} ${diff > 0 ? 'more' : 'fewer'} than his ${one(rest.ptsPerGame)} in his other games.`;
+    if (Math.abs(diff) < 0.5) return `${base}: about the same as ${his} ${one(rest.ptsPerGame)} in ${his} other games.`;
+    return `${base}: ${one(Math.abs(diff))} ${diff > 0 ? 'more' : 'fewer'} than ${his} ${one(rest.ptsPerGame)} in ${his} other games.`;
   };
 
   const shown = matched ? (showAll ? matched : matched.slice(0, 25)) : [];
@@ -168,7 +182,7 @@ const AskTab = ({ scoring, currentSeason }) => {
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* QUESTION BOX */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
-        <div className="flex items-center gap-2 mb-1"><MessageCircleQuestionMark className="w-5 h-5 text-blue-400" /><h2 className="text-lg font-bold text-white">Ask about a kicker</h2></div>
+        <div className="flex items-center gap-2 mb-1"><MessageCircleQuestionMark className="w-5 h-5 text-blue-400" /><h2 className="text-lg font-bold text-white">Ask about a kicker or team</h2></div>
         <p className="text-xs text-slate-500 mb-4">Weather, domes, opponents, home/road and seasons, using every regular-season game since {seasons[seasons.length - 1]}, scored with your league settings.</p>
         <form onSubmit={(e) => { e.preventDefault(); ask(); }} className="flex gap-2">
           <div className="relative flex-1">
@@ -189,8 +203,13 @@ const AskTab = ({ scoring, currentSeason }) => {
       {/* WHAT IT UNDERSTOOD (editable) */}
       <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
         <div className="text-[10px] uppercase font-bold text-slate-500 mb-3">{question ? 'Understood as (change anything)' : 'Or build a question'}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3 pb-3 border-b border-slate-800">
+          <Select label="Current kicker" value={isCurrent ? kickerId : ''} onChange={chooseKicker} options={currentOptions} />
+          <Select label="Past kicker" value={kicker && !isCurrent ? kickerId : ''} onChange={chooseKicker} options={pastOptions} />
+          <Select label="Or a team (all its kickers)" value={teamMode ? teamAbbr : ''} onChange={chooseTeam}
+            options={[['', 'Pick…'], ...[...TEAMS].sort((a, b) => a.nick.localeCompare(b.nick)).map((t) => [t.abbr, t.nick])]} />
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <div className="col-span-2 sm:col-span-3 lg:col-span-1"><Select label="Kicker" value={kickerId} onChange={(v) => { setKickerId(v); setShowAll(false); }} options={kickerOptions} /></div>
           <Select label="Opponent" value={filters.opponent} onChange={setFilter('opponent')} options={teamOptions} />
           <Select label="Stadium" value={filters.stadium} onChange={setFilter('stadium')} options={teamOptions} />
           <Select label="Roof" value={filters.venue} onChange={setFilter('venue')} options={[['', 'Any'], ['dome', 'Dome / closed roof'], ['outdoors', 'Outdoors']]} />
@@ -206,13 +225,15 @@ const AskTab = ({ scoring, currentSeason }) => {
       </div>
 
       {/* ANSWER */}
-      {kickerId && !games && !gamesError && <div className="p-8 text-center text-slate-500 flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Loading games…</div>}
+      {subjectKey && !games && !gamesError && <div className="p-8 text-center text-slate-500 flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Loading games…</div>}
       {gamesError && <div className="p-6 text-center text-red-400 border border-red-900/50 rounded-xl bg-red-950/20 text-sm">Could not load games ({gamesError}).</div>}
 
-      {kicker && games && (
+      {subject && games && (
         <>
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center gap-4">
-            {kicker.headshot_url ? <img src={kicker.headshot_url} alt={kicker.name} className="w-14 h-14 rounded-full border-2 border-slate-700 object-cover bg-slate-950" /> : <HelmetIcon />}
+            {teamMode
+              ? <div className="w-14 h-14 shrink-0 rounded-full border-2 border-slate-700 bg-slate-950 flex items-center justify-center text-sm font-black text-slate-300">{teamAbbr}</div>
+              : kicker.headshot_url ? <img src={kicker.headshot_url} alt={kicker.name} className="w-14 h-14 rounded-full border-2 border-slate-700 object-cover bg-slate-950" /> : <HelmetIcon />}
             <div>
               <div className="text-base md:text-lg font-bold text-white leading-snug">{verdict()}</div>
               {filtered && split.n > 0 && split.n < 6 && <div className="text-xs text-amber-300/90 mt-1 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Small sample: treat this as a hint, not a trend.</div>}
@@ -226,7 +247,7 @@ const AskTab = ({ scoring, currentSeason }) => {
 
           <div className={`grid gap-4 ${filtered ? 'md:grid-cols-2' : ''}`}>
             {filtered
-              ? <><StatBlock title={`Games ${phrase}`} s={split} accent /><StatBlock title="His other games" s={rest} /></>
+              ? <><StatBlock title={`Games ${phrase}`} s={split} accent /><StatBlock title={teamMode ? 'Their other games' : 'His other games'} s={rest} /></>
               : <StatBlock title="All games" s={all} accent />}
           </div>
 
@@ -235,7 +256,7 @@ const AskTab = ({ scoring, currentSeason }) => {
               <table className="w-full text-sm text-left">
                 <thead className="text-[10px] text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="px-4 py-3">Game</th><th className="px-3 py-3">Opponent</th><th className="px-3 py-3">Conditions</th>
+                    <th className="px-4 py-3">Game</th>{teamMode && <th className="px-3 py-3">Kicker</th>}<th className="px-3 py-3">Opponent</th><th className="px-3 py-3">Conditions</th>
                     <th className="px-3 py-3 text-center">FG</th><th className="px-3 py-3 text-center">50+</th><th className="px-3 py-3 text-center">XP</th><th className="px-3 py-3 text-center">Pts</th>
                   </tr>
                 </thead>
@@ -247,8 +268,10 @@ const AskTab = ({ scoring, currentSeason }) => {
                     return (
                       <tr key={`${g.season}-${g.week}`} className="hover:bg-slate-800/50">
                         <td className="px-4 py-2 text-slate-300 whitespace-nowrap">{g.season} · Wk {g.week}</td>
+                        {teamMode && <td className="px-3 py-2 text-slate-400 whitespace-nowrap text-xs">{g.kickers}</td>}
                         <td className="px-3 py-2 text-slate-300 whitespace-nowrap">
-                          <span className="inline-flex items-center gap-1">{g.is_home ? <House className="w-3 h-3 text-slate-500" /> : <Plane className="w-3 h-3 text-slate-500" />}{g.is_home ? 'vs' : '@'} {TEAM_BY_ABBR[g.opponent]?.nick || g.opponent || '–'}</span>
+                          <span className="inline-flex items-center gap-1">{g.is_home ? <House className="w-3 h-3 text-slate-500" /> : <Plane className="w-3 h-3 text-slate-500" />}{g.is_home ? 'vs' : '@'} {TEAM_BY_ABBR[g.opponent]?.nick || g.opponent || '–'}
+                            {g.opponent_code && g.opponent_code !== g.opponent && <span className="text-slate-500 text-[10px]">({g.opponent_code})</span>}</span>
                         </td>
                         <td className={`px-3 py-2 whitespace-nowrap ${c.cls}`}><span className="inline-flex items-center gap-1"><c.Icon className="w-3 h-3" />{c.text}</span></td>
                         <td className="px-3 py-2 text-center font-mono text-slate-200">{g.fg_made}/{g.fg_att}</td>
@@ -268,8 +291,8 @@ const AskTab = ({ scoring, currentSeason }) => {
         </>
       )}
 
-      {!kickerId && !question && kickers && (
-        <div className="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-slate-900/40 text-sm">Ask a question above, try an example, or pick a kicker.</div>
+      {!subjectKey && !question && kickers && (
+        <div className="p-8 text-center text-slate-500 border border-slate-800 rounded-xl bg-slate-900/40 text-sm">Ask a question above, try an example, or pick a kicker or team.</div>
       )}
     </div>
   );

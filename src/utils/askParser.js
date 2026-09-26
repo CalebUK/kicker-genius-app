@@ -20,9 +20,9 @@ export const TEAMS = [
   { abbr: 'IND', nick: 'Colts', names: ['colts', 'indianapolis', 'indy'] },
   { abbr: 'JAX', nick: 'Jaguars', names: ['jaguars', 'jags', 'jacksonville'] },
   { abbr: 'KC', nick: 'Chiefs', names: ['chiefs', 'kansas city', 'arrowhead'] },
-  { abbr: 'LV', nick: 'Raiders', names: ['raiders', 'las vegas', 'vegas'] },
-  { abbr: 'LAC', nick: 'Chargers', names: ['chargers'] },
-  { abbr: 'LA', nick: 'Rams', names: ['rams'] },
+  { abbr: 'LV', nick: 'Raiders', names: ['raiders', 'las vegas', 'vegas', 'oakland'] },
+  { abbr: 'LAC', nick: 'Chargers', names: ['chargers', 'san diego'] },
+  { abbr: 'LA', nick: 'Rams', names: ['rams', 'st. louis', 'st louis'] },
   { abbr: 'MIA', nick: 'Dolphins', names: ['dolphins', 'miami'] },
   { abbr: 'MIN', nick: 'Vikings', names: ['vikings', 'minnesota'] },
   { abbr: 'NE', nick: 'Patriots', names: ['patriots', 'pats', 'new england', 'foxborough'] },
@@ -71,7 +71,7 @@ function findTeams(raw) {
       while ((m = re.exec(text)) !== null) {
         const before = text.slice(Math.max(0, m.index - 14), m.index);
         const role = OPP_WORDS.test(before) ? 'opponent' : AT_WORDS.test(before) ? 'stadium' : 'plain';
-        found.push({ abbr: t.abbr, role, index: m.index });
+        found.push({ abbr: t.abbr, role, index: m.index, length: name.length });
       }
     }
     // abbreviations only in capitals right after vs/at ("vs KC", "@ BUF"),
@@ -80,7 +80,7 @@ function findTeams(raw) {
     let m;
     while ((m = abbrRe.exec(raw)) !== null) {
       const role = /^(at|@)$/i.test(m[1]) ? 'stadium' : 'opponent';
-      found.push({ abbr: t.abbr, role, index: m.index });
+      found.push({ abbr: t.abbr, role, index: m.index, length: m[0].length });
     }
   }
   return found.sort((a, b) => a.index - b.index);
@@ -138,8 +138,10 @@ function findKicker(raw, kickers) {
 }
 
 /**
- * -> { kicker, filters, notes }
- *   kicker: a row from /api/ask/kickers (or null)
+ * -> { kicker, team, filters, notes }
+ *   kicker: a row from /api/ask/kickers, or null
+ *   team:   a team abbr for TEAM mode (all of that franchise's kickers), or ''
+ *           -- set when a team is named but no kicker ("Titans vs the Jaguars")
  *   filters: EMPTY_FILTERS shape
  *   notes: things worth telling the user (e.g. "used the Cowboys' current kicker")
  */
@@ -150,6 +152,7 @@ export function parseQuestion(raw, kickers, currentSeason) {
 
   const found = findKicker(raw, kickers);
   let kicker = found.kicker;
+  let team = '';
   if (found.fuzzy) notes.push(`Assumed you meant ${kicker.name}.`);
   const teams = findTeams(raw);
 
@@ -159,12 +162,22 @@ export function parseQuestion(raw, kickers, currentSeason) {
   }
   const plain = teams.filter((t) => t.role === 'plain');
   if (!kicker && plain.length) {
-    // "Cowboys kicker in domes" -> the team's current kicker
-    const team = plain[0].abbr;
-    kicker = [...kickers].filter((k) => k.team === team)
-      .sort((a, b) => b.last_season - a.last_season || b.games - a.games)[0] || null;
-    if (kicker) notes.push(`Used the ${TEAM_BY_ABBR[team].nick}' current kicker.`);
-    plain.shift();
+    const first = plain.shift();
+    const nick = TEAM_BY_ABBR[first.abbr].nick;
+    // "Cowboys kicker" / "Bills' kicker" (singular) -> that team's current kicker;
+    // otherwise ("Titans vs Jaguars", "Titans kickers") -> every Titans kicker
+    const singular = /^[a-z0-9. ]+?(?:'s|')?\s+kicker\b(?!s)/.test(text.slice(first.index, first.index + first.length + 12));
+    if (singular) {
+      kicker = [...kickers].filter((k) => k.team === first.abbr && k.last_season >= currentSeason)
+        .sort(newestFirst)[0] || null;
+      if (kicker) notes.push(`Used the ${nick}' current kicker.`);
+    }
+    if (!kicker) {
+      team = first.abbr;
+      notes.push(`All ${nick} kickers: every game any ${nick} kicker played.`);
+    }
+    // "Titans Jaguars" (no vs) -> the second team is the opponent
+    if (team && !filters.opponent && plain.length) filters.opponent = plain.shift().abbr;
   }
   // "Butker Titans" (no vs/at): a team that isn't his own is the opponent
   if (!filters.opponent && kicker) {
@@ -199,7 +212,7 @@ export function parseQuestion(raw, kickers, currentSeason) {
 
   if (/\bplayoffs?\b|\bpostseason\b/.test(text)) notes.push('Playoff games are not in the data yet: showing regular season.');
 
-  return { kicker, filters, notes };
+  return { kicker, team, filters, notes };
 }
 
 /** Does one game (a row from /api/ask/games) match the filters? */
