@@ -67,7 +67,7 @@ const StatBlock = ({ title, s, accent }) => (
       <>
         <div className="flex items-baseline gap-2 mb-3">
           <span className={`text-3xl font-black ${accent ? 'text-white' : 'text-slate-300'}`}>{one(s.ptsPerGame)}</span>
-          <span className="text-xs text-slate-500">pts / game · {s.n} game{s.n === 1 ? '' : 's'}</span>
+          <span className="text-xs text-slate-500">fantasy pts / game · {s.n} game{s.n === 1 ? '' : 's'}</span>
         </div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
           <span className="text-slate-500">Field goals</span><span className="text-right text-slate-200 font-mono">{s.fgMade}/{s.fgAtt} ({pct(s.fgMade, s.fgAtt)})</span>
@@ -172,9 +172,9 @@ const AskTab = ({ scoring, currentSeason }) => {
     if (!subject || !games) return null;
     const his = teamMode ? 'their' : 'his';
     const since = seasons[seasons.length - 1];
-    if (!filtered) return `${subject} average${teamMode ? '' : 's'} ${one(all.ptsPerGame)} pts per game across ${all.n} games since ${since}. Add a condition to compare, like snow, domes or an opponent.`;
+    if (!filtered) return `${subject} average${teamMode ? '' : 's'} ${one(all.ptsPerGame)} fantasy pts per game across ${all.n} games since ${since}. Add a condition to compare, like snow, domes or an opponent.`;
     if (split.n === 0) return `${subject} ${teamMode ? 'have' : 'has'} no games ${phrase} in the data (regular season, ${since} on).`;
-    const base = `${subject} average${teamMode ? '' : 's'} ${one(split.ptsPerGame)} pts per game ${phrase} (${split.n} game${split.n === 1 ? '' : 's'})`;
+    const base = `${subject} average${teamMode ? '' : 's'} ${one(split.ptsPerGame)} fantasy pts per game ${phrase} (${split.n} game${split.n === 1 ? '' : 's'})`;
     if (rest.n === 0) return `${base}, which covers every game ${teamMode ? "they've" : "he's"} played.`;
     const diff = split.ptsPerGame - rest.ptsPerGame;
     if (Math.abs(diff) < 0.5) return `${base}: about the same as ${his} ${one(rest.ptsPerGame)} in ${his} other games.`;
@@ -263,7 +263,7 @@ const AskTab = ({ scoring, currentSeason }) => {
                 <thead className="text-[10px] text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="px-4 py-3">Game</th>{teamMode && <th className="px-3 py-3">Kicker</th>}<th className="px-3 py-3">Opponent</th><th className="px-3 py-3">Conditions</th>
-                    <th className="px-3 py-3 text-center">FG</th><th className="px-3 py-3 text-center">50+</th><th className="px-3 py-3 text-center">XP</th><th className="px-3 py-3 text-center">Pts</th>
+                    <th className="px-3 py-3 text-center">FG</th><th className="px-3 py-3 text-center">50+</th><th className="px-3 py-3 text-center">XP</th><th className="px-3 py-3 text-center">Fantasy pts</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
