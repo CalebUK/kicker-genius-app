@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock, Bot } from 'lucide-react';
+import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, MessageCircleQuestionMark, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock, Bot } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
 import { DEFAULT_SCORING, BUY_ME_A_COFFEE_URL } from '../data/constants';
@@ -11,6 +11,7 @@ import AccuracyTab from '../components/AccuracyTab';
 import SettingsTab from '../components/SettingsTab';
 import InjuryReportTab from '../components/InjuryReportTab';
 import GlossaryTab from '../components/GlossaryTab';
+import AskTab from '../components/AskTab';
 
 const INJURY_COLORS = {
   Questionable: 'yellow', Doubtful: 'red-500', OUT: 'red-500',
@@ -450,6 +451,7 @@ const fetchData = useCallback(async () => {
           <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
           <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
           <button onClick={() => { setActiveTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
+          <button onClick={() => setActiveTab('ask')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ask' ? 'text-white border-b-2 border-sky-400' : 'text-slate-500'}`}><MessageCircleQuestionMark className="w-4 h-4"/> Ask</button>
           <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
           <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
@@ -566,6 +568,8 @@ const fetchData = useCallback(async () => {
             </div>
           </div>
         )}
+
+        {activeTab === 'ask' && <AskTab scoring={scoring} currentSeason={data.season} />}
 
         {activeTab === 'injuries' && <InjuryReportTab injuries={injuries.map(r => toBoardRow(r, windowMode))} scoring={scoring} />}
 
