@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { query, Row, CACHE_HEADERS } from '../../../lib/db';
+import { query, Row, CACHE_HEADERS, safeErrorCode } from '../../../lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,6 +55,6 @@ export async function GET() {
         }, { headers: CACHE_HEADERS });
     } catch (error) {
         console.error('API /api/dashboard error:', error);
-        return NextResponse.json({ error: 'Could not load the kicker data.' }, { status: 502 });
+        return NextResponse.json({ error: 'Could not load the kicker data.', code: safeErrorCode(error) }, { status: 502 });
     }
 }

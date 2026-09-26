@@ -32,6 +32,18 @@ export async function query<T = Row>(text: string, params: unknown[] = []): Prom
     return res.rows as T[];
 }
 
+/**
+ * A short, SAFE reason for a failed query, for error responses: our own config
+ * message, a Postgres SQLSTATE (e.g. 28P01 = bad password) or a Node error code
+ * (e.g. ENOTFOUND, ERR_INVALID_URL). Never the message itself, which could echo
+ * connection details.
+ */
+export function safeErrorCode(error: unknown): string {
+    if (error instanceof Error && error.message === 'NEON_READONLY_URL is not set') return 'NEON_READONLY_URL_MISSING';
+    const code = (error as { code?: unknown })?.code;
+    return typeof code === 'string' && /^[A-Z0-9_]{2,40}$/.test(code) ? code : 'UNKNOWN';
+}
+
 // Data changes at most every few hours (each NAS push), so let Vercel's CDN serve
 // cached responses: fast pages, and far fewer wake-ups of the free-tier database.
 export const CACHE_HEADERS = { 'Cache-Control': 's-maxage=300, stale-while-revalidate=3600' };

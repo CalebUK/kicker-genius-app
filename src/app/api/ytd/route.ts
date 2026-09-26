@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { query, CACHE_HEADERS } from '../../../lib/db';
+import { query, CACHE_HEADERS, safeErrorCode } from '../../../lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,6 +68,6 @@ export async function GET(request: Request) {
         return NextResponse.json({ ytd }, { headers: CACHE_HEADERS });
     } catch (error) {
         console.error('API /api/ytd error:', error);
-        return NextResponse.json({ error: 'Could not load season totals.' }, { status: 502 });
+        return NextResponse.json({ error: 'Could not load season totals.', code: safeErrorCode(error) }, { status: 502 });
     }
 }

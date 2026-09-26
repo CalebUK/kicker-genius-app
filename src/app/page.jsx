@@ -283,8 +283,9 @@ const fetchData = useCallback(async () => {
 
   const toggleRow = (rank) => setExpandedRow(expandedRow === rank ? null : rank);
 
-  if (loading || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
+  // error first: when loading fails, data stays null and the spinner would never end
   if (error) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Error</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Could not load the kicker data.</p></div>;
+  if (loading || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
 
   const { rankings, ytd, injuries, meta, history = [] } = data;
   const settings = meta?.model_settings || {};
