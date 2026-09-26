@@ -11,10 +11,11 @@ export const dynamic = 'force-dynamic';
  *   dome_pct            -> % of his games in a dome / closed roof
  *   rz_trips            -> his team's drives reaching FG range, in his games
  *   off_stall_rate_ytd  -> his team's offensive stall rate, in his games
- *   def_stall_rate_ytd  -> his team's OWN defensive stall rate, in his games
- *                          (game script: a stingy defense = more possessions).
- *                          NOT the opponents' defensive rate: per game that's the
- *                          same drives as his offense's rate, so it's identical.
+ *   def_stall_rate_ytd  -> strength of schedule: each opponent's SEASON-LONG
+ *                          defensive stall rate (all their games), averaged over
+ *                          his games. Not the opponent's rate in the game vs him:
+ *                          per game that's the same drives as his offense's rate,
+ *                          so it would just copy the offense column.
  * ?season= defaults to the season the site is showing.
  */
 export async function GET(request: Request) {
@@ -41,6 +42,11 @@ export async function GET(request: Request) {
                 SELECT g.season, g.week, g.away_team, g.home_team, g.roof
                 FROM game_metadata g, s WHERE g.season = s.season
             ),
+            opp_season AS (   -- every defense's season-long stall rate (all its games)
+                SELECT ts.team, AVG(ts.def_stall_rate) AS def_stall_season
+                FROM team_stats_weekly ts, s WHERE ts.season = s.season
+                GROUP BY ts.team
+            ),
             latest AS (   -- his current team = the team of his most recent game
                 SELECT DISTINCT ON (gsis_id) gsis_id, name, team FROM k ORDER BY gsis_id, week DESC
             )
@@ -57,12 +63,13 @@ export async function GET(request: Request) {
                 ROUND(100.0 * AVG(CASE WHEN LOWER(COALESCE(g.roof, '')) IN ('dome', 'closed') THEN 1 ELSE 0 END), 0) AS dome_pct,
                 COALESCE(SUM(ts.off_rz_trips), 0)       AS rz_trips,
                 ROUND(AVG(ts.off_stall_rate)::numeric, 1)  AS off_stall_rate_ytd,
-                ROUND(AVG(ts.def_stall_rate)::numeric, 1)  AS def_stall_rate_ytd,
+                ROUND(AVG(os.def_stall_season)::numeric, 1) AS def_stall_rate_ytd,
                 MAX(h.headshot_url)                     AS headshot_url
             FROM k
             JOIN latest l ON l.gsis_id = k.gsis_id
             LEFT JOIN games g ON g.season = k.season AND g.week = k.week AND g.team = k.team
             LEFT JOIN team_stats_weekly ts  ON ts.season = k.season  AND ts.week = k.week  AND ts.team = k.team
+            LEFT JOIN opp_season os ON os.team = g.opponent
             LEFT JOIN kicker_headshots h ON h.gsis_id = l.gsis_id
             GROUP BY l.gsis_id, l.name, l.team
             ORDER BY l.name;
