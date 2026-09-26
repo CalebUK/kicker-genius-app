@@ -237,6 +237,19 @@ export function matchesFilters(g, f) {
   return true;
 }
 
+/**
+ * Can this game be judged on the weather-type filters at all? A game with no
+ * weather report (e.g. every 2000 outdoor game) is neither "snow" nor "not
+ * snow", so it's left out of BOTH sides of the comparison. Domes always count
+ * (no weather, no wind, no outdoor temperature).
+ */
+export function isComparable(g, f) {
+  if (f.weather && g.game_conditions == null) return false;
+  if (f.temp && !g.is_dome && g.game_temp == null) return false;
+  if (f.wind && !g.is_dome && g.wind == null) return false;
+  return true;
+}
+
 export const hasAnyFilter = (f) => Object.values(f).some(Boolean);
 
 /** "in the snow vs the Titans at home in 2023" */

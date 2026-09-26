@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MessageCircleQuestionMark, Search, Snowflake, CloudRain, Sun, Wind, House, Warehouse, Plane, Loader2, AlertTriangle, Info } from 'lucide-react';
 import { calcFPts } from '../utils/scoring';
 import { HelmetIcon } from './KickerComponents';
-import { TEAMS, TEAM_BY_ABBR, EMPTY_FILTERS, parseQuestion, matchesFilters, hasAnyFilter, describeFilters } from '../utils/askParser';
+import { TEAMS, TEAM_BY_ABBR, EMPTY_FILTERS, parseQuestion, matchesFilters, isComparable, hasAnyFilter, describeFilters } from '../utils/askParser';
 
 // Ask tab: "How does Bass do in the snow?" -- no AI. The question is parsed into
 // a kicker + filters (utils/askParser.js), shown as editable dropdowns, and the
@@ -142,11 +142,16 @@ const AskTab = ({ scoring, currentSeason }) => {
     return Array.from({ length: currentSeason - first + 1 }, (_, i) => String(currentSeason - i));
   }, [kickers, currentSeason]);
 
-  const { matched, split, rest, all } = useMemo(() => {
+  const { matched, split, rest, all, unjudged } = useMemo(() => {
     if (!games) return {};
     const m = games.filter((g) => matchesFilters(g, filters));
-    const o = games.filter((g) => !matchesFilters(g, filters));
-    return { matched: m, split: summarize(m, scoring), rest: summarize(o, scoring), all: summarize(games, scoring) };
+    // "other games" = games that could have matched but didn't; games with no
+    // weather/temp/wind data are left out of both sides (see isComparable)
+    const o = games.filter((g) => !matchesFilters(g, filters) && isComparable(g, filters));
+    return {
+      matched: m, split: summarize(m, scoring), rest: summarize(o, scoring), all: summarize(games, scoring),
+      unjudged: games.length - m.length - o.length,
+    };
   }, [games, filters, scoring]);
 
   const filtered = hasAnyFilter(filters);
@@ -237,8 +242,9 @@ const AskTab = ({ scoring, currentSeason }) => {
             <div>
               <div className="text-base md:text-lg font-bold text-white leading-snug">{verdict()}</div>
               {filtered && split.n > 0 && split.n < 6 && <div className="text-xs text-amber-300/90 mt-1 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Small sample: treat this as a hint, not a trend.</div>}
+              {filtered && unjudged > 0 && <div className="text-xs text-slate-500 mt-1 flex items-center gap-1"><Info className="w-3 h-3" /> {unjudged} game{unjudged === 1 ? '' : 's'} with no weather report left out of the comparison.</div>}
               {filters.weather === 'snow' && split.n === 0 && (
-                <div className="text-xs text-slate-400 mt-2">Snow games are rare (about 14 since 2020, mostly in Buffalo, Denver, Chicago and New England).{' '}
+                <div className="text-xs text-slate-400 mt-2">Snow games are rare (about 3 a season, mostly in Buffalo, Denver, Chicago, Green Bay and New England).{' '}
                   <button onClick={() => setFilters((f) => ({ ...f, weather: '', temp: 'cold' }))} className="text-blue-400 underline">Try cold games instead</button>
                 </div>
               )}

@@ -46,4 +46,10 @@ export function safeErrorCode(error: unknown): string {
 
 // Data changes at most every few hours (each NAS push), so let Vercel's CDN serve
 // cached responses: fast pages, and far fewer wake-ups of the free-tier database.
-export const CACHE_HEADERS = { 'Cache-Control': 's-maxage=300, stale-while-revalidate=3600' };
+// CDN-Cache-Control is for the CDN only; browsers get Cache-Control and always
+// re-check (otherwise a browser can keep serving an hour-old copy via
+// stale-while-revalidate, e.g. right after new seasons are pushed).
+export const CACHE_HEADERS = {
+    'CDN-Cache-Control': 's-maxage=300, stale-while-revalidate=3600',
+    'Cache-Control': 'public, max-age=0, must-revalidate',
+};
