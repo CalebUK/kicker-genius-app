@@ -21,6 +21,8 @@ const EXAMPLES = [
 const sum = (games, keys) => games.reduce((acc, g) => acc + keys.reduce((a, k) => a + (Number(g[k]) || 0), 0), 0);
 const pct = (made, att) => (att > 0 ? `${Math.round((made / att) * 100)}%` : '–');
 const one = (x) => (Math.round(x * 10) / 10).toFixed(1);
+// a single game's score: whole number unless the league's scoring really makes a fraction
+const gamePts = (x) => (Number.isInteger(x) ? String(x) : one(x));
 
 function summarize(games, scoring) {
   const n = games.length;
@@ -283,7 +285,7 @@ const AskTab = ({ scoring, currentSeason }) => {
                         <td className="px-3 py-2 text-center font-mono text-slate-200">{g.fg_made}/{g.fg_att}</td>
                         <td className="px-3 py-2 text-center font-mono text-slate-400">{longAtt ? `${long}/${longAtt}` : '–'}</td>
                         <td className="px-3 py-2 text-center font-mono text-slate-400">{g.xp_made}/{g.xp_att}</td>
-                        <td className="px-3 py-2 text-center font-bold text-emerald-400">{one(calcFPts(g, scoring))}</td>
+                        <td className="px-3 py-2 text-center font-bold text-emerald-400">{gamePts(calcFPts(g, scoring))}</td>
                       </tr>
                     );
                   })}
