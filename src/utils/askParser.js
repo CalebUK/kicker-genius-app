@@ -56,7 +56,7 @@ const lastName = (name) => (name.includes('.') ? name.slice(name.indexOf('.') + 
 const has = (text, re) => re.test(text);
 
 // "vs Titans" / "against the Titans" -> opponent; "at Buffalo" / "in Denver" -> stadium
-const OPP_WORDS = /(?:\bvs\.?|\bversus|\bagainst|\bfacing|\bplaying|\bv\.?)\s+(?:the\s+)?$/;
+const OPP_WORDS = /(?:\bvs\.?|\bversus|\bagainst|\bfac(?:e|es|ed|ing)|\bplay(?:s|ed|ing)?|\bmeets?|\bv\.?)\s+(?:the\s+)?$/;
 const AT_WORDS = /(?:\bat|\bin|@)\s+(?:the\s+)?$/;
 
 // -> [{ abbr, role: 'opponent' | 'stadium' | 'plain', index }] in the order typed
@@ -86,14 +86,55 @@ function findTeams(raw) {
   return found.sort((a, b) => a.index - b.index);
 }
 
+// Levenshtein edit distance (typos: "Aubry" -> "Aubrey" = 1)
+function editDistance(a, b) {
+  const prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    let diag = prev[0];
+    prev[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const tmp = prev[j];
+      prev[j] = Math.min(prev[j] + 1, prev[j - 1] + 1, diag + (a[i - 1] === b[j - 1] ? 0 : 1));
+      diag = tmp;
+    }
+  }
+  return prev[b.length];
+}
+
+// Everyday words in questions that must never be read as a misspelled name.
+const NOT_NAMES = new Set(('when what with does play plays played playing against versus home road away game games ' +
+  'snow snowy rain rainy cold colder wind windy dome domes indoor outdoor outdoors weather season seasons year years ' +
+  'since this last kick kicks kicker field goal goals points point week weeks good well look looks their there ' +
+  'have been does doing warm hard easy mile miles yard yards long short ever from into over under').split(' '));
+
+const newestFirst = (a, b) => b.last_season - a.last_season || b.games - a.games;
+
+// -> { kicker, fuzzy } ; fuzzy = true when found through a typo match
 function findKicker(raw, kickers) {
   const candidates = kickers.filter((k) => new RegExp(`\\b${escapeRe(lastName(k.name))}\\b`, 'i').test(raw));
-  if (candidates.length <= 1) return candidates[0] || null;
-  // same surname: prefer the one whose first initial was typed ("Brandon ...")
-  const byInitial = candidates.filter((k) =>
-    new RegExp(`\\b${escapeRe(k.name[0])}[a-z]*\\.?\\s+${escapeRe(lastName(k.name))}`, 'i').test(raw));
-  const pool = byInitial.length ? byInitial : candidates;
-  return [...pool].sort((a, b) => b.last_season - a.last_season || b.games - a.games)[0];
+  if (candidates.length === 1) return { kicker: candidates[0], fuzzy: false };
+  if (candidates.length > 1) {
+    // same surname: prefer the one whose first initial was typed ("Brandon ...")
+    const byInitial = candidates.filter((k) =>
+      new RegExp(`\\b${escapeRe(k.name[0])}[a-z]*\\.?\\s+${escapeRe(lastName(k.name))}`, 'i').test(raw));
+    return { kicker: [...(byInitial.length ? byInitial : candidates)].sort(newestFirst)[0], fuzzy: false };
+  }
+  // no exact surname: allow a small typo (1 letter for short names, 2 for 7+ letters)
+  const teamWords = new Set(TEAMS.flatMap((t) => t.names));
+  const words = (raw.toLowerCase().match(/[a-z']+/g) || [])
+    .map((w) => w.replace(/'s$/, '').replace(/'/g, ''))
+    .filter((w) => w.length >= 4 && !NOT_NAMES.has(w) && !teamWords.has(w));
+  let best = null;
+  for (const k of kickers) {
+    const surname = lastName(k.name).toLowerCase();
+    if (surname.length < 4) continue;
+    const allowed = surname.length >= 7 ? 2 : 1;
+    for (const w of words) {
+      const d = editDistance(w, surname);
+      if (d <= allowed && (!best || d < best.d || (d === best.d && newestFirst(k, best.k) < 0))) best = { k, d };
+    }
+  }
+  return { kicker: best ? best.k : null, fuzzy: !!best };
 }
 
 /**
@@ -107,7 +148,9 @@ export function parseQuestion(raw, kickers, currentSeason) {
   const filters = { ...EMPTY_FILTERS };
   const notes = [];
 
-  let kicker = findKicker(raw, kickers);
+  const found = findKicker(raw, kickers);
+  let kicker = found.kicker;
+  if (found.fuzzy) notes.push(`Assumed you meant ${kicker.name}.`);
   const teams = findTeams(raw);
 
   for (const t of teams) {
