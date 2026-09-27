@@ -1,7 +1,7 @@
 export const BUY_ME_A_COFFEE_URL = "https://buymeacoffee.com/calebhill";
 
 export const GLOSSARY_DATA = [
-  { header: "Grade", title: "Matchup Grade", desc: "His offense's red-zone stall rate and the opponent defense's stall rate, each scored 40 for a league-average team, plus bonuses: Dome +10, Cold −20 (outdoors, 40°F or below). Divided by 90 to make the projection multiplier.", why: "Predictive Model", source: "Kicker Genius Model" },
+  { header: "Grade", title: "Matchup Grade", desc: "His offense's red-zone kicker points and the red-zone kicker points the opponent allows, each scored 40 for a league-average team, plus bonuses: Dome +10, Cold −20 (outdoors, 40°F or below). Divided by 90 to make the projection multiplier.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
   { header: "Rounding", title: "No Fractional Points", desc: "At Kicker Genius we don't believe in fractional points for Kickers. If a kicker can't get 9.4 points we shouldn't project it. .4 and below will be rounded down and .5 and above will be rounded up.", why: "Realism", source: "Kicker Genius Model" },
   { header: "Proj Acc", title: "Projection Accuracy (L3)", desc: "Total Actual Points vs Total Projected Points over the last 3 weeks.", why: "Model Trust Check", source: "Historical Backtest" },
@@ -11,8 +11,8 @@ export const GLOSSARY_DATA = [
 
   { header: "Injury", title: "Injury Status", desc: "Live tracking of game designation (Out, Doubtful, Questionable) and Practice Squad status.", why: "Availability Risk", source: "NFL Official + CBS Scraper" },
   { header: "Avg FPts", title: "Average Fantasy Points", desc: "Average points scored per game played this season.", why: "Consistency Metric", source: "nflreadpy (Play-by-Play)" },
-  { header: "L4 Off %", title: "Offensive Stall Rate (L4)", desc: "% of drives inside the 25 that fail to score a TD over the last 4 weeks.", why: "Recent Trend Volume", source: "nflreadpy (Play-by-Play)" },
-  { header: "L4 Def %", title: "Opponent Force Rate (L4)", desc: "% of opponent drives allowed inside the 25 that resulted in FGs (Last 4 weeks).", why: "Matchup Difficulty", source: "nflreadpy (Play-by-Play)" },
+  { header: "Off Red Zone", title: "Offense Red Zone (L3/L5)", desc: "Red-zone kicker points per game: every drive that reaches the 25 is worth kicker points. One that stalls = 3 (a field-goal try), any other trip = 1 (almost always a TD, so the extra point). Counts how often the team gets there AND how the trips end. Shown with trips per game and the stall rate (% of red-zone drives that don't end in a TD).", why: "Kicking Volume", source: "nflreadpy (Play-by-Play)" },
+  { header: "Opp Red Zone", title: "Opponent Red Zone (L3/L5)", desc: "The same red-zone kicker points, but for what the opponent's defense ALLOWS per game: trips allowed inside its 25, and how often it forces them to stall.", why: "Matchup Difficulty", source: "nflreadpy (Play-by-Play)" },
   { header: "Off Stall (YTD)", title: "Season Offense Stall Rate", desc: "Percentage of the kicker's team drives inside the 25 that ended in a FG attempt (Full Season).", why: "Long Term Efficiency", source: "nflreadpy (Season)" },
   { header: "Opp Stall (YTD)", title: "Opponent Stall Rate (Season)", desc: "Strength of schedule: how often the defenses he has faced force red-zone drives to stall, using each opponent's full-season rate.", why: "Schedule Difficulty", source: "nflreadpy (Season)" },
   { header: "Vegas", title: "Implied Team Total", desc: "Points Vegas expects this team to score (derived from Spread & Total).", why: "Reality Check", source: "nflreadpy (Lee Sharpe)" },

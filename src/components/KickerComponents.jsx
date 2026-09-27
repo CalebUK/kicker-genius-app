@@ -185,6 +185,10 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
   const wLabel = (x) => `${Math.round((Number(x) || 0) * 100)}%`;
   const lgOffStall = player.lg_off_stall ?? leagueAvgs?.off_stall;
   const lgDefStall = player.lg_def_stall ?? leagueAvgs?.def_stall;
+  // red-zone kicker points (stalled trip = 3, other trip = 1) -- the grade since 2026-09-27
+  const hasRz = player.off_rz_kp != null && player.def_rz_kp != null;
+  const lgOffKp = player.lg_off_rz_kp ?? leagueAvgs?.off_rz_kp;
+  const lgDefKp = player.lg_def_rz_kp ?? leagueAvgs?.def_rz_kp;
   const bonuses = Object.entries(player.bonuses || {});
   const hasVegas = player.vegas_implied != null;
   const win = player.win_label || 'L5';
@@ -195,8 +199,12 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Offense Score</span><span className="font-mono text-white">{f1(player.off_score_val)}</span></div><div className="text-[9px] text-slate-500">({f1(player.off_stall_rate)}% / {f1(lgOffStall)}% lg) × {scale}</div></div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Defense Score</span><span className="font-mono text-white">{f1(player.def_score_val)}</span></div><div className="text-[9px] text-slate-500">({f1(player.def_stall_rate)}% / {f1(lgDefStall)}% lg) × {scale}</div></div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Offense Score</span><span className="font-mono text-white">{f1(player.off_score_val)}</span></div>{hasRz
+              ? <div className="text-[9px] text-slate-500 leading-tight">({f1(player.off_rz_kp)} RZ kicker pts / {f1(lgOffKp)} lg) × {scale}<br />{f1(player.off_rz_trips)} red-zone trips/g, {f1(player.off_stall_rate)}% stall</div>
+              : <div className="text-[9px] text-slate-500">({f1(player.off_stall_rate)}% / {f1(lgOffStall)}% lg) × {scale}</div>}</div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Defense Score</span><span className="font-mono text-white">{f1(player.def_score_val)}</span></div>{hasRz
+              ? <div className="text-[9px] text-slate-500 leading-tight">({f1(player.def_rz_kp)} RZ kicker pts allowed / {f1(lgDefKp)} lg) × {scale}<br />{f1(player.def_rz_trips)} trips allowed/g, {f1(player.def_stall_rate)}% stall</div>
+              : <div className="text-[9px] text-slate-500">({f1(player.def_stall_rate)}% / {f1(lgDefStall)}% lg) × {scale}</div>}</div>
             <div className="border-t border-slate-800 pt-1"><div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div><div className="text-[10px] space-y-0.5">{bonuses.length > 0 ? bonuses.map(([name, val]) => <div key={name} className={`flex justify-between ${val < 0 ? 'text-red-400' : 'text-emerald-400'}`}><span>{bonusLabel(name, player, settings)}</span><span className="font-mono">{val > 0 ? '+' : ''}{val}</span></div>) : <div className="text-slate-600 italic">None</div>}</div></div>
             <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white"><span>Total Grade</span><span>{f1(player.grade)}</span></div><div className="flex justify-between text-[10px] text-blue-400 mt-1"><span>Week {week} Multiplier (÷{divisor})</span><span className="font-mono font-bold">{f2(c.mult)}x</span></div></div>
           </div>

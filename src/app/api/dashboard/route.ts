@@ -39,6 +39,8 @@ export async function GET() {
                 def_stall: r0[`lg_def_stall_${sfx}`],
                 pts: r0[`lg_pts_${sfx}`],
                 share: r0[`lg_share_${sfx}`],
+                off_rz_kp: r0[`lg_off_rz_kp_${sfx}`],   // red-zone kicker points per game (the grade)
+                def_rz_kp: r0[`lg_def_rz_kp_${sfx}`],
             };
         };
 

@@ -38,6 +38,13 @@ const toBoardRow = (r, w) => {
     def_stall_rate: r[`opp_def_stall_${w}`],
     lg_off_stall: r[`lg_off_stall_${w}`],
     lg_def_stall: r[`lg_def_stall_${w}`],
+    // red-zone kicker points per game (stalled trip = FG try, other trip = XP): what the grade is built on
+    off_rz_trips: r[`off_rz_trips_${w}`],
+    off_rz_kp: r[`off_rz_kp_${w}`],
+    def_rz_trips: r[`opp_def_rz_trips_${w}`],
+    def_rz_kp: r[`opp_def_rz_kp_${w}`],
+    lg_off_rz_kp: r[`lg_off_rz_kp_${w}`],
+    lg_def_rz_kp: r[`lg_def_rz_kp_${w}`],
     off_ppg: r[`team_pts_${w}`],
     def_pa: r[`opp_pts_allowed_${w}`],
     exp_team_pts: r[`exp_team_pts_${w}`],
@@ -55,6 +62,16 @@ const toBoardRow = (r, w) => {
     injury_color: INJURY_COLORS[r.injury_status] || (r.injury_status ? 'yellow' : ''),
   };
 };
+
+// Week Model red-zone column: kicker points per game, with trips + stall rate underneath.
+// (Rows from before the red-zone grade have no kicker points -> just the stall rate.)
+const RedZoneCell = ({ kp, trips, stall, className }) => (
+  <td className="px-6 py-4 text-center">
+    {kp != null
+      ? <><div className={`font-mono ${className}`}>{Number(kp).toFixed(1)}</div><div className="text-[9px] text-slate-500 whitespace-nowrap">{Number(trips).toFixed(1)} trips · {stall}%</div></>
+      : <span className={className}>{stall}%</span>}
+  </td>
+);
 
 const TABS = ['potential', 'accuracy', 'ytd', 'ask', 'injuries', 'glossary', 'settings'];
 function tabFromUrl() {
@@ -512,8 +529,8 @@ const fetchData = useCallback(async () => {
                     <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description={`Offense + Defense (avg ${settings.grade_scale ?? 40} each) + bonuses. Multiplier = grade ÷ ${settings.grade_divisor ?? 90}`} />
                     <th className="px-6 py-3 text-center align-middle">Weather</th>
-                    <HeaderCell label={`Offensive Stall % (${winLabel})`} sortKey="off_stall_rate" currentSort={sortConfig} onSort={handleSort} description={`Offense Stall Rate (${winLabel})`} avg={leagueAvgs.off_stall} />
-                    <HeaderCell label={`Opponent Stall % (${winLabel})`} sortKey="def_stall_rate" currentSort={sortConfig} onSort={handleSort} description={`Opponent Force Rate (${winLabel})`} avg={leagueAvgs.def_stall} />
+                    <HeaderCell label={`Offense Red Zone (${winLabel})`} sortKey="off_rz_kp" currentSort={sortConfig} onSort={handleSort} description={`Red-zone kicker points per game (${winLabel}): each red-zone trip that stalls = 3 (a field-goal try), each other trip = 1 (the extra point). Below: trips per game and stall rate.`} avg={leagueAvgs.off_rz_kp} />
+                    <HeaderCell label={`Opponent Red Zone (${winLabel})`} sortKey="def_rz_kp" currentSort={sortConfig} onSort={handleSort} description={`Red-zone kicker points per game the opponent ALLOWS (${winLabel}): stalled trip = 3, other trip = 1. Below: trips allowed per game and stall rate forced.`} avg={leagueAvgs.def_rz_kp} />
                     <HeaderCell label="Projection Accuracy (L3)" sortKey="proj_acc" currentSort={sortConfig} onSort={handleSort} description="Total Actual vs Projected Points (Last 3 Games)" />
                     <HeaderCell label="Implied Vegas Score Line" sortKey="vegas" currentSort={sortConfig} onSort={handleSort} description="Implied Team Total (Vegas Line & Spread)/2" />
                     <HeaderCell label={`Offensive PF (${winLabel})`} sortKey="off_ppg" currentSort={sortConfig} onSort={handleSort} description={`Team Points For (${winLabel})`} avg={leagueAvgs.pts} />
@@ -536,8 +553,8 @@ const fetchData = useCallback(async () => {
                             <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
                             <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
                             <td className="px-6 py-4 text-center text-xs font-mono text-slate-400">{row.weather_desc}</td>
-                            <td className="px-6 py-4 text-center text-blue-300">{row.off_stall_rate}%</td>
-                            <td className="px-6 py-4 text-center text-slate-400">{row.def_stall_rate}%</td>
+                            <RedZoneCell kp={row.off_rz_kp} trips={row.off_rz_trips} stall={row.off_stall_rate} className="text-blue-300" />
+                            <RedZoneCell kp={row.def_rz_kp} trips={row.def_rz_trips} stall={row.def_stall_rate} className="text-slate-300" />
                             <td className="px-6 py-4 text-center"><div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.l3_act_sum >= row.l3_proj_sum ? 'text-green-400' : 'text-red-400'}`}><span>{row.l3_act_sum ?? 0}</span><span className="mx-1 text-slate-600">/</span><span className="text-slate-500">{row.l3_proj_sum ?? 0}</span></div><div className="text-[9px] text-slate-500 uppercase">Act / Proj</div></td>
                             <td className="px-6 py-4 text-center font-mono text-amber-400">{Number(row.vegas).toFixed(1)}</td>
                             <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.off_ppg).toFixed(1)} {row.off_ppg < 15 && "❄️"}</td>
