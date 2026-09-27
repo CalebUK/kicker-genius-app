@@ -24,6 +24,11 @@ const BUCKET_KEYS = ['fg_att', 'fg_made', 'fg_miss', 'xp_att', 'xp_made', 'xp_mi
   'fg_miss_0_19', 'fg_miss_20_29', 'fg_miss_30_39', 'fg_miss_40_49', 'fg_miss_50_59', 'fg_miss_60_plus'];
 const pct = (made, att) => (att > 0 ? `${Math.round((made / att) * 100)}%` : '–');
 const one = (x) => (Math.round(x * 10) / 10).toFixed(1);
+// "KC, CHI, LA, TB, TEN" -> "KC, CHI, LA +2" (kickers who moved around a lot)
+const shortTeams = (teams) => {
+  const list = String(teams || '').split(', ').filter(Boolean);
+  return list.length > 3 ? `${list.slice(0, 3).join(', ')} +${list.length - 3}` : list.join(', ');
+};
 // a single game's score: whole number unless the league's scoring really makes a fraction
 const gamePts = (x) => (Number.isInteger(x) ? String(x) : one(x));
 
@@ -58,6 +63,36 @@ function addTotals(a, b) {
   const t = { n: (Number(a.n) || 0) + (Number(b.n) || 0) };
   for (const k of BUCKET_KEYS) t[k] = (Number(a[k]) || 0) + (Number(b[k]) || 0);
   return t;
+}
+
+// --- the Ask view <-> URL (?tab=ask&q=...&kicker=...&weather=snow) ---
+const EMPTY_VIEW = { asked: '', kickerId: '', teamAbbr: '', allMode: false, filters: EMPTY_FILTERS };
+const FILTER_PARAMS = { opponent: 'opponent', stadium: 'stadium', venue: 'venue', weather: 'weather', wind: 'wind',
+  temp: 'temp', homeAway: 'homeAway', fromSeason: 'from', toSeason: 'to' };
+
+function viewFromUrl() {
+  if (typeof window === 'undefined') return EMPTY_VIEW;
+  const p = new URLSearchParams(window.location.search);
+  const filters = { ...EMPTY_FILTERS };
+  for (const [key, param] of Object.entries(FILTER_PARAMS)) filters[key] = p.get(param) || '';
+  const team = p.get('team') || '';
+  return {
+    asked: p.get('q') || '',
+    kickerId: p.get('kicker') || '',
+    teamAbbr: TEAM_BY_ABBR[team] ? team : '',
+    allMode: p.get('all') === '1',
+    filters,
+  };
+}
+
+function urlForView(v) {
+  const p = new URLSearchParams({ tab: 'ask' });
+  if (v.asked) p.set('q', v.asked);
+  if (v.kickerId) p.set('kicker', v.kickerId);
+  else if (v.teamAbbr) p.set('team', v.teamAbbr);
+  else if (v.allMode) p.set('all', '1');
+  for (const [key, param] of Object.entries(FILTER_PARAMS)) if (v.filters[key]) p.set(param, v.filters[key]);
+  return `?${p}`;
 }
 
 // the filters as /api/ask/split query parameters
@@ -114,17 +149,37 @@ const StatBlock = ({ title, s, accent }) => (
 const AskTab = ({ scoring, currentSeason }) => {
   const [kickers, setKickers] = useState(null);
   const [loadError, setLoadError] = useState(null);
-  const [question, setQuestion] = useState('');
-  // The subject is ONE of: a kicker (gsis id), a team (all its kickers), or
-  // ALL KICKERS (league-wide scenario).
-  const [kickerId, setKickerId] = useState('');
-  const [teamAbbr, setTeamAbbr] = useState('');
-  const [allMode, setAllMode] = useState(false);
-  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  // The VIEW = the asked question + the subject + the conditions. It lives in
+  // the URL (?tab=ask&kicker=...&weather=snow), so every change is a history
+  // entry: Back returns to the previous view, and links reopen the same answer.
+  // Subject is ONE of: a kicker (gsis id), a team (all its kickers), or ALL
+  // KICKERS (league-wide scenario).
+  const [view, setView] = useState(viewFromUrl);
+  const { asked, kickerId, teamAbbr, allMode, filters } = view;
+  const [question, setQuestion] = useState(view.asked);   // the text box (committed on Ask)
   const [notes, setNotes] = useState([]);
   const [gamesByKey, setGamesByKey] = useState({});
   const [errorByKey, setErrorByKey] = useState({});
   const [showAll, setShowAll] = useState(false);
+
+  // Back / Forward within the Ask tab
+  useEffect(() => {
+    const onPop = () => {
+      const v = viewFromUrl();
+      setView(v); setQuestion(v.asked); setNotes([]); setShowAll(false);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // change the view (and add a history entry)
+  const go = (patch) => {
+    const next = { ...view, ...patch };
+    setView(next);
+    setShowAll(false);
+    const url = urlForView(next);
+    if (url !== window.location.search) window.history.pushState(null, '', url);
+  };
 
   // what to fetch: a game log for a kicker/team (filtered here), or the DB-side
   // split for all kickers (refetched whenever the filters change)
@@ -149,30 +204,27 @@ const AskTab = ({ scoring, currentSeason }) => {
     return () => { cancelled = true; };
   }, [subjectKey, gamesByKey]);
 
-  const chooseKicker = (id) => { setKickerId(id); setTeamAbbr(''); setAllMode(false); setShowAll(false); };
-  const chooseTeam = (abbr) => { setTeamAbbr(abbr); setKickerId(''); setAllMode(false); setShowAll(false); };
-  const chooseAll = () => { setAllMode(true); setKickerId(''); setTeamAbbr(''); setShowAll(false); };
-  const clearAll = () => {
-    setQuestion(''); setKickerId(''); setTeamAbbr(''); setAllMode(false);
-    setFilters(EMPTY_FILTERS); setNotes([]); setShowAll(false);
-  };
+  const NO_SUBJECT = { kickerId: '', teamAbbr: '', allMode: false };
+  const chooseKicker = (id) => go({ ...NO_SUBJECT, kickerId: id });
+  const chooseTeam = (abbr) => go({ ...NO_SUBJECT, teamAbbr: abbr });
+  const chooseAll = () => go({ ...NO_SUBJECT, allMode: true });
+  const clearAll = () => { setQuestion(''); setNotes([]); go({ ...EMPTY_VIEW }); };
 
   const ask = (text) => {
     const q = (text ?? question).trim();
     if (!q || !kickers) return;
     setQuestion(q);
     const parsed = parseQuestion(q, kickers, currentSeason);
-    setFilters(parsed.filters);
-    setNotes(parsed.notes);
-    setShowAll(false);
-    if (parsed.kicker) chooseKicker(parsed.kicker.gsis_id);
-    else if (parsed.team) chooseTeam(parsed.team);
-    else if (parsed.allKickers) chooseAll();
-    else { clearSubject(); setNotes([...parsed.notes, "Couldn't spot a kicker, team or scenario in that: pick one below."]); }
+    const subject = parsed.kicker ? { ...NO_SUBJECT, kickerId: parsed.kicker.gsis_id }
+      : parsed.team ? { ...NO_SUBJECT, teamAbbr: parsed.team }
+      : parsed.allKickers ? { ...NO_SUBJECT, allMode: true } : NO_SUBJECT;
+    setNotes(subject === NO_SUBJECT
+      ? [...parsed.notes, "Couldn't spot a kicker, team or scenario in that: pick one below."] : parsed.notes);
+    go({ asked: q, filters: parsed.filters, ...subject });
   };
-  const clearSubject = () => { setKickerId(''); setTeamAbbr(''); setAllMode(false); };
 
-  const setFilter = (key) => (value) => { setFilters((f) => ({ ...f, [key]: value })); setShowAll(false); };
+  const setFilter = (key) => (value) => go({ filters: { ...filters, [key]: value } });
+  const setFilters = (next) => go({ filters: next });
 
   const kicker = kickers?.find((k) => k.gsis_id === kickerId) || null;
   const teamMode = !kickerId && !!teamAbbr;
@@ -219,7 +271,7 @@ const AskTab = ({ scoring, currentSeason }) => {
     return {
       currentOptions: [['', 'Pick…'], ...byName.filter((k) => k.last_season >= currentSeason).map((k) => [k.gsis_id, `${k.name} (${k.team})`])],
       pastOptions: [['', 'Pick…'], ...byName.filter((k) => k.last_season < currentSeason)
-        .map((k) => [k.gsis_id, `${k.name} (${k.team_code || k.team}, ${k.first_season}–${k.last_season})`])],
+        .map((k) => [k.gsis_id, `${k.name} (${shortTeams(k.teams || k.team)}, ${k.first_season === k.last_season ? k.first_season : `${k.first_season}–${k.last_season}`})`])],
     };
   }, [kickers, currentSeason]);
   const isCurrent = kicker ? kicker.last_season >= currentSeason : false;
@@ -309,11 +361,12 @@ const AskTab = ({ scoring, currentSeason }) => {
               : kicker.headshot_url ? <img src={kicker.headshot_url} alt={kicker.name} className="w-14 h-14 rounded-full border-2 border-slate-700 object-cover bg-slate-950" /> : <HelmetIcon />}
             <div>
               <div className="text-base md:text-lg font-bold text-white leading-snug">{verdict()}</div>
+              {kicker?.team_history && <div className="text-[11px] text-slate-500 mt-1">Teams: {kicker.team_history}</div>}
               {filtered && split.n > 0 && split.n < 6 && <div className="text-xs text-amber-300/90 mt-1 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Small sample: treat this as a hint, not a trend.</div>}
               {filtered && unjudged > 0 && <div className="text-xs text-slate-500 mt-1 flex items-center gap-1"><Info className="w-3 h-3" /> {unjudged} game{unjudged === 1 ? '' : 's'} with no weather report left out of the comparison.</div>}
               {filters.weather === 'snow' && split.n === 0 && (
                 <div className="text-xs text-slate-400 mt-2">Snow games are rare (about 3 a season, mostly in Buffalo, Denver, Chicago, Green Bay and New England).{' '}
-                  <button onClick={() => setFilters((f) => ({ ...f, weather: '', temp: 'cold' }))} className="text-blue-400 underline">Try cold games instead</button>
+                  <button onClick={() => setFilters({ ...filters, weather: '', temp: 'cold' })} className="text-blue-400 underline">Try cold games instead</button>
                 </div>
               )}
             </div>
@@ -342,7 +395,7 @@ const AskTab = ({ scoring, currentSeason }) => {
                   {leaders.rows.map((k, i) => (
                     <tr key={k.gsis_id} onClick={() => chooseKicker(k.gsis_id)} className="hover:bg-slate-800/50 cursor-pointer">
                       <td className="px-4 py-2 text-slate-500 font-mono">{i + 1}</td>
-                      <td className="px-3 py-2 whitespace-nowrap"><span className="font-bold text-white">{k.name}</span> <span className="text-[10px] text-slate-500">{k.team} · {k.first_season === k.last_season ? k.first_season : `${k.first_season}–${k.last_season}`}</span></td>
+                      <td className="px-3 py-2 whitespace-nowrap"><span className="font-bold text-white">{k.name}</span> <span className="text-[10px] text-slate-500">{shortTeams(k.teams)} · {k.first_season === k.last_season ? k.first_season : `${k.first_season}–${k.last_season}`}</span></td>
                       <td className="px-3 py-2 text-center text-slate-300">{k.n}</td>
                       <td className="px-3 py-2 text-center font-mono text-slate-200">{k.stats.fgMade}/{k.stats.fgAtt} <span className="text-slate-500 text-[10px]">{pct(k.stats.fgMade, k.stats.fgAtt)}</span></td>
                       <td className="px-3 py-2 text-center font-mono text-slate-400">{k.stats.long.att ? `${k.stats.long.made}/${k.stats.long.att}` : '–'}</td>
@@ -359,7 +412,7 @@ const AskTab = ({ scoring, currentSeason }) => {
               <table className="w-full text-sm text-left">
                 <thead className="text-[10px] text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="px-4 py-3">Game</th>{kickerCol && <th className="px-3 py-3">Kicker</th>}<th className="px-3 py-3">Opponent</th><th className="px-3 py-3">Conditions</th>
+                    <th className="px-4 py-3">Game</th>{kickerCol && <th className="px-3 py-3">Kicker</th>}<th className="px-3 py-3">Team</th><th className="px-3 py-3">Opponent</th><th className="px-3 py-3">Conditions</th>
                     <th className="px-3 py-3 text-center">FG</th><th className="px-3 py-3 text-center">50+</th><th className="px-3 py-3 text-center">XP</th><th className="px-3 py-3 text-center">Fantasy pts</th>
                   </tr>
                 </thead>
@@ -371,7 +424,8 @@ const AskTab = ({ scoring, currentSeason }) => {
                     return (
                       <tr key={`${g.season}-${g.week}-${g.kicker || g.kickers || ''}-${g.team || ''}`} className="hover:bg-slate-800/50">
                         <td className="px-4 py-2 text-slate-300 whitespace-nowrap">{g.season} · Wk {g.week}</td>
-                        {kickerCol && <td className="px-3 py-2 text-slate-400 whitespace-nowrap text-xs">{allMode ? `${g.kicker} (${g.team})` : g.kickers}</td>}
+                        {kickerCol && <td className="px-3 py-2 text-slate-400 whitespace-nowrap text-xs">{allMode ? g.kicker : g.kickers}</td>}
+                        <td className="px-3 py-2 text-slate-300 whitespace-nowrap text-xs font-semibold">{g.team_code || g.team}</td>
                         <td className="px-3 py-2 text-slate-300 whitespace-nowrap">
                           <span className="inline-flex items-center gap-1">{g.is_home ? <House className="w-3 h-3 text-slate-500" /> : <Plane className="w-3 h-3 text-slate-500" />}{g.is_home ? 'vs' : '@'} {TEAM_BY_ABBR[g.opponent]?.nick || g.opponent || '–'}
                             {g.opponent_code && g.opponent_code !== g.opponent && <span className="text-slate-500 text-[10px]">({g.opponent_code})</span>}</span>

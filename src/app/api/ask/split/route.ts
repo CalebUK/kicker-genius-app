@@ -107,13 +107,20 @@ export async function GET(request: Request) {
     try {
         const [sides, kickers, games] = await Promise.all([
             query(`${base} SELECT matched, ${BUCKETS} FROM flagged WHERE matched OR comparable GROUP BY matched;`, params),
+            query(`${base},
+                spans AS (   -- the teams he kicked for in these games, in order (season codes, e.g. OAK)
+                    SELECT gsis_id, team, MIN(season * 100 + week) AS first_game
+                    FROM flagged WHERE matched GROUP BY gsis_id, team
+                ),
+                team_list AS (
+                    SELECT gsis_id, STRING_AGG(team, ', ' ORDER BY first_game) AS teams FROM spans GROUP BY gsis_id
+                )
+                SELECT f.gsis_id, (ARRAY_AGG(f.kname ORDER BY f.season DESC, f.week DESC))[1] AS name, tl.teams,
+                    MIN(f.season) AS first_season, MAX(f.season) AS last_season, ${BUCKETS}
+                FROM flagged f JOIN team_list tl ON tl.gsis_id = f.gsis_id
+                WHERE f.matched GROUP BY f.gsis_id, tl.teams;`, params),
             query(`${base}
-                SELECT gsis_id, (ARRAY_AGG(kname ORDER BY season DESC, week DESC))[1] AS name,
-                    (ARRAY_AGG(fteam ORDER BY season DESC, week DESC))[1] AS team,
-                    MIN(season) AS first_season, MAX(season) AS last_season, ${BUCKETS}
-                FROM flagged WHERE matched GROUP BY gsis_id;`, params),
-            query(`${base}
-                SELECT season, week, kname AS kicker, fteam AS team, opp AS opponent, is_home, is_dome,
+                SELECT season, week, kname AS kicker, fteam AS team, team AS team_code, opp AS opponent, is_home, is_dome,
                     game_conditions, game_temp, wind, fg_att, fg_made, xp_att, xp_made, xp_miss, fg_miss,
                     fg_make_0_19 AS fg_0_19, fg_make_20_29 AS fg_20_29, fg_make_30_39 AS fg_30_39,
                     fg_make_40_49 AS fg_40_49, fg_make_50_59 AS fg_50_59, fg_make_60_plus AS fg_60_plus,

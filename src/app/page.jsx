@@ -55,12 +55,22 @@ const toBoardRow = (r, w) => {
   };
 };
 
+const TABS = ['potential', 'accuracy', 'ytd', 'ask', 'injuries', 'glossary', 'settings'];
+function tabFromUrl() {
+  if (typeof window === 'undefined') return 'potential';
+  const tab = new URLSearchParams(window.location.search).get('tab');
+  return TABS.includes(tab) ? tab : 'potential';
+}
+
 // Just a snapshot's actual kicks that week (wk_* fields).
 const wkFields = (h) => Object.fromEntries(Object.entries(h).filter(([k]) => k.startsWith('wk_')));
 
 const App = () => {
   const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState('potential');
+  // The open tab lives in the URL (?tab=ask) so the browser's Back/Forward
+  // buttons move between tabs and links reopen the right one. Reading it here
+  // is hydration-safe: the first render is the loading screen either way.
+  const [activeTab, setActiveTab] = useState(tabFromUrl);
   const [expandedRow, setExpandedRow] = useState(null);
   const [scoring, setScoring] = useState(DEFAULT_SCORING);
   // 'l3' | 'l5' model window. L5 is the default: in the 2021–2025 backtest it beat
@@ -148,6 +158,20 @@ const fetchData = useCallback(async () => {
 
     fetchData(); // Load data on mount
   }, [fetchData]);
+
+  // Back / Forward: follow the tab in the URL
+  useEffect(() => {
+    const onPop = () => setActiveTab(tabFromUrl());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // Switch tab and add a history entry (so Back returns to the previous tab)
+  const goTab = (tab) => {
+    if (tab === activeTab) return;
+    setActiveTab(tab);
+    window.history.pushState(null, '', tab === 'potential' ? window.location.pathname : `?tab=${tab}`);
+  };
 
   // --- POLLING FOR LIVE SCORES ---
   useEffect(() => {
@@ -442,18 +466,18 @@ const fetchData = useCallback(async () => {
           </div>
           <div className="flex flex-wrap gap-3">
              <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noopener noreferrer" className="bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 px-4 py-2 rounded flex items-center gap-2 border border-amber-500/40 transition-colors text-sm font-semibold">☕ Buy me a coffee</a>
-             <button onClick={() => setActiveTab('settings')} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded flex items-center gap-2 border border-slate-700 transition-colors"><Settings className="w-4 h-4" /> League Settings</button>
+             <button onClick={() => goTab('settings')} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded flex items-center gap-2 border border-slate-700 transition-colors"><Settings className="w-4 h-4" /> League Settings</button>
              <div className="bg-slate-900 border border-slate-800 rounded-lg p-2 flex items-center gap-3 shadow-sm px-4"><div className="text-right"><div className="text-[10px] text-slate-500 uppercase font-bold">Last Update</div><div className="text-xs font-semibold text-white">{meta.updated} (Week {meta.week})</div></div></div>
           </div>
         </div>
 
         <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
-          <button onClick={() => { setActiveTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
-          <button onClick={() => { setActiveTab('accuracy'); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
-          <button onClick={() => { setActiveTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
-          <button onClick={() => setActiveTab('ask')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ask' ? 'text-white border-b-2 border-sky-400' : 'text-slate-500'}`}><MessageCircleQuestionMark className="w-4 h-4"/> Ask</button>
-          <button onClick={() => setActiveTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
-          <button onClick={() => setActiveTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
+          <button onClick={() => { goTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
+          <button onClick={() => goTab('accuracy')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
+          <button onClick={() => { goTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
+          <button onClick={() => goTab('ask')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ask' ? 'text-white border-b-2 border-sky-400' : 'text-slate-500'}`}><MessageCircleQuestionMark className="w-4 h-4"/> Ask</button>
+          <button onClick={() => goTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
+          <button onClick={() => goTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
         {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers} sleeperLeagueName={sleeperLeagueName} windowMode={windowMode} setWindowMode={changeWindow}/> )}
