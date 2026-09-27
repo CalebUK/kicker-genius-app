@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, MessageCircleQuestionMark, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock, Bot } from 'lucide-react';
 // import { Analytics } from '@vercel/analytics/react';
 
-import { DEFAULT_SCORING, BUY_ME_A_COFFEE_URL } from '../data/constants';
+import { BUY_ME_A_COFFEE_URL } from '../data/constants';
+import useLeagues from '../utils/useLeagues';
 import { calcFPts, calcProjection, weekKicks, fetchSleeperScores } from '../utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from '../components/KickerComponents';
 import AccuracyTab from '../components/AccuracyTab';
@@ -73,6 +74,23 @@ const RedZoneCell = ({ kp, trips, stall, className }) => (
   </td>
 );
 
+// Both read the cloud DB: /api/dashboard = Week Model + weekly snapshots
+// (Accuracy tab, trends); /api/ytd = Historical YTD season totals.
+const loadSiteData = async () => {
+  const fetchJson = async (url) => {
+    // No cache-buster: the API routes set short CDN cache headers, so most
+    // visits are served from Vercel's cache instead of waking the database.
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`${url} failed (${res.status}): ${await res.text()}`);
+    return res.json();
+  };
+  const [dashboard, seasonTotals] = await Promise.all([
+    fetchJson('/api/dashboard'),
+    fetchJson('/api/ytd').catch(() => ({ ytd: [] })),
+  ]);
+  return { ...dashboard, ytd: seasonTotals.ytd || [] };
+};
+
 const TABS = ['potential', 'accuracy', 'ytd', 'ask', 'injuries', 'glossary', 'settings'];
 function tabFromUrl() {
   if (typeof window === 'undefined') return 'potential';
@@ -90,10 +108,15 @@ const App = () => {
   // is hydration-safe: the first render is the loading screen either way.
   const [activeTab, setActiveTab] = useState(tabFromUrl);
   const [expandedRow, setExpandedRow] = useState(null);
-  const [scoring, setScoring] = useState(DEFAULT_SCORING);
+  // Saved Sleeper leagues + the active one's scoring (or custom scoring) -- utils/useLeagues.js
+  const lg = useLeagues();
+  const { scoring } = lg;
   // 'l3' | 'l5' model window. L5 is the default: in the 2021–2025 backtest it beat
   // the season-average baseline at every stage of the season; L3 never did.
-  const [windowMode, setWindowMode] = useState('l5');
+  // (Read in the initializer: the first render is the loading screen, so it's hydration-safe.)
+  const [windowMode, setWindowMode] = useState(() => {
+    try { const w = localStorage.getItem('kicker_window'); return w === 'l3' || w === 'l5' ? w : 'l5'; } catch { return 'l5'; }
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -102,80 +125,22 @@ const App = () => {
   const [hideMedOwn, setHideMedOwn] = useState(false);
   const [search, setSearch] = useState('');
 
-  // Sleeper State
-  const [sleeperLeagueId, setSleeperLeagueId] = useState('');
-  const [sleeperLeagueName, setSleeperLeagueName] = useState(''); 
-  const [sleeperUser, setSleeperUser] = useState('');
-  const [sleeperMyKickers, setSleeperMyKickers] = useState(new Set());
-  const [sleeperTakenKickers, setSleeperTakenKickers] = useState(new Set());
-  const [sleeperLoading, setSleeperLoading] = useState(false);
+  // Sleeper: "my team + free agents" filter, and live scores for the active league
   const [sleeperFilter, setSleeperFilter] = useState(false);
-  const [sleeperScoringUpdated, setSleeperScoringUpdated] = useState(false);
-  
-  // LIVE SCORING STATE
-  const [liveScores, setLiveScores] = useState({});
-  const [sleeperIdMap, setSleeperIdMap] = useState({});
+  const [liveScores, setLiveScores] = useState({ league: null, scores: {} });
 
-
-const fetchData = useCallback(async () => {
-      setLoading(true);
-      setError(null);
-      
-      const fetchJson = async (url) => {
-          // No cache-buster: the API routes set short CDN cache headers, so most
-          // visits are served from Vercel's cache instead of waking the database.
-          const res = await fetch(url);
-          if (!res.ok) {
-              const errBody = await res.text();
-              throw new Error(`${url} failed (${res.status}): ${errBody}`);
-          }
-          return res.json();
-      };
-
-      try {
-          // Both read the cloud DB: /api/dashboard = Week Model + weekly snapshots
-          // (Accuracy tab, trends); /api/ytd = Historical YTD season totals.
-          const [dashboard, seasonTotals] = await Promise.all([
-              fetchJson('/api/dashboard'),
-              fetchJson('/api/ytd').catch(() => ({ ytd: [] })),
-          ]);
-
-          setData({ ...dashboard, ytd: seasonTotals.ytd || [] });
-      } catch (err) {
-          console.error("Detailed Fetch Error:", err);
-          setError(err.message);
-      } finally {
-          setLoading(false);
-      }
-  }, []);
 
   // NOTE: the loading guard lives AFTER all hooks (see the `if (loading ...)`
   // return below). An early return here would skip the useEffect hooks and the
-  // app would never call fetchData — leaving it stuck on the loading screen.
-
-  useEffect(() => {
-    const savedScoring = localStorage.getItem('kicker_scoring');
-    const savedWindow = localStorage.getItem('kicker_window');
-    const savedLeagueId = localStorage.getItem('sleeper_league_id');
-    const savedLeagueName = localStorage.getItem('sleeper_league_name');
-    const savedUser = localStorage.getItem('sleeper_username');
-    
-    const savedMyKickers = localStorage.getItem('sleeper_my_kickers');
-    const savedTakenKickers = localStorage.getItem('sleeper_taken_kickers');
-    const savedIdMap = localStorage.getItem('sleeper_id_map');
-    
-    if (savedScoring) { try { setScoring({ ...DEFAULT_SCORING, ...JSON.parse(savedScoring) }); } catch (e) {} }
-    if (savedWindow === 'l3' || savedWindow === 'l5') setWindowMode(savedWindow);
-    if (savedLeagueId) setSleeperLeagueId(savedLeagueId);
-    if (savedLeagueName) setSleeperLeagueName(savedLeagueName);
-    if (savedUser) setSleeperUser(savedUser);
-
-    if (savedMyKickers) { try { setSleeperMyKickers(new Set(JSON.parse(savedMyKickers))); } catch (e) {} }
-    if (savedTakenKickers) { try { setSleeperTakenKickers(new Set(JSON.parse(savedTakenKickers))); } catch (e) {} }
-    if (savedIdMap) { try { setSleeperIdMap(JSON.parse(savedIdMap)); } catch (e) {} }
-
-    fetchData(); // Load data on mount
-  }, [fetchData]);
+  // app would never load the data — leaving it stuck on the loading screen.
+  useEffect(() => {   // load the data once, on mount
+      let cancelled = false;
+      loadSiteData()
+          .then((d) => { if (!cancelled) setData(d); })
+          .catch((err) => { console.error("Detailed Fetch Error:", err); if (!cancelled) setError(err.message); })
+          .finally(() => { if (!cancelled) setLoading(false); });
+      return () => { cancelled = true; };
+  }, []);
 
   // Back / Forward: follow the tab in the URL
   useEffect(() => {
@@ -191,131 +156,25 @@ const fetchData = useCallback(async () => {
     window.history.pushState(null, '', tab === 'potential' ? window.location.pathname : `?tab=${tab}`);
   };
 
-  // --- POLLING FOR LIVE SCORES ---
+  // --- POLLING FOR LIVE SCORES (the active league's own scoring) ---
+  const activeLeagueId = lg.activeId;
   useEffect(() => {
-      if (!sleeperLeagueId || !data?.meta?.week || typeof fetchSleeperScores !== 'function') return;
-      
+      if (!activeLeagueId || !data?.meta?.week || loading) return;
       const pollScores = async () => {
-          console.log("🔄 Polling Sleeper for live scores...");
-          const scores = await fetchSleeperScores(sleeperLeagueId, data.meta.week);
+          const scores = await fetchSleeperScores(activeLeagueId, data.meta.week);
           if (scores && Object.keys(scores).length > 0) {
-              setLiveScores(prev => ({ ...prev, ...scores })); 
+              // tagged with the league, so switching leagues never shows another league's points
+              setLiveScores(prev => ({ league: activeLeagueId, scores: { ...(prev.league === activeLeagueId ? prev.scores : {}), ...scores } }));
           }
       };
-
-      if (!loading && sleeperLeagueId) {
-          pollScores(); 
-          const interval = setInterval(pollScores, 30000); 
-          return () => clearInterval(interval);
-      }
-  }, [sleeperLeagueId, data?.meta?.week, loading]);
-
-
-  const updateScoring = (key, val) => {
-    const numVal = val === '' ? 0 : parseFloat(val);
-    const newScoring = { ...scoring, [key]: numVal };
-    setScoring(newScoring);
-    localStorage.setItem('kicker_scoring', JSON.stringify(newScoring));
-  };
-  
-  const resetScoring = () => {
-    setScoring(DEFAULT_SCORING);
-    localStorage.setItem('kicker_scoring', JSON.stringify(DEFAULT_SCORING));
-  };
+      pollScores();
+      const interval = setInterval(pollScores, 30000);
+      return () => clearInterval(interval);
+  }, [activeLeagueId, data?.meta?.week, loading]);
 
   const changeWindow = (mode) => {
     setWindowMode(mode);
-    localStorage.setItem('kicker_window', mode);
-  };
-
-  const syncSleeper = async () => {
-      if (!sleeperLeagueId) return;
-      setSleeperLoading(true);
-      setSleeperScoringUpdated(false);
-      try {
-          const rostersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/rosters`);
-          if (!rostersRes.ok) throw new Error("League ID invalid or private.");
-          const rosters = await rostersRes.json();
-          
-          const leagueRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}`);
-          const leagueData = await leagueRes.json();
-          
-          const leagueName = leagueData.name || "Unknown League";
-          setSleeperLeagueName(leagueName);
-          localStorage.setItem('sleeper_league_name', leagueName);
-
-          if (leagueData.scoring_settings) {
-             const s = leagueData.scoring_settings;
-             const genMiss = s.fgmiss || 0;
-             const generic50Plus = s.fgm_50p || 5; 
-             const genericMiss50Plus = s.fgmiss_50_plus !== undefined ? s.fgmiss_50_plus : genMiss;
-
-             const newScoring = {
-                fg0_19: s.fgm_0_19 || 3, fg20_29: s.fgm_20_29 || 3, fg30_39: s.fgm_30_39 || 3, fg40_49: s.fgm_40_49 || 4,
-                fg50_59: s.fgm_50_59 !== undefined ? s.fgm_50_59 : generic50Plus,
-                fg60_plus: s.fgm_60_plus !== undefined ? s.fgm_60_plus : (s.fgm_60p !== undefined ? s.fgm_60p : generic50Plus),
-                xp_made: s.xpm || 1, xp_miss: s.xpmiss || 0,
-                fg_miss_0_19: s.fgmiss_0_19 !== undefined ? s.fgmiss_0_19 : genMiss,
-                fg_miss_20_29: s.fgmiss_20_29 !== undefined ? s.fgmiss_20_29 : genMiss,
-                fg_miss_30_39: s.fgmiss_30_39 !== undefined ? s.fgmiss_30_39 : genMiss,
-                fg_miss_40_49: s.fgmiss_40_49 !== undefined ? s.fgmiss_40_49 : genMiss,
-                fg_miss_50_59: s.fgmiss_50_59 !== undefined ? s.fgmiss_50_59 : genericMiss50Plus,
-                fg_miss_60_plus: s.fgmiss_60_plus !== undefined ? s.fgmiss_60_plus : (s.fgmiss_60p !== undefined ? s.fgmiss_60p : genericMiss50Plus),
-                fg_miss: genMiss 
-             };
-             setScoring(newScoring);
-             localStorage.setItem('kicker_scoring', JSON.stringify(newScoring));
-             setSleeperScoringUpdated(true);
-          }
-
-          let myUserId = null;
-          if (sleeperUser) {
-             const usersRes = await fetch(`https://api.sleeper.app/v1/league/${sleeperLeagueId}/users`);
-             const users = await usersRes.json();
-             const me = users.find(u => u.display_name.toLowerCase() === sleeperUser.toLowerCase());
-             if (me) myUserId = me.user_id;
-          }
-
-          const playersRes = await fetch('https://api.sleeper.app/v1/players/nfl'); 
-          const allPlayers = await playersRes.json();
-
-          const mySet = new Set();
-          const takenSet = new Set();
-          const newIdMap = {}; 
-
-          rosters.forEach(roster => {
-              const isMine = roster.owner_id === myUserId;
-              roster.players.forEach(playerId => {
-                  const player = allPlayers[playerId];
-                  if (player && player.position === 'K') {
-                      const first = player.first_name.charAt(0);
-                      const last = player.last_name;
-                      const joinName = `${first}.${last}`;
-                      
-                      newIdMap[joinName] = playerId; 
-
-                      if (isMine) mySet.add(joinName);
-                      else takenSet.add(joinName);
-                  }
-              });
-          });
-
-          setSleeperMyKickers(mySet);
-          setSleeperTakenKickers(takenSet);
-          setSleeperIdMap(newIdMap);
-          
-          localStorage.setItem('sleeper_league_id', sleeperLeagueId);
-          localStorage.setItem('sleeper_username', sleeperUser);
-          localStorage.setItem('sleeper_my_kickers', JSON.stringify(Array.from(mySet)));
-          localStorage.setItem('sleeper_taken_kickers', JSON.stringify(Array.from(takenSet)));
-          localStorage.setItem('sleeper_id_map', JSON.stringify(newIdMap));
-          
-          setSleeperLoading(false);
-      } catch (err) {
-          console.error("Sleeper Sync Failed", err);
-          setSleeperLoading(false);
-          alert(`Sync Failed: ${err.message}. Check League ID.`);
-      }
+    try { localStorage.setItem('kicker_window', mode); } catch { /* ignore */ }
   };
 
   const handleSort = (key) => {
@@ -369,6 +228,11 @@ const fetchData = useCallback(async () => {
       act: calcFPts(weekKicks(h), scoring),
     }));
 
+  const { active } = lg;
+  const myKickers = new Set(active?.myKickers || []);
+  const takenKickers = new Set(active?.takenKickers || []);
+  const live = liveScores.league === lg.activeId ? liveScores.scores : {};
+
   let processed = boardRows.map((p) => {
      const calc = calcProjection(p, windowMode, scoring, settings, baselines[p.season]);
      // this week's kicks so far (for the Accuracy tab's live view)
@@ -378,17 +242,18 @@ const fetchData = useCallback(async () => {
      const l3_proj_sum = l3_games.reduce((acc, g) => acc + g.proj, 0);
      const l3_act_sum = l3_games.reduce((acc, g) => acc + g.act, 0);
 
+     // his status in the ACTIVE league (none when no league is active)
      let sleeperStatus = null;
      const joinName = p.join_name;
-     if (sleeperMyKickers.has(joinName)) sleeperStatus = 'MY_TEAM';
-     else if (sleeperTakenKickers.has(joinName)) sleeperStatus = 'TAKEN';
-     else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
+     if (myKickers.has(joinName)) sleeperStatus = 'MY_TEAM';
+     else if (takenKickers.has(joinName)) sleeperStatus = 'TAKEN';
+     else if (active) sleeperStatus = 'FREE_AGENT';
 
      // MERGE LIVE SLEEPER SCORE
      let sleeperLive = null;
-     const sleeperId = sleeperIdMap[joinName];
-     if (sleeperId && liveScores[sleeperId] !== undefined) {
-         sleeperLive = liveScores[sleeperId];
+     const sleeperId = active?.idMap?.[joinName];
+     if (sleeperId && live[sleeperId] !== undefined) {
+         sleeperLive = live[sleeperId];
      }
 
      return {
@@ -419,7 +284,7 @@ const fetchData = useCallback(async () => {
       );
   }
 
-  if (sleeperFilter && sleeperLeagueId) {
+  if (sleeperFilter && active) {
       processed = processed.filter(p => p.sleeperStatus === 'MY_TEAM' || p.sleeperStatus === 'FREE_AGENT').sort((a, b) => {
           const aMine = a.sleeperStatus === 'MY_TEAM';
           const bMine = b.sleeperStatus === 'MY_TEAM';
@@ -485,7 +350,19 @@ const fetchData = useCallback(async () => {
           </div>
           <div className="flex flex-wrap gap-3">
              <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noopener noreferrer" className="bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 px-4 py-2 rounded flex items-center gap-2 border border-amber-500/40 transition-colors text-sm font-semibold">☕ Buy me a coffee</a>
-             <button onClick={() => goTab('settings')} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded flex items-center gap-2 border border-slate-700 transition-colors"><Settings className="w-4 h-4" /> League Settings</button>
+             {/* league switcher: every tab uses the active league's scoring + rosters */}
+             {lg.leagues.length > 0 && (
+               <label className="bg-slate-800 border border-slate-700 rounded flex items-center gap-2 pl-3 pr-1 text-white">
+                 <Gamepad2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                 <span className="sr-only">Active league</span>
+                 <select value={lg.activeId} onChange={(e) => lg.switchLeague(e.target.value)} className="bg-transparent py-2 pr-1 text-sm font-semibold focus:outline-none max-w-[190px] cursor-pointer">
+                   {lg.leagues.map((l) => <option key={l.id} value={l.id} className="bg-slate-900">{l.name}</option>)}
+                   <option value="" className="bg-slate-900">Custom scoring</option>
+                 </select>
+                 {lg.busy === lg.activeId && lg.activeId && <Loader2 className="w-3 h-3 animate-spin text-slate-400" />}
+               </label>
+             )}
+             <button onClick={() => goTab('settings')} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded flex items-center gap-2 border border-slate-700 transition-colors"><Settings className="w-4 h-4" /> {lg.leagues.length ? 'League Settings' : 'Add your Sleeper league'}</button>
              <div className="bg-slate-900 border border-slate-800 rounded-lg p-2 flex items-center gap-3 shadow-sm px-4"><div className="text-right"><div className="text-[10px] text-slate-500 uppercase font-bold">Last Update</div><div className="text-xs font-semibold text-white">{meta.updated} (Week {meta.week})</div></div></div>
           </div>
         </div>
@@ -499,14 +376,14 @@ const fetchData = useCallback(async () => {
           <button onClick={() => goTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
         </div>
 
-        {activeTab === 'settings' && ( <SettingsTab scoring={scoring} updateScoring={updateScoring} resetScoring={resetScoring} sleeperLeagueId={sleeperLeagueId} setSleeperLeagueId={setSleeperLeagueId} sleeperUser={sleeperUser} setSleeperUser={setSleeperUser} syncSleeper={syncSleeper} sleeperLoading={sleeperLoading} sleeperScoringUpdated={sleeperScoringUpdated} sleeperMyKickers={sleeperMyKickers} sleeperLeagueName={sleeperLeagueName} windowMode={windowMode} setWindowMode={changeWindow}/> )}
+        {activeTab === 'settings' && ( <SettingsTab lg={lg} season={data.season} windowMode={windowMode} setWindowMode={changeWindow}/> )}
 
         {activeTab === 'potential' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4 justify-between">
                 <div className="relative flex-1 min-w-[200px] max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" /><input type="text" placeholder="(e.g. Aubrey, Cowboys, Dome)" className="w-full bg-slate-900 border border-slate-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-blue-500 focus:outline-none placeholder:text-slate-600" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                 <div className="flex items-center gap-4 flex-wrap">
-                    {sleeperMyKickers.size > 0 && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><Bot className="w-3 h-3"/> Sleeper Status</button> )}
+                    {active && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} title={`Only your kicker(s) and free agents in ${active.name}`} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><Bot className="w-3 h-3"/> My team + free agents</button> )}
                     <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
                     <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 80% Own</label>
                     <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 60% Own</label>
@@ -540,10 +417,7 @@ const fetchData = useCallback(async () => {
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {processed.map((row, idx) => {
-                     let sleeperStatus = null;
-                     if (sleeperMyKickers.has(row.join_name)) sleeperStatus = 'MY_TEAM';
-                     else if (sleeperTakenKickers.has(row.join_name)) sleeperStatus = 'TAKEN';
-                     else if (sleeperLeagueId) sleeperStatus = 'FREE_AGENT';
+                     const { sleeperStatus } = row;
                      const isDimmed = sleeperFilter && sleeperStatus === 'TAKEN';
                      return (
                         <React.Fragment key={idx}>
@@ -571,7 +445,7 @@ const fetchData = useCallback(async () => {
           </div>
         )}
         
-        {activeTab === 'accuracy' && <AccuracyTab history={history} season={data.season} week={meta.week} players={processed} scoring={scoring} windowMode={windowMode} sleeperLeagueId={sleeperLeagueId} leagueBaselines={baselines} />}
+        {activeTab === 'accuracy' && <AccuracyTab history={history} season={data.season} week={meta.week} players={processed} scoring={scoring} windowMode={windowMode} sleeperLeagueId={lg.activeId} leagueBaselines={baselines} />}
         
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
