@@ -315,6 +315,7 @@ const fetchData = useCallback(async () => {
 
   const { rankings, ytd, injuries, meta, history = [] } = data;
   const settings = meta?.model_settings || {};
+  const baselines = meta?.league_baselines || {};   // average kicker-game per season (league pull)
   const winLabel = windowMode.toUpperCase();
   const leagueAvgs = meta?.[`league_avgs_${windowMode}`] || {};
 
@@ -347,12 +348,12 @@ const fetchData = useCallback(async () => {
     .map(h => ({
       week: h.week,
       opp: h.opponent,
-      proj: calcProjection(h, windowMode, scoring, h.model_settings || settings).proj,
+      proj: calcProjection(h, windowMode, scoring, h.model_settings || settings, baselines[h.season]).proj,
       act: calcFPts(weekKicks(h), scoring),
     }));
 
   let processed = boardRows.map((p) => {
-     const calc = calcProjection(p, windowMode, scoring, settings);
+     const calc = calcProjection(p, windowMode, scoring, settings, baselines[p.season]);
      // this week's kicks so far (for the Accuracy tab's live view)
      const thisWeek = (snapshotsByKicker.get(p.gsis_id) || []).find(h => h.week === meta.week);
 
@@ -408,8 +409,8 @@ const fetchData = useCallback(async () => {
           if (aMine && !bMine) return -1;
           if (!aMine && bMine) return 1;
           
-          let valA = a[sortConfig.key];
-          let valB = b[sortConfig.key];
+          let valA = sortConfig.key === 'proj' ? (a.calc?.raw ?? a.proj) : a[sortConfig.key];
+          let valB = sortConfig.key === 'proj' ? (b.calc?.raw ?? b.proj) : b[sortConfig.key];
           if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
           if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
           if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -417,8 +418,8 @@ const fetchData = useCallback(async () => {
       });
   } else {
      processed.sort((a, b) => {
-         let valA = a[sortConfig.key];
-         let valB = b[sortConfig.key];
+         let valA = sortConfig.key === 'proj' ? (a.calc?.raw ?? a.proj) : a[sortConfig.key];
+         let valB = sortConfig.key === 'proj' ? (b.calc?.raw ?? b.proj) : b[sortConfig.key];
          if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
          if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
          if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -553,7 +554,7 @@ const fetchData = useCallback(async () => {
           </div>
         )}
         
-        {activeTab === 'accuracy' && <AccuracyTab history={history} season={data.season} week={meta.week} players={processed} scoring={scoring} windowMode={windowMode} sleeperLeagueId={sleeperLeagueId} />}
+        {activeTab === 'accuracy' && <AccuracyTab history={history} season={data.season} week={meta.week} players={processed} scoring={scoring} windowMode={windowMode} sleeperLeagueId={sleeperLeagueId} leagueBaselines={baselines} />}
         
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">

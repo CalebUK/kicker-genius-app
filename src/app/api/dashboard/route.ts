@@ -22,10 +22,13 @@ export async function GET() {
         if (!site) throw new Error('site_meta is empty (no cloud push yet)');
         const { season, week } = site;
 
-        const [rows, settingsRows, history] = await Promise.all([
+        const [rows, settingsRows, history, baselines] = await Promise.all([
             query('SELECT * FROM matchup_inputs_weekly WHERE season = $1 AND week = $2 ORDER BY kicker_name;', [season, week]),
             query<{ key: string; value: number }>('SELECT key, value FROM model_settings;'),
             query('SELECT * FROM projection_results_weekly WHERE season = $1 ORDER BY week, kicker_name;', [season]),
+            // the average kicker-game per season (3 prior seasons) -- the model's league pull.
+            // Missing until the first push after v2 build 1 adds it: then there's simply no pull.
+            query('SELECT * FROM league_baseline;').catch(() => []),
         ]);
 
         const leagueAvgs = (sfx: string) => {
@@ -48,6 +51,7 @@ export async function GET() {
                 league_avgs_l3: leagueAvgs('l3'),
                 league_avgs_l5: leagueAvgs('l5'),
                 model_settings: Object.fromEntries(settingsRows.map((r) => [r.key, r.value])),
+                league_baselines: Object.fromEntries(baselines.map((b) => [String(b.season), b])),
             },
             rankings: rows.filter((r) => !HIDDEN_STATUSES.has(r.injury_status as string)),
             injuries: rows.filter((r) => r.injury_status),

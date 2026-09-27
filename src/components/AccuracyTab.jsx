@@ -287,7 +287,7 @@ const SeasonTable = ({ games }) => {
   );
 };
 
-const AccuracyTab = ({ history, season, week, players, scoring, windowMode, sleeperLeagueId }) => {
+const AccuracyTab = ({ history, season, week, players, scoring, windowMode, sleeperLeagueId, leagueBaselines }) => {
   const [selSeason, setSelSeason] = useState(season);
   const [selWeek, setSelWeek] = useState(week);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -310,7 +310,7 @@ const AccuracyTab = ({ history, season, week, players, scoring, windowMode, slee
     const today = new Date().toISOString().slice(0, 10);
     const live = new Map(players.map(p => [p.gsis_id, p]));
     return rows.map(h => {
-      const c = calcProjection(h, windowMode, scoring, h.model_settings);
+      const c = calcProjection(h, windowMode, scoring, h.model_settings, leagueBaselines?.[h.season]);
       const current = h.season === season && h.week === week ? live.get(h.gsis_id) : null;
       const sleeper = current?.sleeper_live_score;
       let status = 'UPCOMING', actual = null;
@@ -324,7 +324,7 @@ const AccuracyTab = ({ history, season, week, players, scoring, windowMode, slee
         actual, status, usingSleeper: status === 'LIVE',
       };
     });
-  }, [rows, players, scoring, windowMode, season, week]);
+  }, [rows, players, scoring, windowMode, season, week, leagueBaselines]);
 
   const weeks = useMemo(() => [...new Set(games.map(g => g.week))].sort((a, b) => b - a), [games]);
   const inView = selWeek === ALL ? games : games.filter(g => g.week === selWeek);

@@ -205,6 +205,12 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
             <div><div className="flex justify-between text-xs text-slate-300"><span>Base ({wLabel(c.wb)})</span><span className="font-mono text-white">{f1(c.base * c.wb)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(c.avg)} (Season Avg) × {f2(c.mult)} (Mult) = {f1(c.base)}</div></div>
             <div><div className="flex justify-between text-xs text-slate-300"><span>Offense ({wLabel(c.wo)})</span><span className="font-mono text-white">{f1(c.off * c.wo)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(player.exp_team_pts)} (Exp Pts) × {pctOf(player.off_share)} (Share) × {f2(c.ratio)} (Fan/Real) = {f1(c.off)}</div></div>
             <div><div className="flex justify-between text-xs text-slate-300"><span>Defense ({wLabel(c.wd)})</span><span className="font-mono text-white">{f1(c.def * c.wd)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(player.exp_opp_allowed)} (Exp Allowed) × {pctOf(player.def_share)} (Share) × {f2(c.ratio)} (Fan/Real) = {f1(c.def)}</div></div>
+            {c.lg != null && c.pull !== 1 && (
+              <div className="border-t border-slate-800 pt-1">
+                <div className="flex justify-between text-xs text-slate-300"><span>League pull</span><span className="font-mono text-white">{f1(c.model)} → {f1(c.raw)}</span></div>
+                <div className="text-[9px] text-slate-500 leading-tight">Keeps {Math.round(c.pull * 100)}% of the gap from the average kicker ({f1(c.lg)}). Kicker scoring is very random, so this makes the points more realistic without changing the order.</div>
+              </div>
+            )}
             <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white text-[11px]"><span>Week {week} Projection</span><span className="text-emerald-400 text-lg">{player.proj}</span></div><div className="text-[9px] text-right text-slate-500">({f2(c.raw)} rounded)</div></div>
           </div>
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50"><div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between"><div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> Last 3 Trend</div><span className={`text-[10px] font-mono ${trendColor}`}>{trendSign}{l3_diff.toFixed(1)}</span></div><HistoryBars games={player.history?.l3_games} /></div>

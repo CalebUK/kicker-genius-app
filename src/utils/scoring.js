@@ -59,8 +59,12 @@ export const weekKicks = (r) => ({
  *   Base    = season avg fantasy pts x multiplier
  *   Offense = expected team pts x real-point share x fantasy/real ratio
  *   Defense = expected opp pts allowed x real-point share x fantasy/real ratio
+ * Then pulled toward the league average: final = lg + league_pull x (model - lg),
+ * where lg = the average kicker-game over the 3 prior seasons (`baseline`: kick
+ * buckets per game from league_baseline) scored in the user's settings.
+ * No baseline or no league_pull -> no pull.
  */
-export const calcProjection = (p, w, scoring, settings) => {
+export const calcProjection = (p, w, scoring, settings, baseline) => {
   const fptsSeason = calcFPts(p, scoring);
   const realSeason = calcRealPts(p);
   const games = Number(p.games_played) || 0;
@@ -73,8 +77,11 @@ export const calcProjection = (p, w, scoring, settings) => {
   const wb = Number(settings?.weight_base ?? 0.5);
   const wo = Number(settings?.weight_offense ?? 0.3);
   const wd = Number(settings?.weight_defense ?? 0.2);
-  const raw = wb * base + wo * off + wd * def;
-  return { proj: Math.round(raw), raw, avg, ratio, mult, base, off, def, fptsSeason, wb, wo, wd };
+  const model = wb * base + wo * off + wd * def;
+  const pull = Number(settings?.league_pull ?? 1);
+  const lg = baseline ? calcFPts(baseline, scoring) : null;
+  const raw = lg == null ? model : lg + pull * (model - lg);
+  return { proj: Math.round(raw), raw, model, lg, pull, avg, ratio, mult, base, off, def, fptsSeason, wb, wo, wd };
 };
 
 export const calculateLiveScore = (p, scoring) => {
