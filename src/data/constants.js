@@ -1,7 +1,7 @@
 export const BUY_ME_A_COFFEE_URL = "https://buymeacoffee.com/calebhill";
 
 export const GLOSSARY_DATA = [
-  { header: "Grade", title: "Matchup Grade", desc: "Composite score (Baseline 90) combining Stall Rates, Weather, and History. >100 is elite.", why: "Predictive Model", source: "Kicker Genius Model" },
+  { header: "Grade", title: "Matchup Grade", desc: "His offense's red-zone stall rate and the opponent defense's stall rate, each scored 40 for a league-average team, plus bonuses: Dome +10, Cold −20 (outdoors, 40°F or below). Divided by 90 to make the projection multiplier.", why: "Predictive Model", source: "Kicker Genius Model" },
   { header: "Proj Pts", title: "Projected Points", desc: "Forecasted score based on Kicker's Average adjusted by Grade, Vegas lines, and Scoring Caps.", why: "Start/Sit Decision", source: "Kicker Genius Model" },
   { header: "Rounding", title: "No Fractional Points", desc: "At Kicker Genius we don't believe in fractional points for Kickers. If a kicker can't get 9.4 points we shouldn't project it. .4 and below will be rounded down and .5 and above will be rounded up.", why: "Realism", source: "Kicker Genius Model" },
   { header: "Proj Acc", title: "Projection Accuracy (L3)", desc: "Total Actual Points vs Total Projected Points over the last 3 weeks.", why: "Model Trust Check", source: "Historical Backtest" },

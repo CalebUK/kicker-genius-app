@@ -159,6 +159,13 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   );
 };
 
+// Readable names for the grade bonuses/penalties (the `bonuses` jsonb from the model view)
+const bonusLabel = (name, player, settings) => {
+  if (name === 'dome') return 'Dome';
+  if (name === 'cold') return `Cold (${player.temp_f ?? '?'}°F, ${settings?.cold_temp_max ?? 40}°F or below)`;
+  return name.charAt(0).toUpperCase() + name.slice(1);
+};
+
 // The projection worksheet (MODEL_SPEC.md): grade on the left, 50/30/20 on the right.
 // Numbers come from player.calc (calcProjection) + the database's ingredients.
 export const MathCard = ({ player, leagueAvgs, week, settings }) => {
@@ -190,7 +197,7 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
             <div><div className="flex justify-between text-xs text-slate-300"><span>Offense Score</span><span className="font-mono text-white">{f1(player.off_score_val)}</span></div><div className="text-[9px] text-slate-500">({f1(player.off_stall_rate)}% / {f1(lgOffStall)}% lg) × {scale}</div></div>
             <div><div className="flex justify-between text-xs text-slate-300"><span>Defense Score</span><span className="font-mono text-white">{f1(player.def_score_val)}</span></div><div className="text-[9px] text-slate-500">({f1(player.def_stall_rate)}% / {f1(lgDefStall)}% lg) × {scale}</div></div>
-            <div className="border-t border-slate-800 pt-1"><div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div><div className="text-emerald-400 text-[10px] space-y-0.5">{bonuses.length > 0 ? bonuses.map(([name, val]) => <div key={name} className="flex justify-between"><span className="capitalize">{name}</span><span className="font-mono">{val > 0 ? '+' : ''}{val}</span></div>) : <div className="text-slate-600 italic">None</div>}</div></div>
+            <div className="border-t border-slate-800 pt-1"><div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div><div className="text-[10px] space-y-0.5">{bonuses.length > 0 ? bonuses.map(([name, val]) => <div key={name} className={`flex justify-between ${val < 0 ? 'text-red-400' : 'text-emerald-400'}`}><span>{bonusLabel(name, player, settings)}</span><span className="font-mono">{val > 0 ? '+' : ''}{val}</span></div>) : <div className="text-slate-600 italic">None</div>}</div></div>
             <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white"><span>Total Grade</span><span>{f1(player.grade)}</span></div><div className="flex justify-between text-[10px] text-blue-400 mt-1"><span>Week {week} Multiplier (÷{divisor})</span><span className="font-mono font-bold">{f2(c.mult)}x</span></div></div>
           </div>
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">

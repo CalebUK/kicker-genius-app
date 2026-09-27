@@ -47,7 +47,8 @@ const toBoardRow = (r, w) => {
     team_prior_games: r[`team_prior_games_${w}`] || 0,
     opp_prior_games: r[`opp_prior_games_${w}`] || 0,
     vegas: r.vegas_implied,
-    weather_desc: r.weather_desc || (r.is_dome ? 'Dome' : '—'),
+    // kickoff temperature (forecast before the game, actual after) -- drives the cold penalty
+    weather_desc: `${r.weather_desc || (r.is_dome ? 'Dome' : '—')}${!r.is_dome && r.temp_f != null ? ` ${r.temp_f}°F` : ''}`,
     details_vegas_total: r.total_line,
     details_vegas_spread: spread == null ? '' : `${spread > 0 ? '+' : ''}${Number(spread).toFixed(1)}`,
     injury_details: r.practice_status || '',
