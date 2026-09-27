@@ -62,12 +62,17 @@ export const weekKicks = (r) => ({
  * Then pulled toward the league average: final = lg + league_pull x (model - lg),
  * where lg = the average kicker-game over the 3 prior seasons (`baseline`: kick
  * buckets per game from league_baseline) scored in the user's settings.
- * No baseline or no league_pull -> no pull.
+ * No baseline or no league_pull -> no pull. The same baseline tops up the season
+ * average of a kicker with too few games of his own (p.lg_games_used).
  */
 export const calcProjection = (p, w, scoring, settings, baseline) => {
-  const fptsSeason = calcFPts(p, scoring);
-  const realSeason = calcRealPts(p);
-  const games = Number(p.games_played) || 0;
+  const lg = baseline ? calcFPts(baseline, scoring) : null;
+  // fewer than min_games_base games of his own (rookies, long layoffs)? the database
+  // tops him up with league-average kicker-games (lg_games_used) -- same here, in the user's scoring
+  const lgGames = lg == null ? 0 : Number(p.lg_games_used) || 0;
+  const fptsSeason = calcFPts(p, scoring) + lgGames * (lg ?? 0);
+  const realSeason = calcRealPts(p) + lgGames * (baseline ? calcRealPts(baseline) : 0);
+  const games = (Number(p.games_played) || 0) + lgGames;
   const avg = games > 0 ? fptsSeason / games : 0;
   const ratio = realSeason > 0 ? fptsSeason / realSeason : 1;   // replaces the old flat x1.2
   const mult = Number(p[`multiplier_${w}`]) || 0;
@@ -79,9 +84,8 @@ export const calcProjection = (p, w, scoring, settings, baseline) => {
   const wd = Number(settings?.weight_defense ?? 0.2);
   const model = wb * base + wo * off + wd * def;
   const pull = Number(settings?.league_pull ?? 1);
-  const lg = baseline ? calcFPts(baseline, scoring) : null;
   const raw = lg == null ? model : lg + pull * (model - lg);
-  return { proj: Math.round(raw), raw, model, lg, pull, avg, ratio, mult, base, off, def, fptsSeason, wb, wo, wd };
+  return { proj: Math.round(raw), raw, model, lg, pull, avg, ratio, mult, base, off, def, fptsSeason, lgGames, wb, wo, wd };
 };
 
 export const calculateLiveScore = (p, scoring) => {
