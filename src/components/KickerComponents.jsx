@@ -138,7 +138,7 @@ export const KickerCard = ({ row, rank, expanded, onToggle, highlight, children 
   const l3Good = (row.l3_act_sum ?? 0) >= (row.l3_proj_sum ?? 0);
   const rz = (kp, stall) => (kp != null ? f1(kp) : `${stall ?? '–'}%`);
   return (
-    <div className={highlight ? 'bg-purple-900/20' : ''}>
+    <div className={`${highlight ? 'bg-purple-950' : 'bg-slate-900'} ${expanded ? 'sm:col-span-2' : ''}`}>
       <button type="button" onClick={onToggle} aria-expanded={expanded} className="w-full text-left px-3 py-3 flex gap-3 active:bg-slate-800/60 transition-colors">
         <div className="flex flex-col items-center gap-1 w-12 shrink-0">
           {imgError || !url ? <HelmetIcon borderColor={ring} /> : <img src={url} alt={row.kicker_player_name} className={`w-12 h-12 rounded-full border-2 object-cover ${ring}`} onError={() => setImgError(true)} />}
@@ -181,7 +181,7 @@ export const YtdCard = ({ row, rank }) => {
   const url = photoUrl(row);
   const n = (x) => (x == null || Number.isNaN(Number(x)) ? '–' : x);
   return (
-    <div className="px-3 py-3 flex gap-3">
+    <div className="px-3 py-3 flex gap-3 bg-slate-900">
       <div className="flex flex-col items-center gap-1 w-12 shrink-0">
         {imgError || !url ? <HelmetIcon borderColor="border-slate-600" /> : <img src={url} alt={row.kicker_player_name} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={() => setImgError(true)} />}
         <span className="text-[10px] font-mono text-slate-500">#{rank}</span>

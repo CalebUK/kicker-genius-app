@@ -110,12 +110,12 @@ const sortFor = (tab, s) => {
   return keys.includes(s.key) ? s : { key: fallback, direction: 'desc' };
 };
 
-// A main tab. Phones: a filled pill with a short name (the grid shows all 6 at once);
-// 640px+: the full name, underlined when active.
+// A main tab. Below 1024px: a filled pill with a short name (all 6 always visible);
+// 1024px+: the full name, underlined when active.
 const TabButton = ({ active, underline, icon: Icon, short, long, badge, onClick }) => (
-  <button onClick={onClick} className={`flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 py-2 sm:pt-0 sm:pb-3 px-2 sm:px-4 text-xs sm:text-sm font-bold whitespace-nowrap rounded-lg sm:rounded-none transition-colors ${active ? `text-white bg-slate-800 sm:bg-transparent sm:border-b-2 ${underline}` : 'text-slate-500 bg-slate-900/60 sm:bg-transparent hover:text-slate-300'}`}>
+  <button onClick={onClick} className={`flex items-center justify-center lg:justify-start gap-1.5 lg:gap-2 py-2 lg:pt-0 lg:pb-3 px-2 lg:px-4 text-xs lg:text-sm font-bold whitespace-nowrap rounded-lg lg:rounded-none transition-colors ${active ? `text-white bg-slate-800 lg:bg-transparent lg:border-b-2 ${underline}` : 'text-slate-500 bg-slate-900/60 lg:bg-transparent hover:text-slate-300'}`}>
     <Icon className="w-4 h-4 shrink-0" />
-    <span className="sm:hidden">{short}</span><span className="hidden sm:inline">{long}</span>
+    <span className="lg:hidden">{short}</span><span className="hidden lg:inline">{long}</span>
     {badge}
   </button>
 );
@@ -419,15 +419,15 @@ const App = () => {
           </div>
         </div>
 
-        {/* tabs: a 3x2 grid of short names on phones, one underlined row from 640px */}
-        <div className="grid grid-cols-3 gap-1 mb-5 sm:flex sm:gap-4 sm:mb-6 sm:border-b sm:border-slate-800 sm:pb-1 sm:overflow-x-auto">
-          <TabButton active={activeTab === 'potential'} underline="sm:border-emerald-500" icon={TrendingUp} short="Model" long={`Week ${meta.week} Model`} onClick={() => { goTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} />
-          <TabButton active={activeTab === 'accuracy'} underline="sm:border-purple-500" icon={Target} short="Accuracy" long={`Week ${meta.week} Accuracy`} onClick={() => goTab('accuracy')} />
-          <TabButton active={activeTab === 'ytd'} underline="sm:border-blue-500" icon={Activity} short="YTD" long="Historical YTD" onClick={() => { goTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} />
-          <TabButton active={activeTab === 'ask'} underline="sm:border-sky-400" icon={MessageCircleQuestionMark} short="Ask" long="Ask" onClick={() => goTab('ask')} />
-          <TabButton active={activeTab === 'injuries'} underline="sm:border-red-500" icon={Stethoscope} short="Injuries" long="Injury Report" onClick={() => goTab('injuries')}
+        {/* tabs: short-name pills (3x2 on phones, 6 across on foldables/tablets); full underlined names from 1024px (they need ~920px) */}
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 mb-5 lg:flex lg:gap-2 lg:mb-6 lg:border-b lg:border-slate-800 lg:pb-1 lg:overflow-x-auto">
+          <TabButton active={activeTab === 'potential'} underline="lg:border-emerald-500" icon={TrendingUp} short="Model" long={`Week ${meta.week} Model`} onClick={() => { goTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} />
+          <TabButton active={activeTab === 'accuracy'} underline="lg:border-purple-500" icon={Target} short="Accuracy" long={`Week ${meta.week} Accuracy`} onClick={() => goTab('accuracy')} />
+          <TabButton active={activeTab === 'ytd'} underline="lg:border-blue-500" icon={Activity} short="YTD" long="Historical YTD" onClick={() => { goTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} />
+          <TabButton active={activeTab === 'ask'} underline="lg:border-sky-400" icon={MessageCircleQuestionMark} short="Ask" long="Ask" onClick={() => goTab('ask')} />
+          <TabButton active={activeTab === 'injuries'} underline="lg:border-red-500" icon={Stethoscope} short="Injuries" long="Injury Report" onClick={() => goTab('injuries')}
             badge={injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>} />
-          <TabButton active={activeTab === 'glossary'} underline="sm:border-purple-500" icon={BookOpen} short="Legend" long="Stats Legend" onClick={() => goTab('glossary')} />
+          <TabButton active={activeTab === 'glossary'} underline="lg:border-purple-500" icon={BookOpen} short="Legend" long="Stats Legend" onClick={() => goTab('glossary')} />
         </div>
 
         {activeTab === 'settings' && ( <SettingsTab lg={lg} season={data.season} windowMode={windowMode} setWindowMode={changeWindow}/> )}
@@ -454,13 +454,13 @@ const App = () => {
                 </div>
              </div>
              {/* PHONES: a card per kicker; tap for the worksheet */}
-             <div className="md:hidden divide-y divide-slate-800">
+             <div className="md:hidden grid sm:grid-cols-2 gap-px bg-slate-800">
                {processed.map((row, idx) => (
                  <KickerCard key={row.gsis_id || idx} row={row} rank={idx + 1} expanded={expandedRow === idx} onToggle={() => toggleRow(idx)} highlight={row.sleeperStatus === 'MY_TEAM' && hideTaken}>
                    <MathCard player={row} leagueAvgs={leagueAvgs} week={meta.week} settings={settings} />
                  </KickerCard>
                ))}
-               {processed.length === 0 && <div className="p-8 text-center text-sm text-slate-500">No kickers match.</div>}
+               {processed.length === 0 && <div className="p-8 text-center text-sm text-slate-500 bg-slate-900 sm:col-span-2">No kickers match.</div>}
              </div>
              {/* TABLETS + COMPUTERS: the full table */}
              <div className="hidden md:block overflow-x-auto">
@@ -531,7 +531,7 @@ const App = () => {
                    </select>
                  </label>
                </div>
-               <div className="divide-y divide-slate-800">
+               <div className="grid sm:grid-cols-2 gap-px bg-slate-800">
                  {ytdSorted.map((row, idx) => <YtdCard key={row.gsis_id || idx} row={row} rank={idx + 1} />)}
                </div>
              </div>
