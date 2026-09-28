@@ -8,7 +8,7 @@ import { BUY_ME_A_COFFEE_URL } from '../data/constants';
 import useLeagues from '../utils/useLeagues';
 import { buildInsight } from '../utils/insights';
 import { calcFPts, calcProjection, weekKicks, fetchSleeperScores } from '../utils/scoring';
-import { HeaderCell, PlayerCell, DeepDiveRow, Hint } from '../components/KickerComponents';
+import { HeaderCell, PlayerCell, DeepDiveRow, Hint, KickerCard, MathCard } from '../components/KickerComponents';
 import AccuracyTab from '../components/AccuracyTab';
 import SettingsTab from '../components/SettingsTab';
 import InjuryReportTab from '../components/InjuryReportTab';
@@ -100,6 +100,16 @@ const loadSiteData = async () => {
 };
 
 const TABS = ['potential', 'accuracy', 'ytd', 'ask', 'injuries', 'glossary', 'settings'];
+
+// A main tab. Phones: a filled pill with a short name (the grid shows all 6 at once);
+// 640px+: the full name, underlined when active.
+const TabButton = ({ active, underline, icon: Icon, short, long, badge, onClick }) => (
+  <button onClick={onClick} className={`flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 py-2 sm:pt-0 sm:pb-3 px-2 sm:px-4 text-xs sm:text-sm font-bold whitespace-nowrap rounded-lg sm:rounded-none transition-colors ${active ? `text-white bg-slate-800 sm:bg-transparent sm:border-b-2 ${underline}` : 'text-slate-500 bg-slate-900/60 sm:bg-transparent hover:text-slate-300'}`}>
+    <Icon className="w-4 h-4 shrink-0" />
+    <span className="sm:hidden">{short}</span><span className="hidden sm:inline">{long}</span>
+    {badge}
+  </button>
+);
 function tabFromUrl() {
   if (typeof window === 'undefined') return 'potential';
   const tab = new URLSearchParams(window.location.search).get('tab');
@@ -352,7 +362,9 @@ const App = () => {
       const pts = calcFPts(p, scoring);
       const pct = (p.fg_att > 0 ? (p.fg_made / p.fg_att * 100) : 0);
       const longMakes = (p.fg_50_59 || 0) + (p.fg_60_plus || 0);
-      return { ...p, fpts: pts, avg_fpts: (p.games > 0 ? (pts/p.games) : 0), pct_val: pct, pct: pct.toFixed(1), longs: longMakes };
+      return { ...p, fpts: pts, avg_fpts: (p.games > 0 ? (pts/p.games) : 0), pct_val: pct, pct: pct.toFixed(1), longs: longMakes,
+        season_pts: pts, season_games: Number(p.games) || 0, season_avg: p.games > 0 ? pts / p.games : 0,
+        ytdRank: ytdRankMap.get(p.gsis_id), ppgRank: ppgRankMap.get(p.gsis_id), season_kickers: ytd.length };
   }).sort((a, b) => {
       let key = sortConfig.key;
       if (key === 'pct') key = 'pct_val';
@@ -370,10 +382,10 @@ const App = () => {
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        <div className="mb-5 sm:mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-2"><img src="/assets/logo.png" alt="KickerGenius" className="w-12 h-12 object-contain" /><h1 className="text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
-            <p className="text-slate-400 ml-1">Advanced Stall Rate Analytics & Fantasy Projections</p>
+            <div className="flex items-center gap-3 sm:mb-2"><img src="/assets/logo.png" alt="KickerGenius" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" /><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
+            <p className="hidden sm:block text-slate-400 ml-1">Advanced Stall Rate Analytics & Fantasy Projections</p>
           </div>
           {/* compact controls: one line (beside the title on wide screens, under it otherwise) */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -395,13 +407,15 @@ const App = () => {
           </div>
         </div>
 
-        <div className="flex gap-4 mb-6 border-b border-slate-800 pb-1 overflow-x-auto">
-          <button onClick={() => { goTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'potential' ? 'text-white border-b-2 border-emerald-500' : 'text-slate-500'}`}><TrendingUp className="w-4 h-4"/> Week {meta.week} Model</button>
-          <button onClick={() => goTab('accuracy')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'accuracy' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><Target className="w-4 h-4"/> Week {meta.week} Accuracy</button>
-          <button onClick={() => { goTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ytd' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500'}`}><Activity className="w-4 h-4"/> Historical YTD</button>
-          <button onClick={() => goTab('ask')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'ask' ? 'text-white border-b-2 border-sky-400' : 'text-slate-500'}`}><MessageCircleQuestionMark className="w-4 h-4"/> Ask</button>
-          <button onClick={() => goTab('injuries')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'injuries' ? 'text-white border-b-2 border-red-500' : 'text-slate-500'}`}><Stethoscope className="w-4 h-4"/> Injury Report {injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>}</button>
-          <button onClick={() => goTab('glossary')} className={`pb-3 px-4 text-sm font-bold whitespace-nowrap flex items-center gap-2 ${activeTab === 'glossary' ? 'text-white border-b-2 border-purple-500' : 'text-slate-500'}`}><BookOpen className="w-4 h-4"/> Stats Legend</button>
+        {/* tabs: a 3x2 grid of short names on phones, one underlined row from 640px */}
+        <div className="grid grid-cols-3 gap-1 mb-5 sm:flex sm:gap-4 sm:mb-6 sm:border-b sm:border-slate-800 sm:pb-1 sm:overflow-x-auto">
+          <TabButton active={activeTab === 'potential'} underline="sm:border-emerald-500" icon={TrendingUp} short="Model" long={`Week ${meta.week} Model`} onClick={() => { goTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} />
+          <TabButton active={activeTab === 'accuracy'} underline="sm:border-purple-500" icon={Target} short="Accuracy" long={`Week ${meta.week} Accuracy`} onClick={() => goTab('accuracy')} />
+          <TabButton active={activeTab === 'ytd'} underline="sm:border-blue-500" icon={Activity} short="YTD" long="Historical YTD" onClick={() => { goTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} />
+          <TabButton active={activeTab === 'ask'} underline="sm:border-sky-400" icon={MessageCircleQuestionMark} short="Ask" long="Ask" onClick={() => goTab('ask')} />
+          <TabButton active={activeTab === 'injuries'} underline="sm:border-red-500" icon={Stethoscope} short="Injuries" long="Injury Report" onClick={() => goTab('injuries')}
+            badge={injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>} />
+          <TabButton active={activeTab === 'glossary'} underline="sm:border-purple-500" icon={BookOpen} short="Legend" long="Stats Legend" onClick={() => goTab('glossary')} />
         </div>
 
         {activeTab === 'settings' && ( <SettingsTab lg={lg} season={data.season} windowMode={windowMode} setWindowMode={changeWindow}/> )}
@@ -411,12 +425,33 @@ const App = () => {
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4 justify-between">
                 <div className="relative flex-1 min-w-[200px] max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" /><input type="text" placeholder="(e.g. Aubrey, Cowboys, Dome)" className="w-full bg-slate-900 border border-slate-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-blue-500 focus:outline-none placeholder:text-slate-600" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                 <div className="flex items-center gap-4 flex-wrap">
+                    {/* phones have no column headers to tap, so sort from here */}
+                    <label className="md:hidden flex items-center gap-2 text-sm text-slate-400">Sort
+                      <select value={sortConfig.key} onChange={(e) => setSortConfig({ key: e.target.value, direction: 'desc' })} className="bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <option value="proj">Projection</option>
+                        <option value="grade">Matchup grade</option>
+                        <option value="vegas">Vegas implied</option>
+                        <option value="off_rz_kp">Offense red zone</option>
+                        <option value="def_rz_kp">Opponent red zone</option>
+                        <option value="proj_acc">Last 3 vs projected</option>
+                      </select>
+                    </label>
                     <Hint side="left" text={active ? `Hide kickers on other teams in ${active.name} (yours stay, listed first)` : 'Add a Sleeper league in League Settings to hide kickers who are already taken'}>
                       <label className={`flex items-center gap-2 text-sm ${active ? 'text-slate-300 cursor-pointer hover:text-white' : 'text-slate-600 cursor-not-allowed'}`}><input type="checkbox" disabled={!active} checked={hideTaken && !!active} onChange={(e) => setHideTaken(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide taken</label>
                     </Hint>
                 </div>
              </div>
-             <div className="overflow-x-auto">
+             {/* PHONES: a card per kicker; tap for the worksheet */}
+             <div className="md:hidden divide-y divide-slate-800">
+               {processed.map((row, idx) => (
+                 <KickerCard key={row.gsis_id || idx} row={row} rank={idx + 1} expanded={expandedRow === idx} onToggle={() => toggleRow(idx)} highlight={row.sleeperStatus === 'MY_TEAM' && hideTaken}>
+                   <MathCard player={row} leagueAvgs={leagueAvgs} week={meta.week} settings={settings} />
+                 </KickerCard>
+               ))}
+               {processed.length === 0 && <div className="p-8 text-center text-sm text-slate-500">No kickers match.</div>}
+             </div>
+             {/* TABLETS + COMPUTERS: the full table */}
+             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
@@ -468,12 +503,13 @@ const App = () => {
         
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+             <div className="md:hidden px-4 py-2 text-[11px] text-slate-500 border-b border-slate-800">Swipe the table sideways for more stats →</div>
              <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="px-6 py-3 align-middle text-center">Rank</th>
-                    <th className="px-6 py-3 align-middle text-left">Player</th>
+                    <th className="px-3 md:px-6 py-3 align-middle text-center">Rank</th>
+                    <th className="px-3 md:px-6 py-3 align-middle text-left sticky left-0 z-10 bg-slate-950 md:static">Player</th>
                     <HeaderCell label="Fantasy Points" sortKey="fpts" currentSort={sortConfig} onSort={handleSort} description="Total Fantasy Points (Custom Scoring)" avg={ytdAvgs.fpts} />
                     <HeaderCell label="Average Fantasy Points" sortKey="avg_fpts" currentSort={sortConfig} onSort={handleSort} description="Average Fantasy Points per Game" avg={ytdAvgs.avg_fpts} />
                     <HeaderCell label="FG (Made/Attempts)" sortKey="pct" currentSort={sortConfig} onSort={handleSort} description="Field Goal Accuracy" avg={ytdAvgs.pct} />
@@ -487,8 +523,8 @@ const App = () => {
                 <tbody className="divide-y divide-slate-800">
                   {ytdSorted.map((row, idx) => (
                     <tr key={idx} className="hover:bg-slate-800/50 transition-colors">
-                      <td className="px-6 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
-                      <PlayerCell player={row} subtext={row.team} />
+                      <td className="px-3 md:px-6 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                      <PlayerCell player={row} subtext={row.team} sticky />
                       <td className="px-6 py-4 text-center font-bold text-emerald-400 text-lg">{row.fpts}</td>
                       <td className="px-6 py-4 text-center"><div className="font-bold text-white">{Number(row.avg_fpts).toFixed(1)}</div><div className="text-[10px] text-slate-500 uppercase font-bold">Games: {row.games}</div></td>
                       <td className="px-6 py-4 text-center"><div className="text-slate-300">{row.fg_made}/{row.fg_att}</div><div className="text-[10px] text-blue-400 font-mono">{row.pct}%</div></td>

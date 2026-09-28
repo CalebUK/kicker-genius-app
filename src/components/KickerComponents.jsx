@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, AlertTriangle, ShieldAlert, UserMinus, History, Loader2 } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, History, Loader2, ChevronUp, ChevronDown } from 'lucide-react';
 
 // --- GENERIC HELMET ICON (SVG) ---
 // This replaces the broken 404 images
@@ -109,28 +109,81 @@ export const splitReport = (details) => {
   return /practice/i.test(d) ? { practice: d, injury: '' } : { practice: '', injury: d };
 };
 
+// Photo ring + text colour from the board row's injury_color (yellow = Questionable,
+// red = Doubtful/Out, dark red = IR and co.)
+export const injuryStyle = (player) => {
+  const c = player.injury_color || 'slate-600';
+  if (c.includes('yellow')) return { ring: 'border-yellow-500', text: 'text-yellow-400' };
+  if (c.includes('red-500')) return { ring: 'border-red-500', text: 'text-red-400' };
+  if (c.includes('red-700')) return { ring: 'border-red-700', text: 'text-red-500' };
+  if (c.includes('green')) return { ring: 'border-green-500', text: 'text-green-400' };
+  return { ring: 'border-slate-600', text: 'text-slate-400' };
+};
+const photoUrl = (player) => (player.kicker_player_name?.includes('Aubrey') ? '/assets/aubrey_custom.png' : player.headshot_url);
+
+// --- PHONE: one card per kicker (the Week Model table is ~1,200px wide) ---
+const MiniStat = ({ label, value, className = 'text-slate-200' }) => (
+  <div className="min-w-0">
+    <div className="text-[9px] uppercase text-slate-500 leading-none mb-0.5">{label}</div>
+    <div className={`text-xs font-mono font-semibold truncate ${className}`}>{value}</div>
+  </div>
+);
+export const KickerCard = ({ row, rank, expanded, onToggle, highlight, children }) => {
+  const [imgError, setImgError] = useState(false);
+  const { ring, text } = injuryStyle(row);
+  const badge = SLEEPER_BADGES[row.sleeperStatus];
+  const report = splitReport(row.injury_details);
+  const url = photoUrl(row);
+  const f1 = (x) => (x == null || Number.isNaN(Number(x)) ? '–' : Number(x).toFixed(1));
+  const l3Good = (row.l3_act_sum ?? 0) >= (row.l3_proj_sum ?? 0);
+  const rz = (kp, stall) => (kp != null ? f1(kp) : `${stall ?? '–'}%`);
+  return (
+    <div className={highlight ? 'bg-purple-900/20' : ''}>
+      <button type="button" onClick={onToggle} aria-expanded={expanded} className="w-full text-left px-3 py-3 flex gap-3 active:bg-slate-800/60 transition-colors">
+        <div className="flex flex-col items-center gap-1 w-12 shrink-0">
+          {imgError || !url ? <HelmetIcon borderColor={ring} /> : <img src={url} alt={row.kicker_player_name} className={`w-12 h-12 rounded-full border-2 object-cover ${ring}`} onError={() => setImgError(true)} />}
+          <span className="text-[10px] font-mono text-slate-500">#{rank}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="font-bold text-white text-sm">{row.kicker_player_name}</span>
+            {row.isTop5 && <span className="text-xs" aria-label="Top 5 scorer this season">🔥</span>}
+            {badge && <span className={`text-[9px] border px-1 rounded font-bold ${badge[1]}`}>{badge[0]}</span>}
+          </div>
+          <div className="text-[11px] text-slate-400 truncate">{row.team} vs {row.opponent} · {row.weather_desc}</div>
+          {(row.injury_status || report.practice || report.injury) && (
+            <div className={`text-[10px] truncate ${row.injury_status ? text : 'text-sky-300'}`}>{[row.injury_status, report.injury].filter(Boolean).join(': ')}{report.practice ? ` · ${report.practice}` : ''}</div>
+          )}
+          <div className="text-[10px] text-slate-500">{row.season_games ? `#${row.ytdRank} this season · ${f1(row.season_avg)} pts/game` : 'No games yet this season'}</div>
+          <div className="mt-2 grid grid-cols-3 gap-x-2 gap-y-1.5">
+            <MiniStat label="Grade" value={row.grade} className={row.grade > 100 ? 'text-purple-300' : 'text-white'} />
+            <MiniStat label="Vegas" value={f1(row.vegas)} className="text-amber-400" />
+            <MiniStat label="Last 3" value={`${row.l3_act_sum ?? 0}/${row.l3_proj_sum ?? 0}`} className={l3Good ? 'text-green-400' : 'text-red-400'} />
+            <MiniStat label="Off RZ" value={rz(row.off_rz_kp, row.off_stall_rate)} className="text-blue-300" />
+            <MiniStat label="Opp RZ" value={rz(row.def_rz_kp, row.def_stall_rate)} />
+            <MiniStat label="PF / PA" value={`${Math.round(row.off_ppg)}${row.off_ppg < 15 ? '❄️' : ''} / ${Math.round(row.def_pa)}${row.def_pa < 17 ? '🛡️' : ''}`} />
+          </div>
+        </div>
+        <div className="flex flex-col items-end shrink-0">
+          <span className={`text-2xl font-black leading-none ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</span>
+          <span className="text-[9px] uppercase text-slate-500 mt-0.5">proj</span>
+          <span className="mt-2 text-slate-600">{expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>
+        </div>
+      </button>
+      {expanded && <div className="px-2 pb-3">{children}</div>}
+    </div>
+  );
+};
+
 // --- PLAYER CELL ---
 // Hovering the kicker shows his THIS-season numbers (your scoring) + any injury news.
-export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
+// sticky = pinned to the left while a wide table scrolls sideways (phones).
+export const PlayerCell = ({ player, subtext, sleeperStatus, sticky = false }) => {
   const [imgError, setImgError] = useState(false); // Track image load errors
 
-  const injuryColor = player.injury_color || 'slate-600'; 
   const statusText = player.injury_status || '';
-  
-  let borderColor = 'border-slate-600';
-  if (injuryColor.includes('green')) borderColor = 'border-green-500';
-  if (injuryColor.includes('red-700')) borderColor = 'border-red-700';
-  if (injuryColor.includes('red-500')) borderColor = 'border-red-500';
-  if (injuryColor.includes('yellow')) borderColor = 'border-yellow-500';
-
-  let textColor = 'text-slate-400';
-  if (injuryColor.includes('green')) textColor = 'text-green-400';
-  if (injuryColor.includes('red-700')) textColor = 'text-red-500';
-  if (injuryColor.includes('red-500')) textColor = 'text-red-400';
-  if (injuryColor.includes('yellow')) textColor = 'text-yellow-400';
-
-  const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
-  const imageUrl = isAubrey ? '/assets/aubrey_custom.png' : player.headshot_url;
+  const { ring: borderColor, text: textColor } = injuryStyle(player);
+  const imageUrl = photoUrl(player);
 
   const report = splitReport(player.injury_details);
 
@@ -138,7 +191,7 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   const badge = SLEEPER_BADGES[sleeperStatus];
 
   return (
-    <td className="px-3 py-4 font-medium text-white">
+    <td className={`px-3 py-4 font-medium text-white ${sticky ? 'sticky left-0 z-10 bg-slate-900 md:static' : ''}`}>
       <div className="flex flex-col justify-center">
           <div className="flex flex-wrap items-center gap-2 mb-2">
               <div className="text-xs md:text-sm font-bold text-white leading-tight whitespace-normal break-words flex items-center gap-1">
