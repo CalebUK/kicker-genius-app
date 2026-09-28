@@ -50,7 +50,7 @@ const QuartileCard = ({ diffs }) => {
   return (
     <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg">
       <div className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-1"><Users className="w-3 h-3 text-amber-500"/> Kicker Quartile</div>
-      {diffs.length < 4 ? <div className="text-[10px] text-slate-500">Needs 4+ finished games</div> : (
+      {diffs.length < 4 ? <div className="text-[11px] text-slate-500">Needs 4+ finished games</div> : (
         <>
           <div className="flex justify-between items-end relative h-8 px-1">
             <div className="absolute left-0 top-0 text-[8px] text-white font-bold -translate-y-full">Min: {fmt(minV)}</div>
@@ -59,7 +59,7 @@ const QuartileCard = ({ diffs }) => {
               const inMiddle = i >= q1i && i <= q3i;
               return (
                 <div key={i} className="relative flex flex-col items-center">
-                  {i === medi && <div className="absolute -top-7 bg-amber-500 text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md whitespace-nowrap z-40 -translate-x-1/2 left-1/2">Med: {fmt(med)}</div>}
+                  {i === medi && <div className="absolute -top-7 bg-amber-500 text-slate-900 text-[11px] font-bold px-1.5 py-0.5 rounded shadow-md whitespace-nowrap z-40 -translate-x-1/2 left-1/2">Med: {fmt(med)}</div>}
                   <User className={`w-4 h-4 ${inMiddle ? 'text-blue-400 scale-110' : 'text-slate-600 scale-90'} ${i === medi ? 'text-amber-400 scale-125' : ''}`} strokeWidth={inMiddle ? 3 : 2}/>
                 </div>
               );
@@ -80,14 +80,14 @@ const BaselineCard = ({ s }) => {
   return (
     <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg">
       <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><BarChart3 className="w-3 h-3 text-sky-400"/> Model vs Baseline</div>
-      {s.n === 0 ? <div className="text-[10px] text-slate-500">No finished games yet</div> : (
+      {s.n === 0 ? <div className="text-[11px] text-slate-500">No finished games yet</div> : (
         <>
           <div className="flex items-baseline gap-2">
             <span className={`text-2xl font-black ${beats ? 'text-emerald-400' : 'text-amber-400'}`}>{s.maeModel.toFixed(2)}</span>
             <span className="text-xs text-slate-400">vs {s.maeBase.toFixed(2)}</span>
           </div>
-          <div className="text-[10px] text-slate-400">Avg miss (pts): model vs his average</div>
-          <div className={`text-[10px] font-bold mt-0.5 ${beats ? 'text-emerald-400' : 'text-amber-400'}`}>
+          <div className="text-[11px] text-slate-400">Avg miss (pts): model vs his average</div>
+          <div className={`text-[11px] font-bold mt-0.5 ${beats ? 'text-emerald-400' : 'text-amber-400'}`}>
             {beats ? `Model better by ${(s.maeBase - s.maeModel).toFixed(2)}` : `Baseline better by ${(s.maeModel - s.maeBase).toFixed(2)}`}
           </div>
         </>
@@ -103,12 +103,12 @@ const SummaryCards = ({ s }) => {
       <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg">
         <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Activity className="w-3 h-3 text-blue-500"/> Total Points ({s.n})</div>
         <div className="flex items-baseline gap-2"><span className="text-2xl font-black text-white">{Math.round(s.totalActual)}</span><span className="text-sm text-slate-400">vs {s.totalProj} Proj</span></div>
-        <div className={`text-[10px] font-bold ${diff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{fmtSigned(diff, 1)} Diff</div>
+        <div className={`text-[11px] font-bold ${diff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{fmtSigned(diff, 1)} Diff</div>
       </div>
       <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg">
         <div className="text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-1"><Target className="w-3 h-3 text-emerald-500"/> Accuracy Rate</div>
         <div className="text-3xl font-black text-white">{pct(s.within, s.n)}%</div>
-        <div className="text-[10px] text-slate-400">{s.within} of {s.n} within +/- 3 pts</div>
+        <div className="text-[11px] text-slate-400">{s.within} of {s.n} within +/- 3 pts</div>
       </div>
       <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg">
         <div className="text-xs font-bold text-slate-500 uppercase mb-2 flex items-center gap-1"><TrendingUp className="w-3 h-3 text-purple-500"/> Performance</div>
@@ -159,7 +159,7 @@ const GameCard = ({ g }) => {
           <div className="font-bold text-white text-sm truncate">{g.kicker_name}</div>
           <div className="text-xs text-slate-500">{g.team} vs {g.opponent}</div>
         </div>
-        <div className={`px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1 ${cls}`}><Icon className="w-3 h-3" /> {g.status}</div>
+        <div className={`px-2 py-1 rounded text-[11px] font-bold flex items-center gap-1 ${cls}`}><Icon className="w-3 h-3" /> {g.status}</div>
       </div>
 
       <div className="flex justify-between items-end mb-2">
@@ -186,18 +186,18 @@ const GameCard = ({ g }) => {
       )}
 
       <div className="flex flex-wrap gap-1.5">
-        {g.usingSleeper && <span className="text-[10px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded border border-purple-700 flex items-center gap-1"><Bot className="w-3 h-3" /> Sleeper Live</span>}
-        {scored && g.proj > 0 && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${perfPct >= 100 ? 'bg-emerald-900/50 text-emerald-400 border-emerald-700' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>{perfPct}% of Proj</span>}
+        {g.usingSleeper && <span className="text-[11px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded border border-purple-700 flex items-center gap-1"><Bot className="w-3 h-3" /> Sleeper Live</span>}
+        {scored && g.proj > 0 && <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded border ${perfPct >= 100 ? 'bg-emerald-900/50 text-emerald-400 border-emerald-700' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>{perfPct}% of Proj</span>}
         {g.status === 'FINISHED' && (
           <>
-            {longFg > 0 && <span className="text-[10px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{longFg}x 50+</span>}
-            {g.wk_fg_40_49 > 0 && <span className="text-[10px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{g.wk_fg_40_49}x 40-49</span>}
-            {shortFg > 0 && <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{shortFg}x Short FG</span>}
-            {g.wk_xp_made > 0 && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{g.wk_xp_made}x XP</span>}
-            {misses > 0 && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{misses} Miss</span>}
+            {longFg > 0 && <span className="text-[11px] bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50">{longFg}x 50+</span>}
+            {g.wk_fg_40_49 > 0 && <span className="text-[11px] bg-emerald-900/30 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/50">{g.wk_fg_40_49}x 40-49</span>}
+            {shortFg > 0 && <span className="text-[11px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">{shortFg}x Short FG</span>}
+            {g.wk_xp_made > 0 && <span className="text-[11px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{g.wk_xp_made}x XP</span>}
+            {misses > 0 && <span className="text-[11px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded border border-red-800/50 line-through decoration-red-500/50">{misses} Miss</span>}
           </>
         )}
-        {g.status === 'DNP' && <span className="text-[10px] text-slate-500 italic">Did not play: not scored</span>}
+        {g.status === 'DNP' && <span className="text-[11px] text-slate-500 italic">Did not play: not scored</span>}
       </div>
       {isSmashed && <div className="absolute inset-0 bg-blue-500/5 animate-pulse pointer-events-none"></div>}
     </div>
@@ -218,7 +218,7 @@ const ByWeekStrip = ({ byWeek }) => {
       </div>
       <div className="space-y-1.5">
         {byWeek.map(({ week, s }) => (
-          <div key={week} className="flex items-center gap-2 text-[10px]">
+          <div key={week} className="flex items-center gap-2 text-[11px]">
             <span className="w-10 text-slate-400 font-bold shrink-0">Wk {week}</span>
             <div className="flex-1 space-y-0.5">
               <div className="h-1.5 bg-sky-500 rounded-full" style={{ width: `${((s.maeModel || 0) / max) * 100}%` }}></div>
@@ -269,7 +269,7 @@ const SeasonTable = ({ games }) => {
             const beats = r.maeModel < r.maeBase;
             return (
               <tr key={r.gsis_id} className="hover:bg-slate-800/50">
-                <td className="px-4 py-2"><div className="font-bold text-white">{r.kicker_name}</div><div className="text-[10px] text-slate-500">{r.team}</div></td>
+                <td className="px-4 py-2"><div className="font-bold text-white">{r.kicker_name}</div><div className="text-[11px] text-slate-500">{r.team}</div></td>
                 <td className="px-3 py-2 text-center text-slate-300">{r.n}</td>
                 <td className="px-3 py-2 text-center font-bold text-white">{Math.round(r.totalActual)}</td>
                 <td className="px-3 py-2 text-center text-slate-400">{r.totalProj}</td>
@@ -289,7 +289,11 @@ const SeasonTable = ({ games }) => {
 
 const AccuracyTab = ({ history, season, week, players, scoring, windowMode, sleeperLeagueId, leagueBaselines }) => {
   const [selSeason, setSelSeason] = useState(season);
-  const [selWeek, setSelWeek] = useState(week);
+  // open on the latest week with results (early in the week the upcoming one has none)
+  const [selWeek, setSelWeek] = useState(() => {
+    const done = history.filter((h) => h.season === season && h.played).map((h) => h.week);
+    return done.length ? Math.max(...done) : week;
+  });
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [fetched, setFetched] = useState({});   // past seasons, loaded on demand
 

@@ -19,7 +19,7 @@ const GA_ID = "G-LH8GZE2BC2";
 
 export const metadata: Metadata = {
   title: "Kicker Genius",
-  description: "Fantasy football kicker projections: stall-rate matchup grades, Vegas lines and your league's own scoring.",
+  description: "Fantasy football kicker projections built for your league's scoring: red-zone matchup grades, Vegas lines, weather, and every kicker-game since 2000.",
   icons: { icon: "/assets/logo.png" },
 };
 

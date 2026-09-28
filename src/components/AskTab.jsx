@@ -115,7 +115,7 @@ const conditionsLabel = (g) => {
 };
 
 const Select = ({ label, value, onChange, options }) => (
-  <label className="flex flex-col gap-1 text-[10px] uppercase font-bold text-slate-500">
+  <label className="flex flex-col gap-1 text-[11px] uppercase font-bold text-slate-500">
     {label}
     <select value={value} onChange={(e) => onChange(e.target.value)}
       className={`bg-slate-900 border rounded-lg px-2 py-1.5 text-xs normal-case font-semibold focus:outline-none focus:border-blue-500 ${value ? 'border-blue-500/60 text-white' : 'border-slate-700 text-slate-400'}`}>
@@ -320,7 +320,7 @@ const AskTab = ({ scoring, currentSeason }) => {
       {/* WHAT IT UNDERSTOOD (editable) */}
       <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-[10px] uppercase font-bold text-slate-500">{question ? 'Understood as (change anything)' : 'Or build a question'}</div>
+          <div className="text-[11px] uppercase font-bold text-slate-500">{question ? 'Understood as (change anything)' : 'Or build a question'}</div>
           {(question || subjectKey || filtered) && (
             <button onClick={clearAll} className="text-[11px] font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1 rounded-full">Clear all</button>
           )}
@@ -386,7 +386,7 @@ const AskTab = ({ scoring, currentSeason }) => {
                 <span className="normal-case font-normal text-slate-500 ml-2">· {leaders.total} kickers · click one for his details</span>
               </div>
               <table className="w-full text-sm text-left">
-                <thead className="text-[10px] text-slate-400 uppercase bg-slate-950">
+                <thead className="text-[11px] text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="px-4 py-2">#</th><th className="px-3 py-2">Kicker</th><th className="px-3 py-2 text-center">Games</th>
                     <th className="px-3 py-2 text-center">FG</th><th className="px-3 py-2 text-center">50+</th><th className="px-3 py-2 text-center">Fantasy pts / game</th>
@@ -396,9 +396,9 @@ const AskTab = ({ scoring, currentSeason }) => {
                   {leaders.rows.map((k, i) => (
                     <tr key={k.gsis_id} onClick={() => chooseKicker(k.gsis_id)} className="hover:bg-slate-800/50 cursor-pointer">
                       <td className="px-4 py-2 text-slate-500 font-mono">{i + 1}</td>
-                      <td className="px-3 py-2 whitespace-nowrap"><span className="font-bold text-white">{k.name}</span> <span className="text-[10px] text-slate-500">{shortTeams(k.teams)} · {k.first_season === k.last_season ? k.first_season : `${k.first_season}–${k.last_season}`}</span></td>
+                      <td className="px-3 py-2 whitespace-nowrap"><span className="font-bold text-white">{k.name}</span> <span className="text-[11px] text-slate-500">{shortTeams(k.teams)} · {k.first_season === k.last_season ? k.first_season : `${k.first_season}–${k.last_season}`}</span></td>
                       <td className="px-3 py-2 text-center text-slate-300">{k.n}</td>
-                      <td className="px-3 py-2 text-center font-mono text-slate-200">{k.stats.fgMade}/{k.stats.fgAtt} <span className="text-slate-500 text-[10px]">{pct(k.stats.fgMade, k.stats.fgAtt)}</span></td>
+                      <td className="px-3 py-2 text-center font-mono text-slate-200">{k.stats.fgMade}/{k.stats.fgAtt} <span className="text-slate-500 text-[11px]">{pct(k.stats.fgMade, k.stats.fgAtt)}</span></td>
                       <td className="px-3 py-2 text-center font-mono text-slate-400">{k.stats.long.att ? `${k.stats.long.made}/${k.stats.long.att}` : '–'}</td>
                       <td className="px-3 py-2 text-center font-bold text-emerald-400">{one(k.stats.ptsPerGame)}</td>
                     </tr>
@@ -411,7 +411,7 @@ const AskTab = ({ scoring, currentSeason }) => {
           {matched.length > 0 && (
             <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="text-[10px] text-slate-400 uppercase bg-slate-950">
+                <thead className="text-[11px] text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="px-4 py-3">Game</th>{kickerCol && <th className="px-3 py-3">Kicker</th>}<th className="px-3 py-3">Team</th><th className="px-3 py-3">Opponent</th><th className="px-3 py-3">Conditions</th>
                     <th className="px-3 py-3 text-center">FG</th><th className="px-3 py-3 text-center">50+</th><th className="px-3 py-3 text-center">XP</th><th className="px-3 py-3 text-center">Fantasy pts</th>
@@ -429,7 +429,7 @@ const AskTab = ({ scoring, currentSeason }) => {
                         <td className="px-3 py-2 text-slate-300 whitespace-nowrap text-xs font-semibold">{g.team_code || g.team}</td>
                         <td className="px-3 py-2 text-slate-300 whitespace-nowrap">
                           <span className="inline-flex items-center gap-1">{g.is_home ? <House className="w-3 h-3 text-slate-500" /> : <Plane className="w-3 h-3 text-slate-500" />}{g.is_home ? 'vs' : '@'} {TEAM_BY_ABBR[g.opponent]?.nick || g.opponent || '–'}
-                            {g.opponent_code && g.opponent_code !== g.opponent && <span className="text-slate-500 text-[10px]">({g.opponent_code})</span>}</span>
+                            {g.opponent_code && g.opponent_code !== g.opponent && <span className="text-slate-500 text-[11px]">({g.opponent_code})</span>}</span>
                         </td>
                         <td className={`px-3 py-2 whitespace-nowrap ${c.cls}`}><span className="inline-flex items-center gap-1"><c.Icon className="w-3 h-3" />{c.text}</span></td>
                         <td className="px-3 py-2 text-center font-mono text-slate-200">{g.fg_made}/{g.fg_att}</td>

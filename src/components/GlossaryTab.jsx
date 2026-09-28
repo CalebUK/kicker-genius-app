@@ -20,7 +20,7 @@ const GlossaryTab = ({ processed, leagueAvgs, meta }) => {
             )}
 
             <div className="p-4 border-b border-slate-800 bg-slate-900/30 text-center text-xs text-slate-500">
-                This website was created by 16BitHill. If you have any suggestions please <a href="mailto:calebthill@gmail.com" className="text-blue-400 hover:underline">email me</a>.
+                This website was created by 16BitHill. If you have any suggestions please <a href="mailto:16bithill@gmail.com" className="text-blue-400 hover:underline">email me</a>.
                 {' '}Enjoying it? <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Buy me a coffee ☕</a>
             </div>
 
@@ -35,7 +35,7 @@ const GlossaryTab = ({ processed, leagueAvgs, meta }) => {
                                 <div key={item.header} className="bg-slate-800/50 p-3 rounded border border-slate-700">
                                     <div className="flex justify-between items-start gap-2 mb-1">
                                         <span className="font-mono font-bold text-blue-300 text-sm">{item.header}</span>
-                                        <span className="text-[10px] text-emerald-400 flex items-center gap-1 bg-emerald-900/20 px-2 py-0.5 rounded border border-emerald-900/50 whitespace-nowrap">
+                                        <span className="text-[11px] text-emerald-400 flex items-center gap-1 bg-emerald-900/20 px-2 py-0.5 rounded border border-emerald-900/50 whitespace-nowrap">
                                             <Database className="w-3 h-3"/> {item.source}
                                         </span>
                                     </div>

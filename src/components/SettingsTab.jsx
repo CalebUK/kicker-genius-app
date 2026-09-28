@@ -31,7 +31,7 @@ const LeaguesPanel = ({ lg, season }) => {
       {/* saved leagues */}
       <div className="space-y-2 mb-6">
         <button onClick={() => lg.switchLeague('')} className={`w-full text-left p-3 rounded-lg border transition-all ${!lg.activeId ? 'bg-emerald-600/20 border-emerald-500' : 'bg-slate-950/50 border-slate-700 hover:border-slate-600'}`}>
-          <div className="flex items-center gap-2 text-sm font-bold text-white">{!lg.activeId && <Check className="w-4 h-4 text-emerald-400"/>} Custom scoring <span className="text-[10px] font-normal text-slate-500">no league: set the points yourself below</span></div>
+          <div className="flex items-center gap-2 text-sm font-bold text-white">{!lg.activeId && <Check className="w-4 h-4 text-emerald-400"/>} Custom scoring <span className="text-[11px] font-normal text-slate-500">no league: set the points yourself below</span></div>
         </button>
         {lg.leagues.map((l) => {
           const isActive = l.id === lg.activeId, syncing = lg.busy === l.id;
@@ -39,7 +39,7 @@ const LeaguesPanel = ({ lg, season }) => {
             <div key={l.id} className={`p-3 rounded-lg border flex flex-wrap items-center gap-3 transition-all ${isActive ? 'bg-emerald-600/20 border-emerald-500' : 'bg-slate-950/50 border-slate-700'}`}>
               <button onClick={() => lg.switchLeague(l.id)} className="flex-1 min-w-[200px] text-left">
                 <div className="flex items-center gap-2 text-sm font-bold text-white">{isActive && <Check className="w-4 h-4 text-emerald-400"/>} {l.name}</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">
+                <div className="text-[11px] text-slate-500 mt-0.5">
                   {l.teams ? `${l.teams} teams · ` : ''}
                   {l.myKickers?.length ? <span className="text-purple-300">your kicker{l.myKickers.length > 1 ? 's' : ''}: {l.myKickers.join(', ')}</span> : (l.userId || l.username ? 'no kicker on your roster' : 'your team not linked')}
                   {' · '}{syncing ? 'syncing…' : ago(l.syncedAt)}
@@ -66,7 +66,7 @@ const LeaguesPanel = ({ lg, season }) => {
               const saved = savedIds.has(String(f.league_id)), adding = lg.busy === String(f.league_id);
               return (
                 <div key={f.league_id} className="flex items-center justify-between gap-3 p-2 rounded border border-slate-800 bg-slate-950/50">
-                  <div className="text-sm text-white">{f.name} <span className="text-[10px] text-slate-500">{f.total_rosters} teams</span></div>
+                  <div className="text-sm text-white">{f.name} <span className="text-[11px] text-slate-500">{f.total_rosters} teams</span></div>
                   {saved
                     ? <span className="text-xs text-emerald-400 flex items-center gap-1"><Check className="w-3 h-3"/> Saved</span>
                     : <button onClick={() => lg.addLeague(f.league_id, me, f)} disabled={!!lg.busy} className={`${btn} bg-purple-600/20 border-purple-500/50 text-purple-200 hover:bg-purple-600/40`}>{adding ? <Loader2 className="w-3 h-3 animate-spin"/> : <Plus className="w-3 h-3"/>} Add</button>}
@@ -82,7 +82,7 @@ const LeaguesPanel = ({ lg, season }) => {
           <input type="text" value={leagueId} onChange={(e) => setLeagueId(e.target.value.trim())} className="flex-1 min-w-0 bg-slate-950 border border-slate-700 rounded p-2 text-white placeholder:text-slate-600" placeholder="e.g. 104837..." />
           <button onClick={() => { lg.addLeague(leagueId, { username }); setLeagueId(''); }} disabled={!!lg.busy || !leagueId} className="px-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-sm font-bold rounded flex items-center gap-2 whitespace-nowrap flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">{lg.busy === leagueId && leagueId ? <Loader2 className="w-4 h-4 animate-spin"/> : <Plus className="w-4 h-4"/>} Add</button>
         </div>
-        <p className="text-[10px] text-slate-500 mt-1">Uses the username above (if filled in) to find your team in that league.</p>
+        <p className="text-[11px] text-slate-500 mt-1">Uses the username above (if filled in) to find your team in that league.</p>
       </div>
     </div>
   );
@@ -105,9 +105,9 @@ const SettingsTab = ({ lg, season, windowMode, setWindowMode }) => {
                     >
                         <div className="flex items-center gap-2 font-bold text-sm">
                             {windowMode === opt.key && <Check className="w-4 h-4 text-emerald-400"/>}
-                            {opt.label} <span className="text-[10px] font-mono opacity-70">({opt.key.toUpperCase()})</span>
+                            {opt.label} <span className="text-[11px] font-mono opacity-70">({opt.key.toUpperCase()})</span>
                         </div>
-                        <div className="text-[10px] text-slate-500 mt-1">{opt.sub}</div>
+                        <div className="text-[11px] text-slate-500 mt-1">{opt.sub}</div>
                     </button>
                 ))}
             </div>
@@ -130,7 +130,7 @@ const SettingsTab = ({ lg, season, windowMode, setWindowMode }) => {
                         <div className="text-xs font-bold text-blue-400 uppercase mb-3 border-b border-slate-800 pb-1">{group.label}</div>
                         <div className="flex gap-4">
                             <div className="flex-1">
-                                <label className="block text-[9px] uppercase text-slate-500 font-bold mb-1">Make</label>
+                                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">Make</label>
                                 <input 
                                     type="number" 
                                     value={scoring[group.makeKey]} 
@@ -139,7 +139,7 @@ const SettingsTab = ({ lg, season, windowMode, setWindowMode }) => {
                                 />
                             </div>
                             <div className="flex-1">
-                                <label className="block text-[9px] uppercase text-slate-500 font-bold mb-1">Miss</label>
+                                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">Miss</label>
                                 <input 
                                     type="number" 
                                     value={scoring[group.missKey]} 

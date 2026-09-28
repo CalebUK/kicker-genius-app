@@ -50,6 +50,7 @@ export async function GET() {
             meta: {
                 week,
                 updated: `${site.pushed_at.toISOString().slice(0, 16).replace('T', ' ')} UTC`,
+                updated_iso: site.pushed_at.toISOString(),   // the header shows it in the visitor's own time
                 league_avgs_l3: leagueAvgs('l3'),
                 league_avgs_l5: leagueAvgs('l5'),
                 model_settings: Object.fromEntries(settingsRows.map((r) => [r.key, r.value])),

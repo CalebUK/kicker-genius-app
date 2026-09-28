@@ -7,6 +7,7 @@ import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTri
 import { BUY_ME_A_COFFEE_URL } from '../data/constants';
 import useLeagues from '../utils/useLeagues';
 import { buildInsight } from '../utils/insights';
+import { TEAMS } from '../utils/askParser';
 import { calcFPts, calcProjection, weekKicks, fetchSleeperScores } from '../utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, Hint, KickerCard, MathCard, YtdCard } from '../components/KickerComponents';
 import AccuracyTab from '../components/AccuracyTab';
@@ -70,7 +71,7 @@ const toBoardRow = (r, w) => {
 const RedZoneCell = ({ kp, trips, stall, className }) => (
   <td className="px-4 py-4 text-center">
     {kp != null
-      ? <><div className={`font-mono ${className}`}>{Number(kp).toFixed(1)}</div><div className="text-[9px] text-slate-500 whitespace-nowrap">{Number(trips).toFixed(1)} trips · {stall}%</div></>
+      ? <><div className={`font-mono ${className}`}>{Number(kp).toFixed(1)}</div><div className="text-[11px] text-slate-500 whitespace-nowrap">{Number(trips).toFixed(1)} trips · {stall}%</div></>
       : <span className={className}>{stall}%</span>}
   </td>
 );
@@ -80,6 +81,13 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const shortStamp = (s) => {
   const m = /^\d{4}-(\d{2})-(\d{2}) (.*)$/.exec(s || '');
   return m ? `${MONTHS[Number(m[1]) - 1]} ${Number(m[2])} ${m[3]}` : s;
+};
+
+// ISO time -> "Sep 28, 5:25 AM" in the visitor's own time zone
+const localStamp = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 };
 
 // Both read the cloud DB: /api/dashboard = Week Model + weekly snapshots
@@ -224,7 +232,28 @@ const App = () => {
 
   // error first: when loading fails, data stays null and the spinner would never end
   if (error) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-8 text-center"><AlertTriangle className="w-12 h-12 text-red-500 mb-4" /><h2 className="text-xl font-bold mb-2">Data Error</h2><p className="text-slate-400 mb-6">{error}</p><p className="text-sm text-slate-600">Could not load the kicker data.</p></div>;
-  if (loading || !data) return <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white"><Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" /><p>Loading...</p></div>;
+  if (loading || !data) return (
+    <div className="min-h-screen bg-slate-950 p-4 md:p-8" aria-busy="true">
+      <div className="max-w-6xl mx-auto animate-pulse">
+        <div className="flex items-center justify-center sm:justify-start gap-3 mb-6">
+          <img src="/assets/logo.png" alt="KickerGenius" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1>
+        </div>
+        <div className="flex gap-2 mb-6 justify-center sm:justify-start">{[0, 1, 2].map(i => <div key={i} className="h-8 w-32 rounded bg-slate-800" />)}</div>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-6">{[0, 1, 2, 3, 4, 5].map(i => <div key={i} className="h-9 rounded-lg bg-slate-900" />)}</div>
+        <div className="rounded-xl border border-slate-800 bg-slate-900 divide-y divide-slate-800">
+          {[0, 1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="flex items-center gap-3 p-4">
+              <div className="w-12 h-12 rounded-full bg-slate-800 shrink-0" />
+              <div className="flex-1 space-y-2"><div className="h-3 w-32 rounded bg-slate-800" /><div className="h-3 w-48 rounded bg-slate-800/70" /></div>
+              <div className="w-8 h-7 rounded bg-slate-800" />
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-sm text-slate-500 mt-6">Loading this week&apos;s kickers…</p>
+      </div>
+    </div>
+  );
 
   const { rankings, ytd, injuries, meta, history = [] } = data;
   const settings = meta?.model_settings || {};
@@ -321,17 +350,21 @@ const App = () => {
          season_kickers: ytd.length,
          // undefined = still loading; otherwise { venue?, own?, news }
          matchup_history: insights ? (buildInsight(insights.insights?.[p.gsis_id], insights.all, scoring, p) || { news: [] }) : undefined,
-         sleeper_live_score: sleeperLive 
+         sleeper_live_score: sleeperLive,
+         // his game this week is over (his kicks are in): shown as FINAL + moved to the bottom
+         final_pts: thisWeek?.played ? calcFPts(weekKicks(thisWeek), scoring) : null,
      };
   }).filter(p => p.proj > 0); 
 
   if (search) {
-      const q = search.toLowerCase();
-      processed = processed.filter(p => 
-          p.kicker_player_name.toLowerCase().includes(q) || 
-          (p.team && p.team.toLowerCase().includes(q)) ||
-          (q === 'dome' && p.is_dome) ||
-          (q === 'cowboys' && p.team === 'DAL') 
+      const q = search.trim().toLowerCase();
+      // "Bills", "buffalo", "green bay", "BUF" -> the team (names from the Ask tab's list)
+      const teams = new Set(TEAMS.filter(t => t.abbr.toLowerCase() === q ||
+          (q.length >= 3 && (t.nick.toLowerCase().includes(q) || t.names.some(n => n.includes(q))))).map(t => t.abbr));
+      processed = processed.filter(p =>
+          p.kicker_player_name.toLowerCase().includes(q) ||
+          teams.has(p.team) ||
+          (q === 'dome' && p.is_dome)
       );
   }
 
@@ -359,6 +392,7 @@ const App = () => {
          return 0;
      });
   }
+  processed = [...processed.filter(p => p.final_pts == null), ...processed.filter(p => p.final_pts != null)];
 
   
   const calculateLeagueAvg = (arr, key) => {
@@ -397,7 +431,7 @@ const App = () => {
         <div className="mb-5 sm:mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
           <div>
             <div className="flex items-center justify-center sm:justify-start gap-3 sm:mb-2"><img src="/assets/logo.png" alt="KickerGenius" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" /><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
-            <p className="hidden sm:block text-slate-400 ml-1">Advanced Stall Rate Analytics & Fantasy Projections</p>
+            <p className="hidden sm:block text-slate-400 ml-1">Kicker projections built for your league&apos;s scoring</p>
           </div>
           {/* compact controls: one line from 640px (beside the title on wide screens); on phones a centred block: coffee + settings side by side, league switcher, then the update pill */}
           <div className="grid grid-cols-2 gap-2 text-xs sm:flex sm:flex-wrap sm:items-center">
@@ -415,18 +449,18 @@ const App = () => {
                </label>
              )}
              <button onClick={() => goTab('settings')} className="order-2 sm:order-3 h-9 sm:h-8 bg-slate-800 hover:bg-slate-700 text-white px-3 rounded flex items-center justify-center gap-1.5 border border-slate-700 transition-colors font-semibold whitespace-nowrap"><Settings className="w-3.5 h-3.5" /> {lg.leagues.length ? 'League Settings' : <><span className="sm:hidden">Add Sleeper league</span><span className="hidden sm:inline">Add your Sleeper league</span></>}</button>
-             <div title={`Data last updated ${meta.updated}`} className="order-4 col-span-2 justify-self-center sm:justify-self-auto h-8 bg-slate-900 border border-slate-800 rounded-full sm:rounded px-3 flex items-center gap-1.5 whitespace-nowrap text-white font-semibold"><Clock className="w-3.5 h-3.5 text-slate-500" />{shortStamp(meta.updated)} · Wk {meta.week}</div>
+             <div title={`Data last updated ${meta.updated}`} className="order-4 col-span-2 justify-self-center sm:justify-self-auto h-8 bg-slate-900 border border-slate-800 rounded-full sm:rounded px-3 flex items-center gap-1.5 whitespace-nowrap text-white font-semibold"><Clock className="w-3.5 h-3.5 text-slate-500" />{localStamp(meta.updated_iso) || shortStamp(meta.updated)} · Wk {meta.week}</div>
           </div>
         </div>
 
         {/* tabs: short-name pills (3x2 on phones, 6 across on foldables/tablets); full underlined names from 1024px (they need ~920px) */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 mb-5 lg:flex lg:gap-2 lg:mb-6 lg:border-b lg:border-slate-800 lg:pb-1 lg:overflow-x-auto">
           <TabButton active={activeTab === 'potential'} underline="lg:border-emerald-500" icon={TrendingUp} short="Model" long={`Week ${meta.week} Model`} onClick={() => { goTab('potential'); setSortConfig({key:'proj', direction:'desc'}); }} />
-          <TabButton active={activeTab === 'accuracy'} underline="lg:border-purple-500" icon={Target} short="Accuracy" long={`Week ${meta.week} Accuracy`} onClick={() => goTab('accuracy')} />
+          <TabButton active={activeTab === 'accuracy'} underline="lg:border-purple-500" icon={Target} short="Accuracy" long="Accuracy" onClick={() => goTab('accuracy')} />
           <TabButton active={activeTab === 'ytd'} underline="lg:border-blue-500" icon={Activity} short="YTD" long="Historical YTD" onClick={() => { goTab('ytd'); setSortConfig({key:'fpts', direction:'desc'}); }} />
           <TabButton active={activeTab === 'ask'} underline="lg:border-sky-400" icon={MessageCircleQuestionMark} short="Ask" long="Ask" onClick={() => goTab('ask')} />
           <TabButton active={activeTab === 'injuries'} underline="lg:border-red-500" icon={Stethoscope} short="Injuries" long="Injury Report" onClick={() => goTab('injuries')}
-            badge={injuries.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{injuries.length}</span>} />
+            badge={injuries.length > 0 && <span className="bg-red-500 text-white text-[11px] px-1.5 rounded-full">{injuries.length}</span>} />
           <TabButton active={activeTab === 'glossary'} underline="lg:border-purple-500" icon={BookOpen} short="Legend" long="Stats Legend" onClick={() => goTab('glossary')} />
         </div>
 
@@ -448,6 +482,7 @@ const App = () => {
                         <option value="proj_acc">Last 3 vs projected</option>
                       </select>
                     </label>
+                    <span className="hidden md:inline text-[11px] text-slate-500">Click a kicker for his worksheet</span>
                     <Hint side="left" text={active ? `Hide kickers on other teams in ${active.name} (yours stay, listed first)` : 'Add a Sleeper league in League Settings to hide kickers who are already taken'}>
                       <label className={`flex items-center gap-2 text-sm ${active ? 'text-slate-300 cursor-pointer hover:text-white' : 'text-slate-600 cursor-not-allowed'}`}><input type="checkbox" disabled={!active} checked={hideTaken && !!active} onChange={(e) => setHideTaken(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide taken</label>
                     </Hint>
@@ -474,8 +509,8 @@ const App = () => {
                     <HeaderCell label="Weather" description="Kickoff forecast (actual conditions once played): sky, wind and temperature. Dome / closed roof = +10 grade; outdoors at 40°F or below = −20." />
                     <HeaderCell label={`Offense Red Zone (${winLabel})`} sortKey="off_rz_kp" currentSort={boardSort} onSort={handleSort} description={`Red-zone kicker points per game (${winLabel}): each red-zone trip that stalls = 3 (a field-goal try), each other trip = 1 (the extra point). Below: trips per game and stall rate.`} avg={leagueAvgs.off_rz_kp} />
                     <HeaderCell label={`Opponent Red Zone (${winLabel})`} sortKey="def_rz_kp" currentSort={boardSort} onSort={handleSort} description={`Red-zone kicker points per game the opponent ALLOWS (${winLabel}): stalled trip = 3, other trip = 1. Below: trips allowed per game and stall rate forced.`} avg={leagueAvgs.def_rz_kp} />
-                    <HeaderCell label="Projection Accuracy (L3)" sortKey="proj_acc" currentSort={boardSort} onSort={handleSort} description="Total Actual vs Projected Points (Last 3 Games)" />
-                    <HeaderCell label="Implied Vegas Score Line" sortKey="vegas" currentSort={boardSort} onSort={handleSort} description="Implied Team Total (Vegas Line & Spread)/2" />
+                    <HeaderCell label="Last 3: Act / Proj" sortKey="proj_acc" currentSort={boardSort} onSort={handleSort} description="His last 3 games: points scored vs what we projected (your scoring). Green = he scored at least the projection." />
+                    <HeaderCell label="Vegas Team Total" sortKey="vegas" currentSort={boardSort} onSort={handleSort} description="Points Vegas expects his team to score: (game total ± spread) ÷ 2" />
                     <HeaderCell tipAlign="right" label={`Offensive PF (${winLabel})`} sortKey="off_ppg" currentSort={boardSort} onSort={handleSort} description={`His team's average points scored (${winLabel}). ❄️ = under 15 per game`} avg={leagueAvgs.pts} />
                     <HeaderCell tipAlign="right" label={`Opponent PA (${winLabel})`} sortKey="def_pa" currentSort={boardSort} onSort={handleSort} description={`Points the opponent allows per game (${winLabel}). 🛡️ = under 17 per game`} avg={leagueAvgs.pts} />
                   </tr>
@@ -486,15 +521,17 @@ const App = () => {
 
                      return (
                         <React.Fragment key={idx}>
-                          <tr onClick={() => toggleRow(idx)} className={`hover:bg-slate-800/50 cursor-pointer transition-colors ${sleeperStatus === 'MY_TEAM' && hideTaken ? 'bg-purple-900/20' : ''}`}>
+                          <tr onClick={() => toggleRow(idx)} tabIndex={0} aria-expanded={expandedRow === idx} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(idx); } }} className={`hover:bg-slate-800/50 focus:outline-none focus-visible:bg-slate-800/70 cursor-pointer transition-colors ${row.final_pts != null ? 'opacity-60' : ''} ${sleeperStatus === 'MY_TEAM' && hideTaken ? 'bg-purple-900/20' : ''}`}>
                             <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}<div className="flex justify-center text-slate-600 mt-1">{expandedRow === idx ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}</div></td>
                             <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} sleeperStatus={sleeperStatus} />
-                            <td className={`px-4 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
+                            <td className={`px-4 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.final_pts != null
+                              ? <div className="leading-tight"><div className="text-[11px] font-bold uppercase text-slate-400">Final</div><div className="text-white">{Math.round(row.final_pts * 10) / 10} <span className="text-[11px] font-normal text-slate-400">pts</span></div><div className="text-[11px] font-normal text-slate-500">proj {row.proj}</div></div>
+                              : row.proj}</td>
                             <td className="px-4 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
                             <td className="px-4 py-4 text-center text-xs font-mono text-slate-400">{row.weather_desc}</td>
                             <RedZoneCell kp={row.off_rz_kp} trips={row.off_rz_trips} stall={row.off_stall_rate} className="text-blue-300" />
                             <RedZoneCell kp={row.def_rz_kp} trips={row.def_rz_trips} stall={row.def_stall_rate} className="text-slate-300" />
-                            <td className="px-4 py-4 text-center"><div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.l3_act_sum >= row.l3_proj_sum ? 'text-green-400' : 'text-red-400'}`}><span>{row.l3_act_sum ?? 0}</span><span className="mx-1 text-slate-600">/</span><span className="text-slate-500">{row.l3_proj_sum ?? 0}</span></div><div className="text-[9px] text-slate-500 uppercase">Act / Proj</div></td>
+                            <td className="px-4 py-4 text-center"><div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.l3_act_sum >= row.l3_proj_sum ? 'text-green-400' : 'text-red-400'}`}><span>{row.l3_act_sum ?? 0}</span><span className="mx-1 text-slate-600">/</span><span className="text-slate-500">{row.l3_proj_sum ?? 0}</span></div><div className="text-[11px] text-slate-500 uppercase">Act / Proj</div></td>
                             <td className="px-4 py-4 text-center font-mono text-amber-400">{Number(row.vegas).toFixed(1)}</td>
                             <td className="px-4 py-4 text-center font-mono text-slate-300">{Number(row.off_ppg).toFixed(1)} {row.off_ppg < 15 && <Hint side="left" text={`Cold offense: his team averages under 15 points per game (${winLabel})`}>❄️</Hint>}</td>
                             <td className="px-4 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && <Hint side="left" text={`Tough defense: the opponent allows under 17 points per game (${winLabel})`}>🛡️</Hint>}</td>
@@ -556,8 +593,8 @@ const App = () => {
                       <td className="px-4 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                       <PlayerCell player={row} subtext={row.team} />
                       <td className="px-4 py-4 text-center font-bold text-emerald-400 text-lg">{row.fpts}</td>
-                      <td className="px-4 py-4 text-center"><div className="font-bold text-white">{Number(row.avg_fpts).toFixed(1)}</div><div className="text-[10px] text-slate-500 uppercase font-bold">Games: {row.games}</div></td>
-                      <td className="px-4 py-4 text-center"><div className="text-slate-300">{row.fg_made}/{row.fg_att}</div><div className="text-[10px] text-blue-400 font-mono">{row.pct}%</div></td>
+                      <td className="px-4 py-4 text-center"><div className="font-bold text-white">{Number(row.avg_fpts).toFixed(1)}</div><div className="text-[11px] text-slate-500 uppercase font-bold">Games: {row.games}</div></td>
+                      <td className="px-4 py-4 text-center"><div className="text-slate-300">{row.fg_made}/{row.fg_att}</div><div className="text-[11px] text-blue-400 font-mono">{row.pct}%</div></td>
                       <td className="px-4 py-4 text-center"><span className={`px-2 py-1 rounded ${row.longs >= 4 ? 'bg-amber-500/20 text-amber-400' : 'text-slate-500'}`}>{row.longs}</span></td>
                       <td className="px-4 py-4 text-center text-blue-300">{row.dome_pct}%</td>
                       <td className="px-4 py-4 text-center text-slate-300">{row.rz_trips}</td>

@@ -66,13 +66,13 @@ export const HistoryBars = ({ games }) => {
   return (
     <div className="space-y-3">
       {games.map((g, i) => {
-        if (g.status === 'BYE' || g.status === 'DNS') return <div key={i} className="text-[10px]"><div className="text-slate-500 mb-0.5">Wk {g.week}: {g.status}</div><div className="w-full bg-slate-800/50 h-4 rounded-full relative"><div className="bg-slate-700 h-full rounded-full" style={{width: '100%'}}></div></div></div>;
+        if (g.status === 'BYE' || g.status === 'DNS') return <div key={i} className="text-[11px]"><div className="text-slate-500 mb-0.5">Wk {g.week}: {g.status}</div><div className="w-full bg-slate-800/50 h-4 rounded-full relative"><div className="bg-slate-700 h-full rounded-full" style={{width: '100%'}}></div></div></div>;
         const projRounded = Math.round(g.proj); const diff = g.act - projRounded; const maxVal = Math.max(20, projRounded, g.act); const projPct = (projRounded / maxVal) * 100; const actPct = (g.act / maxVal) * 100;
         return (
-          <div key={i} className="text-[10px]">
+          <div key={i} className="text-[11px]">
             <div className="flex justify-between text-slate-400 mb-0.5 font-bold"><span>Wk {g.week} vs {g.opp}</span><span className={g.act >= projRounded ? "text-green-400" : "text-red-400"}>{g.act >= projRounded ? "+" : ""}{diff}</span></div>
-            <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative"><div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}><span className="text-[9px] text-white font-bold leading-none">Projection {projRounded}</span></div></div>
-            <div className="w-full bg-slate-800/50 h-4 rounded-full relative"><div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}><span className="text-[9px] text-white font-bold leading-none">Actual {g.act}</span></div></div>
+            <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative"><div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}><span className="text-[11px] text-white font-bold leading-none">Projection {projRounded}</span></div></div>
+            <div className="w-full bg-slate-800/50 h-4 rounded-full relative"><div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}><span className="text-[11px] text-white font-bold leading-none">Actual {g.act}</span></div></div>
           </div>
         );
       })}
@@ -90,7 +90,7 @@ const HINT_SIDE = {
 export const Hint = ({ text, children, side = 'top', className = '' }) => (
   <span tabIndex={0} aria-label={typeof text === 'string' ? text : undefined} className={`relative inline-flex group/hint cursor-help outline-none ${className}`}>
     {children}
-    <span role="tooltip" className={`absolute ${HINT_SIDE[side]} z-50 w-max max-w-[220px] px-2 py-1 rounded bg-slate-950 border border-slate-700 text-[10px] leading-snug font-normal normal-case tracking-normal text-slate-200 text-left whitespace-normal shadow-xl opacity-0 pointer-events-none transition-opacity group-hover/hint:opacity-100 group-focus/hint:opacity-100`}>
+    <span role="tooltip" className={`absolute ${HINT_SIDE[side]} z-50 w-max max-w-[220px] px-2 py-1 rounded bg-slate-950 border border-slate-700 text-[11px] leading-snug font-normal normal-case tracking-normal text-slate-200 text-left whitespace-normal shadow-xl opacity-0 pointer-events-none transition-opacity group-hover/hint:opacity-100 group-focus/hint:opacity-100`}>
       {text}
     </span>
   </span>
@@ -126,7 +126,7 @@ const photoUrl = (player) => (player.kicker_player_name?.includes('Aubrey') ? '/
 // --- PHONE: one card per kicker (the Week Model table is ~1,200px wide) ---
 const MiniStat = ({ label, value, className = 'text-slate-200' }) => (
   <div className="min-w-0">
-    <div className="text-[9px] uppercase text-slate-500 leading-none mb-0.5">{label}</div>
+    <div className="text-[11px] text-slate-500 leading-none mb-0.5">{label}</div>
     <div className={`text-xs font-mono font-semibold truncate ${className}`}>{value}</div>
   </div>
 );
@@ -140,23 +140,23 @@ export const KickerCard = ({ row, rank, expanded, onToggle, highlight, children 
   const l3Good = (row.l3_act_sum ?? 0) >= (row.l3_proj_sum ?? 0);
   const rz = (kp, stall) => (kp != null ? f1(kp) : `${stall ?? '–'}%`);
   return (
-    <div className={`${highlight ? 'bg-purple-950' : 'bg-slate-900'} ${expanded ? 'sm:col-span-2' : ''}`}>
+    <div className={`${highlight ? 'bg-purple-950' : 'bg-slate-900'} ${expanded ? 'sm:col-span-2' : ''} ${row.final_pts != null && !expanded ? 'opacity-60' : ''}`}>
       <button type="button" onClick={onToggle} aria-expanded={expanded} className="w-full text-left px-3 py-3 flex gap-3 active:bg-slate-800/60 transition-colors">
         <div className="flex flex-col items-center gap-1 w-12 shrink-0">
           {imgError || !url ? <HelmetIcon borderColor={ring} /> : <img src={url} alt={row.kicker_player_name} className={`w-12 h-12 rounded-full border-2 object-cover ${ring}`} onError={() => setImgError(true)} />}
-          <span className="text-[10px] font-mono text-slate-500">#{rank}</span>
+          <span className="text-[11px] font-mono text-slate-500">#{rank}</span>
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="font-bold text-white text-sm">{row.kicker_player_name}</span>
             {row.isTop5 && <span className="text-xs" aria-label="Top 5 scorer this season">🔥</span>}
-            {badge && <span className={`text-[9px] border px-1 rounded font-bold ${badge[1]}`}>{badge[0]}</span>}
+            {badge && <span className={`text-[11px] border px-1 rounded font-bold ${badge[1]}`}>{badge[0]}</span>}
           </div>
           <div className="text-[11px] text-slate-400 truncate">{row.team} vs {row.opponent} · {row.weather_desc}</div>
           {(row.injury_status || report.practice || report.injury) && (
-            <div className={`text-[10px] truncate ${row.injury_status ? text : 'text-sky-300'}`}>{[row.injury_status, report.injury].filter(Boolean).join(': ')}{report.practice ? ` · ${report.practice}` : ''}</div>
+            <div className={`text-[11px] truncate ${row.injury_status ? text : 'text-sky-300'}`}>{[row.injury_status, report.injury].filter(Boolean).join(': ')}{report.practice ? ` · ${report.practice}` : ''}</div>
           )}
-          <div className="text-[10px] text-slate-500">{row.season_games ? `#${row.ytdRank} this season · ${f1(row.season_avg)} pts/game` : 'No games yet this season'}</div>
+          <div className="text-[11px] text-slate-500">{row.season_games ? `#${row.ytdRank} this season · ${f1(row.season_avg)} pts/game` : 'No games yet this season'}</div>
           <div className="mt-2 grid grid-cols-3 gap-x-2 gap-y-1.5">
             <MiniStat label="Grade" value={row.grade} className={row.grade > 100 ? 'text-purple-300' : 'text-white'} />
             <MiniStat label="Vegas" value={f1(row.vegas)} className="text-amber-400" />
@@ -167,8 +167,19 @@ export const KickerCard = ({ row, rank, expanded, onToggle, highlight, children 
           </div>
         </div>
         <div className="flex flex-col items-end shrink-0">
-          <span className={`text-2xl font-black leading-none ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</span>
-          <span className="text-[9px] uppercase text-slate-500 mt-0.5">proj</span>
+          {row.final_pts != null ? (
+            // his game is over: what he scored, with the projection underneath
+            <>
+              <span className="text-[11px] font-bold uppercase text-slate-400 leading-none">Final</span>
+              <span className="text-2xl font-black leading-none text-white">{Math.round(row.final_pts * 10) / 10}</span>
+              <span className="text-[11px] text-slate-500 mt-0.5">proj {row.proj}</span>
+            </>
+          ) : (
+            <>
+              <span className={`text-2xl font-black leading-none ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</span>
+              <span className="text-[11px] uppercase text-slate-500 mt-0.5">proj</span>
+            </>
+          )}
           <span className="mt-2 text-slate-600">{expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>
         </div>
       </button>
@@ -186,14 +197,14 @@ export const YtdCard = ({ row, rank }) => {
     <div className="px-3 py-3 flex gap-3 bg-slate-900">
       <div className="flex flex-col items-center gap-1 w-12 shrink-0">
         {imgError || !url ? <HelmetIcon borderColor="border-slate-600" /> : <img src={url} alt={row.kicker_player_name} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={() => setImgError(true)} />}
-        <span className="text-[10px] font-mono text-slate-500">#{rank}</span>
+        <span className="text-[11px] font-mono text-slate-500">#{rank}</span>
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
           <span className="font-bold text-white text-sm truncate">{row.kicker_player_name}</span>
           <span className="text-[11px] text-slate-400">{row.team}</span>
         </div>
-        <div className="text-[10px] text-slate-500 mb-2">{row.games} game{Number(row.games) === 1 ? '' : 's'} · {Number(row.avg_fpts).toFixed(1)} pts/game</div>
+        <div className="text-[11px] text-slate-500 mb-2">{row.games} game{Number(row.games) === 1 ? '' : 's'} · {Number(row.avg_fpts).toFixed(1)} pts/game</div>
         <div className="grid grid-cols-3 gap-x-2 gap-y-1.5">
           <MiniStat label="Field goals" value={`${row.fg_made}/${row.fg_att}`} />
           <MiniStat label="FG %" value={`${row.pct}%`} className="text-blue-300" />
@@ -205,7 +216,7 @@ export const YtdCard = ({ row, rank }) => {
       </div>
       <div className="flex flex-col items-end shrink-0">
         <span className="text-2xl font-black leading-none text-emerald-400">{Math.round(row.fpts * 10) / 10}</span>
-        <span className="text-[9px] uppercase text-slate-500 mt-0.5">pts</span>
+        <span className="text-[11px] uppercase text-slate-500 mt-0.5">pts</span>
       </div>
     </div>
   );
@@ -233,7 +244,7 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
                 {player.kicker_player_name}
                 {player.isTop5 && <Hint text="Top 5 scorer this season (your scoring)"><span className="text-sm">🔥</span></Hint>}
               </div>
-              {badge && <Hint text={badge[2]}><span className={`text-[9px] border px-1.5 py-0.5 rounded font-bold whitespace-nowrap ${badge[1]}`}>{badge[0]}</span></Hint>}
+              {badge && <Hint text={badge[2]}><span className={`text-[11px] border px-1.5 py-0.5 rounded font-bold whitespace-nowrap ${badge[1]}`}>{badge[0]}</span></Hint>}
           </div>
 
           <div className="relative group/kicker flex items-center gap-3 w-fit">
@@ -256,14 +267,14 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
 
               {/* SEASON TOOLTIP: this season's real numbers (not the kicker avg), + injury */}
               <div role="tooltip" className="absolute left-full top-0 ml-3 w-56 p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs opacity-0 group-hover/kicker:opacity-100 transition-opacity z-50 shadow-xl pointer-events-none">
-                  <div className="text-[10px] uppercase text-slate-500 font-bold mb-1.5">{player.season} season · your scoring</div>
+                  <div className="text-[11px] uppercase text-slate-500 font-bold mb-1.5">{player.season} season · your scoring</div>
                   {sGames > 0 ? (
                     <div className="flex flex-col gap-1">
                       <div className="flex justify-between"><span className="text-slate-400">Season rank</span><span className="text-white font-bold">#{player.ytdRank}{player.season_kickers ? <span className="text-slate-500 font-normal"> of {player.season_kickers}</span> : null}</span></div>
                       <div className="flex justify-between"><span className="text-slate-400">Fantasy points</span><span className="text-white font-mono">{Math.round(player.season_pts * 10) / 10}</span></div>
                       <div className="flex justify-between"><span className="text-slate-400">Avg per game</span><span className="text-emerald-400 font-mono font-bold">{player.season_avg.toFixed(1)}{player.ppgRank ? <span className="text-slate-500 font-normal"> (#{player.ppgRank})</span> : null}</span></div>
                       <div className="flex justify-between"><span className="text-slate-400">Games</span><span className="text-white font-mono">{sGames}</span></div>
-                      {player.isTop5 && <div className="text-amber-300 text-[10px] mt-0.5">🔥 Top 5 scorer this season</div>}
+                      {player.isTop5 && <div className="text-amber-300 text-[11px] mt-0.5">🔥 Top 5 scorer this season</div>}
                     </div>
                   ) : <div className="text-slate-400">No games yet this season</div>}
                   {(statusText || report.injury || report.practice) && (
@@ -299,33 +310,33 @@ const MatchupHistory = ({ player }) => {
   return (
     <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2.5">
       <div className="text-emerald-400 font-bold pb-1 border-b border-slate-800 flex items-center gap-2"><History className="w-3 h-3" /> MATCHUP HISTORY &amp; NEWS</div>
-      {!mh ? <div className="text-[10px] text-slate-500 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Loading history…</div> : (
+      {!mh ? <div className="text-[11px] text-slate-500 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Loading history…</div> : (
         <>
           {mh.venue && (
             <div>
-              <div className="text-[10px] text-slate-400 leading-tight">Kickers {mh.venue.where}{mh.venue.conditions.length ? `, ${mh.venue.conditions.join(', ')}` : ''}:</div>
+              <div className="text-[11px] text-slate-400 leading-tight">Kickers {mh.venue.where}{mh.venue.conditions.length ? `, ${mh.venue.conditions.join(', ')}` : ''}:</div>
               <div className="text-xs text-white mt-0.5"><span className="font-mono font-bold text-emerald-300">{f1(mh.venue.pts)}</span> pts · {f1(mh.venue.fgAtt)} FG tries a game
                 {mh.venue.vsAvg != null && (Math.abs(mh.venue.vsAvg) < 0.05
-                  ? <span className="ml-1 text-[10px] text-slate-400">(same as avg)</span>
-                  : <span className={`ml-1 text-[10px] ${mh.venue.vsAvg > 0 ? 'text-emerald-400' : 'text-red-400'}`}>({signed(mh.venue.vsAvg)} vs avg)</span>)}</div>
-              <div className="text-[9px] text-slate-500">{mh.venue.n.toLocaleString()} kicker-games since 2000 · <a href={mh.venue.link} className="text-sky-400 hover:underline">see them</a></div>
+                  ? <span className="ml-1 text-[11px] text-slate-400">(same as avg)</span>
+                  : <span className={`ml-1 text-[11px] ${mh.venue.vsAvg > 0 ? 'text-emerald-400' : 'text-red-400'}`}>({signed(mh.venue.vsAvg)} vs avg)</span>)}</div>
+              <div className="text-[11px] text-slate-500">{mh.venue.n.toLocaleString()} kicker-games since 2000 · <a href={mh.venue.link} className="text-sky-400 hover:underline">see them</a></div>
             </div>
           )}
           {mh.own && (
             <div>
-              <div className="text-[10px] text-slate-400 leading-tight">{player.kicker_player_name}, {mh.own.conditions.join(', ')}:</div>
+              <div className="text-[11px] text-slate-400 leading-tight">{player.kicker_player_name}, {mh.own.conditions.join(', ')}:</div>
               <div className="text-xs text-white mt-0.5"><span className="font-mono font-bold text-emerald-300">{f1(mh.own.pts)}</span> pts a game
-                {mh.own.others && <span className="text-[10px] text-slate-400"> vs {f1(mh.own.others.pts)} otherwise</span>}</div>
-              <div className="text-[9px] text-slate-500">{mh.own.n} of his games · <a href={mh.own.link} className="text-sky-400 hover:underline">see them</a></div>
+                {mh.own.others && <span className="text-[11px] text-slate-400"> vs {f1(mh.own.others.pts)} otherwise</span>}</div>
+              <div className="text-[11px] text-slate-500">{mh.own.n} of his games · <a href={mh.own.link} className="text-sky-400 hover:underline">see them</a></div>
             </div>
           )}
           {note ? (
             <div className="border-t border-slate-800 pt-2">
-              <div className="text-[10px] text-slate-500">{newsDate(note.post_date)} · RotoWire</div>
+              <div className="text-[11px] text-slate-500">{newsDate(note.post_date)} · RotoWire</div>
               <div className="text-xs font-semibold text-white leading-tight">{note.headline}</div>
-              <div className="text-[10px] text-slate-400 leading-snug line-clamp-3">{note.body}</div>
+              <div className="text-[11px] text-slate-400 leading-snug line-clamp-3">{note.body}</div>
             </div>
-          ) : <div className="text-[10px] text-slate-600 border-t border-slate-800 pt-2">No news in the last 3 weeks.</div>}
+          ) : <div className="text-[11px] text-slate-600 border-t border-slate-800 pt-2">No news in the last 3 weeks.</div>}
         </>
       )}
     </div>
@@ -374,31 +385,31 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-blue-300 font-bold mb-1 pb-1 border-b border-slate-800">MATCHUP GRADE</div>
             <div><div className="flex justify-between text-xs text-slate-300"><span>Offense Score</span><span className="font-mono text-white">{f1(player.off_score_val)}</span></div>{hasRz
-              ? <div className="text-[9px] text-slate-500 leading-tight">({f1(player.off_rz_kp)} RZ kicker pts / {f1(lgOffKp)} lg) × {scale}<br />{f1(player.off_rz_trips)} red-zone trips/g, {f1(player.off_stall_rate)}% stall</div>
-              : <div className="text-[9px] text-slate-500">({f1(player.off_stall_rate)}% / {f1(lgOffStall)}% lg) × {scale}</div>}</div>
+              ? <div className="text-[11px] text-slate-500 leading-tight">({f1(player.off_rz_kp)} RZ kicker pts / {f1(lgOffKp)} lg) × {scale}<br />{f1(player.off_rz_trips)} red-zone trips/g, {f1(player.off_stall_rate)}% stall</div>
+              : <div className="text-[11px] text-slate-500">({f1(player.off_stall_rate)}% / {f1(lgOffStall)}% lg) × {scale}</div>}</div>
             <div><div className="flex justify-between text-xs text-slate-300"><span>Defense Score</span><span className="font-mono text-white">{f1(player.def_score_val)}</span></div>{hasRz
-              ? <div className="text-[9px] text-slate-500 leading-tight">({f1(player.def_rz_kp)} RZ kicker pts allowed / {f1(lgDefKp)} lg) × {scale}<br />{f1(player.def_rz_trips)} trips allowed/g, {f1(player.def_stall_rate)}% stall</div>
-              : <div className="text-[9px] text-slate-500">({f1(player.def_stall_rate)}% / {f1(lgDefStall)}% lg) × {scale}</div>}</div>
-            <div className="border-t border-slate-800 pt-1"><div className="text-[10px] text-slate-400 mb-0.5">Bonuses:</div><div className="text-[10px] space-y-0.5">{bonuses.length > 0 ? bonuses.map(([name, val]) => <div key={name} className={`flex justify-between ${val < 0 ? 'text-red-400' : 'text-emerald-400'}`}><span>{bonusLabel(name, player, settings)}</span><span className="font-mono">{val > 0 ? '+' : ''}{val}</span></div>) : <div className="text-slate-600 italic">None</div>}</div></div>
-            <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white"><span>Total Grade</span><span>{f1(player.grade)}</span></div><div className="flex justify-between text-[10px] text-blue-400 mt-1"><span>Week {week} Multiplier (÷{divisor})</span><span className="font-mono font-bold">{f2(c.mult)}x</span></div></div>
+              ? <div className="text-[11px] text-slate-500 leading-tight">({f1(player.def_rz_kp)} RZ kicker pts allowed / {f1(lgDefKp)} lg) × {scale}<br />{f1(player.def_rz_trips)} trips allowed/g, {f1(player.def_stall_rate)}% stall</div>
+              : <div className="text-[11px] text-slate-500">({f1(player.def_stall_rate)}% / {f1(lgDefStall)}% lg) × {scale}</div>}</div>
+            <div className="border-t border-slate-800 pt-1"><div className="text-[11px] text-slate-400 mb-0.5">Bonuses:</div><div className="text-[11px] space-y-0.5">{bonuses.length > 0 ? bonuses.map(([name, val]) => <div key={name} className={`flex justify-between ${val < 0 ? 'text-red-400' : 'text-emerald-400'}`}><span>{bonusLabel(name, player, settings)}</span><span className="font-mono">{val > 0 ? '+' : ''}{val}</span></div>) : <div className="text-slate-600 italic">None</div>}</div></div>
+            <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white"><span>Total Grade</span><span>{f1(player.grade)}</span></div><div className="flex justify-between text-[11px] text-blue-400 mt-1"><span>Week {week} Multiplier (÷{divisor})</span><span className="font-mono font-bold">{f2(c.mult)}x</span></div></div>
           </div>
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">WEIGHTED PROJECTION</div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Base ({wLabel(c.wb)})</span><span className="font-mono text-white">{f1(c.base * c.wb)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(c.avg)} (Kicker Avg) × {f2(c.mult)} (Mult) = {f1(c.base)}</div>{avgGames && <div className="text-[9px] text-sky-300/70 leading-tight">{avgGames}</div>}</div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Offense ({wLabel(c.wo)})</span><span className="font-mono text-white">{f1(c.off * c.wo)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(player.exp_team_pts)} (Exp Pts) × {pctOf(player.off_share)} (Share) × {f2(c.ratio)} (Fan/Real) = {f1(c.off)}</div></div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Defense ({wLabel(c.wd)})</span><span className="font-mono text-white">{f1(c.def * c.wd)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(player.exp_opp_allowed)} (Exp Allowed) × {pctOf(player.def_share)} (Share) × {f2(c.ratio)} (Fan/Real) = {f1(c.def)}</div></div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Base ({wLabel(c.wb)})</span><span className="font-mono text-white">{f1(c.base * c.wb)}</span></div><div className="text-[11px] text-slate-500 leading-tight">{f1(c.avg)} (Kicker Avg) × {f2(c.mult)} (Mult) = {f1(c.base)}</div>{avgGames && <div className="text-[11px] text-sky-300/70 leading-tight">{avgGames}</div>}</div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Offense ({wLabel(c.wo)})</span><span className="font-mono text-white">{f1(c.off * c.wo)}</span></div><div className="text-[11px] text-slate-500 leading-tight">{f1(player.exp_team_pts)} (Exp Pts) × {pctOf(player.off_share)} (Share) × {f2(c.ratio)} (Fan/Real) = {f1(c.off)}</div></div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Defense ({wLabel(c.wd)})</span><span className="font-mono text-white">{f1(c.def * c.wd)}</span></div><div className="text-[11px] text-slate-500 leading-tight">{f1(player.exp_opp_allowed)} (Exp Allowed) × {pctOf(player.def_share)} (Share) × {f2(c.ratio)} (Fan/Real) = {f1(c.def)}</div></div>
             {c.lg != null && c.pull !== 1 && (
               <div className="border-t border-slate-800 pt-1">
                 <div className="flex justify-between text-xs text-slate-300"><span>League pull</span><span className="font-mono text-white">{f1(c.model)} → {f1(c.raw)}</span></div>
-                <div className="text-[9px] text-slate-500 leading-tight">Keeps {Math.round(c.pull * 100)}% of the gap from the average kicker ({f1(c.lg)}). Kicker scoring is very random, so this makes the points more realistic without changing the order.</div>
+                <div className="text-[11px] text-slate-500 leading-tight">Keeps {Math.round(c.pull * 100)}% of the gap from the average kicker ({f1(c.lg)}). Kicker scoring is very random, so this makes the points more realistic without changing the order.</div>
               </div>
             )}
-            <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white text-[11px]"><span>Week {week} Projection</span><span className="text-emerald-400 text-lg">{player.proj}</span></div><div className="text-[9px] text-right text-slate-500">({f2(c.raw)} rounded)</div></div>
+            <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white text-[11px]"><span>Week {week} Projection</span><span className="text-emerald-400 text-lg">{player.proj}</span></div><div className="text-[11px] text-right text-slate-500">({f2(c.raw)} rounded)</div></div>
           </div>
-          <div className="bg-slate-900 p-3 rounded border border-slate-800/50"><div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between"><div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> Last 3 Trend</div><span className={`text-[10px] font-mono ${trendColor}`}>{trendSign}{l3_diff.toFixed(1)}</span></div><HistoryBars games={player.history?.l3_games} /></div>
+          <div className="bg-slate-900 p-3 rounded border border-slate-800/50"><div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between"><div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> Last 3 Trend</div><span className={`text-[11px] font-mono ${trendColor}`}>{trendSign}{l3_diff.toFixed(1)}</span></div><HistoryBars games={player.history?.l3_games} /></div>
           <MatchupHistory player={player} />
         </div>
-        <div className="mt-3 bg-slate-800/40 p-2 rounded border border-slate-800 text-[10px] text-slate-400 flex flex-wrap gap-x-6 gap-y-1 justify-center">
+        <div className="mt-3 bg-slate-800/40 p-2 rounded border border-slate-800 text-[11px] text-slate-400 flex flex-wrap gap-x-6 gap-y-1 justify-center">
           {hasVegas
             ? <><span><strong className="text-slate-200">Vegas:</strong> {player.details_vegas_spread} / {f1(player.details_vegas_total)} Total</span><span><strong className="text-slate-200">Implied Score:</strong> {f1(player.vegas)} pts</span></>
             : <span className="text-amber-400/80">No Vegas line yet: expected points use {win} averages only</span>}
@@ -410,7 +421,7 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
           const winGames = win === 'L3' ? 3 : 5;
           const form = (fromLast) => `${winGames - (fromLast || 0)} this season + ${fromLast || 0} from last season`;
           return (
-            <div className="mt-2 text-[10px] text-sky-300/80 text-center">
+            <div className="mt-2 text-[11px] text-sky-300/80 text-center">
               Early season: {win} team form uses {form(player.team_prior_games)} · Opponent: {form(player.opp_prior_games)}
             </div>
           );
