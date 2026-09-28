@@ -175,10 +175,43 @@ export const KickerCard = ({ row, rank, expanded, onToggle, highlight, children 
   );
 };
 
+// --- PHONE: Historical YTD card (this season's totals, your scoring) ---
+export const YtdCard = ({ row, rank }) => {
+  const [imgError, setImgError] = useState(false);
+  const url = photoUrl(row);
+  const n = (x) => (x == null || Number.isNaN(Number(x)) ? '–' : x);
+  return (
+    <div className="px-3 py-3 flex gap-3">
+      <div className="flex flex-col items-center gap-1 w-12 shrink-0">
+        {imgError || !url ? <HelmetIcon borderColor="border-slate-600" /> : <img src={url} alt={row.kicker_player_name} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={() => setImgError(true)} />}
+        <span className="text-[10px] font-mono text-slate-500">#{rank}</span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <span className="font-bold text-white text-sm truncate">{row.kicker_player_name}</span>
+          <span className="text-[11px] text-slate-400">{row.team}</span>
+        </div>
+        <div className="text-[10px] text-slate-500 mb-2">{row.games} game{Number(row.games) === 1 ? '' : 's'} · {Number(row.avg_fpts).toFixed(1)} pts/game</div>
+        <div className="grid grid-cols-3 gap-x-2 gap-y-1.5">
+          <MiniStat label="Field goals" value={`${row.fg_made}/${row.fg_att}`} />
+          <MiniStat label="FG %" value={`${row.pct}%`} className="text-blue-300" />
+          <MiniStat label="50+ FGs" value={row.longs} className={row.longs >= 4 ? 'text-amber-400' : 'text-slate-200'} />
+          <MiniStat label="Dome games" value={`${n(row.dome_pct)}%`} />
+          <MiniStat label="RZ trips" value={n(row.rz_trips)} />
+          <MiniStat label="Stall off/opp" value={`${n(row.off_stall_rate_ytd ?? 0)}/${n(row.def_stall_rate_ytd ?? 0)}`} />
+        </div>
+      </div>
+      <div className="flex flex-col items-end shrink-0">
+        <span className="text-2xl font-black leading-none text-emerald-400">{Math.round(row.fpts * 10) / 10}</span>
+        <span className="text-[9px] uppercase text-slate-500 mt-0.5">pts</span>
+      </div>
+    </div>
+  );
+};
+
 // --- PLAYER CELL ---
 // Hovering the kicker shows his THIS-season numbers (your scoring) + any injury news.
-// sticky = pinned to the left while a wide table scrolls sideways (phones).
-export const PlayerCell = ({ player, subtext, sleeperStatus, sticky = false }) => {
+export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   const [imgError, setImgError] = useState(false); // Track image load errors
 
   const statusText = player.injury_status || '';
@@ -191,7 +224,7 @@ export const PlayerCell = ({ player, subtext, sleeperStatus, sticky = false }) =
   const badge = SLEEPER_BADGES[sleeperStatus];
 
   return (
-    <td className={`px-3 py-4 font-medium text-white ${sticky ? 'sticky left-0 z-10 bg-slate-900 md:static' : ''}`}>
+    <td className="px-3 py-4 font-medium text-white">
       <div className="flex flex-col justify-center">
           <div className="flex flex-wrap items-center gap-2 mb-2">
               <div className="text-xs md:text-sm font-bold text-white leading-tight whitespace-normal break-words flex items-center gap-1">

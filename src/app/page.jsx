@@ -8,7 +8,7 @@ import { BUY_ME_A_COFFEE_URL } from '../data/constants';
 import useLeagues from '../utils/useLeagues';
 import { buildInsight } from '../utils/insights';
 import { calcFPts, calcProjection, weekKicks, fetchSleeperScores } from '../utils/scoring';
-import { HeaderCell, PlayerCell, DeepDiveRow, Hint, KickerCard, MathCard } from '../components/KickerComponents';
+import { HeaderCell, PlayerCell, DeepDiveRow, Hint, KickerCard, MathCard, YtdCard } from '../components/KickerComponents';
 import AccuracyTab from '../components/AccuracyTab';
 import SettingsTab from '../components/SettingsTab';
 import InjuryReportTab from '../components/InjuryReportTab';
@@ -100,6 +100,15 @@ const loadSiteData = async () => {
 };
 
 const TABS = ['potential', 'accuracy', 'ytd', 'ask', 'injuries', 'glossary', 'settings'];
+
+// Each tab sorts by its own columns. A key left over from the other tab (after Back /
+// Forward, or opening ?tab=ytd directly) falls back to that tab's default.
+const BOARD_SORT_KEYS = ['proj', 'grade', 'off_rz_kp', 'def_rz_kp', 'proj_acc', 'vegas', 'off_ppg', 'def_pa'];
+const YTD_SORT_KEYS = ['fpts', 'avg_fpts', 'pct', 'longs', 'dome_pct', 'rz_trips', 'off_stall_rate_ytd', 'def_stall_rate_ytd'];
+const sortFor = (tab, s) => {
+  const [keys, fallback] = tab === 'ytd' ? [YTD_SORT_KEYS, 'fpts'] : [BOARD_SORT_KEYS, 'proj'];
+  return keys.includes(s.key) ? s : { key: fallback, direction: 'desc' };
+};
 
 // A main tab. Phones: a filled pill with a short name (the grid shows all 6 at once);
 // 640px+: the full name, underlined when active.
@@ -206,7 +215,8 @@ const App = () => {
 
   const handleSort = (key) => {
     let direction = 'desc';
-    if (sortConfig.key === key && sortConfig.direction === 'desc') direction = 'asc';
+    const current = sortFor(activeTab, sortConfig);
+    if (current.key === key && current.direction === 'desc') direction = 'asc';
     setSortConfig({ key, direction });
   };
 
@@ -218,6 +228,8 @@ const App = () => {
 
   const { rankings, ytd, injuries, meta, history = [] } = data;
   const settings = meta?.model_settings || {};
+  const boardSort = sortFor('potential', sortConfig);
+  const ytdSort = sortFor('ytd', sortConfig);
   const baselines = meta?.league_baselines || {};   // average kicker-game per season (league pull)
   const winLabel = windowMode.toUpperCase();
   const leagueAvgs = meta?.[`league_avgs_${windowMode}`] || {};
@@ -330,20 +342,20 @@ const App = () => {
           if (aMine && !bMine) return -1;
           if (!aMine && bMine) return 1;
           
-          let valA = sortConfig.key === 'proj' ? (a.calc?.raw ?? a.proj) : a[sortConfig.key];
-          let valB = sortConfig.key === 'proj' ? (b.calc?.raw ?? b.proj) : b[sortConfig.key];
-          if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
-          if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
-          if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+          let valA = boardSort.key === 'proj' ? (a.calc?.raw ?? a.proj) : a[boardSort.key];
+          let valB = boardSort.key === 'proj' ? (b.calc?.raw ?? b.proj) : b[boardSort.key];
+          if (boardSort.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
+          if (valA < valB) return boardSort.direction === 'asc' ? -1 : 1;
+          if (valA > valB) return boardSort.direction === 'asc' ? 1 : -1;
           return 0;
       });
   } else {
      processed.sort((a, b) => {
-         let valA = sortConfig.key === 'proj' ? (a.calc?.raw ?? a.proj) : a[sortConfig.key];
-         let valB = sortConfig.key === 'proj' ? (b.calc?.raw ?? b.proj) : b[sortConfig.key];
-         if (sortConfig.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
-         if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
-         if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+         let valA = boardSort.key === 'proj' ? (a.calc?.raw ?? a.proj) : a[boardSort.key];
+         let valB = boardSort.key === 'proj' ? (b.calc?.raw ?? b.proj) : b[boardSort.key];
+         if (boardSort.key === 'proj_acc') { valA = a.acc_diff; valB = b.acc_diff; }
+         if (valA < valB) return boardSort.direction === 'asc' ? -1 : 1;
+         if (valA > valB) return boardSort.direction === 'asc' ? 1 : -1;
          return 0;
      });
   }
@@ -366,13 +378,13 @@ const App = () => {
         season_pts: pts, season_games: Number(p.games) || 0, season_avg: p.games > 0 ? pts / p.games : 0,
         ytdRank: ytdRankMap.get(p.gsis_id), ppgRank: ppgRankMap.get(p.gsis_id), season_kickers: ytd.length };
   }).sort((a, b) => {
-      let key = sortConfig.key;
+      let key = ytdSort.key;
       if (key === 'pct') key = 'pct_val';
       if (key === 'avg_fpts') key = 'avg_fpts';
       let valA = a[key];
       let valB = b[key];
-      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+      if (valA < valB) return ytdSort.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return ytdSort.direction === 'asc' ? 1 : -1;
       return 0;
   });
 
@@ -384,26 +396,26 @@ const App = () => {
         {/* Header */}
         <div className="mb-5 sm:mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <div className="flex items-center gap-3 sm:mb-2"><img src="/assets/logo.png" alt="KickerGenius" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" /><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
+            <div className="flex items-center justify-center sm:justify-start gap-3 sm:mb-2"><img src="/assets/logo.png" alt="KickerGenius" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" /><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
             <p className="hidden sm:block text-slate-400 ml-1">Advanced Stall Rate Analytics & Fantasy Projections</p>
           </div>
-          {/* compact controls: one line (beside the title on wide screens, under it otherwise) */}
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-             <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noopener noreferrer" className="h-8 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 px-3 rounded flex items-center gap-1.5 border border-amber-500/40 transition-colors font-semibold whitespace-nowrap">☕ Buy me a coffee</a>
+          {/* compact controls: one line from 640px (beside the title on wide screens); on phones a centred block: coffee + settings side by side, league switcher, then the update pill */}
+          <div className="grid grid-cols-2 gap-2 text-xs sm:flex sm:flex-wrap sm:items-center">
+             <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noopener noreferrer" className="order-1 h-9 sm:h-8 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 px-3 rounded flex items-center justify-center gap-1.5 border border-amber-500/40 transition-colors font-semibold whitespace-nowrap">☕ Buy me a coffee</a>
              {/* league switcher: every tab uses the active league's scoring + rosters */}
              {lg.leagues.length > 0 && (
-               <label className="h-8 bg-slate-800 border border-slate-700 rounded flex items-center gap-1.5 pl-2.5 pr-1 text-white">
+               <label className="order-3 sm:order-2 col-span-2 h-9 sm:h-8 bg-slate-800 border border-slate-700 rounded flex items-center justify-center gap-1.5 pl-2.5 pr-1 text-white">
                  <Gamepad2 className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
                  <span className="sr-only">Active league</span>
-                 <select value={lg.activeId} onChange={(e) => lg.switchLeague(e.target.value)} className="bg-transparent pr-1 font-semibold focus:outline-none max-w-[160px] cursor-pointer">
+                 <select value={lg.activeId} onChange={(e) => lg.switchLeague(e.target.value)} className="bg-transparent pr-1 font-semibold focus:outline-none max-w-[240px] sm:max-w-[160px] cursor-pointer">
                    {lg.leagues.map((l) => <option key={l.id} value={l.id} className="bg-slate-900">{l.name}</option>)}
                    <option value="" className="bg-slate-900">Custom scoring</option>
                  </select>
                  {lg.busy === lg.activeId && lg.activeId && <Loader2 className="w-3 h-3 animate-spin text-slate-400" />}
                </label>
              )}
-             <button onClick={() => goTab('settings')} className="h-8 bg-slate-800 hover:bg-slate-700 text-white px-3 rounded flex items-center gap-1.5 border border-slate-700 transition-colors font-semibold whitespace-nowrap"><Settings className="w-3.5 h-3.5" /> {lg.leagues.length ? 'League Settings' : 'Add your Sleeper league'}</button>
-             <div title={`Data last updated ${meta.updated}`} className="h-8 bg-slate-900 border border-slate-800 rounded px-3 flex items-center gap-1.5 whitespace-nowrap text-white font-semibold"><Clock className="w-3.5 h-3.5 text-slate-500" />{shortStamp(meta.updated)} · Wk {meta.week}</div>
+             <button onClick={() => goTab('settings')} className="order-2 sm:order-3 h-9 sm:h-8 bg-slate-800 hover:bg-slate-700 text-white px-3 rounded flex items-center justify-center gap-1.5 border border-slate-700 transition-colors font-semibold whitespace-nowrap"><Settings className="w-3.5 h-3.5" /> {lg.leagues.length ? 'League Settings' : <><span className="sm:hidden">Add Sleeper league</span><span className="hidden sm:inline">Add your Sleeper league</span></>}</button>
+             <div title={`Data last updated ${meta.updated}`} className="order-4 col-span-2 justify-self-center sm:justify-self-auto h-8 bg-slate-900 border border-slate-800 rounded-full sm:rounded px-3 flex items-center gap-1.5 whitespace-nowrap text-white font-semibold"><Clock className="w-3.5 h-3.5 text-slate-500" />{shortStamp(meta.updated)} · Wk {meta.week}</div>
           </div>
         </div>
 
@@ -427,7 +439,7 @@ const App = () => {
                 <div className="flex items-center gap-4 flex-wrap">
                     {/* phones have no column headers to tap, so sort from here */}
                     <label className="md:hidden flex items-center gap-2 text-sm text-slate-400">Sort
-                      <select value={sortConfig.key} onChange={(e) => setSortConfig({ key: e.target.value, direction: 'desc' })} className="bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                      <select value={boardSort.key} onChange={(e) => setSortConfig({ key: e.target.value, direction: 'desc' })} className="bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
                         <option value="proj">Projection</option>
                         <option value="grade">Matchup grade</option>
                         <option value="vegas">Vegas implied</option>
@@ -457,15 +469,15 @@ const App = () => {
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
                     <th className="px-2 py-3 align-middle text-left w-full min-w-[150px] text-slate-300">Player</th>
-                    <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected fantasy points in your league's scoring (whole numbers)" />
-                    <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description={`Offense + Defense (avg ${settings.grade_scale ?? 40} each) + bonuses. Multiplier = grade ÷ ${settings.grade_divisor ?? 90}`} />
+                    <HeaderCell label="Projection" sortKey="proj" currentSort={boardSort} onSort={handleSort} description="Projected fantasy points in your league's scoring (whole numbers)" />
+                    <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={boardSort} onSort={handleSort} description={`Offense + Defense (avg ${settings.grade_scale ?? 40} each) + bonuses. Multiplier = grade ÷ ${settings.grade_divisor ?? 90}`} />
                     <HeaderCell label="Weather" description="Kickoff forecast (actual conditions once played): sky, wind and temperature. Dome / closed roof = +10 grade; outdoors at 40°F or below = −20." />
-                    <HeaderCell label={`Offense Red Zone (${winLabel})`} sortKey="off_rz_kp" currentSort={sortConfig} onSort={handleSort} description={`Red-zone kicker points per game (${winLabel}): each red-zone trip that stalls = 3 (a field-goal try), each other trip = 1 (the extra point). Below: trips per game and stall rate.`} avg={leagueAvgs.off_rz_kp} />
-                    <HeaderCell label={`Opponent Red Zone (${winLabel})`} sortKey="def_rz_kp" currentSort={sortConfig} onSort={handleSort} description={`Red-zone kicker points per game the opponent ALLOWS (${winLabel}): stalled trip = 3, other trip = 1. Below: trips allowed per game and stall rate forced.`} avg={leagueAvgs.def_rz_kp} />
-                    <HeaderCell label="Projection Accuracy (L3)" sortKey="proj_acc" currentSort={sortConfig} onSort={handleSort} description="Total Actual vs Projected Points (Last 3 Games)" />
-                    <HeaderCell label="Implied Vegas Score Line" sortKey="vegas" currentSort={sortConfig} onSort={handleSort} description="Implied Team Total (Vegas Line & Spread)/2" />
-                    <HeaderCell label={`Offensive PF (${winLabel})`} sortKey="off_ppg" currentSort={sortConfig} onSort={handleSort} description={`His team's average points scored (${winLabel}). ❄️ = under 15 per game`} avg={leagueAvgs.pts} />
-                    <HeaderCell label={`Opponent PA (${winLabel})`} sortKey="def_pa" currentSort={sortConfig} onSort={handleSort} description={`Points the opponent allows per game (${winLabel}). 🛡️ = under 17 per game`} avg={leagueAvgs.pts} />
+                    <HeaderCell label={`Offense Red Zone (${winLabel})`} sortKey="off_rz_kp" currentSort={boardSort} onSort={handleSort} description={`Red-zone kicker points per game (${winLabel}): each red-zone trip that stalls = 3 (a field-goal try), each other trip = 1 (the extra point). Below: trips per game and stall rate.`} avg={leagueAvgs.off_rz_kp} />
+                    <HeaderCell label={`Opponent Red Zone (${winLabel})`} sortKey="def_rz_kp" currentSort={boardSort} onSort={handleSort} description={`Red-zone kicker points per game the opponent ALLOWS (${winLabel}): stalled trip = 3, other trip = 1. Below: trips allowed per game and stall rate forced.`} avg={leagueAvgs.def_rz_kp} />
+                    <HeaderCell label="Projection Accuracy (L3)" sortKey="proj_acc" currentSort={boardSort} onSort={handleSort} description="Total Actual vs Projected Points (Last 3 Games)" />
+                    <HeaderCell label="Implied Vegas Score Line" sortKey="vegas" currentSort={boardSort} onSort={handleSort} description="Implied Team Total (Vegas Line & Spread)/2" />
+                    <HeaderCell label={`Offensive PF (${winLabel})`} sortKey="off_ppg" currentSort={boardSort} onSort={handleSort} description={`His team's average points scored (${winLabel}). ❄️ = under 15 per game`} avg={leagueAvgs.pts} />
+                    <HeaderCell label={`Opponent PA (${winLabel})`} sortKey="def_pa" currentSort={boardSort} onSort={handleSort} description={`Points the opponent allows per game (${winLabel}). 🛡️ = under 17 per game`} avg={leagueAvgs.pts} />
                     <th className="px-6 py-3"></th>
                   </tr>
                 </thead>
@@ -503,28 +515,48 @@ const App = () => {
         
         {activeTab === 'ytd' && (
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
-             <div className="md:hidden px-4 py-2 text-[11px] text-slate-500 border-b border-slate-800">Swipe the table sideways for more stats →</div>
-             <div className="overflow-x-auto">
+             {/* PHONES: a card per kicker + sort */}
+             <div className="md:hidden">
+               <div className="p-3 bg-slate-950 border-b border-slate-800 flex items-center gap-2 text-sm text-slate-400">
+                 <label className="flex items-center gap-2">Sort
+                   <select value={ytdSort.key} onChange={(e) => setSortConfig({ key: e.target.value, direction: 'desc' })} className="bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                     <option value="fpts">Fantasy points</option>
+                     <option value="avg_fpts">Points per game</option>
+                     <option value="pct">FG %</option>
+                     <option value="longs">50+ FGs</option>
+                     <option value="dome_pct">Dome games</option>
+                     <option value="rz_trips">Red zone trips</option>
+                     <option value="off_stall_rate_ytd">Offense stall %</option>
+                     <option value="def_stall_rate_ytd">Opponent stall %</option>
+                   </select>
+                 </label>
+               </div>
+               <div className="divide-y divide-slate-800">
+                 {ytdSorted.map((row, idx) => <YtdCard key={row.gsis_id || idx} row={row} rank={idx + 1} />)}
+               </div>
+             </div>
+             {/* TABLETS + COMPUTERS: the full table */}
+             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="px-3 md:px-6 py-3 align-middle text-center">Rank</th>
-                    <th className="px-3 md:px-6 py-3 align-middle text-left sticky left-0 z-10 bg-slate-950 md:static">Player</th>
-                    <HeaderCell label="Fantasy Points" sortKey="fpts" currentSort={sortConfig} onSort={handleSort} description="Total Fantasy Points (Custom Scoring)" avg={ytdAvgs.fpts} />
-                    <HeaderCell label="Average Fantasy Points" sortKey="avg_fpts" currentSort={sortConfig} onSort={handleSort} description="Average Fantasy Points per Game" avg={ytdAvgs.avg_fpts} />
-                    <HeaderCell label="FG (Made/Attempts)" sortKey="pct" currentSort={sortConfig} onSort={handleSort} description="Field Goal Accuracy" avg={ytdAvgs.pct} />
-                    <HeaderCell label="50+ FGs" sortKey="longs" currentSort={sortConfig} onSort={handleSort} description="Long Distance Makes" avg={ytdAvgs.longs} />
-                    <HeaderCell label="Dome Games (%)" sortKey="dome_pct" currentSort={sortConfig} onSort={handleSort} description="Dome Games Played" avg={ytdAvgs.dome_pct} />
-                    <HeaderCell label="Red Zone Trips" sortKey="rz_trips" currentSort={sortConfig} onSort={handleSort} description="His team's drives that reached the opponent's 25, in his games this season" avg={ytdAvgs.rz_trips} />
-                    <HeaderCell label="Offense Stall % (Season)" sortKey="off_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Offensive Stall Rate" avg={ytdAvgs.off_stall} />
-                    <HeaderCell label="Opponent Stall % (Season)" sortKey="def_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Strength of schedule: the season-long defensive stall rate of the opponents he has faced" avg={ytdAvgs.def_stall} />
+                    <th className="px-6 py-3 align-middle text-center">Rank</th>
+                    <th className="px-6 py-3 align-middle text-left">Player</th>
+                    <HeaderCell label="Fantasy Points" sortKey="fpts" currentSort={ytdSort} onSort={handleSort} description="Total Fantasy Points (Custom Scoring)" avg={ytdAvgs.fpts} />
+                    <HeaderCell label="Average Fantasy Points" sortKey="avg_fpts" currentSort={ytdSort} onSort={handleSort} description="Average Fantasy Points per Game" avg={ytdAvgs.avg_fpts} />
+                    <HeaderCell label="FG (Made/Attempts)" sortKey="pct" currentSort={ytdSort} onSort={handleSort} description="Field Goal Accuracy" avg={ytdAvgs.pct} />
+                    <HeaderCell label="50+ FGs" sortKey="longs" currentSort={ytdSort} onSort={handleSort} description="Long Distance Makes" avg={ytdAvgs.longs} />
+                    <HeaderCell label="Dome Games (%)" sortKey="dome_pct" currentSort={ytdSort} onSort={handleSort} description="Dome Games Played" avg={ytdAvgs.dome_pct} />
+                    <HeaderCell label="Red Zone Trips" sortKey="rz_trips" currentSort={ytdSort} onSort={handleSort} description="His team's drives that reached the opponent's 25, in his games this season" avg={ytdAvgs.rz_trips} />
+                    <HeaderCell label="Offense Stall % (Season)" sortKey="off_stall_rate_ytd" currentSort={ytdSort} onSort={handleSort} description="Season-Long Offensive Stall Rate" avg={ytdAvgs.off_stall} />
+                    <HeaderCell label="Opponent Stall % (Season)" sortKey="def_stall_rate_ytd" currentSort={ytdSort} onSort={handleSort} description="Strength of schedule: the season-long defensive stall rate of the opponents he has faced" avg={ytdAvgs.def_stall} />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {ytdSorted.map((row, idx) => (
                     <tr key={idx} className="hover:bg-slate-800/50 transition-colors">
-                      <td className="px-3 md:px-6 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
-                      <PlayerCell player={row} subtext={row.team} sticky />
+                      <td className="px-6 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                      <PlayerCell player={row} subtext={row.team} />
                       <td className="px-6 py-4 text-center font-bold text-emerald-400 text-lg">{row.fpts}</td>
                       <td className="px-6 py-4 text-center"><div className="font-bold text-white">{Number(row.avg_fpts).toFixed(1)}</div><div className="text-[10px] text-slate-500 uppercase font-bold">Games: {row.games}</div></td>
                       <td className="px-6 py-4 text-center"><div className="text-slate-300">{row.fg_made}/{row.fg_att}</div><div className="text-[10px] text-blue-400 font-mono">{row.pct}%</div></td>
