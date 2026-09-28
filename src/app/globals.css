@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
+/* KickerGenius is dark-only. A dark page background (no white edges when a phone
+   over-scrolls, whatever the device's light/dark setting), and color-scheme: dark
+   so the browser draws dark scrollbars, dropdowns and form controls. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #020617; /* slate-950, same as the page */
+  --foreground: #e2e8f0; /* slate-200 */
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -12,15 +16,14 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Thin, quiet scrollbars wherever something still scrolls (tablet-width tables, the page) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent; /* slate-700 thumb */
 }

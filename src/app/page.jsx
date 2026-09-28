@@ -68,7 +68,7 @@ const toBoardRow = (r, w) => {
 // Week Model red-zone column: kicker points per game, with trips + stall rate underneath.
 // (Rows from before the red-zone grade have no kicker points -> just the stall rate.)
 const RedZoneCell = ({ kp, trips, stall, className }) => (
-  <td className="px-6 py-4 text-center">
+  <td className="px-4 py-4 text-center">
     {kp != null
       ? <><div className={`font-mono ${className}`}>{Number(kp).toFixed(1)}</div><div className="text-[9px] text-slate-500 whitespace-nowrap">{Number(trips).toFixed(1)} trips · {stall}%</div></>
       : <span className={className}>{stall}%</span>}
@@ -468,7 +468,7 @@ const App = () => {
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
-                    <th className="px-2 py-3 align-middle text-left w-full min-w-[150px] text-slate-300">Player</th>
+                    <th className="px-2 py-3 align-middle text-left min-w-[150px] text-slate-300">Player</th>
                     <HeaderCell label="Projection" sortKey="proj" currentSort={boardSort} onSort={handleSort} description="Projected fantasy points in your league's scoring (whole numbers)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={boardSort} onSort={handleSort} description={`Offense + Defense (avg ${settings.grade_scale ?? 40} each) + bonuses. Multiplier = grade ÷ ${settings.grade_divisor ?? 90}`} />
                     <HeaderCell label="Weather" description="Kickoff forecast (actual conditions once played): sky, wind and temperature. Dome / closed roof = +10 grade; outdoors at 40°F or below = −20." />
@@ -476,9 +476,8 @@ const App = () => {
                     <HeaderCell label={`Opponent Red Zone (${winLabel})`} sortKey="def_rz_kp" currentSort={boardSort} onSort={handleSort} description={`Red-zone kicker points per game the opponent ALLOWS (${winLabel}): stalled trip = 3, other trip = 1. Below: trips allowed per game and stall rate forced.`} avg={leagueAvgs.def_rz_kp} />
                     <HeaderCell label="Projection Accuracy (L3)" sortKey="proj_acc" currentSort={boardSort} onSort={handleSort} description="Total Actual vs Projected Points (Last 3 Games)" />
                     <HeaderCell label="Implied Vegas Score Line" sortKey="vegas" currentSort={boardSort} onSort={handleSort} description="Implied Team Total (Vegas Line & Spread)/2" />
-                    <HeaderCell label={`Offensive PF (${winLabel})`} sortKey="off_ppg" currentSort={boardSort} onSort={handleSort} description={`His team's average points scored (${winLabel}). ❄️ = under 15 per game`} avg={leagueAvgs.pts} />
-                    <HeaderCell label={`Opponent PA (${winLabel})`} sortKey="def_pa" currentSort={boardSort} onSort={handleSort} description={`Points the opponent allows per game (${winLabel}). 🛡️ = under 17 per game`} avg={leagueAvgs.pts} />
-                    <th className="px-6 py-3"></th>
+                    <HeaderCell tipAlign="right" label={`Offensive PF (${winLabel})`} sortKey="off_ppg" currentSort={boardSort} onSort={handleSort} description={`His team's average points scored (${winLabel}). ❄️ = under 15 per game`} avg={leagueAvgs.pts} />
+                    <HeaderCell tipAlign="right" label={`Opponent PA (${winLabel})`} sortKey="def_pa" currentSort={boardSort} onSort={handleSort} description={`Points the opponent allows per game (${winLabel}). 🛡️ = under 17 per game`} avg={leagueAvgs.pts} />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
@@ -488,18 +487,17 @@ const App = () => {
                      return (
                         <React.Fragment key={idx}>
                           <tr onClick={() => toggleRow(idx)} className={`hover:bg-slate-800/50 cursor-pointer transition-colors ${sleeperStatus === 'MY_TEAM' && hideTaken ? 'bg-purple-900/20' : ''}`}>
-                            <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                            <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}<div className="flex justify-center text-slate-600 mt-1">{expandedRow === idx ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}</div></td>
                             <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} sleeperStatus={sleeperStatus} />
-                            <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
-                            <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
-                            <td className="px-6 py-4 text-center text-xs font-mono text-slate-400">{row.weather_desc}</td>
+                            <td className={`px-4 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
+                            <td className="px-4 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
+                            <td className="px-4 py-4 text-center text-xs font-mono text-slate-400">{row.weather_desc}</td>
                             <RedZoneCell kp={row.off_rz_kp} trips={row.off_rz_trips} stall={row.off_stall_rate} className="text-blue-300" />
                             <RedZoneCell kp={row.def_rz_kp} trips={row.def_rz_trips} stall={row.def_stall_rate} className="text-slate-300" />
-                            <td className="px-6 py-4 text-center"><div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.l3_act_sum >= row.l3_proj_sum ? 'text-green-400' : 'text-red-400'}`}><span>{row.l3_act_sum ?? 0}</span><span className="mx-1 text-slate-600">/</span><span className="text-slate-500">{row.l3_proj_sum ?? 0}</span></div><div className="text-[9px] text-slate-500 uppercase">Act / Proj</div></td>
-                            <td className="px-6 py-4 text-center font-mono text-amber-400">{Number(row.vegas).toFixed(1)}</td>
-                            <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.off_ppg).toFixed(1)} {row.off_ppg < 15 && <Hint side="left" text={`Cold offense: his team averages under 15 points per game (${winLabel})`}>❄️</Hint>}</td>
-                            <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && <Hint side="left" text={`Tough defense: the opponent allows under 17 points per game (${winLabel})`}>🛡️</Hint>}</td>
-                            <td className="px-6 py-4 text-slate-600">{expandedRow === idx ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</td>
+                            <td className="px-4 py-4 text-center"><div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.l3_act_sum >= row.l3_proj_sum ? 'text-green-400' : 'text-red-400'}`}><span>{row.l3_act_sum ?? 0}</span><span className="mx-1 text-slate-600">/</span><span className="text-slate-500">{row.l3_proj_sum ?? 0}</span></div><div className="text-[9px] text-slate-500 uppercase">Act / Proj</div></td>
+                            <td className="px-4 py-4 text-center font-mono text-amber-400">{Number(row.vegas).toFixed(1)}</td>
+                            <td className="px-4 py-4 text-center font-mono text-slate-300">{Number(row.off_ppg).toFixed(1)} {row.off_ppg < 15 && <Hint side="left" text={`Cold offense: his team averages under 15 points per game (${winLabel})`}>❄️</Hint>}</td>
+                            <td className="px-4 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && <Hint side="left" text={`Tough defense: the opponent allows under 17 points per game (${winLabel})`}>🛡️</Hint>}</td>
                           </tr>
                           {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} settings={settings} sleeperStatus={sleeperStatus}/>}
                         </React.Fragment>
@@ -540,31 +538,31 @@ const App = () => {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
-                    <th className="px-6 py-3 align-middle text-center">Rank</th>
-                    <th className="px-6 py-3 align-middle text-left">Player</th>
+                    <th className="px-4 py-3 align-middle text-center">Rank</th>
+                    <th className="px-4 py-3 align-middle text-left">Player</th>
                     <HeaderCell label="Fantasy Points" sortKey="fpts" currentSort={ytdSort} onSort={handleSort} description="Total Fantasy Points (Custom Scoring)" avg={ytdAvgs.fpts} />
                     <HeaderCell label="Average Fantasy Points" sortKey="avg_fpts" currentSort={ytdSort} onSort={handleSort} description="Average Fantasy Points per Game" avg={ytdAvgs.avg_fpts} />
                     <HeaderCell label="FG (Made/Attempts)" sortKey="pct" currentSort={ytdSort} onSort={handleSort} description="Field Goal Accuracy" avg={ytdAvgs.pct} />
                     <HeaderCell label="50+ FGs" sortKey="longs" currentSort={ytdSort} onSort={handleSort} description="Long Distance Makes" avg={ytdAvgs.longs} />
                     <HeaderCell label="Dome Games (%)" sortKey="dome_pct" currentSort={ytdSort} onSort={handleSort} description="Dome Games Played" avg={ytdAvgs.dome_pct} />
                     <HeaderCell label="Red Zone Trips" sortKey="rz_trips" currentSort={ytdSort} onSort={handleSort} description="His team's drives that reached the opponent's 25, in his games this season" avg={ytdAvgs.rz_trips} />
-                    <HeaderCell label="Offense Stall % (Season)" sortKey="off_stall_rate_ytd" currentSort={ytdSort} onSort={handleSort} description="Season-Long Offensive Stall Rate" avg={ytdAvgs.off_stall} />
-                    <HeaderCell label="Opponent Stall % (Season)" sortKey="def_stall_rate_ytd" currentSort={ytdSort} onSort={handleSort} description="Strength of schedule: the season-long defensive stall rate of the opponents he has faced" avg={ytdAvgs.def_stall} />
+                    <HeaderCell tipAlign="right" label="Offense Stall % (Season)" sortKey="off_stall_rate_ytd" currentSort={ytdSort} onSort={handleSort} description="Season-Long Offensive Stall Rate" avg={ytdAvgs.off_stall} />
+                    <HeaderCell tipAlign="right" label="Opponent Stall % (Season)" sortKey="def_stall_rate_ytd" currentSort={ytdSort} onSort={handleSort} description="Strength of schedule: the season-long defensive stall rate of the opponents he has faced" avg={ytdAvgs.def_stall} />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {ytdSorted.map((row, idx) => (
                     <tr key={idx} className="hover:bg-slate-800/50 transition-colors">
-                      <td className="px-6 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
+                      <td className="px-4 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                       <PlayerCell player={row} subtext={row.team} />
-                      <td className="px-6 py-4 text-center font-bold text-emerald-400 text-lg">{row.fpts}</td>
-                      <td className="px-6 py-4 text-center"><div className="font-bold text-white">{Number(row.avg_fpts).toFixed(1)}</div><div className="text-[10px] text-slate-500 uppercase font-bold">Games: {row.games}</div></td>
-                      <td className="px-6 py-4 text-center"><div className="text-slate-300">{row.fg_made}/{row.fg_att}</div><div className="text-[10px] text-blue-400 font-mono">{row.pct}%</div></td>
-                      <td className="px-6 py-4 text-center"><span className={`px-2 py-1 rounded ${row.longs >= 4 ? 'bg-amber-500/20 text-amber-400' : 'text-slate-500'}`}>{row.longs}</span></td>
-                      <td className="px-6 py-4 text-center text-blue-300">{row.dome_pct}%</td>
-                      <td className="px-6 py-4 text-center text-slate-300">{row.rz_trips}</td>
-                      <td className="px-6 py-4 text-center font-mono text-blue-300">{row.off_stall_rate_ytd ?? 0}%</td>
-                      <td className="px-6 py-4 text-center font-mono text-slate-400">{row.def_stall_rate_ytd ?? 0}%</td>
+                      <td className="px-4 py-4 text-center font-bold text-emerald-400 text-lg">{row.fpts}</td>
+                      <td className="px-4 py-4 text-center"><div className="font-bold text-white">{Number(row.avg_fpts).toFixed(1)}</div><div className="text-[10px] text-slate-500 uppercase font-bold">Games: {row.games}</div></td>
+                      <td className="px-4 py-4 text-center"><div className="text-slate-300">{row.fg_made}/{row.fg_att}</div><div className="text-[10px] text-blue-400 font-mono">{row.pct}%</div></td>
+                      <td className="px-4 py-4 text-center"><span className={`px-2 py-1 rounded ${row.longs >= 4 ? 'bg-amber-500/20 text-amber-400' : 'text-slate-500'}`}>{row.longs}</span></td>
+                      <td className="px-4 py-4 text-center text-blue-300">{row.dome_pct}%</td>
+                      <td className="px-4 py-4 text-center text-slate-300">{row.rz_trips}</td>
+                      <td className="px-4 py-4 text-center font-mono text-blue-300">{row.off_stall_rate_ytd ?? 0}%</td>
+                      <td className="px-4 py-4 text-center font-mono text-slate-400">{row.def_stall_rate_ytd ?? 0}%</td>
                     </tr>
                   ))}
                 </tbody>

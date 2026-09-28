@@ -41,7 +41,9 @@ export const FootballIcon = ({ isFire }) => (
 );
 
 // --- SORTABLE HEADER ---
-export const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) => {
+// tipAlign="right" for the last columns, so the (hidden) tip never pokes past the table edge
+export const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort, tipAlign = 'center' }) => {
+  const tipRight = tipAlign === 'right';
   const isActive = !!sortKey && currentSort?.key === sortKey;   // columns without a sort never light up
   
   return (
@@ -50,10 +52,10 @@ export const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSo
         <div className="flex items-center gap-1 mt-0.5"><span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>{onSort && (isActive ? (currentSort.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-blue-400" /> : <ArrowDown className="w-3 h-3 text-blue-400" />) : (<ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />))}</div>
         <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
       </div>
-      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto">
+      <div className={`absolute top-full ${tipRight ? 'right-0' : 'left-1/2 -translate-x-1/2'} mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto`}>
         <div className="text-white font-semibold mb-1">{description}</div>
         {avg !== undefined && <div className="text-blue-300">League Avg: {Number(avg).toFixed(1)}</div>}
-        <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 border-l border-t border-slate-700 rotate-45"></div>
+        <div className={`absolute top-[-4px] ${tipRight ? 'right-6' : 'left-1/2 -translate-x-1/2'} w-2 h-2 bg-slate-800 border-l border-t border-slate-700 rotate-45`}></div>
       </div>
     </th>
   );
