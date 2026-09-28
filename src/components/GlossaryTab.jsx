@@ -1,6 +1,6 @@
 import React from 'react';
-import { Calculator, Database, BrainCircuit } from 'lucide-react';
-import { GLOSSARY_DATA, BUY_ME_A_COFFEE_URL } from '../data/constants';
+import { Calculator, Database } from 'lucide-react';
+import { GLOSSARY_SECTIONS, BUY_ME_A_COFFEE_URL } from '../data/constants';
 import { MathCard } from './KickerComponents';
 
 const GlossaryTab = ({ processed, leagueAvgs, meta }) => {
@@ -24,22 +24,27 @@ const GlossaryTab = ({ processed, leagueAvgs, meta }) => {
                 {' '}Enjoying it? <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Buy me a coffee ☕</a>
             </div>
 
-            {/* GLOSSARY GRID LAYOUT */}
-            <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {GLOSSARY_DATA.map((item, idx) => (
-                    <div key={idx} className="bg-slate-800/50 p-4 rounded border border-slate-700">
-                        <div className="flex justify-between items-start mb-2">
-                            <span className="font-mono font-bold text-blue-300">{item.header}</span>
-                            <span className="text-[10px] text-emerald-400 flex items-center gap-1 bg-emerald-900/20 px-2 py-1 rounded border border-emerald-900/50">
-                                <Database className="w-3 h-3"/> {item.source}
-                            </span>
+            {/* THE LEGEND, grouped by the tab each number appears on */}
+            <div className="p-4 space-y-6">
+                {GLOSSARY_SECTIONS.map((sec) => (
+                    <section key={sec.section}>
+                        <h3 className="text-sm font-bold text-white">{sec.section}</h3>
+                        {sec.intro && <p className="text-xs text-slate-500 mb-3">{sec.intro}</p>}
+                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-3 ${sec.intro ? '' : 'mt-3'}`}>
+                            {sec.items.map((item) => (
+                                <div key={item.header} className="bg-slate-800/50 p-3 rounded border border-slate-700">
+                                    <div className="flex justify-between items-start gap-2 mb-1">
+                                        <span className="font-mono font-bold text-blue-300 text-sm">{item.header}</span>
+                                        <span className="text-[10px] text-emerald-400 flex items-center gap-1 bg-emerald-900/20 px-2 py-0.5 rounded border border-emerald-900/50 whitespace-nowrap">
+                                            <Database className="w-3 h-3"/> {item.source}
+                                        </span>
+                                    </div>
+                                    {item.title !== item.header && <div className="text-xs font-semibold text-white mb-1">{item.title}</div>}
+                                    <div className="text-xs text-slate-400 leading-relaxed">{item.desc}</div>
+                                </div>
+                            ))}
                         </div>
-                        <div className="text-sm font-semibold text-white mb-1">{item.title}</div>
-                        <div className="text-xs text-slate-400">{item.desc}</div>
-                        <div className="mt-2 text-[10px] text-slate-500 italic border-t border-slate-700 pt-1">
-                            Why: {item.why}
-                        </div>
-                    </div>
+                    </section>
                 ))}
             </div>
         </div>

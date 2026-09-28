@@ -7,7 +7,7 @@ import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTri
 import { BUY_ME_A_COFFEE_URL } from '../data/constants';
 import useLeagues from '../utils/useLeagues';
 import { calcFPts, calcProjection, weekKicks, fetchSleeperScores } from '../utils/scoring';
-import { HeaderCell, PlayerCell, DeepDiveRow, InjuryCard } from '../components/KickerComponents';
+import { HeaderCell, PlayerCell, DeepDiveRow, Hint } from '../components/KickerComponents';
 import AccuracyTab from '../components/AccuracyTab';
 import SettingsTab from '../components/SettingsTab';
 import InjuryReportTab from '../components/InjuryReportTab';
@@ -209,6 +209,11 @@ const App = () => {
   // ~34 games across seasons -- so they can't be used for season ranks.)
   const ytdRankMap = new Map();
   [...ytd].sort((a, b) => calcFPts(b, scoring) - calcFPts(a, scoring)).forEach((p, i) => ytdRankMap.set(p.gsis_id, i + 1));
+  // this season's points + games per kicker (the Week Model's hover card)
+  const seasonStats = new Map(ytd.map((p) => {
+    const pts = calcFPts(p, scoring), games = Number(p.games) || 0;
+    return [p.gsis_id, { season_pts: pts, season_games: games, season_avg: games ? pts / games : 0 }];
+  }));
 
   const ppgRankMap = new Map();
   const gamesThreshold = (meta.week - 1) * 0.5;
@@ -280,6 +285,8 @@ const App = () => {
          sleeperStatus,
          ytdRank: ytdRankMap.get(p.gsis_id),
          ppgRank: ppgRankMap.get(p.gsis_id),
+         ...(seasonStats.get(p.gsis_id) || { season_pts: 0, season_games: 0, season_avg: 0 }),
+         season_kickers: ytd.length,
          sleeper_live_score: sleeperLive 
      };
   }).filter(p => p.proj > 0); 
@@ -414,15 +421,15 @@ const App = () => {
                         <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </th>
-                    <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected Points (Custom Scoring)" />
+                    <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected fantasy points in your league's scoring (whole numbers)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description={`Offense + Defense (avg ${settings.grade_scale ?? 40} each) + bonuses. Multiplier = grade ÷ ${settings.grade_divisor ?? 90}`} />
-                    <th className="px-6 py-3 text-center align-middle">Weather</th>
+                    <HeaderCell label="Weather" description="Kickoff forecast (actual conditions once played): sky, wind and temperature. Dome / closed roof = +10 grade; outdoors at 40°F or below = −20." />
                     <HeaderCell label={`Offense Red Zone (${winLabel})`} sortKey="off_rz_kp" currentSort={sortConfig} onSort={handleSort} description={`Red-zone kicker points per game (${winLabel}): each red-zone trip that stalls = 3 (a field-goal try), each other trip = 1 (the extra point). Below: trips per game and stall rate.`} avg={leagueAvgs.off_rz_kp} />
                     <HeaderCell label={`Opponent Red Zone (${winLabel})`} sortKey="def_rz_kp" currentSort={sortConfig} onSort={handleSort} description={`Red-zone kicker points per game the opponent ALLOWS (${winLabel}): stalled trip = 3, other trip = 1. Below: trips allowed per game and stall rate forced.`} avg={leagueAvgs.def_rz_kp} />
                     <HeaderCell label="Projection Accuracy (L3)" sortKey="proj_acc" currentSort={sortConfig} onSort={handleSort} description="Total Actual vs Projected Points (Last 3 Games)" />
                     <HeaderCell label="Implied Vegas Score Line" sortKey="vegas" currentSort={sortConfig} onSort={handleSort} description="Implied Team Total (Vegas Line & Spread)/2" />
-                    <HeaderCell label={`Offensive PF (${winLabel})`} sortKey="off_ppg" currentSort={sortConfig} onSort={handleSort} description={`Team Points For (${winLabel})`} avg={leagueAvgs.pts} />
-                    <HeaderCell label={`Opponent PA (${winLabel})`} sortKey="def_pa" currentSort={sortConfig} onSort={handleSort} description={`Opp Points Allowed (${winLabel})`} avg={leagueAvgs.pts} />
+                    <HeaderCell label={`Offensive PF (${winLabel})`} sortKey="off_ppg" currentSort={sortConfig} onSort={handleSort} description={`His team's average points scored (${winLabel}). ❄️ = under 15 per game`} avg={leagueAvgs.pts} />
+                    <HeaderCell label={`Opponent PA (${winLabel})`} sortKey="def_pa" currentSort={sortConfig} onSort={handleSort} description={`Points the opponent allows per game (${winLabel}). 🛡️ = under 17 per game`} avg={leagueAvgs.pts} />
                     <th className="px-6 py-3"></th>
                   </tr>
                 </thead>
@@ -442,8 +449,8 @@ const App = () => {
                             <RedZoneCell kp={row.def_rz_kp} trips={row.def_rz_trips} stall={row.def_stall_rate} className="text-slate-300" />
                             <td className="px-6 py-4 text-center"><div className={`text-sm font-bold whitespace-nowrap flex justify-center ${row.l3_act_sum >= row.l3_proj_sum ? 'text-green-400' : 'text-red-400'}`}><span>{row.l3_act_sum ?? 0}</span><span className="mx-1 text-slate-600">/</span><span className="text-slate-500">{row.l3_proj_sum ?? 0}</span></div><div className="text-[9px] text-slate-500 uppercase">Act / Proj</div></td>
                             <td className="px-6 py-4 text-center font-mono text-amber-400">{Number(row.vegas).toFixed(1)}</td>
-                            <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.off_ppg).toFixed(1)} {row.off_ppg < 15 && "❄️"}</td>
-                            <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && "🛡️"}</td>
+                            <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.off_ppg).toFixed(1)} {row.off_ppg < 15 && <Hint side="left" text={`Cold offense: his team averages under 15 points per game (${winLabel})`}>❄️</Hint>}</td>
+                            <td className="px-6 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && <Hint side="left" text={`Tough defense: the opponent allows under 17 points per game (${winLabel})`}>🛡️</Hint>}</td>
                             <td className="px-6 py-4 text-slate-600">{expandedRow === idx ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</td>
                           </tr>
                           {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} settings={settings} sleeperStatus={sleeperStatus}/>}
@@ -471,7 +478,7 @@ const App = () => {
                     <HeaderCell label="FG (Made/Attempts)" sortKey="pct" currentSort={sortConfig} onSort={handleSort} description="Field Goal Accuracy" avg={ytdAvgs.pct} />
                     <HeaderCell label="50+ FGs" sortKey="longs" currentSort={sortConfig} onSort={handleSort} description="Long Distance Makes" avg={ytdAvgs.longs} />
                     <HeaderCell label="Dome Games (%)" sortKey="dome_pct" currentSort={sortConfig} onSort={handleSort} description="Dome Games Played" avg={ytdAvgs.dome_pct} />
-                    <HeaderCell label="FG Red Zone Trips" sortKey="rz_trips" currentSort={sortConfig} onSort={handleSort} description="Drives reaching FG Range" avg={ytdAvgs.rz_trips} />
+                    <HeaderCell label="Red Zone Trips" sortKey="rz_trips" currentSort={sortConfig} onSort={handleSort} description="His team's drives that reached the opponent's 25, in his games this season" avg={ytdAvgs.rz_trips} />
                     <HeaderCell label="Offense Stall % (Season)" sortKey="off_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Season-Long Offensive Stall Rate" avg={ytdAvgs.off_stall} />
                     <HeaderCell label="Opponent Stall % (Season)" sortKey="def_stall_rate_ytd" currentSort={sortConfig} onSort={handleSort} description="Strength of schedule: the season-long defensive stall rate of the opponents he has faced" avg={ytdAvgs.def_stall} />
                   </tr>

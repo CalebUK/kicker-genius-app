@@ -43,7 +43,7 @@ export const FootballIcon = ({ isFire }) => (
 
 // --- SORTABLE HEADER ---
 export const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSort }) => {
-  const isActive = currentSort?.key === sortKey;
+  const isActive = !!sortKey && currentSort?.key === sortKey;   // columns without a sort never light up
   
   return (
     <th onClick={() => onSort && onSort(sortKey)} className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}>
@@ -79,7 +79,30 @@ export const HistoryBars = ({ games }) => {
   );
 };
 
+// Hover (or tap/focus) tip for an emoji, badge or number. A named Tailwind group, so it
+// works inside other hover groups (table rows, the kicker cell).
+const HINT_SIDE = {
+  top: 'bottom-full left-1/2 -translate-x-1/2 mb-1.5',
+  right: 'left-full top-1/2 -translate-y-1/2 ml-1.5',
+  left: 'right-full top-1/2 -translate-y-1/2 mr-1.5',
+};
+export const Hint = ({ text, children, side = 'top', className = '' }) => (
+  <span tabIndex={0} aria-label={typeof text === 'string' ? text : undefined} className={`relative inline-flex group/hint cursor-help outline-none ${className}`}>
+    {children}
+    <span role="tooltip" className={`absolute ${HINT_SIDE[side]} z-50 w-max max-w-[220px] px-2 py-1 rounded bg-slate-950 border border-slate-700 text-[10px] leading-snug font-normal normal-case tracking-normal text-slate-200 text-left whitespace-normal shadow-xl opacity-0 pointer-events-none transition-opacity group-hover/hint:opacity-100 group-focus/hint:opacity-100`}>
+      {text}
+    </span>
+  </span>
+);
+
+const SLEEPER_BADGES = {
+  MY_TEAM: ['MY TEAM', 'bg-purple-500/20 text-purple-300 border-purple-500/50', 'On your roster in your active Sleeper league'],
+  TAKEN: ['TAKEN', 'bg-slate-700/50 text-slate-400 border-slate-600/50', 'On another team in your active Sleeper league'],
+  FREE_AGENT: ['FREE AGENT', 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50', 'Available to pick up in your active Sleeper league'],
+};
+
 // --- PLAYER CELL ---
+// Hovering the kicker shows his THIS-season numbers (your scoring) + any injury news.
 export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   const [imgError, setImgError] = useState(false); // Track image load errors
 
@@ -111,47 +134,56 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   let displayInjury = '', displayStatus = '';
   if (match) { const reportStatus = match[1]; const injuryType = match[2]; displayInjury = `${player.injury_status}: ${injuryType}`; displayStatus = reportStatus; } else { displayInjury = details; }
 
+  const sGames = Number(player.season_games) || 0;
+  const badge = SLEEPER_BADGES[sleeperStatus];
+
   return (
     <td className="px-3 py-4 font-medium text-white">
       <div className="flex flex-col justify-center">
           <div className="flex flex-wrap items-center gap-2 mb-2">
               <div className="text-xs md:text-sm font-bold text-white leading-tight whitespace-normal break-words flex items-center gap-1">
                 {player.kicker_player_name}
-                {player.isTop5 && <span title="Top 5 Scorer (Season)" className="text-sm">🔥</span>}
+                {player.isTop5 && <Hint text="Top 5 scorer this season (your scoring)"><span className="text-sm">🔥</span></Hint>}
               </div>
-              {sleeperStatus === 'MY_TEAM' && <span className="text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">MY TEAM</span>}
-              {sleeperStatus === 'TAKEN' && <span className="text-[9px] bg-slate-700/50 text-slate-400 border border-slate-600/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">TAKEN</span>}
-              {sleeperStatus === 'FREE_AGENT' && <span className="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">FREE AGENT</span>}
+              {badge && <Hint text={badge[2]}><span className={`text-[9px] border px-1.5 py-0.5 rounded font-bold whitespace-nowrap ${badge[1]}`}>{badge[0]}</span></Hint>}
           </div>
-          
-          <div className="flex items-center gap-3">
-              <div className="relative group flex-shrink-0">
-                {/* IMAGE OR FALLBACK */}
+
+          <div className="relative group/kicker flex items-center gap-3 w-fit">
+              <div className="flex-shrink-0">
+                {/* IMAGE OR FALLBACK (the ring colour = injury status) */}
                 {imgError || !imageUrl ? (
                     <HelmetIcon borderColor={borderColor} />
                 ) : (
-                    <img 
-                        src={imageUrl} 
+                    <img
+                        src={imageUrl}
                         alt={player.kicker_player_name}
-                        className={`w-12 h-12 rounded-full border-2 object-cover shrink-0 ${borderColor}`} 
-                        onError={() => setImgError(true)} 
+                        className={`w-12 h-12 rounded-full border-2 object-cover shrink-0 ${borderColor}`}
+                        onError={() => setImgError(true)}
                     />
-                )}
-
-                {/* TOOLTIP */}
-                {statusText !== '' && (
-                   <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded text-xs opacity-0 group-hover:opacity-100 z-50 shadow-xl pointer-events-none">
-                      {match ? ( <> <div className={`font-bold ${textColor} mb-0.5 truncate`}>{displayInjury}</div> <div className="text-slate-400 italic truncate">{displayStatus}</div> </> ) : ( <div className={`font-bold ${textColor} mb-1 break-words`}>{player.injury_status} <span className="text-slate-400 font-normal">({details})</span></div> )}
-                      <div className="mt-2 pt-2 border-t border-slate-700 flex flex-col gap-1">
-                          <div className="flex justify-between"><span className="text-slate-400">Season Rank:</span><span className="text-white font-bold">#{player.ytdRank}</span></div>
-                          {player.ppgRank && (<div className="flex justify-between"><span className="text-slate-400">Avg/Game Rank:</span><span className="text-emerald-400 font-bold">#{player.ppgRank}</span></div>)}
-                       </div>
-                   </div>
                 )}
               </div>
               <div className="min-w-0">
                 <div className="text-xs text-slate-400 truncate">{subtext}</div>
                 {player.own_pct > 0 && ( <div className={`text-[9px] mt-0.5 font-bold ${ownColor}`}>Own: {player.own_pct.toFixed(1)}%</div> )}
+              </div>
+
+              {/* SEASON TOOLTIP: this season's real numbers (not the kicker avg), + injury */}
+              <div role="tooltip" className="absolute left-full top-0 ml-3 w-56 p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs opacity-0 group-hover/kicker:opacity-100 transition-opacity z-50 shadow-xl pointer-events-none">
+                  <div className="text-[10px] uppercase text-slate-500 font-bold mb-1.5">{player.season} season · your scoring</div>
+                  {sGames > 0 ? (
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between"><span className="text-slate-400">Season rank</span><span className="text-white font-bold">#{player.ytdRank}{player.season_kickers ? <span className="text-slate-500 font-normal"> of {player.season_kickers}</span> : null}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-400">Fantasy points</span><span className="text-white font-mono">{Math.round(player.season_pts * 10) / 10}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-400">Avg per game</span><span className="text-emerald-400 font-mono font-bold">{player.season_avg.toFixed(1)}{player.ppgRank ? <span className="text-slate-500 font-normal"> (#{player.ppgRank})</span> : null}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-400">Games</span><span className="text-white font-mono">{sGames}</span></div>
+                      {player.isTop5 && <div className="text-amber-300 text-[10px] mt-0.5">🔥 Top 5 scorer this season</div>}
+                    </div>
+                  ) : <div className="text-slate-400">No games yet this season</div>}
+                  {statusText !== '' && (
+                    <div className="mt-2 pt-2 border-t border-slate-700">
+                      {match ? ( <> <div className={`font-bold ${textColor} mb-0.5`}>{displayInjury}</div> <div className="text-slate-400 italic">{displayStatus}</div> </> ) : ( <div className={`font-bold ${textColor} break-words`}>{player.injury_status} {details && <span className="text-slate-400 font-normal">({details})</span>}</div> )}
+                    </div>
+                  )}
               </div>
           </div>
       </div>
