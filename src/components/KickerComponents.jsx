@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, BrainCircuit, AlertTriangle, ShieldAlert, UserMinus } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, AlertTriangle, ShieldAlert, UserMinus, History, Loader2 } from 'lucide-react';
 import { calcFPts } from '../utils/scoring';
 
 // --- GENERIC HELMET ICON (SVG) ---
@@ -121,11 +121,6 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   if (injuryColor.includes('red-500')) textColor = 'text-red-400';
   if (injuryColor.includes('yellow')) textColor = 'text-yellow-400';
 
-  const ownPct = player.own_pct || 0;
-  let ownColor = 'text-slate-500';
-  if (ownPct < 10) ownColor = 'text-blue-400 font-bold'; 
-  else if (ownPct > 80) ownColor = 'text-amber-500'; 
-
   const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
   const imageUrl = isAubrey ? '/assets/aubrey_custom.png' : player.headshot_url;
 
@@ -164,7 +159,6 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
               </div>
               <div className="min-w-0">
                 <div className="text-xs text-slate-400 truncate">{subtext}</div>
-                {player.own_pct > 0 && ( <div className={`text-[9px] mt-0.5 font-bold ${ownColor}`}>Own: {player.own_pct.toFixed(1)}%</div> )}
               </div>
 
               {/* SEASON TOOLTIP: this season's real numbers (not the kicker avg), + injury */}
@@ -196,6 +190,52 @@ const bonusLabel = (name, player, settings) => {
   if (name === 'dome') return 'Dome';
   if (name === 'cold') return `Cold (${player.temp_f ?? '?'}°F, ${settings?.cold_temp_max ?? 40}°F or below)`;
   return name.charAt(0).toUpperCase() + name.slice(1);
+};
+
+// Worksheet box: how kickers have done at this stadium in conditions like this week's
+// (since 2000), how HE does in them, and his latest news. player.matchup_history comes
+// from utils/insights.js (null while /api/insights is still loading).
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const newsDate = (d) => { const m = /^\d{4}-(\d{2})-(\d{2})/.exec(String(d || '')); return m ? `${MONTHS[Number(m[1]) - 1]} ${Number(m[2])}` : ''; };
+const MatchupHistory = ({ player }) => {
+  const mh = player.matchup_history;
+  const f1 = (x) => (Number(x) || 0).toFixed(1);
+  const signed = (x) => `${x >= 0 ? '+' : '−'}${Math.abs(x).toFixed(1)}`;
+  const note = mh?.news?.[0];
+  return (
+    <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2.5">
+      <div className="text-emerald-400 font-bold pb-1 border-b border-slate-800 flex items-center gap-2"><History className="w-3 h-3" /> MATCHUP HISTORY &amp; NEWS</div>
+      {!mh ? <div className="text-[10px] text-slate-500 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Loading history…</div> : (
+        <>
+          {mh.venue && (
+            <div>
+              <div className="text-[10px] text-slate-400 leading-tight">Kickers {mh.venue.where}{mh.venue.conditions.length ? `, ${mh.venue.conditions.join(', ')}` : ''}:</div>
+              <div className="text-xs text-white mt-0.5"><span className="font-mono font-bold text-emerald-300">{f1(mh.venue.pts)}</span> pts · {f1(mh.venue.fgAtt)} FG tries a game
+                {mh.venue.vsAvg != null && (Math.abs(mh.venue.vsAvg) < 0.05
+                  ? <span className="ml-1 text-[10px] text-slate-400">(same as avg)</span>
+                  : <span className={`ml-1 text-[10px] ${mh.venue.vsAvg > 0 ? 'text-emerald-400' : 'text-red-400'}`}>({signed(mh.venue.vsAvg)} vs avg)</span>)}</div>
+              <div className="text-[9px] text-slate-500">{mh.venue.n.toLocaleString()} kicker-games since 2000 · <a href={mh.venue.link} className="text-sky-400 hover:underline">see them</a></div>
+            </div>
+          )}
+          {mh.own && (
+            <div>
+              <div className="text-[10px] text-slate-400 leading-tight">{player.kicker_player_name}, {mh.own.conditions.join(', ')}:</div>
+              <div className="text-xs text-white mt-0.5"><span className="font-mono font-bold text-emerald-300">{f1(mh.own.pts)}</span> pts a game
+                {mh.own.others && <span className="text-[10px] text-slate-400"> vs {f1(mh.own.others.pts)} otherwise</span>}</div>
+              <div className="text-[9px] text-slate-500">{mh.own.n} of his games · <a href={mh.own.link} className="text-sky-400 hover:underline">see them</a></div>
+            </div>
+          )}
+          {note ? (
+            <div className="border-t border-slate-800 pt-2">
+              <div className="text-[10px] text-slate-500">{newsDate(note.post_date)} · RotoWire</div>
+              <div className="text-xs font-semibold text-white leading-tight">{note.headline}</div>
+              <div className="text-[10px] text-slate-400 leading-snug line-clamp-3">{note.body}</div>
+            </div>
+          ) : <div className="text-[10px] text-slate-600 border-t border-slate-800 pt-2">No news in the last 3 weeks.</div>}
+        </>
+      )}
+    </div>
+  );
 };
 
 // The projection worksheet (MODEL_SPEC.md): grade on the left, 50/30/20 on the right.
@@ -262,7 +302,7 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
             <div className="mt-auto pt-2 border-t border-slate-700"><div className="flex justify-between font-bold text-white text-[11px]"><span>Week {week} Projection</span><span className="text-emerald-400 text-lg">{player.proj}</span></div><div className="text-[9px] text-right text-slate-500">({f2(c.raw)} rounded)</div></div>
           </div>
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50"><div className="font-bold mb-2 pb-1 border-b border-slate-800 flex items-center justify-between"><div className="flex items-center gap-2 text-purple-400"><Target className="w-3 h-3"/> Last 3 Trend</div><span className={`text-[10px] font-mono ${trendColor}`}>{trendSign}{l3_diff.toFixed(1)}</span></div><HistoryBars games={player.history?.l3_games} /></div>
-          <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col"><div className="text-emerald-400 font-bold mb-2 pb-1 border-b border-slate-800 flex items-center gap-2"><BrainCircuit className="w-3 h-3" /> KICKERGENIUS INSIGHT</div><div className="text-xs text-slate-300 leading-relaxed h-full flex items-center">{player.narrative || "No specific analysis available for this player yet."}</div></div>
+          <MatchupHistory player={player} />
         </div>
         <div className="mt-3 bg-slate-800/40 p-2 rounded border border-slate-800 text-[10px] text-slate-400 flex flex-wrap gap-x-6 gap-y-1 justify-center">
           {hasVegas

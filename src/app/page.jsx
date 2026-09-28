@@ -6,6 +6,7 @@ import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTri
 
 import { BUY_ME_A_COFFEE_URL } from '../data/constants';
 import useLeagues from '../utils/useLeagues';
+import { buildInsight } from '../utils/insights';
 import { calcFPts, calcProjection, weekKicks, fetchSleeperScores } from '../utils/scoring';
 import { HeaderCell, PlayerCell, DeepDiveRow, Hint } from '../components/KickerComponents';
 import AccuracyTab from '../components/AccuracyTab';
@@ -128,13 +129,13 @@ const App = () => {
   const [error, setError] = useState(null);
   
   const [sortConfig, setSortConfig] = useState({ key: 'proj', direction: 'desc' });
-  const [hideHighOwn, setHideHighOwn] = useState(false);
-  const [hideMedOwn, setHideMedOwn] = useState(false);
   const [search, setSearch] = useState('');
 
   // Sleeper: "my team + free agents" filter, and live scores for the active league
-  const [sleeperFilter, setSleeperFilter] = useState(false);
+  const [hideTaken, setHideTaken] = useState(false);   // hide kickers rostered by others in the active league
   const [liveScores, setLiveScores] = useState({ league: null, scores: {} });
+  // worksheet "Matchup History & News" (/api/insights): loaded separately so it never slows the board
+  const [insights, setInsights] = useState(null);
 
 
   // NOTE: the loading guard lives AFTER all hooks (see the `if (loading ...)`
@@ -146,6 +147,15 @@ const App = () => {
           .then((d) => { if (!cancelled) setData(d); })
           .catch((err) => { console.error("Detailed Fetch Error:", err); if (!cancelled) setError(err.message); })
           .finally(() => { if (!cancelled) setLoading(false); });
+      return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {   // matchup history + news, in the background
+      let cancelled = false;
+      fetch('/api/insights')
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null)
+          .then((j) => { if (!cancelled) setInsights(j || { insights: {}, all: null }); });
       return () => { cancelled = true; };
   }, []);
 
@@ -287,6 +297,8 @@ const App = () => {
          ppgRank: ppgRankMap.get(p.gsis_id),
          ...(seasonStats.get(p.gsis_id) || { season_pts: 0, season_games: 0, season_avg: 0 }),
          season_kickers: ytd.length,
+         // undefined = still loading; otherwise { venue?, own?, news }
+         matchup_history: insights ? (buildInsight(insights.insights?.[p.gsis_id], insights.all, scoring, p) || { news: [] }) : undefined,
          sleeper_live_score: sleeperLive 
      };
   }).filter(p => p.proj > 0); 
@@ -301,7 +313,7 @@ const App = () => {
       );
   }
 
-  if (sleeperFilter && active) {
+  if (hideTaken && active) {
       processed = processed.filter(p => p.sleeperStatus === 'MY_TEAM' || p.sleeperStatus === 'FREE_AGENT').sort((a, b) => {
           const aMine = a.sleeperStatus === 'MY_TEAM';
           const bMine = b.sleeperStatus === 'MY_TEAM';
@@ -326,8 +338,6 @@ const App = () => {
      });
   }
 
-  if (hideHighOwn) processed = processed.filter(p => (p.own_pct || 0) <= 80);
-  if (hideMedOwn) processed = processed.filter(p => (p.own_pct || 0) <= 60);
   
   const calculateLeagueAvg = (arr, key) => {
       if (!arr || arr.length === 0) return 0;
@@ -401,10 +411,9 @@ const App = () => {
              <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center gap-4 justify-between">
                 <div className="relative flex-1 min-w-[200px] max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" /><input type="text" placeholder="(e.g. Aubrey, Cowboys, Dome)" className="w-full bg-slate-900 border border-slate-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-blue-500 focus:outline-none placeholder:text-slate-600" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                 <div className="flex items-center gap-4 flex-wrap">
-                    {active && ( <button onClick={() => setSleeperFilter(!sleeperFilter)} title={`Only your kicker(s) and free agents in ${active.name}`} className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded border transition-all ${sleeperFilter ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}><Bot className="w-3 h-3"/> My team + free agents</button> )}
-                    <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
-                    <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideHighOwn} onChange={(e) => setHideHighOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 80% Own</label>
-                    <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer hover:text-white"><input type="checkbox" checked={hideMedOwn} onChange={(e) => setHideMedOwn(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide {'>'} 60% Own</label>
+                    <Hint side="left" text={active ? `Hide kickers on other teams in ${active.name} (yours stay, listed first)` : 'Add a Sleeper league in League Settings to hide kickers who are already taken'}>
+                      <label className={`flex items-center gap-2 text-sm ${active ? 'text-slate-300 cursor-pointer hover:text-white' : 'text-slate-600 cursor-not-allowed'}`}><input type="checkbox" disabled={!active} checked={hideTaken && !!active} onChange={(e) => setHideTaken(e.target.checked)} className="rounded border-slate-700 bg-slate-800 text-blue-500" /> Hide taken</label>
+                    </Hint>
                 </div>
              </div>
              <div className="overflow-x-auto">
@@ -412,15 +421,7 @@ const App = () => {
                 <thead className="text-xs text-slate-400 uppercase bg-slate-950">
                   <tr>
                     <th className="w-10 px-2 py-3 align-middle text-center">Rank</th>
-                    <th 
-                      className="px-2 py-3 align-middle text-left cursor-pointer group w-full min-w-[150px]"
-                      onClick={() => handleSort('own_pct')}
-                    >
-                      <div className="flex items-center gap-1">
-                        <span className={sortConfig.key === 'own_pct' ? "text-blue-400" : "text-slate-300"}>Player</span>
-                        <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </th>
+                    <th className="px-2 py-3 align-middle text-left w-full min-w-[150px] text-slate-300">Player</th>
                     <HeaderCell label="Projection" sortKey="proj" currentSort={sortConfig} onSort={handleSort} description="Projected fantasy points in your league's scoring (whole numbers)" />
                     <HeaderCell label="Matchup Grade" sortKey="grade" currentSort={sortConfig} onSort={handleSort} description={`Offense + Defense (avg ${settings.grade_scale ?? 40} each) + bonuses. Multiplier = grade ÷ ${settings.grade_divisor ?? 90}`} />
                     <HeaderCell label="Weather" description="Kickoff forecast (actual conditions once played): sky, wind and temperature. Dome / closed roof = +10 grade; outdoors at 40°F or below = −20." />
@@ -436,10 +437,10 @@ const App = () => {
                 <tbody className="divide-y divide-slate-800">
                   {processed.map((row, idx) => {
                      const { sleeperStatus } = row;
-                     const isDimmed = sleeperFilter && sleeperStatus === 'TAKEN';
+
                      return (
                         <React.Fragment key={idx}>
-                          <tr onClick={() => toggleRow(idx)} className={`hover:bg-slate-800/50 cursor-pointer transition-colors ${isDimmed ? 'opacity-40 grayscale' : ''} ${sleeperStatus === 'MY_TEAM' && sleeperFilter ? 'bg-purple-900/20' : ''}`}>
+                          <tr onClick={() => toggleRow(idx)} className={`hover:bg-slate-800/50 cursor-pointer transition-colors ${sleeperStatus === 'MY_TEAM' && hideTaken ? 'bg-purple-900/20' : ''}`}>
                             <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}</td>
                             <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} sleeperStatus={sleeperStatus} />
                             <td className={`px-6 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.proj}</td>
