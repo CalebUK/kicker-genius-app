@@ -231,13 +231,22 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
           <span><strong className="text-slate-200">{win} Team PF:</strong> {player.off_ppg != null ? f1(player.off_ppg) : '--'} pts</span>
           <span><strong className="text-slate-200">{win} Opp PA:</strong> {player.def_pa != null ? f1(player.def_pa) : '--'} pts</span>
         </div>
-        {(player.prior_games_used > 0 || player.team_prior_games > 0 || player.opp_prior_games > 0 || c.lgGames > 0) && (
-          <div className="mt-2 text-[10px] text-sky-300/80 text-center">
-            Early season: uses earlier games to fill in. Kicker avg includes {player.prior_games_used || 0} of his {player.games_played} games from earlier seasons
-            {c.lgGames > 0 && <> + {c.lgGames} league-average kicker games (not enough games of his own yet)</>};
-            {' '}{win} team form {player.team_prior_games} from last season, opponent {player.opp_prior_games}.
-          </div>
-        )}
+        {(player.prior_games_used > 0 || player.team_prior_games > 0 || player.opp_prior_games > 0 || c.lgGames > 0) && (() => {
+          // not enough games this season yet -> each number is filled in with earlier games
+          const prior = player.prior_games_used || 0;
+          const winGames = win === 'L3' ? 3 : 5;
+          const kickerParts = [`${(player.games_played || 0) - prior} this season`];
+          if (prior > 0) kickerParts.push(`${prior} from earlier seasons`);
+          if (c.lgGames > 0) kickerParts.push(`${c.lgGames} league-average (not enough of his own)`);
+          const form = (fromLast) => `${winGames - (fromLast || 0)} this season + ${fromLast || 0} from last season`;
+          return (
+            <div className="mt-2 text-[10px] text-sky-300/80 text-center space-y-0.5">
+              <div className="font-bold">Early season: not enough games yet, so earlier games fill in</div>
+              <div>Kicker average: {kickerParts.join(' + ')} = {(player.games_played || 0) + (c.lgGames || 0)} games</div>
+              <div>{win} team form: {form(player.team_prior_games)} · Opponent: {form(player.opp_prior_games)}</div>
+            </div>
+          );
+        })()}
     </div>
   );
 };
