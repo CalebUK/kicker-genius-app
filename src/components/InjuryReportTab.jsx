@@ -1,11 +1,15 @@
 import React from 'react';
-import { Stethoscope, AlertTriangle, ShieldAlert, UserMinus } from 'lucide-react';
+import { ClipboardList, AlertTriangle, ShieldAlert, UserMinus } from 'lucide-react';
 import { InjuryCard } from './KickerComponents';
 
-const InjuryReportTab = ({ injuries, scoring }) => {
+// Game status from CBS Sports; practice participation (DNP / Limited / Full) from the
+// official NFL injury report (engine/injuries.py). Practice-only = listed on the NFL
+// report with no game status yet (early in the week).
+const InjuryReportTab = ({ injuries }) => {
     const bucketQuestionable = injuries.filter(k => k.injury_status === 'Questionable');
     const bucketOutDoubtful = injuries.filter(k => ['OUT', 'Doubtful', 'Inactive'].includes(k.injury_status));
-    const bucketRest = injuries.filter(k => ['IR', 'CUT', 'Practice Squad'].includes(k.injury_status) || k.injury_status.includes('Roster'));
+    const bucketRest = injuries.filter(k => ['IR', 'CUT', 'PUP', 'Practice Squad'].includes(k.injury_status) || (k.injury_status || '').includes('Roster'));
+    const bucketPractice = injuries.filter(k => !k.injury_status && k.practice_status);
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -17,7 +21,7 @@ const InjuryReportTab = ({ injuries, scoring }) => {
                         <h3 className="font-bold text-white">QUESTIONABLE (Start with Caution)</h3>
                     </div>
                     <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {bucketQuestionable.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-yellow-500" textColor="text-yellow-300" scoring={scoring} />)}
+                        {bucketQuestionable.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-yellow-500" textColor="text-yellow-300" />)}
                     </div>
                 </div>
             )}
@@ -30,7 +34,7 @@ const InjuryReportTab = ({ injuries, scoring }) => {
                         <h3 className="font-bold text-white">OUT / DOUBTFUL (Do Not Start)</h3>
                     </div>
                     <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {bucketOutDoubtful.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-red-600" textColor="text-red-300" scoring={scoring} />)}
+                        {bucketOutDoubtful.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-red-600" textColor="text-red-300" />)}
                     </div>
                 </div>
             )}
@@ -43,12 +47,25 @@ const InjuryReportTab = ({ injuries, scoring }) => {
                         <h3 className="font-bold text-white">IR / INACTIVE / PRACTICE SQUAD / RELEASED</h3>
                     </div>
                     <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {bucketRest.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-slate-600" textColor="text-slate-300" scoring={scoring} />)}
+                        {bucketRest.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-slate-600" textColor="text-slate-300" />)}
                     </div>
                 </div>
             )}
 
-            {(!bucketQuestionable.length && !bucketOutDoubtful.length && !bucketRest.length) && (
+            {/* BUCKET 4: PRACTICE REPORT ONLY (no game status yet) */}
+            {bucketPractice.length > 0 && (
+                <div className="bg-sky-900/10 rounded-xl border border-sky-900/50 overflow-hidden">
+                    <div className="p-4 bg-sky-900/20 border-b border-sky-900/50 flex items-center gap-2">
+                        <ClipboardList className="w-5 h-5 text-sky-400" />
+                        <h3 className="font-bold text-white">PRACTICE REPORT <span className="text-xs font-normal text-slate-400">(listed by the NFL, no game status yet)</span></h3>
+                    </div>
+                    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {bucketPractice.map((k, i) => <InjuryCard key={i} k={k} borderColor="border-sky-700" textColor="text-sky-300" />)}
+                    </div>
+                </div>
+            )}
+
+            {(!bucketQuestionable.length && !bucketOutDoubtful.length && !bucketRest.length && !bucketPractice.length) && (
                 <div className="p-12 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">
                     No kickers currently listed on the injury report!
                 </div>

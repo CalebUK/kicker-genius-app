@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, AlertTriangle, ShieldAlert, UserMinus, History, Loader2 } from 'lucide-react';
-import { calcFPts } from '../utils/scoring';
 
 // --- GENERIC HELMET ICON (SVG) ---
 // This replaces the broken 404 images
@@ -101,6 +100,15 @@ const SLEEPER_BADGES = {
   FREE_AGENT: ['FREE AGENT', 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50', 'Available to pick up in your active Sleeper league'],
 };
 
+// practice_status text -> { injury, practice }. The engine writes "Limited practice (Hip)"
+// (official NFL report); CBS may give "Did Not Practice on Thursday" or just "Knee".
+export const splitReport = (details) => {
+  const d = String(details || '').trim();
+  const m = d.match(/^(.+?)\s\((.+)\)$/);
+  if (m) return { practice: m[1], injury: m[2] };
+  return /practice/i.test(d) ? { practice: d, injury: '' } : { practice: '', injury: d };
+};
+
 // --- PLAYER CELL ---
 // Hovering the kicker shows his THIS-season numbers (your scoring) + any injury news.
 export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
@@ -124,10 +132,7 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
   const isAubrey = player.kicker_player_name?.includes('Aubrey') || player.kicker_player_name === 'B.Aubrey';
   const imageUrl = isAubrey ? '/assets/aubrey_custom.png' : player.headshot_url;
 
-  const details = player.injury_details || '';
-  const match = details.match(/^(.+?)\s\((.+)\)$/);
-  let displayInjury = '', displayStatus = '';
-  if (match) { const reportStatus = match[1]; const injuryType = match[2]; displayInjury = `${player.injury_status}: ${injuryType}`; displayStatus = reportStatus; } else { displayInjury = details; }
+  const report = splitReport(player.injury_details);
 
   const sGames = Number(player.season_games) || 0;
   const badge = SLEEPER_BADGES[sleeperStatus];
@@ -173,9 +178,10 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
                       {player.isTop5 && <div className="text-amber-300 text-[10px] mt-0.5">🔥 Top 5 scorer this season</div>}
                     </div>
                   ) : <div className="text-slate-400">No games yet this season</div>}
-                  {statusText !== '' && (
+                  {(statusText || report.injury || report.practice) && (
                     <div className="mt-2 pt-2 border-t border-slate-700">
-                      {match ? ( <> <div className={`font-bold ${textColor} mb-0.5`}>{displayInjury}</div> <div className="text-slate-400 italic">{displayStatus}</div> </> ) : ( <div className={`font-bold ${textColor} break-words`}>{player.injury_status} {details && <span className="text-slate-400 font-normal">({details})</span>}</div> )}
+                      <div className={`font-bold ${statusText ? textColor : 'text-sky-300'} mb-0.5 break-words`}>{[statusText, report.injury].filter(Boolean).join(': ') || 'On the injury report'}</div>
+                      {report.practice && <div className="text-slate-400 italic">{report.practice}</div>}
                     </div>
                   )}
               </div>
@@ -333,9 +339,10 @@ export const DeepDiveRow = ({ player, leagueAvgs, week, settings, sleeperStatus 
   </tr>
 );
 
-export const InjuryCard = ({ k, borderColor, textColor, scoring }) => {
+// Injury Report card. Points = THIS season (the kicker-avg buckets span ~2 seasons).
+export const InjuryCard = ({ k, borderColor, textColor }) => {
      const [imgError, setImgError] = useState(false);
-     const match = (k.injury_details || '').match(/^(.+?)\s\((.+)\)$/);
+     const report = splitReport(k.injury_details);
      
      return (
          <div className={`flex items-center gap-4 p-3 bg-slate-900/80 rounded-lg border ${borderColor} overflow-hidden`}>
@@ -350,8 +357,9 @@ export const InjuryCard = ({ k, borderColor, textColor, scoring }) => {
             )}
             <div className="min-w-0 flex-1">
                <div className="font-bold text-white truncate">{k.kicker_player_name} ({k.team})</div>
-               {match ? ( <> <div className={`text-xs font-bold ${textColor} truncate`}>{k.injury_status}: {match[2]}</div> <div className="text-xs text-slate-400 italic truncate">{match[1]}</div> </> ) : ( <div className={`text-xs ${textColor} break-words`}>{k.injury_details}</div> )}
-               <div className="text-xs text-slate-500 mt-1">Total FPts: {calcFPts(k, scoring)}</div>
+               <div className={`text-xs font-bold ${textColor} truncate`}>{[k.injury_status, report.injury].filter(Boolean).join(': ') || 'On the injury report'}</div>
+               {report.practice && <div className="text-xs text-slate-400 italic truncate">{report.practice}</div>}
+               <div className="text-xs text-slate-500 mt-1">{k.season_games ? `This season: ${Math.round(k.season_pts * 10) / 10} pts in ${k.season_games} game${k.season_games === 1 ? '' : 's'}` : 'No games this season'}</div>
             </div>
          </div>
      );

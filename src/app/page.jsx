@@ -507,7 +507,7 @@ const App = () => {
 
         {activeTab === 'ask' && <AskTab scoring={scoring} currentSeason={data.season} />}
 
-        {activeTab === 'injuries' && <InjuryReportTab injuries={injuries.map(r => toBoardRow(r, windowMode))} scoring={scoring} />}
+        {activeTab === 'injuries' && <InjuryReportTab injuries={injuries.map(r => ({ ...toBoardRow(r, windowMode), ...(seasonStats.get(r.gsis_id) || {}) }))} />}
 
         {activeTab === 'glossary' && <GlossaryTab processed={processed} leagueAvgs={leagueAvgs} meta={meta} />}
       </div>

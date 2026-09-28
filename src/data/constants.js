@@ -54,7 +54,7 @@ export const GLOSSARY_SECTIONS = [
     { header: 'Conditions', title: 'Game Conditions', desc: 'Dome or outdoors, and the weather on the day — snow, rain or clear — plus wind and temperature where recorded.', source: 'nflverse' },
   ] },
   { section: 'Injuries & Settings', items: [
-    { header: 'Injury Status', title: 'Injury Report', desc: 'Game designation (Questionable, Doubtful, Out) and practice status, refreshed every 3 hours. Kickers on IR, the practice squad or inactive are hidden from the Week Model.', source: 'CBS Sports' },
+    { header: 'Injury Status', title: 'Injury Report', desc: 'Game status (Questionable, Doubtful, Out, IR…) from CBS Sports, refreshed every 3 hours, plus practice participation from the official NFL injury report — DNP (did not practice), Limited or Full — updated about daily. Early in the week a kicker can be on the practice report before he has a game status. Kickers on IR, the practice squad or inactive are hidden from the Week Model.', source: 'CBS Sports · NFL report (nflverse)' },
     { header: 'Scoring · Leagues', title: 'Your Scoring', desc: 'Custom scoring, or your saved Sleeper leagues — switch at the top of the page. Every projection, trend and accuracy number uses the active league’s scoring.', source: 'Sleeper' },
   ] },
 ];

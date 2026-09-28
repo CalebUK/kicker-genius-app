@@ -56,7 +56,7 @@ export async function GET() {
                 league_baselines: Object.fromEntries(baselines.map((b) => [String(b.season), b])),
             },
             rankings: rows.filter((r) => !HIDDEN_STATUSES.has(r.injury_status as string)),
-            injuries: rows.filter((r) => r.injury_status),
+            injuries: rows.filter((r) => r.injury_status || r.practice_status),   // + practice-report-only (no game status yet)
             history,
         }, { headers: CACHE_HEADERS });
     } catch (error) {
