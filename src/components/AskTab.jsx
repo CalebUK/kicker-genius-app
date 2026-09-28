@@ -135,6 +135,7 @@ const StatBlock = ({ title, s, accent }) => (
         </div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
           <span className="text-slate-500">Field goals</span><span className="text-right text-slate-200 font-mono">{s.fgMade}/{s.fgAtt} ({pct(s.fgMade, s.fgAtt)})</span>
+          <span className="text-slate-500">FG attempts / game</span><span className="text-right text-slate-200 font-mono">{one(s.fgAtt / s.n)}</span>
           <span className="text-slate-500">FG made / game</span><span className="text-right text-slate-200 font-mono">{one(s.fgMade / s.n)}</span>
           <span className="text-slate-500">0–39 yds</span><span className="text-right text-slate-200 font-mono">{s.short.made}/{s.short.att}</span>
           <span className="text-slate-500">40–49 yds</span><span className="text-right text-slate-200 font-mono">{s.mid.made}/{s.mid.att}</span>
