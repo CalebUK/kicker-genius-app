@@ -2,7 +2,7 @@
 
 Fantasy football kicker projections at [kickergenius.com](https://www.kickergenius.com), built by 16BitHill.
 
-Every kicker gets a weekly matchup grade (his offense's red-zone stall rate vs. the league, plus the opponent's defense) and a 50/30/20 projection that blends his season average, Vegas-implied team totals and his share of team scoring. Projections are scored in **your** league's settings, and you can link a Sleeper league.
+Every kicker gets a weekly matchup grade (red-zone kicker points for his offense and allowed by the opponent, plus dome / cold bonuses) and a 50/30/20 projection that blends his kicker average (his last 34 games), Vegas-implied team totals and his share of team scoring, pulled 40% toward the average kicker. Projections are scored in **your** league's settings, and you can save several Sleeper leagues. The full model is in `MODEL_SPEC.md` in the engine repo.
 
 ## How it fits together
 
@@ -23,10 +23,11 @@ NAS (private, home network)                     Cloud
 
 | Tab | What it shows |
 |---|---|
-| Week Model | This week's projections, grades, Vegas lines and weather, with a worksheet per kicker |
-| Accuracy | Projected vs. actual for every kicker and week, in your scoring, compared with a season-average baseline |
+| Week Model | This week's projections, grades, Vegas lines and weather; a worksheet per kicker with matchup history + news; finished games shown as FINAL |
+| Accuracy | Projected vs. actual for every kicker and week, in your scoring, compared with just using his kicker average |
 | Historical YTD | Season totals: fantasy points, FG %, 50+ makes, dome games, red-zone trips |
-| Injury Report | Kicker injury designations and practice status |
+| Ask | Plain-English questions about any kicker, team or all kickers since 2000 (no AI) |
+| Injury Report | Game status (CBS) + official NFL practice participation |
 | Stats Legend | How every number is calculated |
 
 ## Running locally
@@ -42,4 +43,4 @@ npm install
 npm run dev
 ```
 
-The API routes (`/api/dashboard`, `/api/projections`, `/api/ytd`) run server-side; the database URL never reaches the browser.
+The API routes (`/api/dashboard`, `/api/projections`, `/api/ytd`, `/api/insights`, `/api/ask/*`) run server-side; the database URL never reaches the browser. Phones get card layouts (under 768px); tablets and computers get the tables.

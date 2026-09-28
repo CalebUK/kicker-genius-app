@@ -88,66 +88,6 @@ export const calcProjection = (p, w, scoring, settings, baseline) => {
   return { proj: Math.round(raw), raw, model, lg, pull, avg, ratio, mult, base, off, def, fptsSeason, lgGames, wb, wo, wd };
 };
 
-export const calculateLiveScore = (p, scoring) => {
-  // 1. Check for Sleeper Override (Real-time)
-  if (p.sleeper_live_score !== undefined && p.sleeper_live_score !== null) {
-      return p.sleeper_live_score;
-  }
-
-  // 2. Fallback to Python Engine Data
-  
-  // Calculate Granular Miss Penalty
-  const granularMissPenalty = 
-    ((p.wk_fg_miss_0_19||0) * scoring.fg_miss_0_19) +
-    ((p.wk_fg_miss_20_29||0) * scoring.fg_miss_20_29) +
-    ((p.wk_fg_miss_30_39||0) * scoring.fg_miss_30_39) +
-    ((p.wk_fg_miss_40_49||0) * scoring.fg_miss_40_49) +
-    ((p.wk_fg_miss_50_59||0) * scoring.fg_miss_50_59) +
-    ((p.wk_fg_miss_60_plus||0) * scoring.fg_miss_60_plus);
-
-  // Calculate General Penalty (Fallback)
-  const totalMisses = p.wk_fg_miss || 0;
-  const hasGranularData = (
-      (p.wk_fg_miss_0_19||0) + (p.wk_fg_miss_20_29||0) + (p.wk_fg_miss_30_39||0) + 
-      (p.wk_fg_miss_40_49||0) + (p.wk_fg_miss_50_59||0) + (p.wk_fg_miss_60_plus||0)
-  ) > 0;
-
-  const missPenalty = hasGranularData ? granularMissPenalty : (totalMisses * scoring.fg_miss);
-
-  return (
-      // Makes
-      ((p.wk_fg_0_19 || 0) * scoring.fg0_19) +
-      ((p.wk_fg_20_29 || 0) * scoring.fg20_29) +
-      ((p.wk_fg_30_39 || 0) * scoring.fg30_39) +
-      ((p.wk_fg_40_49 || 0) * scoring.fg40_49) +
-      ((p.wk_fg_50_59 || 0) * scoring.fg50_59) +
-      ((p.wk_fg_60_plus || 0) * scoring.fg60_plus) +
-      
-      // XP
-      ((p.wk_xp_made || 0) * scoring.xp_made) +
-      ((p.wk_xp_miss || 0) * scoring.xp_miss) +
-      
-      // Miss Penalty (Smart Logic)
-      missPenalty
-  );
-};
-
-export const getGameStatus = (gameDtStr) => {
-  if (!gameDtStr) return 'UPCOMING';
-  try {
-      const gameDate = new Date(`${gameDtStr.replace(' ', 'T')}-05:00`);
-      if (isNaN(gameDate.getTime())) return 'UPCOMING';
-
-      const now = new Date();
-      const diffMs = now - gameDate;
-      const diffHours = diffMs / (1000 * 60 * 60);
-      
-      if (diffHours < 0) return 'UPCOMING';
-      if (diffHours >= 0 && diffHours < 4.5) return 'LIVE'; 
-      return 'FINISHED';
-  } catch (e) { return 'UPCOMING'; }
-};
-
 // --- SLEEPER LIVE FETCH ---
 export const fetchSleeperScores = async (leagueId, week) => {
     if (!leagueId || !week) return {};

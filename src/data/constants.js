@@ -80,7 +80,3 @@ export const SCORING_CONFIG = [
   { label: "60+ Yards", makeKey: "fg60_plus", missKey: "fg_miss_60_plus" },
   { label: "PAT", makeKey: "xp_made", missKey: "xp_miss" }
 ];
-
-export const SETTING_LABELS = {
-  // Kept for legacy support if needed
-};

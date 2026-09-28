@@ -156,7 +156,7 @@ const AskTab = ({ scoring, currentSeason }) => {
   // Subject is ONE of: a kicker (gsis id), a team (all its kickers), or ALL
   // KICKERS (league-wide scenario).
   const [view, setView] = useState(viewFromUrl);
-  const { asked, kickerId, teamAbbr, allMode, filters } = view;
+  const { kickerId, teamAbbr, allMode, filters } = view;
   const [question, setQuestion] = useState(view.asked);   // the text box (committed on Ask)
   const [notes, setNotes] = useState([]);
   const [gamesByKey, setGamesByKey] = useState({});

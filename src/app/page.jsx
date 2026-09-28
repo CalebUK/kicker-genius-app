@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Filter, Target, ArrowUpDown, Calculator, Database, ChevronDown, ChevronUp, Gamepad2, BrainCircuit, MessageCircleQuestionMark, ShieldAlert, UserMinus, PlayCircle, CheckCircle2, Clock, Bot } from 'lucide-react';
-// import { Analytics } from '@vercel/analytics/react';
+import { TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Target, ChevronDown, ChevronUp, Gamepad2, MessageCircleQuestionMark, Clock } from 'lucide-react';
 
 import { BUY_ME_A_COFFEE_URL } from '../data/constants';
 import useLeagues from '../utils/useLeagues';
@@ -536,7 +535,7 @@ const App = () => {
                             <td className="px-4 py-4 text-center font-mono text-slate-300">{Number(row.off_ppg).toFixed(1)} {row.off_ppg < 15 && <Hint side="left" text={`Cold offense: his team averages under 15 points per game (${winLabel})`}>❄️</Hint>}</td>
                             <td className="px-4 py-4 text-center font-mono text-slate-300">{Number(row.def_pa).toFixed(1)} {row.def_pa < 17 && <Hint side="left" text={`Tough defense: the opponent allows under 17 points per game (${winLabel})`}>🛡️</Hint>}</td>
                           </tr>
-                          {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} settings={settings} sleeperStatus={sleeperStatus}/>}
+                          {expandedRow === idx && <DeepDiveRow player={row} leagueAvgs={leagueAvgs} week={meta.week} settings={settings}/>}
                         </React.Fragment>
                      );
                   })}

@@ -443,7 +443,7 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
   );
 };
 
-export const DeepDiveRow = ({ player, leagueAvgs, week, settings, sleeperStatus }) => (
+export const DeepDiveRow = ({ player, leagueAvgs, week, settings }) => (
   <tr className="bg-slate-900/50 border-b border-slate-800">
     <td colSpan="11" className="p-4">
       <MathCard player={player} leagueAvgs={leagueAvgs} week={week} settings={settings} />
@@ -462,7 +462,8 @@ export const InjuryCard = ({ k, borderColor, textColor }) => {
                <HelmetIcon borderColor={borderColor} />
             ) : (
                <img 
-                 src={k.headshot_url} 
+                 src={k.headshot_url}
+                 alt={k.kicker_player_name} 
                  className={`w-12 h-12 rounded-full border-2 object-cover flex-shrink-0 ${borderColor.replace('border', 'border-')}`} 
                  onError={() => setImgError(true)} 
                />
