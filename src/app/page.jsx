@@ -74,6 +74,13 @@ const RedZoneCell = ({ kp, trips, stall, className }) => (
   </td>
 );
 
+// "2026-09-28 06:00 UTC" -> "Sep 28 06:00 UTC" (header's last-update chip)
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const shortStamp = (s) => {
+  const m = /^\d{4}-(\d{2})-(\d{2}) (.*)$/.exec(s || '');
+  return m ? `${MONTHS[Number(m[1]) - 1]} ${Number(m[2])} ${m[3]}` : s;
+};
+
 // Both read the cloud DB: /api/dashboard = Week Model + weekly snapshots
 // (Accuracy tab, trends); /api/ytd = Historical YTD season totals.
 const loadSiteData = async () => {
@@ -343,27 +350,28 @@ const App = () => {
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2"><img src="/assets/logo.png" alt="KickerGenius" className="w-12 h-12 object-contain" /><h1 className="text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
             <p className="text-slate-400 ml-1">Advanced Stall Rate Analytics & Fantasy Projections</p>
           </div>
-          <div className="flex flex-wrap gap-3">
-             <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noopener noreferrer" className="bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 px-4 py-2 rounded flex items-center gap-2 border border-amber-500/40 transition-colors text-sm font-semibold">☕ Buy me a coffee</a>
+          {/* compact controls: one line (beside the title on wide screens, under it otherwise) */}
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+             <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noopener noreferrer" className="h-8 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 px-3 rounded flex items-center gap-1.5 border border-amber-500/40 transition-colors font-semibold whitespace-nowrap">☕ Buy me a coffee</a>
              {/* league switcher: every tab uses the active league's scoring + rosters */}
              {lg.leagues.length > 0 && (
-               <label className="bg-slate-800 border border-slate-700 rounded flex items-center gap-2 pl-3 pr-1 text-white">
-                 <Gamepad2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
+               <label className="h-8 bg-slate-800 border border-slate-700 rounded flex items-center gap-1.5 pl-2.5 pr-1 text-white">
+                 <Gamepad2 className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
                  <span className="sr-only">Active league</span>
-                 <select value={lg.activeId} onChange={(e) => lg.switchLeague(e.target.value)} className="bg-transparent py-2 pr-1 text-sm font-semibold focus:outline-none max-w-[190px] cursor-pointer">
+                 <select value={lg.activeId} onChange={(e) => lg.switchLeague(e.target.value)} className="bg-transparent pr-1 font-semibold focus:outline-none max-w-[160px] cursor-pointer">
                    {lg.leagues.map((l) => <option key={l.id} value={l.id} className="bg-slate-900">{l.name}</option>)}
                    <option value="" className="bg-slate-900">Custom scoring</option>
                  </select>
                  {lg.busy === lg.activeId && lg.activeId && <Loader2 className="w-3 h-3 animate-spin text-slate-400" />}
                </label>
              )}
-             <button onClick={() => goTab('settings')} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded flex items-center gap-2 border border-slate-700 transition-colors"><Settings className="w-4 h-4" /> {lg.leagues.length ? 'League Settings' : 'Add your Sleeper league'}</button>
-             <div className="bg-slate-900 border border-slate-800 rounded-lg p-2 flex items-center gap-3 shadow-sm px-4"><div className="text-right"><div className="text-[10px] text-slate-500 uppercase font-bold">Last Update</div><div className="text-xs font-semibold text-white">{meta.updated} (Week {meta.week})</div></div></div>
+             <button onClick={() => goTab('settings')} className="h-8 bg-slate-800 hover:bg-slate-700 text-white px-3 rounded flex items-center gap-1.5 border border-slate-700 transition-colors font-semibold whitespace-nowrap"><Settings className="w-3.5 h-3.5" /> {lg.leagues.length ? 'League Settings' : 'Add your Sleeper league'}</button>
+             <div title={`Data last updated ${meta.updated}`} className="h-8 bg-slate-900 border border-slate-800 rounded px-3 flex items-center gap-1.5 whitespace-nowrap text-white font-semibold"><Clock className="w-3.5 h-3.5 text-slate-500" />{shortStamp(meta.updated)} · Wk {meta.week}</div>
           </div>
         </div>
 
