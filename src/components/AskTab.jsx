@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { MessageCircleQuestionMark, Search, Snowflake, CloudRain, Sun, Wind, House, Warehouse, Plane, Loader2, AlertTriangle, Info } from 'lucide-react';
 import { calcFPts } from '../utils/scoring';
 import { HelmetIcon } from './KickerComponents';
@@ -359,7 +360,7 @@ const AskTab = ({ scoring, currentSeason }) => {
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center gap-4">
             {teamMode || allMode
               ? <div className="w-14 h-14 shrink-0 rounded-full border-2 border-slate-700 bg-slate-950 flex items-center justify-center text-sm font-black text-slate-300">{allMode ? 'ALL' : teamAbbr}</div>
-              : kicker.headshot_url ? <img src={kicker.headshot_url} alt={kicker.name} className="w-14 h-14 rounded-full border-2 border-slate-700 object-cover bg-slate-950" /> : <HelmetIcon />}
+              : kicker.headshot_url ? <Image src={kicker.headshot_url} alt={kicker.name} width={56} height={56} className="w-14 h-14 rounded-full border-2 border-slate-700 object-cover bg-slate-950" /> : <HelmetIcon />}
             <div>
               <div className="text-base md:text-lg font-bold text-white leading-snug">{verdict()}</div>
               {kicker?.team_history && <div className="text-[11px] text-slate-500 mt-1">Teams: {kicker.team_history}</div>}

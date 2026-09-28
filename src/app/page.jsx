@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { TrendingUp, Activity, Stethoscope, BookOpen, Settings, AlertTriangle, Loader2, Search, Target, ChevronDown, ChevronUp, Gamepad2, MessageCircleQuestionMark, Clock } from 'lucide-react';
 
 import { BUY_ME_A_COFFEE_URL } from '../data/constants';
@@ -235,7 +236,7 @@ const App = () => {
     <div className="min-h-screen bg-slate-950 p-4 md:p-8" aria-busy="true">
       <div className="max-w-6xl mx-auto animate-pulse">
         <div className="flex items-center justify-center sm:justify-start gap-3 mb-6">
-          <img src="/assets/logo.png" alt="KickerGenius" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
+          <Image src="/assets/logo.png" alt="KickerGenius" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1>
         </div>
         <div className="flex gap-2 mb-6 justify-center sm:justify-start">{[0, 1, 2].map(i => <div key={i} className="h-8 w-32 rounded bg-slate-800" />)}</div>
@@ -429,7 +430,7 @@ const App = () => {
         {/* Header */}
         <div className="mb-5 sm:mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <div className="flex items-center justify-center sm:justify-start gap-3 sm:mb-2"><img src="/assets/logo.png" alt="KickerGenius" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" /><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
+            <div className="flex items-center justify-center sm:justify-start gap-3 sm:mb-2"><Image src="/assets/logo.png" alt="KickerGenius" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" /><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
             <p className="hidden sm:block text-slate-400 ml-1">Kicker projections built for your league&apos;s scoring</p>
           </div>
           {/* compact controls: one line from 640px (beside the title on wide screens); on phones a centred block: coffee + settings side by side, league switcher, then the update pill */}
