@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
 import { ArrowUp, ArrowDown, ArrowUpDown, Info, Flame, Calculator, Target, History, Loader2, ChevronUp, ChevronDown } from 'lucide-react';
 
+// How a finished game went vs its projection -- the same rule everywhere (Week Model
+// "Final", Last 3 trend, Accuracy tab): more than 3 over = smash, within ±3 = met,
+// more than 3 under = bust.
+export const resultBand = (actual, proj) => {
+  const d = Number(actual) - Number(proj);
+  return d > 3 ? 'smash' : d < -3 ? 'bust' : 'met';
+};
+export const RESULT_STYLE = {
+  smash: { text: 'text-blue-400', bar: 'bg-blue-500', fire: true, label: 'Smashed it (4+ over)' },
+  met: { text: 'text-emerald-400', bar: 'bg-emerald-500', fire: false, label: 'Met it (within 3)' },
+  bust: { text: 'text-red-400', bar: 'bg-red-500', fire: false, label: 'Busted (4+ under)' },
+};
+
 // --- GENERIC HELMET ICON (SVG) ---
 // This replaces the broken 404 images
 export const HelmetIcon = ({ borderColor }) => (
@@ -49,8 +62,8 @@ export const HeaderCell = ({ label, description, avg, sortKey, currentSort, onSo
   return (
     <th onClick={() => onSort && onSort(sortKey)} className={`px-2 py-3 text-center align-middle group relative cursor-pointer leading-tight min-w-[90px] select-none hover:bg-slate-800/80 transition-colors ${isActive ? 'bg-slate-800/50' : ''}`}>
       <div className="flex flex-col items-center justify-center h-full gap-0.5">
-        <div className="flex items-center gap-1 mt-0.5"><span className={isActive ? "text-blue-400" : "text-slate-300"}>{label}</span>{onSort && (isActive ? (currentSort.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-blue-400" /> : <ArrowDown className="w-3 h-3 text-blue-400" />) : (<ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />))}</div>
-        <Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
+        <span className={`mt-0.5 ${isActive ? "text-blue-400" : "text-slate-300"}`}>{label}</span>
+        <div className="flex items-center gap-1"><Info className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />{onSort && (isActive ? (currentSort.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-blue-400" /> : <ArrowDown className="w-3 h-3 text-blue-400" />) : (<ArrowUpDown className="w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />))}</div>
       </div>
       <div className={`absolute top-full ${tipRight ? 'right-0' : 'left-1/2 -translate-x-1/2'} mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-xl text-xs normal-case font-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-normal text-left cursor-auto`}>
         <div className="text-white font-semibold mb-1">{description}</div>
@@ -70,9 +83,9 @@ export const HistoryBars = ({ games }) => {
         const projRounded = Math.round(g.proj); const diff = g.act - projRounded; const maxVal = Math.max(20, projRounded, g.act); const projPct = (projRounded / maxVal) * 100; const actPct = (g.act / maxVal) * 100;
         return (
           <div key={i} className="text-[11px]">
-            <div className="flex justify-between text-slate-400 mb-0.5 font-bold"><span>Wk {g.week} vs {g.opp}</span><span className={g.act >= projRounded ? "text-green-400" : "text-red-400"}>{g.act >= projRounded ? "+" : ""}{diff}</span></div>
-            <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative"><div className="bg-slate-600 h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2" style={{ width: `${projPct}%` }}><span className="text-[11px] text-white font-bold leading-none">Projection {projRounded}</span></div></div>
-            <div className="w-full bg-slate-800/50 h-4 rounded-full relative"><div className={`${g.act >= projRounded ? "bg-green-500" : "bg-red-500"} h-full rounded-full overflow-hidden whitespace-nowrap flex items-center px-2`} style={{ width: `${actPct}%` }}><span className="text-[11px] text-white font-bold leading-none">Actual {g.act}</span></div></div>
+            <div className="flex justify-between text-slate-400 mb-0.5 font-bold"><span>Wk {g.week} vs {g.opp}</span><span className={RESULT_STYLE[resultBand(g.act, projRounded)].text}>{diff > 0 ? "+" : ""}{diff}{RESULT_STYLE[resultBand(g.act, projRounded)].fire ? " 🔥" : ""}</span></div>
+            <div className="w-full bg-slate-800/50 h-4 rounded-full mb-1 relative overflow-hidden"><div className="absolute inset-y-0 left-0 bg-slate-600 rounded-full" style={{ width: `${projPct}%` }} /><span className="relative z-10 flex items-center h-full px-2 text-[11px] text-white font-bold leading-none whitespace-nowrap">Projection {projRounded}</span></div>
+            <div className="w-full bg-slate-800/50 h-4 rounded-full relative overflow-hidden"><div className={`absolute inset-y-0 left-0 ${RESULT_STYLE[resultBand(g.act, projRounded)].bar} rounded-full`} style={{ width: `${actPct}%` }} /><span className="relative z-10 flex items-center h-full px-2 text-[11px] text-white font-bold leading-none whitespace-nowrap">Actual {g.act}</span></div>
           </div>
         );
       })}
@@ -140,7 +153,7 @@ export const KickerCard = ({ row, rank, expanded, onToggle, highlight, children 
   const l3Good = (row.l3_act_sum ?? 0) >= (row.l3_proj_sum ?? 0);
   const rz = (kp, stall) => (kp != null ? f1(kp) : `${stall ?? '–'}%`);
   return (
-    <div className={`${highlight ? 'bg-purple-950' : 'bg-slate-900'} ${expanded ? 'sm:col-span-2' : ''} ${row.final_pts != null && !expanded ? 'opacity-60' : ''}`}>
+    <div className={`${highlight ? 'bg-purple-950' : 'bg-slate-900'} ${expanded ? 'sm:col-span-2' : ''} ${row.final_pts != null && !expanded ? 'opacity-80' : ''}`}>
       <button type="button" onClick={onToggle} aria-expanded={expanded} className="w-full text-left px-3 py-3 flex gap-3 active:bg-slate-800/60 transition-colors">
         <div className="flex flex-col items-center gap-1 w-12 shrink-0">
           {imgError || !url ? <HelmetIcon borderColor={ring} /> : <img src={url} alt={row.kicker_player_name} className={`w-12 h-12 rounded-full border-2 object-cover ${ring}`} onError={() => setImgError(true)} />}
@@ -171,7 +184,7 @@ export const KickerCard = ({ row, rank, expanded, onToggle, highlight, children 
             // his game is over: what he scored, with the projection underneath
             <>
               <span className="text-[11px] font-bold uppercase text-slate-400 leading-none">Final</span>
-              <span className="text-2xl font-black leading-none text-white">{Math.round(row.final_pts * 10) / 10}</span>
+              <span className={`text-2xl font-black leading-none ${RESULT_STYLE[resultBand(row.final_pts, row.proj)].text}`} title={RESULT_STYLE[resultBand(row.final_pts, row.proj)].label}>{Math.round(row.final_pts * 10) / 10}{RESULT_STYLE[resultBand(row.final_pts, row.proj)].fire && <span className="text-base align-top"> 🔥</span>}</span>
               <span className="text-[11px] text-slate-500 mt-0.5">proj {row.proj}</span>
             </>
           ) : (

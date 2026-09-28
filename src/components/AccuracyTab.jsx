@@ -53,8 +53,8 @@ const QuartileCard = ({ diffs }) => {
       {diffs.length < 4 ? <div className="text-[11px] text-slate-500">Needs 4+ finished games</div> : (
         <>
           <div className="flex justify-between items-end relative h-8 px-1">
-            <div className="absolute left-0 top-0 text-[8px] text-white font-bold -translate-y-full">Min: {fmt(minV)}</div>
-            <div className="absolute right-0 top-0 text-[8px] text-white font-bold -translate-y-full">Max: {fmt(maxV)}</div>
+            <div className="absolute left-0 top-0 text-[11px] text-white font-bold -translate-y-full">Min: {fmt(minV)}</div>
+            <div className="absolute right-0 top-0 text-[11px] text-white font-bold -translate-y-full">Max: {fmt(maxV)}</div>
             {Array.from({ length: 10 }, (_, i) => {
               const inMiddle = i >= q1i && i <= q3i;
               return (
@@ -65,7 +65,7 @@ const QuartileCard = ({ diffs }) => {
               );
             })}
           </div>
-          <div className="text-[8px] text-slate-500 text-center mt-1 flex justify-center gap-3">
+          <div className="text-[11px] text-slate-500 text-center mt-1 flex justify-center gap-3">
             <span>Q1: {fmt(q1)}</span><span className="text-blue-400">Middle 50%</span><span>Q3: {fmt(q3)}</span>
           </div>
         </>
@@ -113,16 +113,16 @@ const SummaryCards = ({ s }) => {
       <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-center shadow-lg">
         <div className="text-xs font-bold text-slate-500 uppercase mb-2 flex items-center gap-1"><TrendingUp className="w-3 h-3 text-purple-500"/> Performance</div>
         <div className="flex justify-between items-end text-xs font-bold w-full px-1">
-          <div className="text-emerald-400 flex flex-col items-center"><span>{s.smashes}</span><span className="text-[8px] text-slate-500 font-normal">SMASH</span></div>
-          <div className="text-slate-200 flex flex-col items-center"><span>{s.within}</span><span className="text-[8px] text-slate-500 font-normal">MET</span></div>
-          <div className="text-red-400 flex flex-col items-center"><span>{s.busts}</span><span className="text-[8px] text-slate-500 font-normal">BUST</span></div>
+          <div className="text-blue-400 flex flex-col items-center"><span>{s.smashes}</span><span className="text-[11px] text-slate-500 font-normal">SMASH</span></div>
+          <div className="text-emerald-400 flex flex-col items-center"><span>{s.within}</span><span className="text-[11px] text-slate-500 font-normal">MET</span></div>
+          <div className="text-red-400 flex flex-col items-center"><span>{s.busts}</span><span className="text-[11px] text-slate-500 font-normal">BUST</span></div>
         </div>
         <div className="w-full h-2 bg-slate-800 rounded-full mt-1 flex overflow-hidden">
-          <div className="bg-emerald-500 h-full" style={{ width: `${pct(s.smashes, s.n)}%` }}></div>
-          <div className="bg-slate-400 h-full" style={{ width: `${pct(s.within, s.n)}%` }}></div>
+          <div className="bg-blue-500 h-full" style={{ width: `${pct(s.smashes, s.n)}%` }}></div>
+          <div className="bg-emerald-500 h-full" style={{ width: `${pct(s.within, s.n)}%` }}></div>
           <div className="bg-red-500 h-full" style={{ width: `${pct(s.busts, s.n)}%` }}></div>
         </div>
-        <div className="flex justify-between text-[8px] text-slate-600 mt-0.5"><span>&gt;+3</span><span>+/-3</span><span>&lt;-3</span></div>
+        <div className="flex justify-between text-[11px] text-slate-600 mt-0.5"><span>&gt;+3</span><span>+/-3</span><span>&lt;-3</span></div>
       </div>
       <QuartileCard diffs={s.diffs} />
       <BaselineCard s={s} />
@@ -141,7 +141,7 @@ const GameCard = ({ g }) => {
   const [imgError, setImgError] = useState(false);
   const scored = g.actual != null;
   const perfPct = scored && g.proj > 0 ? Math.round((g.actual / g.proj) * 100) : 0;
-  const isBeat = scored && g.actual >= g.proj;
+  const isBust = scored && g.actual < g.proj - 3;
   const isSmashed = scored && g.actual > g.proj + 3;
   const visualPct = Math.min(100, Math.max(5, perfPct));
   const { cls, Icon } = STATUS_STYLE[g.status];
@@ -164,7 +164,7 @@ const GameCard = ({ g }) => {
 
       <div className="flex justify-between items-end mb-2">
         <div>
-          <span className={`text-3xl font-black ${isSmashed ? 'text-blue-400' : isBeat ? 'text-emerald-400' : 'text-white'}`}>{scored ? Math.round(g.actual * 10) / 10 : '–'}</span>
+          <span className={`text-3xl font-black ${isSmashed ? 'text-blue-400' : isBust ? 'text-red-400' : scored ? 'text-emerald-400' : 'text-white'}`}>{scored ? Math.round(g.actual * 10) / 10 : '–'}</span>
           <span className="text-xs text-slate-500 ml-1">pts</span>
         </div>
         <div className="text-xs text-slate-400 font-bold text-right">PROJECTED: <span className="text-white text-base">{g.proj}</span></div>
@@ -178,7 +178,7 @@ const GameCard = ({ g }) => {
           <div className="absolute inset-0 flex justify-between px-4 items-center pointer-events-none">
             {[...Array(9)].map((_, i) => <div key={i} className={i === 4 ? 'h-full w-0.5 bg-white/80' : 'h-[60%] w-px bg-white/40'}></div>)}
           </div>
-          <div className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBeat ? 'bg-emerald-500/60' : 'bg-yellow-500/50'}`} style={{ width: `${visualPct}%` }}></div>
+          <div className={`h-full transition-all duration-1000 ease-out z-10 relative ${isSmashed ? 'bg-blue-500/60' : isBust ? 'bg-red-500/60' : 'bg-emerald-500/60'}`} style={{ width: `${visualPct}%` }}></div>
           <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 transition-all duration-1000 ease-out z-30 flex items-center justify-center drop-shadow-lg" style={{ left: `calc(${visualPct}% - 16px)` }}>
             <FootballIcon isFire={isSmashed} />
           </div>

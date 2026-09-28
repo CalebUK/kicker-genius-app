@@ -9,7 +9,7 @@ import useLeagues from '../utils/useLeagues';
 import { buildInsight } from '../utils/insights';
 import { TEAMS } from '../utils/askParser';
 import { calcFPts, calcProjection, weekKicks, fetchSleeperScores } from '../utils/scoring';
-import { HeaderCell, PlayerCell, DeepDiveRow, Hint, KickerCard, MathCard, YtdCard } from '../components/KickerComponents';
+import { HeaderCell, PlayerCell, DeepDiveRow, Hint, KickerCard, MathCard, YtdCard, resultBand, RESULT_STYLE } from '../components/KickerComponents';
 import AccuracyTab from '../components/AccuracyTab';
 import SettingsTab from '../components/SettingsTab';
 import InjuryReportTab from '../components/InjuryReportTab';
@@ -521,11 +521,11 @@ const App = () => {
 
                      return (
                         <React.Fragment key={idx}>
-                          <tr onClick={() => toggleRow(idx)} tabIndex={0} aria-expanded={expandedRow === idx} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(idx); } }} className={`hover:bg-slate-800/50 focus:outline-none focus-visible:bg-slate-800/70 cursor-pointer transition-colors ${row.final_pts != null ? 'opacity-60' : ''} ${sleeperStatus === 'MY_TEAM' && hideTaken ? 'bg-purple-900/20' : ''}`}>
+                          <tr onClick={() => toggleRow(idx)} tabIndex={0} aria-expanded={expandedRow === idx} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(idx); } }} className={`hover:bg-slate-800/50 focus:outline-none focus-visible:bg-slate-800/70 cursor-pointer transition-colors ${row.final_pts != null ? 'opacity-80' : ''} ${sleeperStatus === 'MY_TEAM' && hideTaken ? 'bg-purple-900/20' : ''}`}>
                             <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}<div className="flex justify-center text-slate-600 mt-1">{expandedRow === idx ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}</div></td>
                             <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} sleeperStatus={sleeperStatus} />
                             <td className={`px-4 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.final_pts != null
-                              ? <div className="leading-tight"><div className="text-[11px] font-bold uppercase text-slate-400">Final</div><div className="text-white">{Math.round(row.final_pts * 10) / 10} <span className="text-[11px] font-normal text-slate-400">pts</span></div><div className="text-[11px] font-normal text-slate-500">proj {row.proj}</div></div>
+                              ? <div className="leading-tight"><div className="text-[11px] font-bold uppercase text-slate-400">Final</div><div className={RESULT_STYLE[resultBand(row.final_pts, row.proj)].text} title={RESULT_STYLE[resultBand(row.final_pts, row.proj)].label}>{Math.round(row.final_pts * 10) / 10}{RESULT_STYLE[resultBand(row.final_pts, row.proj)].fire ? ' 🔥' : ''} <span className="text-[11px] font-normal text-slate-400">pts</span></div><div className="text-[11px] font-normal text-slate-500">proj {row.proj}</div></div>
                               : row.proj}</td>
                             <td className="px-4 py-4 text-center"><span className={`px-2 py-1 rounded font-bold ${row.grade > 100 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'}`}>{row.grade}</span></td>
                             <td className="px-4 py-4 text-center text-xs font-mono text-slate-400">{row.weather_desc}</td>
