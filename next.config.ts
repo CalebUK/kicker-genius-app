@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     // Next serves small WebP copies sized for the screen instead.
     remotePatterns: [{ protocol: "https", hostname: "static.www.nfl.com" }],
     formats: ["image/webp"],
+    qualities: [75, 90],
     // photos rarely change: keep the resized copies for 30 days
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },

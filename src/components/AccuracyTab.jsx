@@ -155,7 +155,7 @@ const GameCard = ({ g }) => {
       <div className="flex items-center gap-3 mb-4">
         {imgError || !g.headshot_url
           ? <HelmetIcon />
-          : <Image src={g.headshot_url} alt={g.kicker_name} width={48} height={48} className="w-12 h-12 rounded-full border-2 border-slate-700 object-cover bg-slate-950" onError={() => setImgError(true)} />}
+          : <Image src={g.headshot_url} alt={g.kicker_name} width={96} height={96} quality={90} className="w-12 h-12 rounded-full border-2 border-slate-700 object-cover bg-slate-950" onError={() => setImgError(true)} />}
         <div className="min-w-0 flex-1">
           <div className="font-bold text-white text-sm truncate">{g.kicker_name}</div>
           <div className="text-xs text-slate-500">{g.team} vs {g.opponent}</div>

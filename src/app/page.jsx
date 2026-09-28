@@ -236,7 +236,7 @@ const App = () => {
     <div className="min-h-screen bg-slate-950 p-4 md:p-8" aria-busy="true">
       <div className="max-w-6xl mx-auto animate-pulse">
         <div className="flex items-center justify-center sm:justify-start gap-3 mb-6">
-          <Image src="/assets/logo.png" alt="KickerGenius" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
+          <Image src="/assets/logo.png" alt="KickerGenius" width={96} height={96} quality={90} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1>
         </div>
         <div className="flex gap-2 mb-6 justify-center sm:justify-start">{[0, 1, 2].map(i => <div key={i} className="h-8 w-32 rounded bg-slate-800" />)}</div>
@@ -430,7 +430,7 @@ const App = () => {
         {/* Header */}
         <div className="mb-5 sm:mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <div className="flex items-center justify-center sm:justify-start gap-3 sm:mb-2"><Image src="/assets/logo.png" alt="KickerGenius" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" /><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
+            <div className="flex items-center justify-center sm:justify-start gap-3 sm:mb-2"><Image src="/assets/logo.png" alt="KickerGenius" width={96} height={96} quality={90} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" /><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kicker<span className="text-blue-500">Genius</span></h1></div>
             <p className="hidden sm:block text-slate-400 ml-1">Kicker projections built for your league&apos;s scoring</p>
           </div>
           {/* compact controls: one line from 640px (beside the title on wide screens); on phones a centred block: coffee + settings side by side, league switcher, then the update pill */}
@@ -521,7 +521,7 @@ const App = () => {
 
                      return (
                         <React.Fragment key={idx}>
-                          <tr onClick={() => toggleRow(idx)} tabIndex={0} aria-expanded={expandedRow === idx} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(idx); } }} className={`hover:bg-slate-800/50 focus:outline-none focus-visible:bg-slate-800/70 cursor-pointer transition-colors ${row.final_pts != null ? 'opacity-80' : ''} ${sleeperStatus === 'MY_TEAM' && hideTaken ? 'bg-purple-900/20' : ''}`}>
+                          <tr onClick={() => toggleRow(idx)} tabIndex={0} aria-expanded={expandedRow === idx} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(idx); } }} className={`hover:bg-slate-800/50 focus:outline-none focus-visible:bg-slate-800/70 cursor-pointer transition-colors ${row.final_pts != null ? '[&>td:not(:nth-child(2))]:opacity-80' : ''} ${sleeperStatus === 'MY_TEAM' && hideTaken ? 'bg-purple-900/20' : ''}`}>
                             <td className="w-10 px-2 py-4 font-mono text-slate-500 text-center">#{idx + 1}<div className="flex justify-center text-slate-600 mt-1">{expandedRow === idx ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}</div></td>
                             <PlayerCell player={row} subtext={`${row.team} vs ${row.opponent}`} sleeperStatus={sleeperStatus} />
                             <td className={`px-4 py-4 text-center text-lg font-bold ${row.proj === 0 ? 'text-red-500' : 'text-emerald-400'}`}>{row.final_pts != null

@@ -157,7 +157,7 @@ export const KickerCard = ({ row, rank, expanded, onToggle, highlight, children 
     <div className={`${highlight ? 'bg-purple-950' : 'bg-slate-900'} ${expanded ? 'sm:col-span-2' : ''} ${row.final_pts != null && !expanded ? 'opacity-80' : ''}`}>
       <button type="button" onClick={onToggle} aria-expanded={expanded} className="w-full text-left px-3 py-3 flex gap-3 active:bg-slate-800/60 transition-colors">
         <div className="flex flex-col items-center gap-1 w-12 shrink-0">
-          {imgError || !url ? <HelmetIcon borderColor={ring} /> : <Image src={url} alt={row.kicker_player_name} width={48} height={48} className={`w-12 h-12 rounded-full border-2 object-cover ${ring}`} onError={() => setImgError(true)} />}
+          {imgError || !url ? <HelmetIcon borderColor={ring} /> : <Image src={url} alt={row.kicker_player_name} width={96} height={96} quality={90} className={`w-12 h-12 rounded-full border-2 object-cover ${ring}`} onError={() => setImgError(true)} />}
           <span className="text-[11px] font-mono text-slate-500">#{rank}</span>
         </div>
         <div className="flex-1 min-w-0">
@@ -210,7 +210,7 @@ export const YtdCard = ({ row, rank }) => {
   return (
     <div className="px-3 py-3 flex gap-3 bg-slate-900">
       <div className="flex flex-col items-center gap-1 w-12 shrink-0">
-        {imgError || !url ? <HelmetIcon borderColor="border-slate-600" /> : <Image src={url} alt={row.kicker_player_name} width={48} height={48} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={() => setImgError(true)} />}
+        {imgError || !url ? <HelmetIcon borderColor="border-slate-600" /> : <Image src={url} alt={row.kicker_player_name} width={96} height={96} quality={90} className="w-12 h-12 rounded-full border-2 border-slate-600 object-cover" onError={() => setImgError(true)} />}
         <span className="text-[11px] font-mono text-slate-500">#{rank}</span>
       </div>
       <div className="flex-1 min-w-0">
@@ -269,8 +269,9 @@ export const PlayerCell = ({ player, subtext, sleeperStatus }) => {
                 ) : (
                     <Image
                         src={imageUrl}
-                        width={48}
-                        height={48}
+                        width={96}
+                        height={96}
+                        quality={90}
                         alt={player.kicker_player_name}
                         className={`w-12 h-12 rounded-full border-2 object-cover shrink-0 ${borderColor}`}
                         onError={() => setImgError(true)}
@@ -466,8 +467,9 @@ export const InjuryCard = ({ k, borderColor, textColor }) => {
             ) : (
                <Image
                  src={k.headshot_url}
-                 width={48}
-                 height={48}
+                 width={96}
+                 height={96}
+                 quality={90}
                  alt={k.kicker_player_name} 
                  className={`w-12 h-12 rounded-full border-2 object-cover flex-shrink-0 ${borderColor}`} 
                  onError={() => setImgError(true)} 
