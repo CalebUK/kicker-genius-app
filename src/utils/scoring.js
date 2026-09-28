@@ -56,7 +56,7 @@ export const weekKicks = (r) => ({
  * `p` is a matchup_inputs_weekly or historical_projections row: the database's
  * scoring-independent ingredients (multiplier, real-point offense/defense) plus
  * season-to-date kick buckets. `w` is 'l3' | 'l5'. `settings` = model_settings.
- *   Base    = season avg fantasy pts x multiplier
+ *   Base    = kicker avg fantasy pts (his last ~34 games) x multiplier
  *   Offense = expected team pts x real-point share x fantasy/real ratio
  *   Defense = expected opp pts allowed x real-point share x fantasy/real ratio
  * Then pulled toward the league average: final = lg + league_pull x (model - lg),

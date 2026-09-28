@@ -192,6 +192,14 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
   const bonuses = Object.entries(player.bonuses || {});
   const hasVegas = player.vegas_implied != null;
   const win = player.win_label || 'L5';
+  // what the Kicker Avg is built on: his last N games (all of this season + his latest
+  // earlier games), plus league-average games for rookies -- MODEL_SPEC §2
+  const priorGames = player.prior_games_used || 0;
+  const avgGames = player.games_played == null ? null : [
+    `Kicker avg = his last ${player.games_played} game${player.games_played === 1 ? '' : 's'}`,
+    `(${player.games_played - priorGames} in ${player.season ?? 'this season'}${priorGames ? ` + ${priorGames} before` : ''})`,
+    c.lgGames > 0 ? `+ ${c.lgGames} league-average (rookie)` : '',
+  ].filter(Boolean).join(' ');
 
   return (
     <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
@@ -210,7 +218,7 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
           </div>
           <div className="bg-slate-900 p-3 rounded border border-slate-800/50 flex flex-col gap-2">
             <div className="text-amber-400 font-bold mb-1 pb-1 border-b border-slate-800">WEIGHTED PROJECTION</div>
-            <div><div className="flex justify-between text-xs text-slate-300"><span>Base ({wLabel(c.wb)})</span><span className="font-mono text-white">{f1(c.base * c.wb)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(c.avg)} (Season Avg) × {f2(c.mult)} (Mult) = {f1(c.base)}</div></div>
+            <div><div className="flex justify-between text-xs text-slate-300"><span>Base ({wLabel(c.wb)})</span><span className="font-mono text-white">{f1(c.base * c.wb)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(c.avg)} (Kicker Avg) × {f2(c.mult)} (Mult) = {f1(c.base)}</div>{avgGames && <div className="text-[9px] text-sky-300/70 leading-tight">{avgGames}</div>}</div>
             <div><div className="flex justify-between text-xs text-slate-300"><span>Offense ({wLabel(c.wo)})</span><span className="font-mono text-white">{f1(c.off * c.wo)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(player.exp_team_pts)} (Exp Pts) × {pctOf(player.off_share)} (Share) × {f2(c.ratio)} (Fan/Real) = {f1(c.off)}</div></div>
             <div><div className="flex justify-between text-xs text-slate-300"><span>Defense ({wLabel(c.wd)})</span><span className="font-mono text-white">{f1(c.def * c.wd)}</span></div><div className="text-[9px] text-slate-500 leading-tight">{f1(player.exp_opp_allowed)} (Exp Allowed) × {pctOf(player.def_share)} (Share) × {f2(c.ratio)} (Fan/Real) = {f1(c.def)}</div></div>
             {c.lg != null && c.pull !== 1 && (
@@ -231,19 +239,13 @@ export const MathCard = ({ player, leagueAvgs, week, settings }) => {
           <span><strong className="text-slate-200">{win} Team PF:</strong> {player.off_ppg != null ? f1(player.off_ppg) : '--'} pts</span>
           <span><strong className="text-slate-200">{win} Opp PA:</strong> {player.def_pa != null ? f1(player.def_pa) : '--'} pts</span>
         </div>
-        {(player.prior_games_used > 0 || player.team_prior_games > 0 || player.opp_prior_games > 0 || c.lgGames > 0) && (() => {
-          // not enough games this season yet -> each number is filled in with earlier games
-          const prior = player.prior_games_used || 0;
+        {(player.team_prior_games > 0 || player.opp_prior_games > 0) && (() => {
+          // the team windows still reach into last season early on
           const winGames = win === 'L3' ? 3 : 5;
-          const kickerParts = [`${(player.games_played || 0) - prior} this season`];
-          if (prior > 0) kickerParts.push(`${prior} from earlier seasons`);
-          if (c.lgGames > 0) kickerParts.push(`${c.lgGames} league-average (not enough of his own)`);
           const form = (fromLast) => `${winGames - (fromLast || 0)} this season + ${fromLast || 0} from last season`;
           return (
-            <div className="mt-2 text-[10px] text-sky-300/80 text-center space-y-0.5">
-              <div className="font-bold">Early season: not enough games yet, so earlier games fill in</div>
-              <div>Kicker average: {kickerParts.join(' + ')} = {(player.games_played || 0) + (c.lgGames || 0)} games</div>
-              <div>{win} team form: {form(player.team_prior_games)} · Opponent: {form(player.opp_prior_games)}</div>
+            <div className="mt-2 text-[10px] text-sky-300/80 text-center">
+              Early season: {win} team form uses {form(player.team_prior_games)} · Opponent: {form(player.opp_prior_games)}
             </div>
           );
         })()}

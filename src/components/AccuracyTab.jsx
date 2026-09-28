@@ -7,7 +7,7 @@ import { FootballIcon, HelmetIcon } from './KickerComponents';
 // Projections are rebuilt from the locked weekly snapshots (projection_results_weekly)
 // with the model_settings in force that week; actuals come from that week's kicks.
 // Only games actually played are scored -- upcoming / did-not-play games never count.
-// "Baseline" = the kicker's season average going into the week: the model has to
+// "Baseline" = the kicker average going into the week (his last ~34 games): the model has to
 // beat it to be adding anything (MODEL_SPEC.md / BEFORE_SEASON_LIVE.md "Model tuning").
 
 const ALL = 'ALL';
@@ -74,7 +74,7 @@ const QuartileCard = ({ diffs }) => {
   );
 };
 
-// --- Model vs "just use his season average" ---
+// --- Model vs "just use his kicker average" ---
 const BaselineCard = ({ s }) => {
   const beats = s.maeModel != null && s.maeModel < s.maeBase;
   return (
@@ -86,7 +86,7 @@ const BaselineCard = ({ s }) => {
             <span className={`text-2xl font-black ${beats ? 'text-emerald-400' : 'text-amber-400'}`}>{s.maeModel.toFixed(2)}</span>
             <span className="text-xs text-slate-400">vs {s.maeBase.toFixed(2)}</span>
           </div>
-          <div className="text-[10px] text-slate-400">Avg miss (pts): model vs season avg</div>
+          <div className="text-[10px] text-slate-400">Avg miss (pts): model vs his average</div>
           <div className={`text-[10px] font-bold mt-0.5 ${beats ? 'text-emerald-400' : 'text-amber-400'}`}>
             {beats ? `Model better by ${(s.maeBase - s.maeModel).toFixed(2)}` : `Baseline better by ${(s.maeModel - s.maeBase).toFixed(2)}`}
           </div>
@@ -213,7 +213,7 @@ const ByWeekStrip = ({ byWeek }) => {
         <BarChart3 className="w-3 h-3 text-sky-400"/> Avg miss by week
         <span className="normal-case font-normal flex items-center gap-3 ml-auto">
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-sky-500"></span>Model</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-slate-500"></span>Season avg</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-slate-500"></span>His average</span>
         </span>
       </div>
       <div className="space-y-1.5">
@@ -260,7 +260,7 @@ const SeasonTable = ({ games }) => {
             <th className="px-3 py-3 text-center">+/-</th>
             <th className="px-3 py-3 text-center">Within ±3</th>
             <th className="px-3 py-3 text-center">Avg Miss</th>
-            <th className="px-3 py-3 text-center">vs Season Avg</th>
+            <th className="px-3 py-3 text-center">vs His Avg</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-800">

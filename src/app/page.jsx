@@ -204,15 +204,18 @@ const App = () => {
 
   const boardRows = rankings.filter(r => !r.is_bye).map(r => toBoardRow(r, windowMode));
 
+  // Season Rank / Avg-per-game Rank: THIS season's real totals (/api/ytd), in the
+  // user's scoring. (The board rows' kick buckets are the kicker average -- his last
+  // ~34 games across seasons -- so they can't be used for season ranks.)
   const ytdRankMap = new Map();
-  [...boardRows].sort((a, b) => calcFPts(b, scoring) - calcFPts(a, scoring)).forEach((p, i) => ytdRankMap.set(p.kicker_player_name, i + 1));
+  [...ytd].sort((a, b) => calcFPts(b, scoring) - calcFPts(a, scoring)).forEach((p, i) => ytdRankMap.set(p.gsis_id, i + 1));
 
   const ppgRankMap = new Map();
   const gamesThreshold = (meta.week - 1) * 0.5;
-  [...boardRows]
-    .filter(p => p.games > 0 && p.games >= gamesThreshold)
+  [...ytd]
+    .filter(p => Number(p.games) > 0 && Number(p.games) >= gamesThreshold)
     .sort((a, b) => (calcFPts(b, scoring) / b.games) - (calcFPts(a, scoring) / a.games))
-    .forEach((p, i) => ppgRankMap.set(p.kicker_player_name, i + 1));
+    .forEach((p, i) => ppgRankMap.set(p.gsis_id, i + 1));
 
   // Locked weekly snapshots (projection_results_weekly), grouped by kicker.
   const snapshotsByKicker = new Map();
@@ -275,8 +278,8 @@ const App = () => {
          l3_act_sum, 
          acc_diff: l3_act_sum - l3_proj_sum, 
          sleeperStatus,
-         ytdRank: ytdRankMap.get(p.kicker_player_name),
-         ppgRank: ppgRankMap.get(p.kicker_player_name),
+         ytdRank: ytdRankMap.get(p.gsis_id),
+         ppgRank: ppgRankMap.get(p.gsis_id),
          sleeper_live_score: sleeperLive 
      };
   }).filter(p => p.proj > 0); 
