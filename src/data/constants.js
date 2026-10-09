@@ -36,7 +36,7 @@ export const GLOSSARY_SECTIONS = [
     { header: 'Kicker Quartile', title: 'Kicker Quartile', desc: 'The spread of (actual − projected): the lowest and highest, the median (M), and the middle half of kickers highlighted. Needs 4+ finished games.', source: 'KickerGenius weekly snapshots' },
     { header: 'Avg Miss', title: 'Average Miss', desc: 'The average size of the miss, |actual − projected|, in points. Kicker scoring is noisy: even a model that knew the final score would miss by about 3.4 on average.', source: 'KickerGenius weekly snapshots' },
     { header: 'Model vs Baseline', title: 'Model vs His Average', desc: "Average miss of our projection vs simply guessing each kicker's Kicker Avg. Lower is better — the model should win.", source: 'KickerGenius weekly snapshots' },
-    { header: 'Sleeper Live', title: 'Live Scores', desc: 'During games, live points from your active Sleeper league, in that league’s own scoring.', source: 'Sleeper' },
+    { header: 'Sleeper Live', title: 'Live Scores', desc: 'Once his game is under way, live points from your active Sleeper league, in that league’s own scoring (FINAL with "Sleeper score" = his game is over and the official stats are on their way). Before kickoff he shows as UPCOMING.', source: 'Sleeper' },
   ] },
   { section: 'Historical YTD', intro: "This season's real totals (not the Kicker Avg), in your scoring.", items: [
     { header: 'Fantasy Points', title: 'Fantasy Points', desc: 'Total fantasy points this season.', source: 'nflverse play-by-play' },

@@ -133,6 +133,7 @@ const SummaryCards = ({ s }) => {
 
 const STATUS_STYLE = {
   LIVE: { cls: 'bg-red-900/50 text-red-400 animate-pulse', Icon: PlayCircle },
+  FINAL: { cls: 'bg-emerald-900/30 text-emerald-400', Icon: CheckCircle2 },   // over; Sleeper's points until the official stats land
   FINISHED: { cls: 'bg-emerald-900/30 text-emerald-400', Icon: CheckCircle2 },
   UPCOMING: { cls: 'bg-blue-900/30 text-blue-400', Icon: Clock },
   DNP: { cls: 'bg-slate-800 text-slate-500', Icon: Minus },
@@ -187,7 +188,7 @@ const GameCard = ({ g }) => {
       )}
 
       <div className="flex flex-wrap gap-1.5">
-        {g.usingSleeper && <span className="text-[11px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded border border-purple-700 flex items-center gap-1"><Bot className="w-3 h-3" /> Sleeper Live</span>}
+        {g.usingSleeper && <span className="text-[11px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded border border-purple-700 flex items-center gap-1"><Bot className="w-3 h-3" /> {g.status === 'LIVE' ? 'Sleeper Live' : 'Sleeper score'}</span>}
         {scored && g.proj > 0 && <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded border ${perfPct >= 100 ? 'bg-emerald-900/50 text-emerald-400 border-emerald-700' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>{perfPct}% of Proj</span>}
         {g.status === 'FINISHED' && (
           <>
@@ -312,7 +313,8 @@ const AccuracyTab = ({ history, season, week, players, scoring, windowMode, slee
 
   const games = useMemo(() => {
     if (!rows) return [];
-    const today = new Date().toISOString().slice(0, 10);
+    // the NFL's own (US Eastern) date: a Sunday night game is still "today" after midnight UTC
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
     const live = new Map(players.map(p => [p.gsis_id, p]));
     return rows.map(h => {
       const c = calcProjection(h, windowMode, scoring, h.model_settings, leagueBaselines?.[h.season]);
@@ -320,13 +322,15 @@ const AccuracyTab = ({ history, season, week, players, scoring, windowMode, slee
       const sleeper = current?.sleeper_live_score;
       let status = 'UPCOMING', actual = null;
       if (h.played) { status = 'FINISHED'; actual = calcFPts(weekKicks(h), scoring); }
-      else if (sleeper != null) { status = 'LIVE'; actual = sleeper; }
+      // Sleeper lists every rostered kicker at 0 until his game starts, so only a real score
+      // on his game day counts as live (no kickoff times in the data)
+      else if (sleeper && h.gameday && h.gameday <= today) { status = h.gameday < today ? 'FINAL' : 'LIVE'; actual = sleeper; }
       else if (h.gameday ? h.gameday < today : h.season < season) { status = 'DNP'; }
       return {
         ...h,
         headshot_url: live.get(h.gsis_id)?.headshot_url,
         proj: c.proj, projRaw: c.raw, baseline: c.avg,
-        actual, status, usingSleeper: status === 'LIVE',
+        actual, status, usingSleeper: status === 'LIVE' || status === 'FINAL',
       };
     });
   }, [rows, players, scoring, windowMode, season, week, leagueBaselines]);
@@ -340,7 +344,7 @@ const AccuracyTab = ({ history, season, week, players, scoring, windowMode, slee
     .map(w => ({ week: w, s: summarize(games.filter(g => g.week === w)) }))
     .filter(w => w.s.n > 0), [weeks, games]);
 
-  const order = { LIVE: 0, FINISHED: 0, UPCOMING: 1, DNP: 2 };
+  const order = { LIVE: 0, FINAL: 0, FINISHED: 0, UPCOMING: 1, DNP: 2 };
   const cards = [...inView].sort((a, b) =>
     order[a.status] - order[b.status] || (b.actual ?? -99) - (a.actual ?? -99) || b.proj - a.proj);
 
